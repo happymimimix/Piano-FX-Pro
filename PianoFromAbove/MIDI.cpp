@@ -365,6 +365,9 @@ int MIDI::ParseTracks( const unsigned char *pcData, size_t iMaxSize )
     }
     while ( iMaxSize - iTotal > 0 && iCount > 0 && m_Info.iFormatType != 2 );
 
+    // Some MIDIs lie about the amount of tracks
+    m_Info.iNumTracks = iTrack;
+
     return iTotal;
 }
 
