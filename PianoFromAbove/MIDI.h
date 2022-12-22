@@ -17,7 +17,6 @@
 using namespace std;
 
 #include "Misc.h"
-#include "robin_hood.h"
 
 //Classes defined in this file
 class MIDI;
@@ -48,6 +47,8 @@ public:
     int GetTicksPerBeat() const { return m_iTicksPerBeat; }
     int GetTicksPerSecond() const { return m_iTicksPerSecond; }
     int GetMicroSecsPerBeat() const { return m_iMicroSecsPerBeat; }
+
+    int* m_pTrackTime;
 
 private:
     // Where are we in the file?
@@ -134,11 +135,6 @@ public:
 
     const MIDIInfo& GetInfo() const { return m_Info; }
     const vector< MIDITrack* >& GetTracks() const { return m_vTracks; }
-
-protected:
-    robin_hood::unordered_map<int, std::pair<std::vector<MIDIEvent*>::iterator, std::vector<MIDIEvent*>>> midi_map;
-    std::vector<int> midi_map_times;
-    size_t midi_map_times_pos = 0;
 
 private:
     static void InitArrays();

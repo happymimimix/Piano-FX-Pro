@@ -8,11 +8,11 @@
 *
 *************************************************************************************************/
 #include "MIDI.h"
-#include "robin_hood.h"
 #include <fstream>
 #include <stack>
 #include <array>
 #include <ppl.h>
+#include <immintrin.h>
 
 //std::map<int, std::pair<std::vector<MIDIEvent*>::iterator, std::vector<MIDIEvent*>>> midi_map;
 MIDILoadingProgress g_LoadingProgress;
@@ -28,9 +28,12 @@ MIDIPos::MIDIPos( MIDI &midi ) : m_MIDI( midi )
 
     // Init track positions
     size_t iTracks = m_MIDI.m_vTracks.size();
-    for (size_t i = 0; i < iTracks; i++) {
+    size_t iTracksRounded = (iTracks + 8) & ~7; // Need to round up to 32 bytes, each int is 4 bytes
+    m_pTrackTime = (int*)_aligned_malloc(iTracksRounded * sizeof(int), 32);
+    for (size_t i = 0; i < iTracks; i++)
         m_vTrackPos.push_back(0);
-    }
+    for (size_t i = 0; i < iTracksRounded; i++)
+        m_pTrackTime[i] = INT_MAX;
 
     // Init SMPTE tempo
     if ( m_MIDI.m_Info.iDivision & 0x8000 )
@@ -53,6 +56,45 @@ MIDIPos::MIDIPos( MIDI &midi ) : m_MIDI( midi )
     }
 }
 
+// https://github.com/WojciechMula/toys/blob/master/simd-min-index/avx2.cpp
+size_t min_index_avx2(int32_t* array, size_t size) {
+    const __m256i increment = _mm256_set1_epi32(8);
+    __m256i indices = _mm256_setr_epi32(0, 1, 2, 3, 4, 5, 6, 7);
+    __m256i minindices = indices;
+    __m256i minvalues = _mm256_loadu_si256((__m256i*)array);
+
+    for (size_t i = 8; i < size; i += 8) {
+
+        indices = _mm256_add_epi32(indices, increment);
+
+        const __m256i values = _mm256_loadu_si256((__m256i*)(array + i));
+        const __m256i lt = _mm256_cmpgt_epi32(minvalues, values);
+        minindices = _mm256_blendv_epi8(minindices, indices, lt);
+        minvalues = _mm256_min_epi32(values, minvalues);
+    }
+
+    // find min index in vector result (in an extremely naive way)
+    int32_t values_array[8];
+    uint32_t indices_array[8];
+
+    _mm256_storeu_si256((__m256i*)values_array, minvalues);
+    _mm256_storeu_si256((__m256i*)indices_array, minindices);
+
+    size_t  minindex = indices_array[0];
+    int32_t minvalue = values_array[0];
+    for (int i = 1; i < 8; i++) {
+        if (values_array[i] < minvalue) {
+            minvalue = values_array[i];
+            minindex = indices_array[i];
+        }
+        else if (values_array[i] == minvalue) {
+            minindex = min(minindex, size_t(indices_array[i]));
+        }
+    }
+
+    return minindex;
+}
+
 // Gets the next closest event as long as it occurs before iMicroSecs elapse
 // Always get next event if iMicroSecs is negative
 int MIDIPos::GetNextEvent( int iMicroSecs, MIDIEvent **pOutEvent )
@@ -61,18 +103,31 @@ int MIDIPos::GetNextEvent( int iMicroSecs, MIDIEvent **pOutEvent )
     *pOutEvent = NULL;
 
     // Get the next closest event
-    MIDIEvent *pMinEvent = NULL;
-
-    if (m_MIDI.midi_map_times_pos != m_MIDI.midi_map_times.size()) {
-        auto& pair = m_MIDI.midi_map[m_MIDI.midi_map_times[m_MIDI.midi_map_times_pos]];
-        pMinEvent = *pair.first;
-        if (++pair.first == pair.second.end())
-            m_MIDI.midi_map_times_pos++;
+    /*
+    MIDIEvent* pMinEvent = NULL;
+    size_t iMinPos = 0;
+    size_t iTracks = m_vTrackPos.size();
+    for (size_t i = 0; i < iTracks; i++)
+    {
+        size_t pos = m_vTrackPos[i];
+        if (pos < m_MIDI.m_vTracks[i]->m_vEvents.size() &&
+            (!pMinEvent || m_vTrackTime[i] < pMinEvent->GetAbsT()))
+        {
+            pMinEvent = m_MIDI.m_vTracks[i]->m_vEvents[pos];
+            iMinPos = i;
+        }
     }
 
     // No min found. We're at the end of file
-    if ( !pMinEvent )
+    if (iMinPos == -1)
         return 0;
+    */
+    size_t iTracks = m_vTrackPos.size();
+    int iMinPos = (int)min_index_avx2(m_pTrackTime, (iTracks + 8) & ~7);
+    if (m_pTrackTime[iMinPos] == INT_MAX)
+        return 0;
+
+    MIDIEvent* pMinEvent = m_MIDI.m_vTracks[iMinPos]->m_vEvents[m_vTrackPos[iMinPos]];
 
     // Make sure the event doesn't occur after the requested time window
     int iMaxTickAllowed = m_iCurrTick;
@@ -93,7 +148,8 @@ int MIDIPos::GetNextEvent( int iMicroSecs, MIDIEvent **pOutEvent )
             iSpan = ( 1000000LL * iSpan ) / m_iTicksPerSecond - m_iCurrMicroSec;
         m_iCurrTick = pMinEvent->GetAbsT();
         m_iCurrMicroSec = 0;
-        //m_vTrackPos[iMinPos]++;
+        m_vTrackPos[iMinPos]++;
+        m_pTrackTime[iMinPos] = m_vTrackPos[iMinPos] == m_MIDI.m_vTracks[iMinPos]->m_vEvents.size() ? INT_MAX : m_MIDI.m_vTracks[iMinPos]->m_vEvents[m_vTrackPos[iMinPos]]->GetAbsT();
 
         // Change the tempo going forward if we're at a SetTempo event
         if ( pMinEvent->GetEventType() == MIDIEvent::MetaEvent )
@@ -302,9 +358,6 @@ void MIDI::clear( void )
         delete *it;
     m_vTracks.clear();
     m_Info.clear();
-    midi_map.clear();
-    midi_map_times.clear();
-    midi_map_times_pos = 0;
     event_pools.clear();
 }
 
@@ -431,8 +484,11 @@ void MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vP
     int iSimultaneous = 0;
 
     size_t event_count = 0;
-    for (auto track : m_vTracks)
-        event_count += track->m_vEvents.size();
+    for (int i = 0; i < m_vTracks.size(); i++) {
+        event_count += m_vTracks[i]->m_vEvents.size();
+        if (!m_vTracks[i]->m_vEvents.empty())
+            midiPos.m_pTrackTime[i] = m_vTracks[i]->m_vEvents[0]->GetAbsT();
+    }
 
     g_LoadingProgress.stage = MIDILoadingProgress::Stage::SortEvents;
     g_LoadingProgress.progress = 0;
@@ -511,10 +567,6 @@ void MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vP
 
     m_Info.llTotalMicroSecs = llTime;
     m_Info.llFirstNote = max( 0LL, llFirstNote );
-
-    midi_map.clear();
-    midi_map_times.clear();
-    midi_map_times_pos = 0;
 }
 
 void MIDI::ConnectNotes()
@@ -631,8 +683,6 @@ size_t MIDITrack::ParseEvents( const unsigned char *pcData, size_t iMaxSize, int
     while ( iMaxSize - iTotal > 0 && iCount > 0 &&
             ( pEvent->GetEventType() != MIDIEvent::MetaEvent ||
               reinterpret_cast< MIDIMetaEvent* >( pEvent )->GetMetaEventType() != MIDIMetaEvent::EndOfTrack ) );
-
-    std::sort(m_MIDI.midi_map_times.begin(), m_MIDI.midi_map_times.end());
 
     return iTotal;
 }
@@ -764,11 +814,13 @@ int MIDIEvent::MakeNextEvent( MIDI& midi, const unsigned char *pcData, size_t iM
     (*pOutEvent)->m_iAbsT = iDT;
     if ( pPrevEvent ) (*pOutEvent)->m_iAbsT += pPrevEvent->m_iAbsT;
 
+    /*
     auto& key = midi.midi_map[(*pOutEvent)->m_iAbsT];
     key.second.push_back(*pOutEvent);
     key.first = key.second.begin();
     if (key.second.size() == 1)
         midi.midi_map_times.push_back((*pOutEvent)->m_iAbsT);
+    */
 
     return iTotal;
 }

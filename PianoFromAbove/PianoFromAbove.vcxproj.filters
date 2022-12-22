@@ -78,9 +78,6 @@
     <ClInclude Include="tinyxml\tinyxml.h">
       <Filter>Header Files\TinyXML</Filter>
     </ClInclude>
-    <ClInclude Include="robin_hood.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="d3dx12\d3dx12.h">
       <Filter>Header Files\d3dx12</Filter>
     </ClInclude>
@@ -341,7 +338,7 @@
       <Filter>Source Files\imgui</Filter>
     </ClCompile>
     <ClCompile Include="imgui\imgui_freetype.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\imgui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

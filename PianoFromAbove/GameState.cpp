@@ -637,6 +637,7 @@ MainScreen::MainScreen( wstring sMIDIFile, State eGameMode, HWND hWnd, D3D12Rend
     // Finish off midi processing
     if ( !m_MIDI.IsValid() ) return;
     m_MIDI.ConnectNotes(); // Order's important here
+    m_vEvents.reserve(m_MIDI.GetInfo().iEventCount);
     m_MIDI.PostProcess(m_vEvents, &m_vProgramChange, &m_vMetaEvents, &m_vTempo, &m_vSignature, &m_vMarkers);
 
     // Allocate

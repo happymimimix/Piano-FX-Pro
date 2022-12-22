@@ -20,7 +20,6 @@ using namespace std;
 #include "Renderer.h"
 #include "MIDI.h"
 #include "Misc.h"
-#include "robin_hood.h"
 
 //Abstract base class
 class GameState
