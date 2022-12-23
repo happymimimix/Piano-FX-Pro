@@ -331,7 +331,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
         .PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
         .NumRenderTargets = 1,
         .RTVFormats = {
-            DXGI_FORMAT_R8G8B8A8_UNORM,
+            DXGI_FORMAT_B8G8R8A8_UNORM,
         },
         .DSVFormat = DXGI_FORMAT_D32_FLOAT,
         .SampleDesc = {
@@ -638,7 +638,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     style.Colors[ImGuiCol_WindowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.50f);
 
     ImGui_ImplWin32_Init(hWnd);
-    ImGui_ImplDX12_Init(m_pDevice.Get(), FrameCount, DXGI_FORMAT_R8G8B8A8_UNORM, imgui_heap, imgui_heap->GetCPUDescriptorHandleForHeapStart(), imgui_heap->GetGPUDescriptorHandleForHeapStart());
+    ImGui_ImplDX12_Init(m_pDevice.Get(), FrameCount, DXGI_FORMAT_B8G8R8A8_UNORM, imgui_heap, imgui_heap->GetCPUDescriptorHandleForHeapStart(), imgui_heap->GetGPUDescriptorHandleForHeapStart());
 
     return std::make_tuple(S_OK, "");
 }
@@ -656,7 +656,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::CreateWindowDependentObjects(HWN
         }
 
         // Resize the swap chain
-        res = m_pSwapChain->ResizeBuffers(FrameCount, 0, 0, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING);
+        res = m_pSwapChain->ResizeBuffers(FrameCount, 0, 0, DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING);
         if (FAILED(res))
             return std::make_tuple(res, "ResizeBuffers");
     } else {
@@ -665,7 +665,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::CreateWindowDependentObjects(HWN
         DXGI_SWAP_CHAIN_DESC1 swap_chain_desc = {
             .Width = 0,
             .Height = 0,
-            .Format = DXGI_FORMAT_R8G8B8A8_UNORM,
+            .Format = DXGI_FORMAT_B8G8R8A8_UNORM,
             .Stereo = FALSE,
             .SampleDesc = {
                 .Count = 1,
@@ -1237,7 +1237,7 @@ char* D3D12Renderer::Screenshot() {
     D3D12_PLACED_SUBRESOURCE_FOOTPRINT footprint = {
         .Offset = 0,
         .Footprint = {
-            .Format = DXGI_FORMAT_R8G8B8A8_UNORM,
+            .Format = DXGI_FORMAT_B8G8R8A8_UNORM,
             .Width = (UINT)m_iBufferWidth,
             .Height = (UINT)m_iBufferHeight,
             .Depth = 1,
