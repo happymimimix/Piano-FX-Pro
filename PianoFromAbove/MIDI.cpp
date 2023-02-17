@@ -198,25 +198,34 @@ int MIDIPos::GetNextEvents( int iMicroSecs, vector< MIDIEvent* > &vEvents )
 
 MIDI::MIDI ( const wstring &sFilename )
 {
+    FILE* stream;
+
     // Open the file
-    ifstream ifs( sFilename, ios::in | ios::binary | ios::ate );
-    if ( !ifs.is_open() )
-        return;
+    if (_wfopen_s(&stream, sFilename.c_str(), L"rb") == 0)
+    {
+        // Go to the end of the file to get the max size
+        _fseeki64(stream, 0, SEEK_END);
+        size_t iSize = static_cast<size_t>(_ftelli64(stream));
+        unsigned char* pcMemBlock = new unsigned char[iSize];
 
-    // Read it all in
-    size_t iSize = ifs.tellg();
-    unsigned char *pcMemBlock = new unsigned char[iSize];
-    ifs.seekg( 0, ios::beg );
-    ifs.read( reinterpret_cast< char* >( pcMemBlock ), iSize );
-    ifs.close();
+        // Go to the beginning of the file to prepare for parsing
+        if (_fseeki64(stream, 0, SEEK_SET))
+            MessageBoxA(NULL, "_fseeki64 encountered an error.", "Piano From Above", MB_OK | MB_ICONERROR);
 
-    // Parse it
-    int iTotal = ParseMIDI ( pcMemBlock, iSize );
-    m_Info.sFilename = sFilename;
-    //Util::MD5( pcMemBlock, iSize, m_Info.sMd5 );
- 
-    // Clean up
-    delete[] pcMemBlock;
+        // Parse the entire MIDI to memory
+        fread(reinterpret_cast<char*>(pcMemBlock), 1, iSize, stream);
+
+        // Close the stream, since it's not needed anymore
+        fclose(stream);
+
+        // Parse it
+        size_t iTotal = ParseMIDI(pcMemBlock, iSize);
+        m_Info.sFilename = sFilename;
+        // Util::MD5( pcMemBlock, iSize, m_Info.sMd5 );
+
+        // Clean up
+        delete[] pcMemBlock;
+    }
 }
 
 MIDI::~MIDI( void )
@@ -361,7 +370,7 @@ void MIDI::clear( void )
     event_pools.clear();
 }
 
-int MIDI::ParseMIDI( const unsigned char *pcData, size_t iMaxSize )
+size_t MIDI::ParseMIDI( const unsigned char *pcData, size_t iMaxSize )
 {
     char pcBuf[4];
     size_t iTotal;
@@ -392,7 +401,7 @@ int MIDI::ParseMIDI( const unsigned char *pcData, size_t iMaxSize )
     return iTotal + ParseTracks( pcData + iTotal, iMaxSize - iTotal );
 }
 
-int MIDI::ParseTracks( const unsigned char *pcData, size_t iMaxSize )
+size_t MIDI::ParseTracks( const unsigned char *pcData, size_t iMaxSize )
 {
     size_t iTotal = 0, iCount = 0, iTrack = m_vTracks.size();
     g_LoadingProgress.stage = MIDILoadingProgress::Stage::ParseTracks;
@@ -424,11 +433,11 @@ int MIDI::ParseTracks( const unsigned char *pcData, size_t iMaxSize )
     return iTotal;
 }
 
-int MIDI::ParseEvents( const unsigned char *pcData, size_t iMaxSize )
+size_t MIDI::ParseEvents( const unsigned char *pcData, size_t iMaxSize )
 {
     // Create and parse the track
     MIDITrack *track = new MIDITrack(*this);
-    int iCount = track->ParseEvents( pcData, iMaxSize, static_cast< int >( m_vTracks.size() ) );
+    size_t iCount = track->ParseEvents( pcData, iMaxSize, static_cast< int >( m_vTracks.size() ) );
 
     // If Success, add it to the list
     if ( iCount > 0 ) {

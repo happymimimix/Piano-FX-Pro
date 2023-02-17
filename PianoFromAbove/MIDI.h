@@ -99,9 +99,9 @@ public:
     MIDIChannelEvent* AllocChannelEvent();
 
     //Parsing functions that load data into the instance
-    int ParseMIDI( const unsigned char *pcData, size_t iMaxSize );
-    int ParseTracks( const unsigned char *pcData, size_t iMaxSize );
-    int ParseEvents( const unsigned char *pcData, size_t iMaxSize );
+    size_t ParseMIDI( const unsigned char *pcData, size_t iMaxSize );
+    size_t ParseTracks( const unsigned char *pcData, size_t iMaxSize );
+    size_t ParseEvents( const unsigned char *pcData, size_t iMaxSize );
     bool IsValid() const { return ( m_vTracks.size() > 0 && m_Info.iNoteCount > 0 && m_Info.iDivision > 0 ); }
 
     void PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vProgramChanges = nullptr,
