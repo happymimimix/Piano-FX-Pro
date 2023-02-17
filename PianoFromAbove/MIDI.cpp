@@ -437,7 +437,7 @@ size_t MIDI::ParseEvents( const unsigned char *pcData, size_t iMaxSize )
 {
     // Create and parse the track
     MIDITrack *track = new MIDITrack(*this);
-    size_t iCount = track->ParseEvents( pcData, iMaxSize, static_cast< int >( m_vTracks.size() ) );
+    size_t iCount = track->ParseEvents( pcData, iMaxSize, m_vTracks.size());
 
     // If Success, add it to the list
     if ( iCount > 0 ) {
@@ -638,7 +638,7 @@ void MIDITrack::clear( void )
     m_TrackInfo.clear();
 }
 
-size_t MIDITrack::ParseTrack( const unsigned char *pcData, size_t iMaxSize, int iTrack )
+size_t MIDITrack::ParseTrack( const unsigned char *pcData, size_t iMaxSize, size_t iTrack )
 {
     char pcBuf[4];
     size_t iTotal;
@@ -663,7 +663,7 @@ size_t MIDITrack::ParseTrack( const unsigned char *pcData, size_t iMaxSize, int 
     return iTotal + iTrkSize;
 }
 
-size_t MIDITrack::ParseEvents( const unsigned char *pcData, size_t iMaxSize, int iTrack )
+size_t MIDITrack::ParseEvents( const unsigned char *pcData, size_t iMaxSize, size_t iTrack )
 {
     int iDTCode = 0;
     size_t iTotal = 0, iCount = 0;
