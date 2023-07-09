@@ -54,18 +54,12 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
     if ( FAILED( hr ) ) return 1;
 
     // Bug the user if WinMM isn't patched
-    char* temp = nullptr;
-    if (!_get_pgmptr(&temp)) {
-        // Get the directory of the executable
-        char* temp2 = _strdup(temp);
-        PathRemoveFileSpecA(temp2);
-        std::string path(temp2);
-        free(temp2);
-
-        // Check if winmm.dll exists
-        path += "\\winmm.dll";
-        if (GetFileAttributesA(path.c_str()) == INVALID_FILE_ATTRIBUTES)
-            MessageBox(NULL, L"You don't appear to be using a patched winmm.dll.\nPlease patch it for best results.", L"", MB_ICONWARNING);
+    wchar_t winmm_path[1024] = {};
+    wchar_t win_dir[MAX_PATH] = {};
+    if (GetModuleFileName(GetModuleHandle(L"winmm.dll"), winmm_path, _countof(winmm_path)) &&
+        GetWindowsDirectory(win_dir, MAX_PATH) &&
+        FindNLSString(0, LINGUISTIC_IGNORECASE, winmm_path, -1, win_dir, -1, NULL) == 0) {
+        MessageBox(NULL, L"You don't appear to be using a patched winmm.dll.\nPlease patch it for best results.", L"", MB_ICONWARNING);
     }
 
     // Register the window class
