@@ -142,7 +142,10 @@ SplashScreen::SplashScreen( HWND hWnd, D3D12Renderer *pRenderer ) : GameState( h
     vector< MIDIEvent* > vEvents;
     vEvents.reserve( m_MIDI.GetInfo().iEventCount );
     m_MIDI.ConnectNotes(); // Order's important here
-    m_MIDI.PostProcess(m_vEvents);
+    if (IsProcessorFeaturePresent(PF_AVX2_INSTRUCTIONS_AVAILABLE))
+        m_MIDI.PostProcess<true>(m_vEvents);
+    else
+        m_MIDI.PostProcess<false>(m_vEvents);
 
     // Allocate
     m_vTrackSettings.resize( m_MIDI.GetInfo().iNumTracks );
@@ -638,7 +641,10 @@ MainScreen::MainScreen( wstring sMIDIFile, State eGameMode, HWND hWnd, D3D12Rend
     if ( !m_MIDI.IsValid() ) return;
     m_MIDI.ConnectNotes(); // Order's important here
     m_vEvents.reserve(m_MIDI.GetInfo().iEventCount);
-    m_MIDI.PostProcess(m_vEvents, &m_vProgramChange, &m_vMetaEvents, &m_vTempo, &m_vSignature, &m_vMarkers);
+    if (IsProcessorFeaturePresent(PF_AVX2_INSTRUCTIONS_AVAILABLE))
+        m_MIDI.PostProcess<true>(m_vEvents, &m_vProgramChange, &m_vMetaEvents, &m_vTempo, &m_vSignature, &m_vMarkers);
+    else
+        m_MIDI.PostProcess<false>(m_vEvents, &m_vProgramChange, &m_vMetaEvents, &m_vTempo, &m_vSignature, &m_vMarkers);
 
     // Allocate
     m_vTrackSettings.resize( m_MIDI.GetInfo().iNumTracks );
