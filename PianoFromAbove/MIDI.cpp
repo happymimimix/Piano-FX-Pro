@@ -56,6 +56,11 @@ MIDIPos::MIDIPos( MIDI &midi ) : m_MIDI( midi )
     }
 }
 
+MIDIPos::~MIDIPos() {
+    if (m_pTrackTime)
+        _aligned_free(m_pTrackTime);
+}
+
 // https://github.com/WojciechMula/toys/blob/master/simd-min-index/avx2.cpp
 size_t min_index_avx2(int32_t* array, size_t size) {
     const __m256i increment = _mm256_set1_epi32(8);

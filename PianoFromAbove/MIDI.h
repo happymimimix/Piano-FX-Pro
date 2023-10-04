@@ -39,6 +39,7 @@ class MIDIPos
 {
 public:
     MIDIPos( MIDI &midi );
+    ~MIDIPos();
 
     template<bool AVX>
     int GetNextEvent( int iMicroSecs, MIDIEvent **pEvent );
