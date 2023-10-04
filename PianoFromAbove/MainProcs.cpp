@@ -210,6 +210,9 @@ LRESULT WINAPI WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                 case ID_GAMEERROR:
                     MessageBoxW( hWnd, GameState::Errors[lParam].c_str(), L"Error", MB_OK | MB_ICONEXCLAMATION );
                     return 0;
+                case ID_UPDATE:
+                    ShellExecute(NULL, L"open", L"https://github.com/khang06/PianoFromAbove/releases", NULL, NULL, SW_SHOWNORMAL);
+                    return 0;
             }
             break;
         }

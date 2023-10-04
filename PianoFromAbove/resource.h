@@ -206,13 +206,15 @@
 #define ID_GRAPHICS_RESET               40171
 #define ID_VIEW_NOLIBRARYHERE           40172
 #define ID_VIEW_SETWINDOWSIZE           40173
+#define ID__UPDATE                      40174
+#define ID_UPDATE                       40175
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        160
-#define _APS_NEXT_COMMAND_VALUE         40174
+#define _APS_NEXT_COMMAND_VALUE         40176
 #define _APS_NEXT_CONTROL_VALUE         1109
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
