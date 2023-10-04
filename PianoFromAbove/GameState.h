@@ -190,7 +190,6 @@ public:
 
 private:
     // Initialization
-    void InitNoteMap( const vector< MIDIEvent* > &vEvents );
     void InitColors();
     void InitState();
 

@@ -413,7 +413,7 @@ void SplashScreen::UpdateState(int iPos)
 {
     // Event data
     MIDIChannelEvent* pEvent = m_vEvents[iPos];
-    if (!pEvent->GetSister()) return;
+    if (!pEvent->HasSister()) return;
 
     MIDIChannelEvent::ChannelEventType eEventType = pEvent->GetChannelEventType();
     int iNote = pEvent->GetParam1();
@@ -436,7 +436,7 @@ void SplashScreen::UpdateState(int iPos)
         else {
             // slow path, should rarely happen
             vector< int >::iterator it = note_state.begin();
-            MIDIChannelEvent* pSearch = pEvent->GetSister();
+            MIDIChannelEvent* pSearch = pEvent->GetSister(m_vEvents);
             while (it != note_state.end())
             {
                 if (m_vEvents[*it] == pSearch) {
@@ -505,7 +505,7 @@ void SplashScreen::RenderNotes()
     for (int i = m_iEndPos; i >= m_iStartPos; i--) {
         MIDIChannelEvent* pEvent = m_vEvents[i];
         if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn &&
-            pEvent->GetParam2() > 0 && pEvent->GetSister() &&
+            pEvent->GetParam2() > 0 && pEvent->HasSister() &&
             MIDI::IsSharp(pEvent->GetParam1())) {
             RenderNote(pEvent);
         }
@@ -521,7 +521,7 @@ void SplashScreen::RenderNotes()
     for (int i = m_iEndPos; i >= m_iStartPos; i--) {
         MIDIChannelEvent* pEvent = m_vEvents[i];
         if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn &&
-            pEvent->GetParam2() > 0 && pEvent->GetSister())
+            pEvent->GetParam2() > 0 && pEvent->HasSister())
         {
             if (!MIDI::IsSharp(pEvent->GetParam1())) {
                 RenderNote(pEvent);
@@ -541,64 +541,11 @@ void SplashScreen::RenderNotes()
 
 void SplashScreen::RenderNote(MIDIChannelEvent* pNote)
 {
-    /*
     int iNote = pNote->GetParam1();
     int iTrack = pNote->GetTrack();
     int iChannel = pNote->GetChannel();
     long long llNoteStart = pNote->GetAbsMicroSec();
-    long long llNoteEnd = pNote->GetSister()->GetAbsMicroSec();
-
-    ChannelSettings &csTrack = m_vTrackSettings[iTrack].aChannels[iChannel];
-    if ( m_vTrackSettings[iTrack].aChannels[iChannel].bHidden ) return;
-
-    // Compute true positions
-    float x = GetNoteX( iNote );
-    float y = m_fNotesY + m_fNotesCY * ( 1.0f - static_cast< float >( llNoteStart - m_llRndStartTime ) / TimeSpan );
-    float cx =  MIDI::IsSharp( iNote ) ? m_fWhiteCX * SharpRatio : m_fWhiteCX;
-    float cy = m_fNotesCY * ( static_cast< float >( llNoteEnd - llNoteStart ) / TimeSpan );
-    float fDeflate = m_fWhiteCX * 0.15f / 2.0f;
-
-    // Rounding to make everything consistent
-    cy = floor( cy + 0.5f ); // constant cy across rendering
-    y = floor( y + 0.5f );
-    fDeflate = floor( fDeflate + 0.5f );
-    fDeflate = max( min( fDeflate, 3.0f ), 1.0f );
-
-    // Clipping :/
-    float fMinY = m_fNotesY - 5.0f;
-    float fMaxY = m_fNotesY + m_fNotesCY + 5.0f;
-    if ( y > fMaxY )
-    {
-        cy -= ( y - fMaxY );
-        y = fMaxY;
-    }
-    if ( y - cy < fMinY )
-    {
-        cy -= ( fMinY - ( y - cy ) );
-        y = fMinY + cy;
-    }
-
-    // Visualize!
-    long long llDuration = m_llStartTime - ( m_MIDI.GetInfo().llFirstNote - 3000000 );
-    int iAlpha = 0xFF - static_cast< int >( ( 0xFF * min( 1500000, llDuration ) ) / 1500000 );
-    int iAlpha1 = static_cast< int >( ( 0xFF * ( m_fNotesCY - y ) / m_fNotesCY ) + 0.5f );
-    int iAlpha2 = static_cast< int >( ( 0xFF * ( m_fNotesCY - ( y + cy ) ) / m_fNotesCY ) + 0.5f );
-    iAlpha1 = max( iAlpha1, 0 );
-    iAlpha2 = min( iAlpha1, 0xFF );
-    iAlpha <<= 24;
-    iAlpha1 <<= 24;
-    iAlpha2 <<= 24;
-    m_pRenderer->DrawRect(x + fDeflate, y - cy + fDeflate,
-        cx - fDeflate * 2.0f, cy - fDeflate * 2.0f,
-        csTrack.iPrimaryRGB | iAlpha1, csTrack.iDarkRGB | iAlpha1, csTrack.iDarkRGB | iAlpha2, csTrack.iPrimaryRGB | iAlpha2);
-    m_pRenderer->DrawRect(x, y - cy, cx, cy, csTrack.iVeryDarkRGB | iAlpha);
-    */
-
-    int iNote = pNote->GetParam1();
-    int iTrack = pNote->GetTrack();
-    int iChannel = pNote->GetChannel();
-    long long llNoteStart = pNote->GetAbsMicroSec();
-    long long llNoteEnd = pNote->GetSister()->GetAbsMicroSec();
+    long long llNoteEnd = llNoteStart + pNote->GetLength();
     m_pRenderer->PushNoteData(
         NoteData {
             .key = (uint8_t)iNote,
@@ -652,60 +599,10 @@ MainScreen::MainScreen( wstring sMIDIFile, State eGameMode, HWND hWnd, D3D12Rend
         note_state.reserve(m_MIDI.GetInfo().iNumTracks * 16);
 
     // Initialize
-    //InitNoteMap( vEvents ); // Longish
     InitColors();
     InitState();
 
     g_LoadingProgress.stage = MIDILoadingProgress::Stage::Done;
-}
-
-void MainScreen::InitNoteMap( const vector< MIDIEvent* > &vEvents )
-{
-    g_LoadingProgress.stage = MIDILoadingProgress::Stage::Finalize;
-    g_LoadingProgress.progress = 0;
-    g_LoadingProgress.max = vEvents.size(); // probably stays the same
-
-    bool bPianoOverride = Config::GetConfig().m_bPianoOverride;
-
-    //Get only the channel events
-    m_vEvents.reserve( vEvents.size() );
-    m_vMarkers.push_back(pair<long long, int>(0, -1)); // dummy value
-    for (vector< MIDIEvent* >::const_iterator it = vEvents.begin(); it != vEvents.end(); ++it) {
-        if ((*it)->GetEventType() == MIDIEvent::ChannelEvent)
-        {
-            MIDIChannelEvent* pEvent = reinterpret_cast<MIDIChannelEvent*>(*it);
-            m_vEvents.push_back(pEvent);
-
-            // Makes random access to the song faster, but unsure if it's worth it
-            MIDIChannelEvent::ChannelEventType eEventType = pEvent->GetChannelEventType();
-            if (eEventType == MIDIChannelEvent::ProgramChange || eEventType == MIDIChannelEvent::Controller) {
-                m_vProgramChange.push_back(pair< long long, int >(pEvent->GetAbsMicroSec(), m_vEvents.size() - 1));
-            }
-            if (pEvent->GetSister())
-                pEvent->GetSister()->SetSisterIdx(m_vEvents.size() - 1);
-        }
-        // Have to keep track of tempo and signature for the measure lines
-        // markers too
-        else if ((*it)->GetEventType() == MIDIEvent::MetaEvent)
-        {
-            MIDIMetaEvent* pEvent = reinterpret_cast<MIDIMetaEvent*>(*it);
-            m_vMetaEvents.push_back(pEvent);
-
-            MIDIMetaEvent::MetaEventType eEventType = pEvent->GetMetaEventType();
-            switch (eEventType) {
-            case MIDIMetaEvent::SetTempo:
-                m_vTempo.push_back(pair< long long, int >(pEvent->GetAbsMicroSec(), m_vMetaEvents.size() - 1));
-                break;
-            case MIDIMetaEvent::TimeSignature:
-                m_vSignature.push_back(pair< long long, int >(pEvent->GetAbsMicroSec(), m_vMetaEvents.size() - 1));
-                break;
-            case MIDIMetaEvent::Marker:
-                m_vMarkers.push_back(pair< long long, int >(pEvent->GetAbsMicroSec(), m_vMetaEvents.size() - 1));
-                break;
-            }
-        }
-        g_LoadingProgress.progress++;
-    }
 }
 
 // Display colors
@@ -1275,7 +1172,7 @@ void MainScreen::UpdateState( int iPos )
 {
     // Event data
     MIDIChannelEvent *pEvent = m_vEvents[iPos];
-    if ( !pEvent->GetSister() ) return;
+    if ( !pEvent->HasSister() ) return;
     if (pEvent->GetParam1() > 127)
         return;
 
@@ -1304,7 +1201,7 @@ void MainScreen::UpdateState( int iPos )
         } else {
             // slow path, should rarely happen
             vector< int >::iterator it = note_state.begin();
-            MIDIChannelEvent* pSearch = pEvent->GetSister();
+            MIDIChannelEvent* pSearch = pEvent->GetSister(m_vEvents);
             while (it != note_state.end())
             {
                 if (m_vEvents[*it] == pSearch) {
@@ -1363,8 +1260,8 @@ void MainScreen::JumpTo(long long llStartTime, bool bUpdateGUI)
         {
             auto idx = m_vEvents.size() - 1 - (it - m_vEvents.rbegin());
             MIDIChannelEvent* pEvent = m_vEvents[idx];
-            if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0 && pEvent->GetSister()) {
-                MIDIChannelEvent* pSister = pEvent->GetSister();
+            if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0 && pEvent->HasSister()) {
+                MIDIChannelEvent* pSister = pEvent->GetSister(m_vEvents);
                 if (pSister->GetAbsMicroSec() > pEvent->GetAbsMicroSec()) // > because itMiddle is the max for its time
                     iFound++;
                 if (pSister->GetAbsMicroSec() > llStartTime) // > because we don't care about simultaneous ending notes
@@ -1844,46 +1741,10 @@ void MainScreen::RenderNotes()
 
     bool visualize_bends = Config::GetConfig().GetVizSettings().bVisualizePitchBends;
 
-    /*
     for (int i = m_iEndPos; i >= m_iStartPos; i--) {
         MIDIChannelEvent* pEvent = m_vEvents[i];
         if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn &&
-            pEvent->GetParam2() > 0 && pEvent->GetSister() &&
-            MIDI::IsSharp(pEvent->GetParam1())) {
-            RenderNote(pEvent, visualize_bends);
-        }
-    }
-    for (int i = 0; i < 128; i++) {
-        if (MIDI::IsSharp(i)) {
-            for (vector< int >::reverse_iterator it = (m_vState[i]).rbegin(); it != (m_vState[i]).rend(); it++) {
-                RenderNote(m_vEvents[*it], visualize_bends);
-            }
-        }
-    }
-
-    for (int i = m_iEndPos; i >= m_iStartPos; i--) {
-        MIDIChannelEvent* pEvent = m_vEvents[i];
-        if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn &&
-            pEvent->GetParam2() > 0 && pEvent->GetSister())
-        {
-            if (!MIDI::IsSharp(pEvent->GetParam1())) {
-                RenderNote(pEvent, visualize_bends);
-            }
-        }
-    }
-    for (int i = 0; i < 128; i++) {
-        if (!MIDI::IsSharp(i)) {
-            for (vector< int >::reverse_iterator it = (m_vState[i]).rbegin(); it != (m_vState[i]).rend(); it++) {
-                RenderNote(m_vEvents[*it], visualize_bends);
-            }
-        }
-    }
-    */
-
-    for (int i = m_iEndPos; i >= m_iStartPos; i--) {
-        MIDIChannelEvent* pEvent = m_vEvents[i];
-        if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn &&
-            pEvent->GetParam2() > 0 && pEvent->GetSister()) {
+            pEvent->GetParam2() > 0 && pEvent->HasSister()) {
             RenderNote(pEvent, visualize_bends);
         }
     }
@@ -1900,67 +1761,14 @@ void MainScreen::RenderNotes()
 
 void MainScreen::RenderNote(const MIDIChannelEvent* pNote, bool bVisualizeBends)
 {
-    /*
-    int iNote = pNote->GetParam1();
-    int iTrack = pNote->GetTrack();
-    int iChannel = pNote->GetChannel();
-    float fNoteStart = 0;
-    float fNoteEnd = 0;
-    if (m_bTickMode) {
-        fNoteStart = pNote->GetAbsT();
-        fNoteEnd = pNote->GetSister()->GetAbsT();
-    } else {
-        fNoteStart = pNote->GetAbsMicroSec();
-        fNoteEnd = pNote->GetSister()->GetAbsMicroSec();
-    }
-
-    // TODO: this load is really expensive
-    ChannelSettings &csTrack = m_vTrackSettings[iTrack].aChannels[iChannel];
-    if ( m_vTrackSettings[iTrack].aChannels[iChannel].bHidden ) return;
-
-    // Compute true positions
-    float x = GetNoteX( iNote );
-    if (bVisualizeBends)
-        x += (notex_table[1] - notex_table[0]) * (m_pBends[iChannel] / (8192.0f / 12.0f));
-    float y = m_fNotesY + m_fNotesCY * ( 1.0f - ( fNoteStart - m_fRndStartTime) / m_llTimeSpan );
-    float cx =  MIDI::IsSharp( iNote ) ? m_fWhiteCX * SharpRatio : m_fWhiteCX;
-    float cy = m_fNotesCY * ( ( fNoteEnd - fNoteStart ) / m_llTimeSpan);
-    float fDeflate = m_fWhiteCX * 0.15f / 2.0f;
-
-    // Rounding to make everything consistent
-    cy = floor( cy + 0.5f ); // constant cy across rendering
-    y = floor( y + 0.5f );
-    fDeflate = floor( fDeflate + 0.5f );
-    fDeflate = max( min( fDeflate, 3.0f ), 1.0f );
-
-    // Clipping :/
-    float fMinY = m_fNotesY - 5.0f;
-    float fMaxY = m_fNotesY + m_fNotesCY + 5.0f;
-    if ( y > fMaxY )
-    {
-        cy -= ( y - fMaxY );
-        y = fMaxY;
-    }
-    if ( y - cy < fMinY )
-    {
-        cy -= ( fMinY - ( y - cy ) );
-        y = fMinY + cy;
-    }
-
-    m_pRenderer->DrawRect(x + fDeflate, y - cy + fDeflate,
-        cx - fDeflate * 2.0f, cy - fDeflate * 2.0f,
-        csTrack.iPrimaryRGB, csTrack.iDarkRGB, csTrack.iDarkRGB, csTrack.iPrimaryRGB);
-    m_pRenderer->DrawRect(x, y - cy, cx, cy, csTrack.iVeryDarkRGB);
-    */
-
     int iNote = pNote->GetParam1();
     int iTrack = pNote->GetTrack();
     int iChannel = pNote->GetChannel();
     long long llNoteStart = pNote->GetAbsMicroSec();
-    long long llNoteEnd = pNote->GetSister()->GetAbsMicroSec();
+    long long llNoteEnd = llNoteStart + pNote->GetLength();
     if (m_bTickMode) {
         llNoteStart = pNote->GetAbsT();
-        llNoteEnd = pNote->GetSister()->GetAbsT();
+        llNoteEnd = pNote->GetSister(m_vEvents)->GetAbsT();
     }
     m_pRenderer->PushNoteData(
         NoteData{

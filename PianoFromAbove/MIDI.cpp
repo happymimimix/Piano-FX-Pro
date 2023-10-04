@@ -550,7 +550,7 @@ void MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vP
         {
             MIDIChannelEvent *pChannelEvent = reinterpret_cast< MIDIChannelEvent* >( pEvent );
             pChannelEvent->SetSimultaneous(iSimultaneous);
-            if ( pChannelEvent->GetSister() )
+            if ( pChannelEvent->HasSister() )
             {
                 if ( pChannelEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn &&
                      pChannelEvent->GetParam2() > 0 )
@@ -561,7 +561,13 @@ void MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vP
                 }
                 else
                     iSimultaneous--;
-                pChannelEvent->GetSister()->SetSisterIdx(vChannelEvents.size());
+                auto sister = pChannelEvent->GetPassDone() ? pChannelEvent->GetSister(vChannelEvents) : pChannelEvent->GetSister(m_vTracks[pEvent->GetTrack()]->m_vEvents);
+                sister->SetSisterIdx(vChannelEvents.size());
+                sister->SetPassDone(true);
+                if (pChannelEvent->GetChannelEventType() != MIDIChannelEvent::NoteOn ||
+                    pChannelEvent->GetParam2() == 0) {
+                    sister->SetLength(llTime - sister->GetAbsMicroSec());
+                }
             }
             vChannelEvents.push_back(pChannelEvent);
 
@@ -610,7 +616,7 @@ void MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vP
 
 void MIDI::ConnectNotes()
 {
-    std::vector<std::array<std::stack<MIDIChannelEvent*>, 128>> vStacks;
+    std::vector<std::array<std::stack<std::tuple<size_t, MIDIChannelEvent*>>, 128>> vStacks;
     vStacks.resize(m_vTracks.size() * 16);
 
     g_LoadingProgress.stage = MIDILoadingProgress::Stage::ConnectNotes;
@@ -630,13 +636,14 @@ void MIDI::ConnectNotes()
                 auto& sStack = vStacks[track * 16 + iChannel][iNote];
 
                 if (eEventType == MIDIChannelEvent::NoteOn && iVelocity > 0) {
-                    sStack.push(pEvent);
+                    sStack.push(std::make_tuple(i, pEvent));
                 }
                 else if (eEventType == MIDIChannelEvent::NoteOff || eEventType == MIDIChannelEvent::NoteOn) {
                     if (!sStack.empty()) {
                         auto pTop = sStack.top();
                         sStack.pop();
-                        pTop->SetSister(pEvent);
+                        pEvent->SetSisterIdx(std::get<0>(pTop));
+                        std::get<1>(pTop)->SetSisterIdx(i);
                     }
                 }
             }
@@ -707,7 +714,12 @@ size_t MIDITrack::ParseEvents( const unsigned char *pcData, size_t iMaxSize, siz
         iDTCode = MIDIEvent::MakeNextEvent( m_MIDI, pcData + iTotal, iMaxSize - iTotal, iTrack, &pEvent );
         if ( iDTCode > 0 )
         {
-            iCount = pEvent->ParseEvent( pcData + iDTCode + iTotal, iMaxSize - iDTCode - iTotal );
+            switch (pEvent->GetEventType())
+            {
+            case MIDIEvent::ChannelEvent: iCount = ((MIDIChannelEvent*)pEvent)->ParseEvent(pcData + iDTCode + iTotal, iMaxSize - iDTCode - iTotal); break;
+            case MIDIEvent::MetaEvent: iCount = ((MIDIMetaEvent*)pEvent)->ParseEvent(pcData + iDTCode + iTotal, iMaxSize - iDTCode - iTotal); break;
+            case MIDIEvent::SysExEvent: iCount = ((MIDISysExEvent*)pEvent)->ParseEvent(pcData + iDTCode + iTotal, iMaxSize - iDTCode - iTotal); break;
+            }
             if ( iCount > 0 )
             {
                 iTotal += iDTCode + iCount;
@@ -867,11 +879,10 @@ int MIDIEvent::MakeNextEvent( MIDI& midi, const unsigned char *pcData, size_t iM
 int MIDIChannelEvent::ParseEvent( const unsigned char *pcData, size_t iMaxSize )
 {
     // Split up the event code
-    m_eChannelEventType = static_cast< ChannelEventType >( m_iEventCode >> 4 );
     m_cChannel = m_iEventCode & 0xF;
 
     // Parse one parameter
-    if ( m_eChannelEventType == ProgramChange || m_eChannelEventType == ChannelAftertouch )
+    if (static_cast<ChannelEventType>(m_iEventCode >> 4) == ProgramChange || static_cast<ChannelEventType>(m_iEventCode >> 4) == ChannelAftertouch)
     {
         if ( iMaxSize < 1 ) return 0;
         m_cParam1 = pcData[0];

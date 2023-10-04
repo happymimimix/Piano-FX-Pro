@@ -206,7 +206,6 @@ public:
 
     //Parsing functions that load data into the instance
     static int MakeNextEvent( MIDI& midi, const unsigned char *pcData, size_t iMaxSize, int iTrack, MIDIEvent **pOutEvent );
-    virtual int ParseEvent( const unsigned char *pcData, size_t iMaxSize ) = 0;
 
     //Accessors
     EventType GetEventType() const { return (EventType)m_eEventType; }
@@ -227,35 +226,42 @@ public:
 class MIDIChannelEvent : public MIDIEvent
 {
 public:
-    MIDIChannelEvent() : m_pSister(NULL), m_iSimultaneous(0) { }
+    MIDIChannelEvent() : m_iSisterIdx(-1), m_iSimultaneous(0), m_bPassDone(false) { }
 
     enum ChannelEventType { NoteOff = 0x8, NoteOn, NoteAftertouch, Controller, ProgramChange, ChannelAftertouch, PitchBend };
     int ParseEvent( const unsigned char *pcData, size_t iMaxSize );
 
     //Accessors
-    ChannelEventType GetChannelEventType() const { return (ChannelEventType)m_eChannelEventType; }
+    ChannelEventType GetChannelEventType() const { return static_cast<ChannelEventType>(m_iEventCode >> 4); }
     unsigned char GetChannel() const { return m_cChannel; }
     unsigned char GetParam1() const { return m_cParam1; }
     unsigned char GetParam2() const { return m_cParam2; }
-    MIDIChannelEvent *GetSister() const { return m_pSister; }
+    MIDIChannelEvent *GetSister(const std::vector<MIDIChannelEvent*>& events) const {
+        return m_iSisterIdx == -1 ? nullptr : events[m_iSisterIdx];
+    }
+    MIDIChannelEvent *GetSister(const std::vector<MIDIEvent*>& events) const {
+        return m_iSisterIdx == -1 ? nullptr : (MIDIChannelEvent*)events[m_iSisterIdx];
+    }
     int GetSisterIdx() const { return m_iSisterIdx; }
     int GetSimultaneous() const { return m_iSimultaneous; }
+    unsigned GetLength() const { return m_uLength; }
+    bool GetPassDone() const { return m_bPassDone; }
 
     void SetChannel(unsigned char channel) { m_cChannel = channel; }
     void SetParam1(unsigned char param1) { m_cParam1 = param1; }
     void SetParam2(unsigned char param2) { m_cParam2 = param2; }
-    void SetSister(MIDIChannelEvent* pSister) {
-        m_pSister = pSister;
-        pSister->m_pSister = this;
-    }
     void SetSisterIdx(int iSisterIdx) { m_iSisterIdx = iSisterIdx; }
     void SetSimultaneous(int iSimultaneous) { m_iSimultaneous = iSimultaneous; }
+    void SetLength(unsigned length) { m_uLength = length; }
+    void SetPassDone(bool done) { m_bPassDone = done; }
+
+    bool HasSister() const { return m_iSisterIdx != -1; }
 
 private:
-    MIDIChannelEvent *m_pSister;
-    int m_iSisterIdx = -1;
+    int m_iSisterIdx;
     int m_iSimultaneous;
-    char m_eChannelEventType;
+    unsigned m_uLength;
+    bool m_bPassDone;
     unsigned char m_cChannel;
     unsigned char m_cParam1;
     unsigned char m_cParam2;

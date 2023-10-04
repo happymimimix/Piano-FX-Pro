@@ -1105,7 +1105,6 @@ VOID SetPlayPauseStop( BOOL bPlay, BOOL bPause, BOOL bStop )
 }
 
 INT_PTR LoadingProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
-    static int asdf = 0;
     switch (msg) {
     case WM_INITDIALOG: {
         SetWindowTextW(hwnd, (L"Loading " + g_LoadingProgress.name).c_str());
