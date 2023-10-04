@@ -13,6 +13,7 @@
 #include <array>
 #include <ppl.h>
 #include <intrin.h>
+#include <smmintrin.h>
 
 //std::map<int, std::pair<std::vector<MIDIEvent*>::iterator, std::vector<MIDIEvent*>>> midi_map;
 MIDILoadingProgress g_LoadingProgress;
@@ -61,6 +62,7 @@ MIDIPos::~MIDIPos() {
         _aligned_free(m_pTrackTime);
 }
 
+#ifdef __AVX2__
 // https://github.com/WojciechMula/toys/blob/master/simd-min-index/avx2.cpp
 size_t min_index_avx2(int32_t* array, size_t size) {
     const __m256i increment = _mm256_set1_epi32(8);
@@ -99,7 +101,7 @@ size_t min_index_avx2(int32_t* array, size_t size) {
 
     return minindex;
 }
-
+#else
 // https://github.com/WojciechMula/toys/blob/master/simd-min-index/sse.cpp
 size_t min_index_sse(int32_t* array, size_t size) {
     const __m128i increment = _mm_set1_epi32(4);
@@ -138,10 +140,10 @@ size_t min_index_sse(int32_t* array, size_t size) {
 
     return minindex;
 }
+#endif
 
 // Gets the next closest event as long as it occurs before iMicroSecs elapse
 // Always get next event if iMicroSecs is negative
-template<bool AVX>
 int MIDIPos::GetNextEvent( int iMicroSecs, MIDIEvent **pOutEvent )
 {
     if ( !pOutEvent ) return 0;
@@ -149,11 +151,11 @@ int MIDIPos::GetNextEvent( int iMicroSecs, MIDIEvent **pOutEvent )
 
     // Get the next closest event
     size_t iTracks = m_vTrackPos.size();
-    int iMinPos;
-    if constexpr (AVX)
-        iMinPos = (int)min_index_avx2(m_pTrackTime, (iTracks + 8) & ~7);
-    else
-        iMinPos = (int)min_index_sse(m_pTrackTime, (iTracks + 8) & ~7);
+#ifdef __AVX2__
+    int iMinPos = (int)min_index_avx2(m_pTrackTime, (iTracks + 8) & ~7);
+#else
+    int iMinPos = (int)min_index_sse(m_pTrackTime, (iTracks + 8) & ~7);
+#endif
     if (m_pTrackTime[iMinPos] == INT_MAX)
         return 0;
 
@@ -205,7 +207,6 @@ int MIDIPos::GetNextEvent( int iMicroSecs, MIDIEvent **pOutEvent )
     }
 }
 
-template<bool AVX>
 int MIDIPos::GetNextEvents( int iMicroSecs, vector< MIDIEvent* > &vEvents )
 {
     MIDIEvent *pEvent = NULL;
@@ -213,9 +214,9 @@ int MIDIPos::GetNextEvents( int iMicroSecs, vector< MIDIEvent* > &vEvents )
     do
     {
         if ( iMicroSecs >= 0 )
-            iTotal += GetNextEvent<AVX>( iMicroSecs - iTotal, &pEvent );
+            iTotal += GetNextEvent( iMicroSecs - iTotal, &pEvent );
         else
-            iTotal += GetNextEvent<AVX>( iMicroSecs, &pEvent );
+            iTotal += GetNextEvent( iMicroSecs, &pEvent );
         if ( pEvent ) vEvents.push_back( pEvent );
     }
     while ( pEvent );
@@ -509,12 +510,8 @@ void MIDI::MIDIInfo::AddTrackInfo( const MIDITrack &mTrack )
         this->iTotalBeats = this->iTotalTicks / this->iDivision;
 }
 
-template void MIDI::PostProcess<true>(vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vProgramChanges, vector<MIDIMetaEvent*>* vMetaEvents, eventvec_t* vTempo, eventvec_t* vSignature, eventvec_t* vMarkers);
-template void MIDI::PostProcess<false>(vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vProgramChanges, vector<MIDIMetaEvent*>* vMetaEvents, eventvec_t* vTempo, eventvec_t* vSignature, eventvec_t* vMarkers);
-
 // Sets absolute time variables. A lot of code for not much happening...
 // Has to be EXACT. Even a little drift and things start messing up a few minutes in (metronome, etc)
-template<bool AVX>
 void MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vProgramChanges, vector<MIDIMetaEvent*>* vMetaEvents, eventvec_t* vTempo, eventvec_t* vSignature, eventvec_t* vMarkers)
 {
     // Iterator like class
@@ -541,7 +538,7 @@ void MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vP
     MIDIEvent *pEvent = NULL;
     long long llFirstNote = -1;
     long long llTime = 0;
-    for ( midiPos.GetNextEvent<AVX>( -1, &pEvent ); pEvent; midiPos.GetNextEvent<AVX>( -1, &pEvent ) )
+    for ( midiPos.GetNextEvent( -1, &pEvent ); pEvent; midiPos.GetNextEvent( -1, &pEvent ) )
     {
         // Compute the exact time (off by at most a micro second... I don't feel like rounding)
         int iTick = pEvent->GetAbsT();

@@ -41,9 +41,7 @@ public:
     MIDIPos( MIDI &midi );
     ~MIDIPos();
 
-    template<bool AVX>
     int GetNextEvent( int iMicroSecs, MIDIEvent **pEvent );
-    template<bool AVX>
     int GetNextEvents( int iMicroSecs, vector< MIDIEvent* > &vEvents );
 
     bool IsStandard() const { return m_bIsStandard; }
@@ -107,7 +105,6 @@ public:
     size_t ParseEvents( const unsigned char *pcData, size_t iMaxSize );
     bool IsValid() const { return ( m_vTracks.size() > 0 && m_Info.iNoteCount > 0 && m_Info.iDivision > 0 ); }
 
-    template<bool AVX>
     void PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vProgramChanges = nullptr,
         vector<MIDIMetaEvent*>* vMetaEvents = nullptr, eventvec_t* vTempo = nullptr, eventvec_t* vSignature = nullptr, eventvec_t* vMarkers = nullptr);
     void ConnectNotes();
