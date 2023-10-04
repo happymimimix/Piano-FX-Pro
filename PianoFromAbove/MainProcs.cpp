@@ -1184,6 +1184,7 @@ BOOL PlayFile( const wstring &sFile, bool bCustomSettings, bool bLibraryEligible
     g_LoadingProgress.max = 1;
     auto thread = std::thread([&]() {
         pGameState = new MainScreen(sFile, ePlayMode, NULL, NULL);
+        g_LoadingProgress.stage = MIDILoadingProgress::Done;
     });
     DialogBox(NULL, MAKEINTRESOURCE(IDD_LOADING), g_hWnd, LoadingProc);
     thread.join();
