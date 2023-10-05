@@ -219,6 +219,7 @@ INT_PTR WINAPI AudioProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
     {
         case WM_INITDIALOG:
             SetAudioProc( hWnd, Config::GetConfig().GetAudioSettings() );
+            CheckDlgButton(hWnd, IDC_KDMAPI, Config::GetConfig().GetVizSettings().bKDMAPI);
             return TRUE;
         case WM_COMMAND:
         {
