@@ -27,8 +27,6 @@ class MIDIMetaEvent;
 class MIDISysExEvent;
 class MIDIPos;
 
-class MIDIDevice;
-class MIDIInDevice;
 class MIDIOutDevice;
 
 //
@@ -309,37 +307,21 @@ private:
 // MIDI Device Classes
 //
 
-class MIDIDevice
+class MIDIOutDevice
 {
 public:
-    virtual int GetNumDevs() const = 0;
-    virtual wstring GetDevName( int iDev ) const = 0;
-    virtual bool Open( int iDev ) = 0;
-    virtual void Close() = 0;
-
-    bool IsOpen() const { return m_bIsOpen; }
-    const wstring &GetDevice() const { return m_sDevice; };
-
-protected:
-    MIDIDevice() : m_bIsOpen( false ), m_iDevice( 0 ) { }
-    virtual ~MIDIDevice() { }
-
-    bool m_bIsOpen;
-    int m_iDevice;
-    wstring m_sDevice;
-};
-
-class MIDIOutDevice : public MIDIDevice
-{
-public:
-    MIDIOutDevice() : m_hMIDIOut( NULL ) { }
+    MIDIOutDevice() : m_bIsOpen(false), m_hMIDIOut( NULL ) { }
     virtual ~MIDIOutDevice() { Close(); }
 
     int GetNumDevs() const;
     wstring GetDevName( int iDev ) const;
     bool Open( int iDev );
+    bool OpenKDMAPI();
     void Close();
     void Reset();
+
+    bool IsOpen() const { return m_bIsOpen; }
+    const wstring& GetDevice() const { return m_sDevice; };
 
     void AllNotesOff();
     void AllNotesOff( const vector< int > &vChannels );
@@ -350,8 +332,14 @@ public:
     bool PlayEvent( unsigned char bStatus, unsigned char bParam1, unsigned char bParam2 = 0 );
 
 private:
+    static FARPROC GetOmniMIDIProc(const char* func);
     static void CALLBACK MIDIOutProc( HMIDIOUT hmo, UINT wMsg, DWORD_PTR dwInstance,
                                       DWORD_PTR dwParam1, DWORD_PTR dwParam2 );
+
+    bool m_bIsOpen;
+    bool m_bIsKDMAPI;
+    void(WINAPI* SendDirectData)(DWORD);
+    wstring m_sDevice;
     HMIDIOUT m_hMIDIOut;
 };
 

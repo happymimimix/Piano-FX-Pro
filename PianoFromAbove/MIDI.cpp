@@ -1037,20 +1037,37 @@ wstring MIDIOutDevice::GetDevName( int iDev ) const
 bool MIDIOutDevice::Open( int iDev )
 {
     if ( m_bIsOpen ) Close();
-    m_iDevice = iDev;
     m_sDevice = GetDevName( iDev );
+    m_bIsKDMAPI = false;
 
     MMRESULT mmResult = midiOutOpen( &m_hMIDIOut, iDev, ( DWORD_PTR )MIDIOutProc, ( DWORD_PTR )this, CALLBACK_FUNCTION );
     m_bIsOpen = ( mmResult == MMSYSERR_NOERROR );
     return m_bIsOpen;
 }
 
+bool MIDIOutDevice::OpenKDMAPI() {
+    if (m_bIsOpen)
+        Close();
+    m_sDevice = L"KDMAPI";
+    m_bIsKDMAPI = true;
+
+    auto InitializeKDMAPIStream = (int(WINAPI*)())GetOmniMIDIProc("InitializeKDMAPIStream");
+    *(FARPROC*)&SendDirectData = GetOmniMIDIProc("SendDirectData");
+    return m_bIsOpen = (SendDirectData && InitializeKDMAPIStream && InitializeKDMAPIStream());
+}
+
 void MIDIOutDevice::Close()
 {
     if ( !m_bIsOpen ) return;
 
-    midiOutReset( m_hMIDIOut );
-    midiOutClose( m_hMIDIOut );
+    if (m_bIsKDMAPI) {
+        auto TerminateKDMAPIStream = (int(WINAPI*)())GetOmniMIDIProc("TerminateKDMAPIStream");
+        if (TerminateKDMAPIStream)
+            TerminateKDMAPIStream();
+    } else {
+        midiOutReset(m_hMIDIOut);
+        midiOutClose(m_hMIDIOut);
+    }
     m_bIsOpen = false;
 }
 
@@ -1058,7 +1075,13 @@ void MIDIOutDevice::Reset()
 {
     if (!m_bIsOpen) return;
 
-    midiOutReset(m_hMIDIOut);
+    if (m_bIsKDMAPI) {
+        auto ResetKDMAPIStream = (void(WINAPI*)())GetOmniMIDIProc("ResetKDMAPIStream");
+        if (ResetKDMAPIStream)
+            ResetKDMAPIStream();
+    } else {
+        midiOutReset(m_hMIDIOut);
+    }
 }
 
 // Specialized midi functions
@@ -1076,8 +1099,11 @@ void MIDIOutDevice::AllNotesOff( const vector< int > &vChannels )
 
 void MIDIOutDevice::SetVolume( double dVolume )
 {
-    DWORD dwVolume = static_cast< DWORD >( 0xFFFF * dVolume + 0.5 );
-    midiOutSetVolume( m_hMIDIOut, dwVolume | ( dwVolume << 16 ) );
+    // No-op on KDMAPI
+    if (!m_bIsKDMAPI) {
+        DWORD dwVolume = static_cast<DWORD>(0xFFFF * dVolume + 0.5);
+        midiOutSetVolume(m_hMIDIOut, dwVolume | (dwVolume << 16));
+    }
 }
 
 // Play events
@@ -1108,7 +1134,19 @@ bool MIDIOutDevice::PlayEventAcrossChannels( unsigned char cStatus, unsigned cha
 bool MIDIOutDevice::PlayEvent( unsigned char cStatus, unsigned char cParam1, unsigned char cParam2 )
 {
     if ( !m_bIsOpen ) return false;
-    return midiOutShortMsg( m_hMIDIOut, ( cParam2 << 16 ) + ( cParam1 << 8 ) + cStatus ) == MMSYSERR_NOERROR;
+    if (m_bIsKDMAPI) {
+        SendDirectData((cParam2 << 16) + (cParam1 << 8) + cStatus);
+        return true;
+    } else {
+        return midiOutShortMsg(m_hMIDIOut, (cParam2 << 16) + (cParam1 << 8) + cStatus) == MMSYSERR_NOERROR;
+    }
+}
+
+FARPROC MIDIOutDevice::GetOmniMIDIProc(const char* func) {
+    auto dll = GetModuleHandle(L"OmniMIDI");
+    if (!dll)
+        dll = LoadLibrary(L"OmniMIDI");
+    return GetProcAddress(dll, func);
 }
 
 void CALLBACK MIDIOutDevice::MIDIOutProc( HMIDIOUT hmo, UINT wMsg, DWORD_PTR dwInstance,

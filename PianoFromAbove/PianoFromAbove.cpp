@@ -129,15 +129,6 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
     HRESULT hr = CoInitialize( NULL );
     if ( FAILED( hr ) ) return 1;
 
-    // Bug the user if WinMM isn't patched
-    wchar_t winmm_path[1024] = {};
-    wchar_t win_dir[MAX_PATH] = {};
-    if (GetModuleFileName(GetModuleHandle(L"winmm.dll"), winmm_path, _countof(winmm_path)) &&
-        GetWindowsDirectory(win_dir, MAX_PATH) &&
-        FindNLSString(0, LINGUISTIC_IGNORECASE, winmm_path, -1, win_dir, -1, NULL) == 0) {
-        MessageBox(NULL, L"You don't appear to be using a patched winmm.dll.\nPlease patch it for best results.", L"", MB_ICONWARNING);
-    }
-
     // Register the window class
     WNDCLASSEX wc;
     wc.cbSize = sizeof( WNDCLASSEX );
@@ -175,6 +166,17 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
     Config &config = Config::GetConfig();
     ViewSettings &cView = config.GetViewSettings();
     PlaybackSettings &cPlayback = config.GetPlaybackSettings();
+
+    // Bug the user if WinMM isn't patched
+    if (!config.GetVizSettings().bKDMAPI || !LoadLibrary(L"OmniMIDI")) {
+        wchar_t winmm_path[1024] = {};
+        wchar_t win_dir[MAX_PATH] = {};
+        if (GetModuleFileName(GetModuleHandle(L"winmm.dll"), winmm_path, _countof(winmm_path)) &&
+            GetWindowsDirectory(win_dir, MAX_PATH) &&
+            FindNLSString(0, LINGUISTIC_IGNORECASE, winmm_path, -1, win_dir, -1, NULL) == 0) {
+            MessageBox(NULL, L"You don't appear to be using a patched winmm.dll.\nPlease patch it for best results.", L"", MB_ICONWARNING);
+        }
+    }
 
     // Create the application window
     g_hWnd = CreateWindowEx( 0, CLASSNAME, L"pfavizkhang-dx12 " __DATE__, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, cView.GetMainLeft(), cView.GetMainTop(),

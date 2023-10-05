@@ -243,14 +243,18 @@ INT_PTR WINAPI AudioProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                     // Get a copy of the config to overwrite the settings
                     Config &config = Config::GetConfig();
                     AudioSettings cAudio = config.GetAudioSettings();
+                    VizSettings cViz = config.GetVizSettings();
 
                     // Get the values
                     cAudio.iOutDevice = (int)SendDlgItemMessage( hWnd, IDC_MIDIOUT, LB_GETCURSEL, 0, 0 );
+                    cViz.bKDMAPI = IsDlgButtonChecked(hWnd, IDC_KDMAPI) == BST_CHECKED;
                     if ( cAudio.iOutDevice >= 0 ) cAudio.sDesiredOut = cAudio.vMIDIOutDevices[cAudio.iOutDevice];
 
                     // Set the values
-                    bool bChanged = ( cAudio.iOutDevice != config.GetAudioSettings().iOutDevice );
-                    config.SetAudioSettings( cAudio );
+                    bool bChanged = (cAudio.iOutDevice != config.GetAudioSettings().iOutDevice) ||
+                        (cViz.bKDMAPI != config.GetVizSettings().bKDMAPI);
+                    config.SetAudioSettings(cAudio);
+                    config.SetVizSettings(cViz);
 
                     if ( bChanged )
                         HandOffMsg( WM_DEVICECHANGE, 0, 0 );

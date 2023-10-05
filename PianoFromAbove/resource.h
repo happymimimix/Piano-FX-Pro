@@ -111,6 +111,7 @@
 #define IDC_PITCHBENDS2                 1108
 #define IDC_FFMPEG                      1108
 #define IDC_BACKGROUNDBROWSE            1109
+#define IDC_KDMAPI                      1109
 #define IDC_SPLASHRESET2                1110
 #define IDC_BACKGROUNDRESET             1110
 #define IDC_COLORLOOP                   1111
@@ -213,9 +214,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        160
+#define _APS_NEXT_RESOURCE_VALUE        161
 #define _APS_NEXT_COMMAND_VALUE         40176
-#define _APS_NEXT_CONTROL_VALUE         1109
+#define _APS_NEXT_CONTROL_VALUE         1110
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

@@ -168,7 +168,8 @@ void SplashScreen::InitState()
     static Config &config = Config::GetConfig();
     static const PlaybackSettings &cPlayback = config.GetPlaybackSettings();
     static const VisualSettings &cVisual = config.GetVisualSettings();
-    static const AudioSettings &cAudio = Config::GetConfig().GetAudioSettings();
+    static const AudioSettings &cAudio = config.GetAudioSettings();
+    static const VizSettings &cViz = config.GetVizSettings();
 
     m_iStartPos = 0;
     m_iEndPos = -1;
@@ -179,9 +180,13 @@ void SplashScreen::InitState()
     SetChannelSettings( vector< bool >(), vector< bool >(),
         vector< unsigned >( cVisual.colors, cVisual.colors + sizeof( cVisual.colors ) / sizeof( cVisual.colors[0] ) ) );
 
-    if ( cAudio.iOutDevice >= 0 )
-        m_OutDevice.Open( cAudio.iOutDevice );
-    m_OutDevice.SetVolume( 1.0 );
+    if (cViz.bKDMAPI) {
+        m_OutDevice.OpenKDMAPI();
+    } else {
+        if (cAudio.iOutDevice >= 0)
+            m_OutDevice.Open(cAudio.iOutDevice);
+    }
+    m_OutDevice.SetVolume(1.0);
 
     m_Timer.Init(false);
 }
@@ -231,7 +236,8 @@ GameState::GameError SplashScreen::MsgProc( HWND hWnd, UINT msg, WPARAM wParam, 
 {
     static Config &config = Config::GetConfig();
     static PlaybackSettings &cPlayback = config.GetPlaybackSettings();
-    static const AudioSettings &cAudio = config.GetAudioSettings();
+    static const AudioSettings& cAudio = config.GetAudioSettings();
+    static const VizSettings& cViz = config.GetVizSettings();
 
     switch (msg)
     {
@@ -249,8 +255,12 @@ GameState::GameError SplashScreen::MsgProc( HWND hWnd, UINT msg, WPARAM wParam, 
             }
         }
         case WM_DEVICECHANGE:
-            if ( cAudio.iOutDevice >= 0 && m_OutDevice.GetDevice() != cAudio.vMIDIOutDevices[cAudio.iOutDevice] )
-                m_OutDevice.Open( cAudio.iOutDevice );
+            if (cViz.bKDMAPI) {
+                m_OutDevice.OpenKDMAPI();
+            } else {
+                if (cAudio.iOutDevice >= 0 && m_OutDevice.GetDevice() != cAudio.vMIDIOutDevices[cAudio.iOutDevice])
+                    m_OutDevice.Open(cAudio.iOutDevice);
+            }
             break;
         case WM_KEYDOWN:
         {
@@ -676,8 +686,13 @@ GameState::GameError MainScreen::Init()
 {
     static Config& config = Config::GetConfig();
     static const AudioSettings &cAudio = config.GetAudioSettings();
-    if ( cAudio.iOutDevice >= 0 )
-        m_OutDevice.Open( cAudio.iOutDevice );
+    static const VizSettings &cViz = config.GetVizSettings();
+    if (cViz.bKDMAPI) {
+        m_OutDevice.OpenKDMAPI();
+    } else {
+        if (cAudio.iOutDevice >= 0)
+            m_OutDevice.Open(cAudio.iOutDevice);
+    }
 
     m_OutDevice.Reset();
     m_OutDevice.SetVolume( 1.0 );
@@ -795,6 +810,7 @@ GameState::GameError MainScreen::MsgProc( HWND hWnd, UINT msg, WPARAM wParam, LP
     static ViewSettings &cView = config.GetViewSettings();
     static const ControlsSettings &cControls = config.GetControlsSettings();
     static const AudioSettings &cAudio = config.GetAudioSettings();
+    static const VizSettings &cViz = config.GetVizSettings();
 
     switch (msg)
     {
@@ -898,8 +914,12 @@ GameState::GameError MainScreen::MsgProc( HWND hWnd, UINT msg, WPARAM wParam, LP
             break;
         }
         case WM_DEVICECHANGE:
-            if ( cAudio.iOutDevice >= 0 && m_OutDevice.GetDevice() != cAudio.vMIDIOutDevices[cAudio.iOutDevice] )
-                m_OutDevice.Open( cAudio.iOutDevice );
+            if (cViz.bKDMAPI) {
+                m_OutDevice.OpenKDMAPI();
+            } else {
+                if (cAudio.iOutDevice >= 0 && m_OutDevice.GetDevice() != cAudio.vMIDIOutDevices[cAudio.iOutDevice])
+                    m_OutDevice.Open(cAudio.iOutDevice);
+            }
             break;
         case TBM_SETPOS:
         {
@@ -1083,7 +1103,7 @@ GameState::GameError MainScreen::Logic( void )
         {
             MIDIChannelEvent *pEvent = m_vEvents[m_iStartPos];
             if (pEvent->GetChannelEventType() != MIDIChannelEvent::NoteOn) {
-                if (config.m_bPianoOverride && pEvent->GetChannelEventType() == MIDIChannelEvent::ProgramChange && pEvent->GetChannel() != MIDI::Drums)
+                if (pEvent->GetChannelEventType() == MIDIChannelEvent::ProgramChange && pEvent->GetChannel() != MIDI::Drums && config.m_bPianoOverride)
                     pEvent->SetParam1(0);
                 if (pEvent->GetChannelEventType() == MIDIChannelEvent::PitchBend) {
                     //m_pBends[pEvent->GetChannel()] = (short)(((pEvent->GetParam2() << 7) | pEvent->GetParam1()) - 8192);
@@ -1171,8 +1191,6 @@ void MainScreen::UpdateState( int iPos )
         return;
 
     MIDIChannelEvent::ChannelEventType eEventType = pEvent->GetChannelEventType();
-    int iTrack = pEvent->GetTrack();
-    int iChannel = pEvent->GetChannel();
     int iNote = pEvent->GetParam1();
     int iVelocity = pEvent->GetParam2();
 
