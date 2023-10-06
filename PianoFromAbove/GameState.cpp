@@ -792,7 +792,6 @@ void MainScreen::SetChannelSettings( const vector< bool > &vMuted, const vector<
     size_t iPos = 0;
     for ( int i = 0; i < vTracks.size(); i++ )
     {
-        const MIDITrack::MIDITrackInfo &mTrackInfo = vTracks[i]->GetInfo();
         for (int j = 0; j < 16; j++) {
             MuteChannel(i, j, bMuted ? vMuted[min(iPos, vMuted.size() - 1)] : false);
             HideChannel(i, j, bHidden ? vHidden[min(iPos, vHidden.size() - 1)] : false);
@@ -1259,22 +1258,34 @@ void MainScreen::JumpTo(long long llStartTime, bool bUpdateGUI)
     if (itMiddle != itEnd && itMiddle - m_vEvents.begin() < m_iStartPos)
         m_iStartPos = itMiddle - m_vEvents.begin();
 
+    // Need to scan up to the next note on event
+    for (; itMiddle != itEnd; itMiddle++) {
+        if ((*itMiddle)->GetChannelEventType() == MIDIChannelEvent::NoteOn && (*itMiddle)->GetParam2() > 0)
+            break;
+    }
+
     // Find the notes that occur simultaneously with the previous note on
     for (auto& note_state : m_vState)
         note_state.clear();
     memset(m_pNoteState, -1, sizeof(m_pNoteState));
     if (itMiddle != itBegin)
     {
+        // Need to scan down to the last note on event
         auto itPrev = itMiddle - 1;
+        for (; itPrev != itBegin; itPrev--) {
+            if ((*itPrev)->GetChannelEventType() == MIDIChannelEvent::NoteOn && (*itPrev)->GetParam2() > 0)
+                break;
+        }
+
         int iFound = 0;
-        int iSimultaneous = m_vEvents[itPrev - m_vEvents.begin()]->GetSimultaneous() + 1;
+        int iSimultaneous = (*itPrev)->GetSimultaneous() + 1;
         for (std::vector<MIDIChannelEvent*>::reverse_iterator it(itMiddle); iFound < iSimultaneous && it != m_vEvents.rend(); ++it)
         {
             auto idx = m_vEvents.size() - 1 - (it - m_vEvents.rbegin());
             MIDIChannelEvent* pEvent = m_vEvents[idx];
             if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0 && pEvent->HasSister()) {
                 MIDIChannelEvent* pSister = pEvent->GetSister(m_vEvents);
-                if (pSister->GetAbsMicroSec() > pEvent->GetAbsMicroSec()) // > because itMiddle is the max for its time
+                if (pSister->GetAbsMicroSec() > (*itPrev)->GetAbsMicroSec()) // > because itMiddle is the max for its time
                     iFound++;
                 if (pSister->GetAbsMicroSec() > llStartTime) // > because we don't care about simultaneous ending notes
                 {
