@@ -1537,13 +1537,16 @@ int MainScreen::GetBeat( int iTick, int iBeatType, int iLastSignatureTick )
 {
     int iDivision = m_MIDI.GetInfo().iDivision;
     int iTickOffset = iTick - iLastSignatureTick;
-    if ( !( iDivision & 0x8000 ) )
+    if (!(iDivision & 0x8000))
     {
-        if ( iTickOffset > 0 )
-            return ( iTickOffset * iBeatType - 1 ) / ( iDivision  * 4 ) + 1;
+        m_CurBeat = (iTickOffset * iBeatType) / (iDivision * 4);
+
+        if (iTickOffset > 0)
+            return (iTickOffset * iBeatType - 1) / (iDivision * 4) + 1;
         else
-            return ( iTickOffset * iBeatType ) / ( iDivision  * 4 );
+            return (iTickOffset * iBeatType) / (iDivision * 4);
     }
+
     return -1;
 }
 
@@ -2065,7 +2068,7 @@ void MainScreen::RenderStatusLine(const char* left, const char* format, ...) {
 
 void MainScreen::RenderStatus(LPRECT prcStatus)
 {
-    constexpr float width = 156.0f;
+    constexpr float width = 172.0f;
     ImGui::SetNextWindowPos(ImVec2(m_pRenderer->GetBufferWidth() - width + 1, -1.0f));
     ImGui::SetNextWindowSize(ImVec2(width, 0.0f), ImGuiCond_Always);
     ImGui::Begin("stats", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoMove |
@@ -2073,30 +2076,36 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
         ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoFocusOnAppearing);
 
     // Time
+    Config& config = Config::GetConfig();
+    VizSettings viz = config.GetVizSettings();
     const MIDI::MIDIInfo& mInfo = m_MIDI.GetInfo();
-    if (m_llStartTime >= 0)
-        RenderStatusLine("Time:", "%lld:%04.1lf / %lld:%04.1lf",
-            m_llStartTime / 60000000, (m_llStartTime % 60000000) / 1000000.0,
-            mInfo.llTotalMicroSecs / 60000000, (mInfo.llTotalMicroSecs % 60000000) / 1000000.0);
-    else
-        RenderStatusLine("Time:", "\t-%lld:%04.1lf / %lld:%04.1lf",
-            -m_llStartTime / 60000000, (-m_llStartTime % 60000000) / 1000000.0,
-            mInfo.llTotalMicroSecs / 60000000, (mInfo.llTotalMicroSecs % 60000000) / 1000000.0);
-    
-    // Tempo
-    RenderStatusLine("Tempo:", "%.3lf", 60000000.0 / m_iMicroSecsPerBeat);
+    auto div = m_MIDI.GetInfo().iDivision;
+    auto starttime = ((m_llStartTime >= 0) ? m_llStartTime : -m_llStartTime);
+
+    auto min = starttime / 60000000;
+    auto sec = (starttime % 60000000) / 1000000;
+    auto ms = (starttime % 1000000) / 1000;
+    auto tmin = mInfo.llTotalMicroSecs / 60000000;
+    auto tsec = (mInfo.llTotalMicroSecs % 60000000) / 1000000;
+    auto tms = (mInfo.llTotalMicroSecs % 1000000) / 1000;
+    auto tempo = 60000000.0 / m_iMicroSecsPerBeat;
+
+    RenderStatusLine("Time:", "%s%lld:%02d.%03d / %lld:%02d.%03d",
+        m_llStartTime >= 0 ? "" : "-",
+        min, sec, ms,
+        tmin, tsec, tms);
+    RenderStatusLine("BPM (Beat):", "%.3lf (%u/%u)", tempo, (m_CurBeat % m_iBeatType) + 1, m_iBeatType);
 
     // Framerate
     if (m_bShowFPS && !m_bDumpFrames)
-        RenderStatusLine("FPS:", "%.1lf", m_dFPS);
+        RenderStatusLine("FPS:", "%.0lf", m_dFPS);
 
     // Nerd stats
-    Config& config = Config::GetConfig();
-    VizSettings viz = config.GetVizSettings();
     if (viz.bNerdStats) {
         long long nps = 0;
         for (int i = 0; i < m_dNPSNotes.size(); i++)
             nps += std::get<1>(m_dNPSNotes[i]);
+
         RenderStatusLine("NPS:", "%lld", nps);
         RenderStatusLine("Rendered:", "%llu", m_pRenderer->GetRenderedNotesCount());
     }

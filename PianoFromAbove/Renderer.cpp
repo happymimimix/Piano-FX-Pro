@@ -626,8 +626,9 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     // Set up font and disable imgui.ini
     auto& io = ImGui::GetIO();
     ImFontConfig font_config = {};
-    font_config.FontNo = 1; // Yu Gothic UI
-    io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\YuGothB.ttc", 13.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
+    font_config.FontNo = 0; // TAHOMA!
+    font_config.RasterizerMultiply = 2.0f;
+    io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Tahoma.ttf", 14.0f, nullptr, io.Fonts->GetGlyphRangesDefault());
     io.IniFilename = nullptr;
 
     // Theme tweaks
