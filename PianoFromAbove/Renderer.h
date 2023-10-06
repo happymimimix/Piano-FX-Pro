@@ -115,6 +115,7 @@ public:
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
     }
+    ImDrawList* GetDrawList() { return m_pDrawList; }
 
 private:
     std::tuple<HRESULT, const char*> CreateWindowDependentObjects(HWND hWnd);
@@ -188,4 +189,6 @@ private:
     std::vector<RectVertex> m_vRectsIntermediate;
     std::vector<NoteData> m_vNotesIntermediate;
     int m_iRectSplit = -1;
+
+    ImDrawList* m_pDrawList;
 };

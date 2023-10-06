@@ -2029,11 +2029,6 @@ void MainScreen::RenderText()
     // Screen info
     RECT rcStatus = { m_pRenderer->GetBufferWidth() - 156, 0, m_pRenderer->GetBufferWidth(), 6 + 16 * iLines };
 
-    // Current marker (if there is one)
-    RECT rcMarker;
-    //m_pRenderer->DrawText(m_wsMarker.c_str(), D3D12Renderer::Small, &rcMarker, DT_CALCRECT, 0);
-    rcMarker = { 0, rcMarker.top, rcMarker.right - rcMarker.left + 12, rcMarker.bottom + 6 };
-
     int iMsgCY = 200;
     RECT rcMsg = { 0, static_cast<int>(m_pRenderer->GetBufferHeight() * (1.0f - KBPercent) - iMsgCY) / 2 };
     rcMsg.right = m_pRenderer->GetBufferWidth();
@@ -2043,38 +2038,34 @@ void MainScreen::RenderText()
     m_pRenderer->BeginText();
 
     RenderStatus(&rcStatus);
-    if (viz.bShowMarkers)
-        RenderMarker(&rcMarker, m_sMarker.c_str());
+    if (!m_sMarker.empty() && viz.bShowMarkers)
+        RenderMarker(m_sMarker.c_str());
     if (m_bZoomMove)
         RenderMessage(&rcMsg, TEXT("- Left-click and drag to move the screen\n- Right-click and drag to zoom horizontally\n- Press Escape to abort changes\n- Press Ctrl+V to save changes"));
 
     m_pRenderer->EndText();
 }
 
-void MainScreen::RenderStatusLine(const char* left, const char* format, ...) {
+void MainScreen::RenderStatusLine(int line, const char* left, const char* format, ...) {
     va_list varargs;
     va_start(varargs, format);
 
     char buf[1024] = {};
     vsnprintf_s(buf, sizeof(buf), format, varargs);
 
-    ImGui::Text("%s", left);
-    ImGui::SameLine();
-    ImGui::SetCursorPosX(ImGui::GetWindowWidth() - ImGui::CalcTextSize(buf).x - ImGui::GetScrollX() - ImGui::GetStyle().WindowPadding.x);
-    ImGui::Text("%s", buf);
+    auto draw_list = m_pRenderer->GetDrawList();
+    ImVec2 left_pos = ImVec2(m_pRenderer->GetBufferWidth() - 156 + 6, 3 + line * 16);
+    ImVec2 right_pos = ImVec2(m_pRenderer->GetBufferWidth() - ImGui::CalcTextSize(buf).x - 6, 3 + line * 16);
+    draw_list->AddText(ImVec2(left_pos.x + 2, left_pos.y + 1), 0xFF404040, left);
+    draw_list->AddText(ImVec2(left_pos.x, left_pos.y), 0xFFFFFFFF, left);
+    draw_list->AddText(ImVec2(right_pos.x + 2, right_pos.y + 1), 0xFF404040, buf);
+    draw_list->AddText(ImVec2(right_pos.x, right_pos.y), 0xFFFFFFFF, buf);
 
     va_end(varargs);
 }
 
 void MainScreen::RenderStatus(LPRECT prcStatus)
 {
-    constexpr float width = 172.0f;
-    ImGui::SetNextWindowPos(ImVec2(m_pRenderer->GetBufferWidth() - width + 1, -1.0f));
-    ImGui::SetNextWindowSize(ImVec2(width, 0.0f), ImGuiCond_Always);
-    ImGui::Begin("stats", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoMove |
-        ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoNav |
-        ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoFocusOnAppearing);
-
     // Time
     Config& config = Config::GetConfig();
     VizSettings viz = config.GetVizSettings();
@@ -2084,21 +2075,24 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
 
     auto min = starttime / 60000000;
     auto sec = (starttime % 60000000) / 1000000;
-    auto ms = (starttime % 1000000) / 1000;
+    auto cs = (starttime % 1000000) / 100000;
     auto tmin = mInfo.llTotalMicroSecs / 60000000;
     auto tsec = (mInfo.llTotalMicroSecs % 60000000) / 1000000;
-    auto tms = (mInfo.llTotalMicroSecs % 1000000) / 1000;
+    auto tcs = (mInfo.llTotalMicroSecs % 1000000) / 100000;
     auto tempo = 60000000.0 / m_iMicroSecsPerBeat;
 
-    RenderStatusLine("Time:", "%s%lld:%02d.%03d / %lld:%02d.%03d",
+    int cur_line = 0;
+    m_pRenderer->GetDrawList()->AddRectFilled(ImVec2(prcStatus->left, prcStatus->top), ImVec2(prcStatus->right, prcStatus->bottom), 0x80000000);
+
+    RenderStatusLine(cur_line++, "Time:", "%s%lld:%02d.%d / %lld:%02d.%d",
         m_llStartTime >= 0 ? "" : "-",
-        min, sec, ms,
-        tmin, tsec, tms);
-    RenderStatusLine("BPM (Beat):", "%.3lf (%u/%u)", tempo, (m_CurBeat % m_iBeatType) + 1, m_iBeatType);
+        min, sec, cs,
+        tmin, tsec, tcs);
+    RenderStatusLine(cur_line++, "Tempo:", "%.3lf bpm", tempo);
 
     // Framerate
     if (m_bShowFPS && !m_bDumpFrames)
-        RenderStatusLine("FPS:", "%.0lf", m_dFPS);
+        RenderStatusLine(cur_line++, "FPS:", "%.1lf", m_dFPS);
 
     // Nerd stats
     if (viz.bNerdStats) {
@@ -2106,35 +2100,20 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
         for (int i = 0; i < m_dNPSNotes.size(); i++)
             nps += std::get<1>(m_dNPSNotes[i]);
 
-        RenderStatusLine("NPS:", "%lld", nps);
-        RenderStatusLine("Rendered:", "%llu", m_pRenderer->GetRenderedNotesCount());
+        RenderStatusLine(cur_line++, "NPS:", "%lld", nps);
+        RenderStatusLine(cur_line++, "Rendered:", "%llu", m_pRenderer->GetRenderedNotesCount());
     }
-
-    ImGui::End();
 }
 
-void MainScreen::RenderMarker(LPRECT prcPos, const char* sStr)
-{
-    /*
-    InflateRect(prcPos, -6, -3);
+void MainScreen::RenderMarker(const char* str) {
+    ImVec2 size = ImGui::CalcTextSize(str);
+    size.x += 12;
+    size.y += 6;
 
-    OffsetRect(prcPos, 2, 1);
-    m_pRenderer->DrawText(sStr, D3D12Renderer::Small, prcPos, 0, 0xFF404040);
-    OffsetRect(prcPos, -2, -1);
-    m_pRenderer->DrawText(sStr, D3D12Renderer::Small, prcPos, 0, 0xFFFFFFFF);
-    */
-
-    if (strlen(sStr)) {
-        ImGui::SetNextWindowPos(ImVec2(-1.0f, -1.0f));
-        ImGui::SetNextWindowSize(ImVec2(0.0f, 0.0f), ImGuiCond_Once);
-        ImGui::Begin("marker", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoMove |
-            ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoNav |
-            ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoFocusOnAppearing);
-
-        ImGui::Text("%s", sStr);
-
-        ImGui::End();
-    }
+    auto draw_list = m_pRenderer->GetDrawList();
+    draw_list->AddRectFilled(ImVec2(0, 0), size, 0x80000000);
+    draw_list->AddText(ImVec2(6 + 2, 3 + 1), 0xFF404040, str);
+    draw_list->AddText(ImVec2(6, 3), 0xFFFFFFFF, str);
 }
 
 void MainScreen::RenderMessage(LPRECT prcMsg, TCHAR* sMsg)

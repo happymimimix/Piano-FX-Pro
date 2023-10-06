@@ -222,9 +222,9 @@ private:
     void RenderKeys();
     void RenderBorder();
     void RenderText();
-    void RenderStatusLine(const char* left, const char* format, ...);
+    void RenderStatusLine(int line, const char* left, const char* format, ...);
     void RenderStatus( LPRECT prcPos );
-    void RenderMarker(LPRECT prcPos, const char* sStr);
+    void RenderMarker(const char* str);
     void RenderMessage( LPRECT prcMsg, TCHAR *sMsg );
 
     // MIDI info

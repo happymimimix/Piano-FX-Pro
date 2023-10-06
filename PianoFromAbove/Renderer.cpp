@@ -627,8 +627,10 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     auto& io = ImGui::GetIO();
     ImFontConfig font_config = {};
     font_config.FontNo = 0; // TAHOMA!
-    font_config.RasterizerMultiply = 2.0f;
-    io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Tahoma.ttf", 14.0f, nullptr, io.Fonts->GetGlyphRangesDefault());
+    io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Tahoma.ttf", 14.0f, &font_config, io.Fonts->GetGlyphRangesDefault());
+    font_config.FontNo = 1; // MS UI Gothic
+    font_config.MergeMode = true;
+    io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\msgothic.ttc", 14.0f, &font_config, io.Fonts->GetGlyphRangesJapanese());
     io.IniFilename = nullptr;
 
     // Theme tweaks
@@ -640,6 +642,8 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
 
     ImGui_ImplWin32_Init(hWnd);
     ImGui_ImplDX12_Init(m_pDevice.Get(), FrameCount, DXGI_FORMAT_B8G8R8A8_UNORM, imgui_heap, imgui_heap->GetCPUDescriptorHandleForHeapStart(), imgui_heap->GetGPUDescriptorHandleForHeapStart());
+
+    m_pDrawList = new ImDrawList(ImGui::GetDrawListSharedData());
 
     return std::make_tuple(S_OK, "");
 }
@@ -937,6 +941,7 @@ HRESULT D3D12Renderer::ClearAndBeginScene(DWORD color) {
 HRESULT D3D12Renderer::EndScene(bool draw_bg) {
     // Generate ImGui render data
     ImGui::Render();
+    ImGui::GetDrawData()->AddDrawList(m_pDrawList);
 
     // Draw background
     if (draw_bg) {
@@ -1083,7 +1088,10 @@ HRESULT D3D12Renderer::Present() {
 }
 
 HRESULT D3D12Renderer::BeginText() {
-    // TODO
+    ImGui::Render();
+    m_pDrawList->_ResetForNewFrame();
+    m_pDrawList->PushClipRectFullScreen();
+    m_pDrawList->PushTextureID(ImGui::GetIO().Fonts->TexID);
     return S_OK;
 }
 
