@@ -50,7 +50,6 @@ private:
     long long GetRawTicks();
     long long m_llStartTicks;
     long long m_llTicksPerSec;
-    bool m_bTooPrecise;
 
     // More manual timer stuff
     long long m_llManualTicks;
@@ -74,7 +73,6 @@ public:
     static wchar_t* StringToWstring( const string &s );
     static char* WstringToString( const wstring &s );
     static void ParseLongHex( const string &sText, string &sVal );
-    static bool MD5( const unsigned char *pData, int iSize, string &sOut );
     static unsigned RandColor();
     static void RGBtoHSV( int R, int G, int B, int &H, int &S, int &V );
     static void HSVtoRGB( int H, int S, int V, int &R, int &G, int &B );

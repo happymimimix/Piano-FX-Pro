@@ -28,7 +28,6 @@ Timer::~Timer()
 
 void Timer::Init(bool manual) {
     // Get the frequency. This should be done in a static constructor. Oh well.
-    LARGE_INTEGER liFreq = { 0 };
     m_bManualTimer = manual;
     m_llManualTicks = 0;
     if (!m_bManualTimer) {
@@ -171,24 +170,6 @@ void Util::ParseLongHex( const string &sText, string &sVal )
         if ( sscanf_s( buf, "%2X", &byte ) > 0 )
             sVal[sVal.length() - 1] = byte;
     }
-}
-
-bool Util::MD5( const unsigned char *pData, int iSize, string &sOut )
-{
-    HCRYPTPROV hCryptProv;
-    HCRYPTHASH hHash;
-    BYTE pHash[32] = { 0 };
-    DWORD iHashLen = sizeof( pHash );
-
-    bool bSuccess = ( CryptAcquireContext( &hCryptProv, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT | CRYPT_MACHINE_KEYSET ) &&
-                      CryptCreateHash( hCryptProv, CALG_MD5, 0, 0, &hHash ) && 
-                      CryptHashData( hHash, pData, iSize, 0 ) &&
-                      CryptGetHashParam( hHash, HP_HASHVAL, pHash, &iHashLen, 0 ) );
-
-    CryptDestroyHash( hHash );
-    CryptReleaseContext( hCryptProv, 0 );
-    sOut = reinterpret_cast< char* >( pHash );
-    return bSuccess;
 }
 
 unsigned Util::RandColor()

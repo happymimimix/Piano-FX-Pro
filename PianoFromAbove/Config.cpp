@@ -152,7 +152,7 @@ void VisualSettings::LoadDefaultValues()
     this->iLastKey = 127;
 
     iBkgColor = 0x00303030;
-    int R, G, B, H = 0, S = 80, V = 100;
+    int R, G, B = 0, S = 80, V = 100;
     int iColors = sizeof( this->colors ) / sizeof( this->colors[0] );
     for ( int i = 10, count = 0; count < iColors; i = ( i + 7 ) % iColors, count++ )
     {
@@ -199,7 +199,6 @@ void ViewSettings::LoadDefaultValues()
     this->m_bKeyboard = true;
     this->m_bOnTop = false;
     this->m_bFullScreen = false;
-    this->m_bZoomMove = false;
     this->m_fOffsetX = 0.0f;
     this->m_fOffsetY = 0.0f;
     this->m_fZoomX = 1.0f;

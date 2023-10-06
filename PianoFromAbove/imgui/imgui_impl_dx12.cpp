@@ -336,6 +336,7 @@ static void ImGui_ImplDX12_CreateFontsTexture()
         ID3D12Resource* uploadBuffer = nullptr;
         HRESULT hr = bd->pd3dDevice->CreateCommittedResource(&props, D3D12_HEAP_FLAG_NONE, &desc,
             D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&uploadBuffer));
+        (void)hr;
         IM_ASSERT(SUCCEEDED(hr));
 
         void* mapped = nullptr;

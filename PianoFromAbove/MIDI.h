@@ -297,11 +297,9 @@ public:
     int ParseEvent( const unsigned char *pcData, size_t iMaxSize );
 
 private:
-    int m_iSysExCode;
     int m_iDataLen;
     unsigned char *m_pcData;
     bool m_bHasMoreData;
-    MIDISysExEvent *prevEvent;
 };
 
 //

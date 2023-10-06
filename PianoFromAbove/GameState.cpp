@@ -264,9 +264,6 @@ GameState::GameError SplashScreen::MsgProc( HWND hWnd, UINT msg, WPARAM wParam, 
             break;
         case WM_KEYDOWN:
         {
-            bool bCtrl = GetKeyState( VK_CONTROL ) < 0;
-            bool bAlt = GetKeyState( VK_MENU ) < 0;
-
             switch( wParam )
             {
                 case VK_SPACE:
@@ -313,7 +310,6 @@ GameState::GameError SplashScreen::Logic()
         m_OutDevice.AllNotesOff();
 
     // Figure out start and end times for display
-    long long llOldStartTime = m_llStartTime;
     long long llNextStartTime = m_llStartTime + llElapsed;
     if ( !bPaused && m_llStartTime < llMaxTime )
         m_llStartTime = llNextStartTime;
@@ -628,7 +624,6 @@ void MainScreen::InitState()
     static Config &config = Config::GetConfig();
     static const PlaybackSettings &cPlayback = config.GetPlaybackSettings();
     static const ViewSettings &cView = config.GetViewSettings();
-    static const VisualSettings &cVisual = config.GetVisualSettings();
     static const VizSettings& cViz = config.GetVizSettings();
 
     m_eGameMode = Practice;
@@ -770,7 +765,6 @@ ChannelSettings* MainScreen::GetChannelSettings( int iTrack )
 
 void MainScreen::SetChannelSettings( const vector< bool > &vMuted, const vector< bool > &vHidden, const vector< unsigned > &vColor )
 {
-    const MIDI::MIDIInfo &mInfo = m_MIDI.GetInfo();
     const vector< MIDITrack* > &vTracks = m_MIDI.GetTracks();
 
     bool bMuted = vMuted.size() > 0;
@@ -1010,9 +1004,7 @@ GameState::GameError MainScreen::Logic( void )
     bool bMute = cPlayback.GetMute();
     long long llTimeSpan = static_cast< long long >( 3.0 * dNSpeed * 1000000 );
     bool bPausedChanged = ( bPaused != m_bPaused );
-    bool bSpeedChanged = ( dSpeed != m_dSpeed );
     bool bMuteChanged = ( bMute != m_bMute );
-    bool bTimeSpanChanged = ( llTimeSpan != m_llTimeSpan );
     
     // Set the state
     m_bTickMode = cViz.bTickBased;
@@ -2041,7 +2033,7 @@ void MainScreen::RenderText()
     if (!m_sMarker.empty() && viz.bShowMarkers)
         RenderMarker(m_sMarker.c_str());
     if (m_bZoomMove)
-        RenderMessage(&rcMsg, TEXT("- Left-click and drag to move the screen\n- Right-click and drag to zoom horizontally\n- Press Escape to abort changes\n- Press Ctrl+V to save changes"));
+        RenderMessage(&rcMsg, (TCHAR*)TEXT("- Left-click and drag to move the screen\n- Right-click and drag to zoom horizontally\n- Press Escape to abort changes\n- Press Ctrl+V to save changes"));
 
     m_pRenderer->EndText();
 }
@@ -2070,7 +2062,6 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
     Config& config = Config::GetConfig();
     VizSettings viz = config.GetVizSettings();
     const MIDI::MIDIInfo& mInfo = m_MIDI.GetInfo();
-    auto div = m_MIDI.GetInfo().iDivision;
     auto starttime = ((m_llStartTime >= 0) ? m_llStartTime : -m_llStartTime);
 
     auto min = starttime / 60000000;

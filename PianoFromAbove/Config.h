@@ -14,7 +14,7 @@
 #include <string>
 
 //#include "ProtoBuf\MetaData.pb.h"
-#include "tinyxml\tinyxml.h"
+#include "TinyXML\tinyxml.h"
 
 #include "MIDI.h"
 #include "GameState.h"

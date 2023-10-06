@@ -51,7 +51,7 @@ VOID DoPreferences( HWND hWndOwner )
     psh.ppsp = (LPCPROPSHEETPAGE) &psp;
     psh.pfnCallback = NULL;
 
-    INT_PTR result = PropertySheet(&psh);
+    PropertySheet(&psh);
 }
 
 VOID Changed( HWND hWnd )
@@ -346,7 +346,7 @@ INT_PTR WINAPI ControlsProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 
             // Edit boxes
             TCHAR buf[32];
-            int len = _stprintf_s( buf, TEXT( "%g" ), cControls.dFwdBackSecs );
+            _stprintf_s( buf, TEXT( "%g" ), cControls.dFwdBackSecs );
             SetWindowText( hWndFwdBack, buf );
             _stprintf_s( buf, TEXT( "%g" ), cControls.dSpeedUpPct );
             SetWindowText( hWndSpeedPct, buf );
@@ -553,8 +553,8 @@ BOOL ToggleYN( HWND hWndListview, int iItem )
     lvi.cchTextMax = 2;
     if ( SendMessage( hWndListview, LVM_GETITEMTEXT, iItem, ( LPARAM )&lvi )  <= 0 ) return FALSE;
 
-    if ( YN[0] == TEXT( 'Y' ) ) lvi.pszText = TEXT( "No" );
-    else if ( YN[0] == TEXT( 'N' ) ) lvi.pszText = TEXT( "Yes" );
+    if ( YN[0] == TEXT( 'Y' ) ) lvi.pszText = (LPWSTR)TEXT( "No" );
+    else if ( YN[0] == TEXT( 'N' ) ) lvi.pszText = (LPWSTR)TEXT( "Yes" );
     else return TRUE;
 
     SendMessage( hWndListview, LVM_SETITEMTEXT, iItem, ( LPARAM )&lvi );
@@ -620,7 +620,7 @@ INT_PTR WINAPI TracksProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
             GetClientRect( hWndTracks, &rcTracks );
             int aFmt[6] = { LVCFMT_LEFT, LVCFMT_LEFT, LVCFMT_RIGHT, LVCFMT_CENTER, LVCFMT_CENTER, LVCFMT_CENTER };
             int aCx[6] = { 27, rcTracks.right - 27 - 55 - 50 - 50 - 50, 55, 50, 50, 50 };
-            TCHAR *aText[6] = { TEXT( "Trk" ), TEXT( "Instrument" ), TEXT( "Notes" ), TEXT( "Muted" ), TEXT( "Hidden" ), TEXT( "Color" ) };
+            CONST TCHAR *aText[6] = { TEXT( "Trk" ), TEXT( "Instrument" ), TEXT( "Notes" ), TEXT( "Muted" ), TEXT( "Hidden" ), TEXT( "Color" ) };
 
             LVCOLUMN lvc = { 0 };
             lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT;
@@ -628,7 +628,7 @@ INT_PTR WINAPI TracksProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
             {
                 lvc.fmt = aFmt[i];
                 lvc.cx = aCx[i];
-                lvc.pszText = aText[i];
+                lvc.pszText = (TCHAR*)aText[i];
                 SendMessage( hWndTracks, LVM_INSERTCOLUMN, i, ( LPARAM )&lvc );
             }
 
@@ -666,8 +666,6 @@ INT_PTR WINAPI TracksProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 
             RECT rcItem = { LVIR_BOUNDS };
             SendMessage( hWndTracks, LVM_GETITEMRECT, 0, ( LPARAM )&rcItem );
-            int iItemHeight = rcItem.bottom - rcItem.top;
-            int iBmpSize = iItemHeight - 2;
 
             return TRUE;
         }

@@ -163,11 +163,12 @@ int MIDIPos::GetNextEvent( int iMicroSecs, MIDIEvent **pOutEvent )
 
     // Make sure the event doesn't occur after the requested time window
     int iMaxTickAllowed = m_iCurrTick;
-    if ( m_bIsStandard )
+    if (m_bIsStandard) {
         if (m_iMicroSecsPerBeat != 0)
-            iMaxTickAllowed += ( static_cast< long long >( m_iTicksPerBeat ) * ( m_iCurrMicroSec + iMicroSecs ) ) / m_iMicroSecsPerBeat;
-    else
-        iMaxTickAllowed += ( static_cast< long long >( m_iTicksPerSecond ) * ( m_iCurrMicroSec + iMicroSecs ) ) / 1000000;
+            iMaxTickAllowed += (static_cast<long long>(m_iTicksPerBeat) * (m_iCurrMicroSec + iMicroSecs)) / m_iMicroSecsPerBeat;
+    } else {
+        iMaxTickAllowed += (static_cast<long long>(m_iTicksPerSecond) * (m_iCurrMicroSec + iMicroSecs)) / 1000000;
+    }
 
     if ( iMicroSecs < 0 || pMinEvent->GetAbsT() <= iMaxTickAllowed )
     {
@@ -251,9 +252,8 @@ MIDI::MIDI ( const wstring &sFilename )
         fclose(stream);
 
         // Parse it
-        size_t iTotal = ParseMIDI(pcMemBlock, iSize);
+        ParseMIDI(pcMemBlock, iSize);
         m_Info.sFilename = sFilename;
-        // Util::MD5( pcMemBlock, iSize, m_Info.sMd5 );
 
         // Clean up
         delete[] pcMemBlock;
@@ -605,6 +605,8 @@ void MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vP
                     if (vMarkers)
                         vMarkers->push_back(pair< long long, int >(pEvent->GetAbsMicroSec(), vMetaEvents->size() - 1));
                     break;
+                default:
+                    break;
                 }
             }
         }
@@ -725,6 +727,7 @@ size_t MIDITrack::ParseEvents( const unsigned char *pcData, size_t iMaxSize, siz
             case MIDIEvent::ChannelEvent: iCount = ((MIDIChannelEvent*)pEvent)->ParseEvent(pcData + iDTCode + iTotal, iMaxSize - iDTCode - iTotal); break;
             case MIDIEvent::MetaEvent: iCount = ((MIDIMetaEvent*)pEvent)->ParseEvent(pcData + iDTCode + iTotal, iMaxSize - iDTCode - iTotal); break;
             case MIDIEvent::SysExEvent: iCount = ((MIDISysExEvent*)pEvent)->ParseEvent(pcData + iDTCode + iTotal, iMaxSize - iDTCode - iTotal); break;
+            default: break;
             }
             if ( iCount > 0 )
             {
@@ -768,6 +771,8 @@ void MIDITrack::MIDITrackInfo::AddEventInfo( const MIDIEvent &mEvent )
                 case MIDIMetaEvent::SequenceNumber:
                     if ( mMetaEvent.GetDataLen() == 2)
                         MIDI::Parse16Bit( mMetaEvent.GetData(), 2, &this->iSequenceNumber );
+                    break;
+                default:
                     break;
             }
             break;
@@ -817,9 +822,13 @@ void MIDITrack::MIDITrackInfo::AddEventInfo( const MIDIEvent &mEvent )
                             this->aProgram[ iChannel ] = iParam1;
                     }
                     break;
+                default:
+                    break;
             }
             break;
         }
+        default:
+            break;
     }
 }
 
@@ -863,6 +872,7 @@ int MIDIEvent::MakeNextEvent( MIDI& midi, const unsigned char *pcData, size_t iM
         case ChannelEvent: *pOutEvent = midi.AllocChannelEvent(); break;
         case MetaEvent: *pOutEvent = new MIDIMetaEvent(); break;
         case SysExEvent: *pOutEvent = new MIDISysExEvent(); break;
+        default: break;
     }
 
     (*pOutEvent)->m_eEventType = eEventType;
@@ -1156,8 +1166,6 @@ FARPROC MIDIOutDevice::GetOmniMIDIProc(const char* func) {
 void CALLBACK MIDIOutDevice::MIDIOutProc( HMIDIOUT hmo, UINT wMsg, DWORD_PTR dwInstance,
                                           DWORD_PTR dwParam1, DWORD_PTR dwParam2 )
 {
-    MIDIOutDevice *pOutDevice = reinterpret_cast< MIDIOutDevice* >( dwInstance );
-
     switch ( wMsg )
     {
         case MOM_CLOSE:

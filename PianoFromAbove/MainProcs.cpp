@@ -95,7 +95,6 @@ LRESULT WINAPI WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
         case WM_COMMAND:
         {
             int iId = LOWORD( wParam );
-            int iCode = HIWORD( wParam );
             switch ( iId )
             {
                 case IDOK:
@@ -330,9 +329,8 @@ LRESULT WINAPI GfxProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
     // Static vars for poping up the lib and bar in full screen mode
     static const ViewSettings &cView = Config::GetConfig().GetViewSettings();
-    static const PlaybackSettings &cPlayback = Config::GetConfig().GetPlaybackSettings();
     static const VisualSettings &cVisual = Config::GetConfig().GetVisualSettings();
-    static bool bShowLib, bShowBar;
+    static bool bShowBar;
     static int iBarHeight;
 
     static bool bTrack = false, bTrackL = false, bTrackR = false;
@@ -640,14 +638,14 @@ HWND CreateRebar( HWND hWndOwner )
     rbbi.fMask = RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_STYLE | RBBIM_TEXT;
 
     rbbi.fStyle = RBBS_NOGRIPPER | RBBS_VARIABLEHEIGHT;
-    rbbi.lpText = TEXT( "" );
+    rbbi.lpText = (LPWSTR)TEXT( "" );
     rbbi.hwndChild = hWndToolbar;
     rbbi.cxMinChild = rbbi.cyIntegral = 0;
     rbbi.cyMinChild = rbbi.cyChild = rbbi.cyMaxChild = 31;
     SendMessage( hWndRebar, RB_INSERTBAND, -1, (LPARAM)&rbbi );
 
     rbbi.fStyle = RBBS_NOGRIPPER | RBBS_VARIABLEHEIGHT | RBBS_BREAK;
-    rbbi.lpText = TEXT( "" );
+    rbbi.lpText = (LPWSTR)TEXT( "" );
     rbbi.hwndChild = hWndPosn;
     rbbi.cyMinChild = rbbi.cyChild = rbbi.cyMaxChild = 20;
     SendMessage( hWndRebar, RB_INSERTBAND, -1, (LPARAM)&rbbi );
@@ -900,7 +898,6 @@ VOID MoveThumbPosition( int iPositionNew, int &iPosition, HWND hWnd, RECT *rcCha
 INT_PTR WINAPI AboutProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
     static HANDLE hSplash = NULL;
-    static ViewSettings &cView = Config::GetConfig().GetViewSettings();
 
     switch( msg )
     {
@@ -922,7 +919,6 @@ INT_PTR WINAPI AboutProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
         case WM_CTLCOLORSTATIC:
         {
             HDC hDC = ( HDC )wParam;
-            HWND hWndCtrl = ( HWND )lParam;
             SetBkMode( hDC, TRANSPARENT );
             return ( INT_PTR )GetStockObject( WHITE_BRUSH );
         }
@@ -1066,11 +1062,8 @@ VOID SetPlayable( BOOL bPlayable )
 
 VOID SetPlayMode( INT ePlayMode )
 {
-    static const PlaybackSettings &cPlayback = Config::GetConfig().GetPlaybackSettings();
-
     HWND hWndToolbar = GetDlgItem( g_hWndBar, IDC_TOPTOOLBAR );
     HMENU hMenu = GetMainMenu();
-    BOOL bSplash = ( ePlayMode == GameState::Splash );
     BOOL bPractice = ( ePlayMode == GameState::Practice );
 
     int iPlayButtons[] = { ID_PLAY_PLAY, ID_PLAY_PAUSE, ID_PLAY_STOP };
@@ -1170,7 +1163,6 @@ BOOL PlayFile( const wstring &sFile, bool bCustomSettings, bool bLibraryEligible
 {
     Config &config = Config::GetConfig();
     const VisualSettings &cVisual = config.GetVisualSettings();
-    const AudioSettings &cAudio = config.GetAudioSettings();
     PlaybackSettings &cPlayback = config.GetPlaybackSettings();
     ViewSettings &cView = config.GetViewSettings();
 
@@ -1204,7 +1196,6 @@ BOOL PlayFile( const wstring &sFile, bool bCustomSettings, bool bLibraryEligible
     }
     else
     {
-        int iNumChannels = pGameState->GetMIDI().GetInfo().iNumChannels;
         pGameState->SetChannelSettings(
             vector< bool >(),
             vector< bool >(),
@@ -1258,7 +1249,6 @@ VOID CheckActivity( BOOL bIsActive, POINT *ptNew, BOOL bToggleEnable )
     }
     else if ( !bIsActive && GetFocus() == g_hWndGfx  && ( !IsWindowVisible( g_hWndBar ) || cVisual.bAlwaysShowControls ))
     {
-        HWND hTest = GetFocus();
         if ( bWasActive )
             bWasActive = false;
         else if ( !bMouseHidden )
