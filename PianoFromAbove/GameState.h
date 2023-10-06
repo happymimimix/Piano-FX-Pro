@@ -155,9 +155,9 @@ public:
 };
 
 typedef struct {
-    size_t queue_pos; // where to write the generated vertex data
-    const MIDIChannelEvent* note;
-    bool visualize_bends;
+    bool note_on;
+    int idx;
+    int sister_idx;
 } thread_work_t;
 
 class MainScreen : public GameState
@@ -194,7 +194,7 @@ private:
     void InitState();
 
     // Logic
-    void UpdateState( int iPos );
+    void UpdateState(int key, const thread_work_t& work);
     void JumpTo(long long llStartTime, bool bUpdateGUI = true);
     void PlaySkippedEvents(eventvec_t::const_iterator itOldProgramChange);
     void ApplyMarker(unsigned char* data, size_t size);
@@ -255,6 +255,7 @@ private:
     long long m_llStartTime, m_llTimeSpan;  // Times of the start and end events of the current window
     int m_iStartTick; // Tick that corresponds with m_llStartTime. Used to help with beat and metronome detection
     vector<int> m_vState[128];  // The notes that are on at time m_llStartTime.
+    vector<thread_work_t> m_vThreadWork[128];
     int m_pNoteState[128]; // The last note that was turned on
     double m_dSpeed; // Speed multiplier
     bool m_bPaused; // Paused state
@@ -282,7 +283,6 @@ private:
     ChannelSettings m_csBackground;
     ChannelSettings m_csKBRed, m_csKBWhite, m_csKBSharp, m_csKBBackground;
     vector< TrackSettings > m_vTrackSettings;
-    vector< thread_work_t > m_vThreadWork;
     float m_pBends[16] = {};
     deque<tuple<long long, long long>> m_dNPSNotes;
     std::wstring m_sCurBackground;

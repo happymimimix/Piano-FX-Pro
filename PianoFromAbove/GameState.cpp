@@ -1099,6 +1099,9 @@ GameState::GameError MainScreen::Logic( void )
         // Advance start position updating initial state as we pass stale events
         // Also PLAYS THE MUSIC
         long long notes_played = 0;
+        long long events_processed = 0;
+        for (auto& work : m_vThreadWork)
+            work.clear();
         while ( m_iStartPos < iEventCount && m_vEvents[m_iStartPos]->GetAbsMicroSec() <= m_llStartTime )
         {
             MIDIChannelEvent *pEvent = m_vEvents[m_iStartPos];
@@ -1116,8 +1119,31 @@ GameState::GameError MainScreen::Logic( void )
                     static_cast<int>(pEvent->GetParam2() * dVolumeCorrect + 0.5));
                 notes_played++;
             }
-            UpdateState( m_iStartPos );
+            if ((pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn || pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOff)
+                && pEvent->GetParam1() < 128 && pEvent->HasSister())
+            {
+                m_vThreadWork[pEvent->GetParam1()].push_back({
+                    .note_on = (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0),
+                    .idx = m_iStartPos,
+                    .sister_idx = pEvent->GetSisterIdx(),
+                });
+            }
             m_iStartPos++;
+            events_processed++;
+        }
+
+        // Only parallelize after an events threshold is hit for this frame
+        if (events_processed < 131072) {
+            for (int i = 0; i < 128; i++) {
+                for (const auto& work : m_vThreadWork[i])
+                    UpdateState(i, work);
+            }
+        }
+        else {
+            concurrency::parallel_for(size_t(0), size_t(128), [&](int key) {
+                for (const auto& work : m_vThreadWork[key])
+                    UpdateState(key, work);
+            });
         }
         
         // Update NPS
@@ -1182,53 +1208,23 @@ GameState::GameError MainScreen::Logic( void )
     return Success;
 }
 
-void MainScreen::UpdateState( int iPos )
+void MainScreen::UpdateState(int key, const thread_work_t& work)
 {
-    // Event data
-    MIDIChannelEvent *pEvent = m_vEvents[iPos];
-    if ( !pEvent->HasSister() ) return;
-    if (pEvent->GetParam1() > 127)
-        return;
-
-    MIDIChannelEvent::ChannelEventType eEventType = pEvent->GetChannelEventType();
-    int iNote = pEvent->GetParam1();
-    int iVelocity = pEvent->GetParam2();
-
-    int iSisterIdx = pEvent->GetSisterIdx();
-    auto& note_state = m_vState[iNote];
-
-    // Turn note on
-    if ( eEventType == MIDIChannelEvent::NoteOn && iVelocity > 0 )
-    {
-        note_state.push_back( iPos );
-        m_pNoteState[iNote] = iPos;
-    }
-    else
-    {
-        if (iSisterIdx != -1) {
+    auto& note_state = m_vState[key];
+    if (work.note_on) {
+        note_state.push_back(work.idx);
+        m_pNoteState[key] = work.idx;
+    } else {
+        if (work.sister_idx != -1) {
             // binary search
-            auto pos = sse_bin_search(note_state, iSisterIdx);
+            auto pos = sse_bin_search(note_state, work.sister_idx);
             if (pos != -1)
                 note_state.erase(note_state.begin() + pos);
-        } else {
-            // slow path, should rarely happen
-            vector< int >::iterator it = note_state.begin();
-            MIDIChannelEvent* pSearch = pEvent->GetSister(m_vEvents);
-            while (it != note_state.end())
-            {
-                if (m_vEvents[*it] == pSearch) {
-                    it = note_state.erase(it);
-                    break;
-                } else {
-                    ++it;
-                }
-            }
         }
-
         if (note_state.size() == 0)
-            m_pNoteState[iNote] = -1;
+            m_pNoteState[key] = -1;
         else
-            m_pNoteState[iNote] = note_state.back();
+            m_pNoteState[key] = note_state.back();
     }
 }
 
@@ -1768,7 +1764,6 @@ void MainScreen::RenderNotes()
     }
 
     m_pRenderer->RenderBatch(true);
-    m_vThreadWork.clear();
 }
 
 void MainScreen::RenderNote(const MIDIChannelEvent* pNote, bool bVisualizeBends)
