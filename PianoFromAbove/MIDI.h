@@ -183,6 +183,7 @@ public:
         int aNoteCount[16], aProgram[16], iNumChannels;
     };
     const MIDITrackInfo& GetInfo() const { return m_TrackInfo; }
+    void ClearEvents() { m_vEvents.clear(); m_vEvents.shrink_to_fit(); }
 
 private:
     MIDITrackInfo m_TrackInfo;

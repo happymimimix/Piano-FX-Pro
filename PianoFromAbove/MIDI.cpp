@@ -612,6 +612,10 @@ void MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vP
         g_LoadingProgress.progress++;
     }
 
+    // We don't need the track vectors anymore (saves 8 bytes per event!)
+    for (auto track : m_vTracks)
+        track->ClearEvents();
+
     m_Info.llTotalMicroSecs = llTime;
     m_Info.llFirstNote = max( 0LL, llFirstNote );
 }

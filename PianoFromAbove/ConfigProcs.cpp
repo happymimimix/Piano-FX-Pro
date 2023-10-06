@@ -225,7 +225,7 @@ INT_PTR WINAPI AudioProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
         {
             int iId = LOWORD( wParam );
             int iCode = HIWORD( wParam );
-            if ( iCode == LBN_SELCHANGE ) 
+            if (iCode == LBN_SELCHANGE || (iId == IDC_KDMAPI && iCode == BN_CLICKED))
                 Changed( hWnd );
             break;
         }
