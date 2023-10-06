@@ -20,7 +20,7 @@
 #include "Globals.h"
 #include "Renderer.h"
 
-#include <shlobj.h>
+#include <ShlObj.h>
 
 ComPtr<IWICImagingFactory> D3D12Renderer::s_pWICFactory;
 
