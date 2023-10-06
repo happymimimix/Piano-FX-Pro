@@ -793,21 +793,20 @@ void MainScreen::SetChannelSettings( const vector< bool > &vMuted, const vector<
     for ( int i = 0; i < vTracks.size(); i++ )
     {
         const MIDITrack::MIDITrackInfo &mTrackInfo = vTracks[i]->GetInfo();
-        for ( int j = 0; j < 16; j++ )
-            if ( mTrackInfo.aNoteCount[j] > 0 )
-            {
-                MuteChannel( i, j, bMuted ? vMuted[min( iPos, vMuted.size() - 1 )] : false );
-                HideChannel( i, j, bHidden ? vHidden[min( iPos, vHidden.size() - 1 )] : false );
-                if (cViz.bColorLoop && bColor) {
-                    ColorChannel(i, j, vColor[iPos % vColor.size()]);
-                } else {
-                    if (bColor && iPos < vColor.size())
-                        ColorChannel(i, j, vColor[iPos]);
-                    else
-                        ColorChannel(i, j, 0, true);
-                }
-                iPos++;
+        for (int j = 0; j < 16; j++) {
+            MuteChannel(i, j, bMuted ? vMuted[min(iPos, vMuted.size() - 1)] : false);
+            HideChannel(i, j, bHidden ? vHidden[min(iPos, vHidden.size() - 1)] : false);
+            if (cViz.bColorLoop && bColor) {
+                ColorChannel(i, j, vColor[iPos % vColor.size()]);
             }
+            else {
+                if (bColor && iPos < vColor.size())
+                    ColorChannel(i, j, vColor[iPos]);
+                else
+                    ColorChannel(i, j, 0, true);
+            }
+            iPos++;
+        }
     }
 }
 
@@ -1885,8 +1884,8 @@ void MainScreen::RenderKeys()
             else
             {
                 const MIDIChannelEvent *pEvent = ( m_pNoteState[i] >= 0 ? m_vEvents[m_pNoteState[i]] : NULL );
-                const int iTrack = ( pEvent ? pEvent->GetTrack() : -1 );
-                const int iChannel = ( pEvent ? pEvent->GetChannel() : -1 );
+                const int iTrack = pEvent->GetTrack() % MaxTrackColors;
+                const int iChannel = pEvent->GetChannel();
 
                 ChannelSettings &csKBWhite = m_vTrackSettings[iTrack].aChannels[iChannel];
                 m_pRenderer->DrawRect( fCurX + fKeyGap1 , fCurY, m_fWhiteCX - fKeyGap, fTopCY + fNearCY - 2.0f,
@@ -1959,8 +1958,8 @@ void MainScreen::RenderKeys()
             else
             {
                 const MIDIChannelEvent *pEvent = ( m_pNoteState[i] >= 0 ? m_vEvents[m_pNoteState[i]] : NULL );
-                const int iTrack = ( pEvent ? pEvent->GetTrack() : -1 );
-                const int iChannel = ( pEvent ? pEvent->GetChannel() : -1 );
+                const int iTrack = pEvent->GetTrack() % MaxTrackColors;
+                const int iChannel = pEvent->GetChannel();
 
                 const float fNewNear = fNearCY * 0.25f;
 
