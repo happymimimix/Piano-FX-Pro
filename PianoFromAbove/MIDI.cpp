@@ -574,7 +574,7 @@ void MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vP
             vChannelEvents.push_back(pChannelEvent);
 
             MIDIChannelEvent::ChannelEventType eEventType = pChannelEvent->GetChannelEventType();
-            if (vProgramChanges && (eEventType == MIDIChannelEvent::ProgramChange || eEventType == MIDIChannelEvent::Controller))
+            if (vProgramChanges && (eEventType == MIDIChannelEvent::ProgramChange || eEventType == MIDIChannelEvent::Controller || eEventType == MIDIChannelEvent::PitchBend))
                 vProgramChanges->push_back(pair< long long, int >(pEvent->GetAbsMicroSec(), vChannelEvents.size() - 1));
         }
         else if ( pEvent->GetEventType() == MIDIEvent::MetaEvent )

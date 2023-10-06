@@ -1113,10 +1113,8 @@ GameState::GameError MainScreen::Logic( void )
             if (pEvent->GetChannelEventType() != MIDIChannelEvent::NoteOn) {
                 if (pEvent->GetChannelEventType() == MIDIChannelEvent::ProgramChange && pEvent->GetChannel() != MIDI::Drums && config.m_bPianoOverride)
                     pEvent->SetParam1(0);
-                if (pEvent->GetChannelEventType() == MIDIChannelEvent::PitchBend) {
-                    //m_pBends[pEvent->GetChannel()] = (short)(((pEvent->GetParam2() << 7) | pEvent->GetParam1()) - 8192);
+                if (pEvent->GetChannelEventType() == MIDIChannelEvent::PitchBend)
                     m_pBends[pEvent->GetChannel()] = (notex_table[1] - notex_table[0]) * (((short)(((pEvent->GetParam2() << 7) | pEvent->GetParam1()) - 8192)) / (8192.0f / 12.0f));
-                }
                 m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), pEvent->GetParam2());
             }
             else if (!m_bMute && (!m_bAnyChannelMuted || !m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bMuted)) {
@@ -1327,9 +1325,11 @@ void MainScreen::PlaySkippedEvents(eventvec_t::const_iterator itOldProgramChange
         return;
 
     // Lookup tables to see if we've got an event for a given control or program. faster than map or hash_map.
-    bool aControl[16][128], aProgram[16];
+    bool aControl[16][128], aProgram[16], aPitchBend[16];
+    bool bPianoOverride = Config::GetConfig().m_bPianoOverride;
     memset(aControl, 0, sizeof(aControl));
     memset(aProgram, 0, sizeof(aProgram));
+    memset(aPitchBend, 0, sizeof(aPitchBend));
 
     // Go from one before the next to the beginning backwards. iterators are so verbose :/
     vector< MIDIChannelEvent* > vControl;
@@ -1352,6 +1352,15 @@ void MainScreen::PlaySkippedEvents(eventvec_t::const_iterator itOldProgramChange
             !aProgram[pEvent->GetChannel()])
         {
             aProgram[pEvent->GetChannel()] = true;
+            if (pEvent->GetChannel() != MIDI::Drums && bPianoOverride)
+                pEvent->SetParam1(0);
+            m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), pEvent->GetParam2());
+        }
+        else if (pEvent->GetChannelEventType() == MIDIChannelEvent::PitchBend &&
+            !aPitchBend[pEvent->GetChannel()])
+        {
+            aPitchBend[pEvent->GetChannel()] = true;
+            m_pBends[pEvent->GetChannel()] = (notex_table[1] - notex_table[0]) * (((short)(((pEvent->GetParam2() << 7) | pEvent->GetParam1()) - 8192)) / (8192.0f / 12.0f));
             m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), pEvent->GetParam2());
         }
     }
