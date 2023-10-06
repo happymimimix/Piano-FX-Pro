@@ -106,6 +106,10 @@ GameState::GameError IntroScreen::Render()
     m_pRenderer->DrawRect( 0.0f, 0.0f, static_cast< float >( m_pRenderer->GetBufferWidth() ),
                            static_cast< float >( m_pRenderer->GetBufferHeight() ), 0x00000000 );
 
+    // Clear out the ImGui draw list
+    m_pRenderer->BeginText();
+    m_pRenderer->EndText();
+
     // Present the backbuffer contents to the display
     m_pRenderer->EndScene();
     m_pRenderer->Present();
@@ -708,6 +712,9 @@ GameState::GameError MainScreen::Init()
 
     }
 
+    for (auto& work : m_vThreadWork)
+        work.reserve(262144); // Should be plenty for most MIDIs
+
     return Success;
 }
 
@@ -1115,9 +1122,8 @@ GameState::GameError MainScreen::Logic( void )
                 && pEvent->GetParam1() < 128 && pEvent->HasSister())
             {
                 m_vThreadWork[pEvent->GetParam1()].push_back({
-                    .note_on = (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0),
                     .idx = m_iStartPos,
-                    .sister_idx = pEvent->GetSisterIdx(),
+                    .sister_idx = (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0) ? -1 : pEvent->GetSisterIdx(),
                 });
             }
             m_iStartPos++;
@@ -1203,16 +1209,15 @@ GameState::GameError MainScreen::Logic( void )
 void MainScreen::UpdateState(int key, const thread_work_t& work)
 {
     auto& note_state = m_vState[key];
-    if (work.note_on) {
+    if (work.sister_idx == -1) {
         note_state.push_back(work.idx);
         m_pNoteState[key] = work.idx;
     } else {
-        if (work.sister_idx != -1) {
-            // binary search
-            auto pos = sse_bin_search(note_state, work.sister_idx);
-            if (pos != -1)
-                note_state.erase(note_state.begin() + pos);
-        }
+        // binary search
+        auto pos = sse_bin_search(note_state, work.sister_idx);
+        if (pos != -1)
+            note_state.erase(note_state.begin() + pos);
+
         if (note_state.size() == 0)
             m_pNoteState[key] = -1;
         else

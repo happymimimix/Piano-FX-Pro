@@ -155,7 +155,6 @@ public:
 };
 
 typedef struct {
-    bool note_on;
     int idx;
     int sister_idx;
 } thread_work_t;
