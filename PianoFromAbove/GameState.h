@@ -261,6 +261,7 @@ private:
     Timer m_Timer; // Frame timers
     Timer m_RealTimer;
     bool m_bMute;
+    bool m_bAnyChannelMuted;
     double m_dVolume;
     bool m_bTickMode = false;
 

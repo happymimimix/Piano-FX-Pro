@@ -650,6 +650,14 @@ void MainScreen::InitState()
     double dNSpeed = cPlayback.GetNSpeed();
     m_llTimeSpan = static_cast< long long >( 3.0 * dNSpeed * 1000000 );
 
+    m_bAnyChannelMuted = false;
+    for (auto& track : m_vTrackSettings) {
+        for (auto& chan : track.aChannels) {
+            if (chan.bMuted)
+                m_bAnyChannelMuted = true;
+        }
+    }
+
     // m_Timer will be initialized *later*
     m_RealTimer.Init(false);
 
@@ -1113,7 +1121,7 @@ GameState::GameError MainScreen::Logic( void )
                 }
                 m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), pEvent->GetParam2());
             }
-            else if (!m_bMute && !m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bMuted) {
+            else if (!m_bMute && (!m_bAnyChannelMuted || !m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bMuted)) {
                 m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(),
                     static_cast<int>(pEvent->GetParam2() * dVolumeCorrect + 0.5));
                 notes_played++;
