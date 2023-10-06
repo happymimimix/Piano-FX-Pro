@@ -25,7 +25,7 @@
 #include "Misc.h"
 
 // Yes, I know you shouldn't store build numbers as doubles
-constexpr double BUILD_VERSION = 20231006;
+constexpr double BUILD_VERSION = 20231006.1;
 
 INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, INT nCmdShow );
 DWORD WINAPI GameThread( LPVOID lpParameter );
