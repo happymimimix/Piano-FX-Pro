@@ -790,21 +790,24 @@ void MainScreen::SetChannelSettings( const vector< bool > &vMuted, const vector<
     static const VizSettings& cViz = config.GetVizSettings();
 
     size_t iPos = 0;
-    for ( int i = 0; i < vTracks.size(); i++ )
-    {
+    unsigned int last_col = bColor ? vColor[0] : 0;
+    for (int i = 0; i < vTracks.size(); i++) {
+        const MIDITrack::MIDITrackInfo& mTrackInfo = vTracks[i]->GetInfo();
         for (int j = 0; j < 16; j++) {
-            MuteChannel(i, j, bMuted ? vMuted[min(iPos, vMuted.size() - 1)] : false);
-            HideChannel(i, j, bHidden ? vHidden[min(iPos, vHidden.size() - 1)] : false);
-            if (cViz.bColorLoop && bColor) {
-                ColorChannel(i, j, vColor[iPos % vColor.size()]);
+            if (mTrackInfo.aNoteCount[j] > 0) {
+                MuteChannel(i, j, bMuted ? vMuted[min(iPos, vMuted.size() - 1)] : false);
+                HideChannel(i, j, bHidden ? vHidden[min(iPos, vHidden.size() - 1)] : false);
+                if (cViz.bColorLoop && bColor) {
+                    last_col = vColor[iPos % vColor.size()];
+                } else {
+                    if (bColor && iPos < vColor.size())
+                        last_col = vColor[iPos];
+                    else
+                        last_col = Util::RandColor();
+                }
+                iPos++;
             }
-            else {
-                if (bColor && iPos < vColor.size())
-                    ColorChannel(i, j, vColor[iPos]);
-                else
-                    ColorChannel(i, j, 0, true);
-            }
-            iPos++;
+            ColorChannel(i, j, last_col);
         }
     }
 }
