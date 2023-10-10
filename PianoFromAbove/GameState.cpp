@@ -1092,7 +1092,7 @@ GameState::GameError MainScreen::Logic( void )
     RenderGlobals();
 
     // Advance end position
-    int iEventCount = (int)m_vEvents.size();
+    size_t iEventCount = m_vEvents.size();
     if (m_bTickMode) {
         while (m_iEndPos + 1 < iEventCount && m_vEvents[m_iEndPos + 1]->GetAbsT() < llEndTime)
             m_iEndPos++;
@@ -1129,8 +1129,8 @@ GameState::GameError MainScreen::Logic( void )
                 && pEvent->GetParam1() < 128 && pEvent->HasSister())
             {
                 m_vThreadWork[pEvent->GetParam1()].push_back({
-                    .idx = m_iStartPos,
-                    .sister_idx = (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0) ? -1 : pEvent->GetSisterIdx(),
+                    .idx = (unsigned)m_iStartPos,
+                    .sister_idx = (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0) ? ~0 : pEvent->GetSisterIdx(),
                 });
             }
             m_iStartPos++;
@@ -1216,7 +1216,7 @@ GameState::GameError MainScreen::Logic( void )
 void MainScreen::UpdateState(int key, const thread_work_t& work)
 {
     auto& note_state = m_vState[key];
-    if (work.sister_idx == -1) {
+    if (work.sister_idx == ~0) {
         note_state.push_back(work.idx);
         m_pNoteState[key] = work.idx;
     } else {
@@ -1255,7 +1255,7 @@ void MainScreen::JumpTo(long long llStartTime, bool bUpdateGUI)
     });
 
     // Start position
-    m_iStartPos = (int)m_vEvents.size();
+    m_iStartPos = (long long)m_vEvents.size();
     if (itMiddle != itEnd && itMiddle - m_vEvents.begin() < m_iStartPos)
         m_iStartPos = itMiddle - m_vEvents.begin();
 
@@ -1278,8 +1278,8 @@ void MainScreen::JumpTo(long long llStartTime, bool bUpdateGUI)
                 break;
         }
 
-        int iFound = 0;
-        int iSimultaneous = (*itPrev)->GetSimultaneous() + 1;
+        unsigned iFound = 0;
+        unsigned iSimultaneous = (*itPrev)->GetSimultaneous() + 1;
         for (std::vector<MIDIChannelEvent*>::reverse_iterator it(itMiddle); iFound < iSimultaneous && it != m_vEvents.rend(); ++it)
         {
             auto idx = m_vEvents.size() - 1 - (it - m_vEvents.rbegin());
@@ -1302,7 +1302,7 @@ void MainScreen::JumpTo(long long llStartTime, bool bUpdateGUI)
 
     // End position: a little tricky. Same as logic code. Only needed for paused jumping.
     m_iEndPos = m_iStartPos - 1;
-    int iEventCount = (int)m_vEvents.size();
+    auto iEventCount = (long long)m_vEvents.size();
     while (m_iEndPos + 1 < iEventCount && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() < llEndTime)
         m_iEndPos++;
 
@@ -1771,7 +1771,7 @@ void MainScreen::RenderLines()
 void MainScreen::RenderNotes()
 {
     // Do we have any notes to render?
-    if ( m_iEndPos < 0 || m_iStartPos >= static_cast< int >( m_vEvents.size() ) )
+    if ( m_iEndPos < 0 || m_iStartPos >= m_vEvents.size() )
         return;
 
     // Ensure that any rects rendered after this point render over the notes
@@ -1779,7 +1779,7 @@ void MainScreen::RenderNotes()
 
     bool visualize_bends = Config::GetConfig().GetVizSettings().bVisualizePitchBends;
 
-    for (int i = m_iEndPos; i >= m_iStartPos; i--) {
+    for (auto i = m_iEndPos; i >= m_iStartPos; i--) {
         MIDIChannelEvent* pEvent = m_vEvents[i];
         if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn &&
             pEvent->GetParam2() > 0 && pEvent->HasSister()) {

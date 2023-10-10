@@ -593,7 +593,7 @@ INT_PTR WINAPI TracksProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
             // Fill out the static text vals
             SetWindowText( GetDlgItem( hWnd, IDC_FILE ), mInfo.sFilename.c_str() + mInfo.sFilename.find_last_of( L'\\' ) + 1 );
             SetWindowText( GetDlgItem( hWnd, IDC_FOLDER ), mInfo.sFilename.substr( 0, mInfo.sFilename.find_last_of( L'\\' ) ).c_str() );
-            _stprintf_s( buf, TEXT( "%d" ), mInfo.iNoteCount );
+            _stprintf_s( buf, TEXT( "%llu" ), mInfo.iNoteCount );
             SetWindowText( GetDlgItem( hWnd, IDC_NOTES ), buf );
             _stprintf_s( buf, TEXT( "%lld:%02.0lf" ), mInfo.llTotalMicroSecs / 60000000,
                                                     ( mInfo.llTotalMicroSecs % 60000000 ) / 1000000.0 );
@@ -653,7 +653,7 @@ INT_PTR WINAPI TracksProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                         SendMessage( hWndTracks, LVM_SETITEM, 0, ( LPARAM )&lvi );
 
                         lvi.iSubItem++;
-                        _stprintf_s( buf, TEXT( "%d" ), mTrackInfo.aNoteCount[j] );
+                        _stprintf_s( buf, TEXT( "%llu" ), mTrackInfo.aNoteCount[j] );
                         SendMessage( hWndTracks, LVM_SETITEM, 0, ( LPARAM )&lvi );
 
                         lvi.iItem++;

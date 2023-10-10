@@ -180,7 +180,8 @@ public:
         int iMaxVolume, iVolumeSum;
         int iTotalTicks;
         long long llTotalMicroSecs;
-        int aNoteCount[16], aProgram[16], iNumChannels;
+        size_t aNoteCount[16];
+        int aProgram[16], iNumChannels;
     };
     const MIDITrackInfo& GetInfo() const { return m_TrackInfo; }
     void ClearEvents() { m_vEvents.clear(); m_vEvents.shrink_to_fit(); }
@@ -239,15 +240,15 @@ public:
     MIDIChannelEvent *GetSister(const std::vector<MIDIEvent*>& events) const {
         return m_iSisterIdx == -1 ? nullptr : (MIDIChannelEvent*)events[m_iSisterIdx];
     }
-    int GetSisterIdx() const { return m_iSisterIdx; }
-    int GetSimultaneous() const { return m_iSimultaneous; }
+    unsigned GetSisterIdx() const { return m_iSisterIdx; }
+    unsigned GetSimultaneous() const { return m_iSimultaneous; }
     unsigned GetLength() const { return m_uLength; }
     bool GetPassDone() const { return m_bPassDone; }
 
     void SetChannel(unsigned char channel) { m_cChannel = channel; }
     void SetParam1(unsigned char param1) { m_cParam1 = param1; }
     void SetParam2(unsigned char param2) { m_cParam2 = param2; }
-    void SetSisterIdx(int iSisterIdx) { m_iSisterIdx = iSisterIdx; }
+    void SetSisterIdx(unsigned iSisterIdx) { m_iSisterIdx = iSisterIdx; }
     void SetSimultaneous(int iSimultaneous) { m_iSimultaneous = iSimultaneous; }
     void SetLength(unsigned length) { m_uLength = length; }
     void SetPassDone(bool done) { m_bPassDone = done; }
@@ -255,8 +256,8 @@ public:
     bool HasSister() const { return m_iSisterIdx != -1; }
 
 private:
-    int m_iSisterIdx;
-    int m_iSimultaneous;
+    unsigned m_iSisterIdx;
+    unsigned m_iSimultaneous;
     unsigned m_uLength;
     bool m_bPassDone;
     unsigned char m_cChannel;
