@@ -145,8 +145,8 @@ public:
     void SetFullScreen( bool bFullScreen, bool bUpdateGUI = false ) { m_bFullScreen = bFullScreen; if ( bUpdateGUI ) ::SetFullScreen( bFullScreen ); }
     void SetZoomMove( bool bZoomMove, bool bUpdateGUI = false ) { m_bZoomMove = bZoomMove; if ( bUpdateGUI ) ::SetZoomMove( bZoomMove ); }
 
-    int GetMainLeft() const { return m_iMainLeft; }
-    int GetMainTop() const { return m_iMainTop; }
+    int GetMainLeft() const { return m_iMainLeft == -32000 ? CW_USEDEFAULT : m_iMainLeft; }
+    int GetMainTop() const { return m_iMainTop == -32000 ? CW_USEDEFAULT : m_iMainTop; }
     int GetMainWidth() const { return m_iMainWidth; }
     int GetMainHeight() const { return m_iMainHeight; }
     int GetLibWidth() const { return m_iLibWidth; }
