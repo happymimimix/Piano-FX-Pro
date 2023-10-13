@@ -221,6 +221,7 @@ void VizSettings::LoadDefaultValues() {
     this->sBackground = L"";
     this->bColorLoop = false;
     this->bKDMAPI = true;
+    this->bDisableUI = false;
 }
 
 void AudioSettings::LoadMIDIDevices()
@@ -376,6 +377,8 @@ void VizSettings::LoadConfigValues(TiXmlElement* txRoot) {
         bColorLoop = (iAttrVal != 0);
     if (txViz->QueryIntAttribute("KDMAPI", &iAttrVal) == TIXML_SUCCESS)
         bKDMAPI = (iAttrVal != 0);
+    if (txViz->QueryIntAttribute("DisableUI", &iAttrVal) == TIXML_SUCCESS)
+        bDisableUI = (iAttrVal != 0);
     std::string sTempStr;
     txViz->QueryStringAttribute("SplashMIDI", &sTempStr);
     sSplashMIDI = Util::StringToWstring(sTempStr);
@@ -500,6 +503,7 @@ bool VizSettings::SaveConfigValues(TiXmlElement* txRoot) {
     txViz->SetAttribute("Background", Util::WstringToString(sBackground));
     txViz->SetAttribute("ColorLoop", bColorLoop);
     txViz->SetAttribute("KDMAPI", bKDMAPI);
+    txViz->SetAttribute("DisableUI", bDisableUI);
 
     TiXmlElement* txBarColor = new TiXmlElement("BarColor");
     txViz->LinkEndChild(txBarColor);

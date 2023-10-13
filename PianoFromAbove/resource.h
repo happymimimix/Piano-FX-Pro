@@ -115,6 +115,8 @@
 #define IDC_SPLASHRESET2                1110
 #define IDC_BACKGROUNDRESET             1110
 #define IDC_COLORLOOP                   1111
+#define IDC_COLORLOOP2                  1113
+#define IDC_DISABLEUI                   1113
 #define ID_FILE_PLAYFILE                40001
 #define ID_FILE_ADDFILE                 40002
 #define ID_FILE_ADDFOLDER               40003

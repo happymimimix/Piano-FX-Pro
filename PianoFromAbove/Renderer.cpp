@@ -21,6 +21,7 @@
 #include "Renderer.h"
 
 #include <ShlObj.h>
+#include <Config.h>
 
 ComPtr<IWICImagingFactory> D3D12Renderer::s_pWICFactory;
 
@@ -1036,9 +1037,11 @@ HRESULT D3D12Renderer::EndScene(bool draw_bg) {
     }
 
     // Draw ImGui
-    ID3D12DescriptorHeap* heaps[] = { m_pImGuiSRVDescriptorHeap.Get()};
-    m_pCommandList->SetDescriptorHeaps(_countof(heaps), heaps);
-    ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), m_pCommandList.Get());
+    if (!Config::GetConfig().GetVizSettings().bDisableUI) {
+        ID3D12DescriptorHeap* heaps[] = { m_pImGuiSRVDescriptorHeap.Get() };
+        m_pCommandList->SetDescriptorHeaps(_countof(heaps), heaps);
+        ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), m_pCommandList.Get());
+    }
 
     // Transition backbuffer state to present
     auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_pRenderTargets[m_uFrameIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);

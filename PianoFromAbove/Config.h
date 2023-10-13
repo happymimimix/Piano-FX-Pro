@@ -181,6 +181,7 @@ struct VizSettings : public ISettings {
     std::wstring sBackground;
     bool bColorLoop;
     bool bKDMAPI;
+    bool bDisableUI;
 };
 
 class Config : public ISettings
