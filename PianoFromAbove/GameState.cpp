@@ -650,14 +650,6 @@ void MainScreen::InitState()
     double dNSpeed = cPlayback.GetNSpeed();
     m_llTimeSpan = static_cast< long long >( 3.0 * dNSpeed * 1000000 );
 
-    m_bAnyChannelMuted = false;
-    for (auto& track : m_vTrackSettings) {
-        for (auto& chan : track.aChannels) {
-            if (chan.bMuted)
-                m_bAnyChannelMuted = true;
-        }
-    }
-
     // m_Timer will be initialized *later*
     m_RealTimer.Init(false);
 
@@ -1050,6 +1042,14 @@ GameState::GameError MainScreen::Logic( void )
     double dMaxCorrect = ( mInfo.iMaxVolume > 0 ? 127.0 / mInfo.iMaxVolume : 1.0 );
     double dVolumeCorrect = ( mInfo.iVolumeSum > 0 ? ( m_dVolume * 127.0 * mInfo.iNoteCount ) / mInfo.iVolumeSum : 1.0 );
     dVolumeCorrect = min( dVolumeCorrect, dMaxCorrect );
+
+    m_bAnyChannelMuted = false;
+    for (auto& track : m_vTrackSettings) {
+        for (auto& chan : track.aChannels) {
+            if (chan.bMuted)
+                m_bAnyChannelMuted = true;
+        }
+    }
 
     if (cViz.eMarkerEncoding != m_iCurEncoding) {
         m_iCurEncoding = cViz.eMarkerEncoding;
