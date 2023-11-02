@@ -53,7 +53,8 @@ NotePSInput main(uint id : SV_VertexID) {
     //float2 right_bottom = mul(root.proj, float4(x + cx, y - cy, 0.5, 1)).xy;
 
     //uint color_idx = outline ? 2 : right;
-    result.position = mul(root.proj, float4(position, !sharp * 0.5, 1));
+    // cheaper runtime cost than checking if track is hidden on cpu
+    result.position = colors[track * 16 + chan].colors[2] == 0xFFFFFFFF ? float4(0, 0, 0, 0) : mul(root.proj, float4(position, !sharp * 0.5, 1));
     result.color = float4(unpack_color(colors[track * 16 + chan].colors[is_right]), 0);
     result.border = float4(unpack_color(colors[track * 16 + chan].colors[2]), 0);
     //result.edges = float4(left_top, right_bottom);

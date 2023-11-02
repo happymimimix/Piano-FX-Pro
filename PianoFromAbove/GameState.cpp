@@ -1206,7 +1206,7 @@ GameState::GameError MainScreen::Logic( void )
             auto& dst = track_colors[i * 16 + j];
             dst.primary = src.iPrimaryRGB;
             dst.dark = src.iDarkRGB;
-            dst.darker = src.iVeryDarkRGB;
+            dst.darker = src.bHidden ? 0xFFFFFFFF : src.iVeryDarkRGB; // Hack to signal hidden track without checking on CPU
         }
     }
 
