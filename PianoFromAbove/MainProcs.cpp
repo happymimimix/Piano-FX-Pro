@@ -1146,8 +1146,22 @@ INT_PTR LoadingProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
         SetWindowTextA(GetDlgItem(hwnd, IDC_MEMUSAGE), buf);
 
         auto bar = GetDlgItem(hwnd, IDC_LOADINGPROGRESS);
-        SendMessage(bar, PBM_SETRANGE32, 0, g_LoadingProgress.max);
-        SendMessage(bar, PBM_SETPOS, prog, 0);
+        static bool marquee = false;
+        if (g_LoadingProgress.stage == MIDILoadingProgress::Stage::CopyToMem) {
+            if (!marquee) {
+                SetWindowLong(bar, GWL_STYLE, WS_CHILD | WS_VISIBLE | PBS_MARQUEE);
+                SendMessage(bar, PBM_SETMARQUEE, 1, 0);
+                marquee = true;
+            }
+        } else {
+            if (marquee) {
+                SetWindowLong(bar, GWL_STYLE, WS_CHILD | WS_VISIBLE);
+                SendMessage(bar, PBM_SETMARQUEE, 0, 0);
+            }
+            SendMessage(bar, PBM_SETRANGE32, 0, g_LoadingProgress.max);
+            SendMessage(bar, PBM_SETPOS, prog, 0);
+            SendMessage(bar, PBM_SETPOS, max(1, prog) - 1, 0); // Bypass progress bar interpolation
+        }
         UpdateWindow(bar);
         return true;
     }
