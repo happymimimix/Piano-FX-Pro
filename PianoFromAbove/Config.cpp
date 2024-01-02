@@ -142,7 +142,7 @@ bool Config::SaveConfigValues( TiXmlElement *txRoot )
 //-----------------------------------------------------------------------------
 // LoadDefaultValues
 //-----------------------------------------------------------------------------
-#define RGBA(r, g, b, a) ((DWORD)(((BYTE)(r) | ((WORD)((BYTE)(g)) << 8)) | (((DWORD)(BYTE)(b)) << 16) | (((DWORD)(BYTE)(a)) << 24)))
+#define RGBA(r, g, b, a) ((DWORD)(((BYTE)(r) << 8 | ((WORD)((BYTE)(g)) << 16)) | (((DWORD)(BYTE)(b)) << 24) | (((DWORD)(BYTE)(a)) << 0)))
 
 void VisualSettings::LoadDefaultValues()
 {
@@ -152,19 +152,14 @@ void VisualSettings::LoadDefaultValues()
     this->iFirstKey = 0;
     this->iLastKey = 127;
 
-    this->iBkgColor = 0x00303030;
-
-    int R, G, B, A = 255;
-    int S = 80, V = 100;
+    iBkgColor = 0x00303030;
+    int R, G, B = 0, S = 80, V = 100;
     int iColors = sizeof(this->colors) / sizeof(this->colors[0]);
-
     for (int i = 10, count = 0; count < iColors; i = (i + 7) % iColors, count++)
     {
         Util::HSVtoRGB(360 * i / iColors, S, V, R, G, B);
-
-        this->colors[count] = RGBA(R, G, B, A);
+        this->colors[count] = RGB(R, G, B);
     }
-
     swap(this->colors[2], this->colors[4]);
 }
 
@@ -278,19 +273,16 @@ void VisualSettings::LoadConfigValues( TiXmlElement *txRoot )
               txColor = txColor->NextSiblingElement( "Color" ), i++ )
             if (txColor->QueryIntAttribute("R", &r) == TIXML_SUCCESS &&
                 txColor->QueryIntAttribute("G", &g) == TIXML_SUCCESS &&
-                txColor->QueryIntAttribute("B", &b) == TIXML_SUCCESS) {
-                txColor->QueryIntAttribute("A", &a);
-                this->colors[i] = ( ( r & 0xFF ) << 0 ) | ( ( g & 0xFF ) << 8 ) | ( ( b & 0xFF ) << 16 ) | ( (a & 0xFF) << 24);
-            }
+                txColor->QueryIntAttribute("B", &b) == TIXML_SUCCESS &&
+                txColor->QueryIntAttribute("A", &a) == TIXML_SUCCESS)
+                this->colors[i] = ((r & 0xFF) << 0) | ((g & 0xFF) << 8) | ((b & 0xFF) << 16);
     TiXmlElement *txBkgColor = txVisual->FirstChildElement( "BkgColor" );
     if ( txBkgColor )
         if (txBkgColor->QueryIntAttribute("R", &r) == TIXML_SUCCESS &&
             txBkgColor->QueryIntAttribute("G", &g) == TIXML_SUCCESS &&
-            txBkgColor->QueryIntAttribute("B", &b) == TIXML_SUCCESS) {
-            txBkgColor->QueryIntAttribute("A", &a);
-            this->iBkgColor = ( ( r & 0xFF ) << 0 ) | ( ( g & 0xFF ) << 8 ) | ( ( b & 0xFF ) << 16 ) | ( (a & 0xFF) << 24);
-        }
-
+            txBkgColor->QueryIntAttribute("B", &b) == TIXML_SUCCESS &&
+            txBkgColor->QueryIntAttribute("A", &a) == TIXML_SUCCESS)
+            this->iBkgColor = ((r & 0xFF) << 0) | ((g & 0xFF) << 8) | ((b & 0xFF) << 16);
 }
 
 void AudioSettings::LoadConfigValues( TiXmlElement *txRoot )
@@ -403,11 +395,9 @@ void VizSettings::LoadConfigValues(TiXmlElement* txRoot) {
     if (txBarColor)
         if (txBarColor->QueryIntAttribute("R", &r) == TIXML_SUCCESS &&
             txBarColor->QueryIntAttribute("G", &g) == TIXML_SUCCESS &&
-            txBarColor->QueryIntAttribute("B", &b) == TIXML_SUCCESS) {
-            txBarColor->QueryIntAttribute("A", &a);
-            iBarColor = ((r & 0xFF) << 0) | ((g & 0xFF) << 8) | ((b & 0xFF) << 16) | ((a & 0xFF) << 24);
-        }
-
+            txBarColor->QueryIntAttribute("B", &b) == TIXML_SUCCESS &&
+            txBarColor->QueryIntAttribute("A", &a) == TIXML_SUCCESS)
+            iBarColor = ((r & 0xFF) << 0) | ((g & 0xFF) << 8) | ((b & 0xFF) << 16);
 }
 
 //-----------------------------------------------------------------------------
