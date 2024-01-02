@@ -21,8 +21,8 @@ StructuredBuffer<FixedSizeData> fixed : register(t1);
 StructuredBuffer<TrackColor> colors : register(t2);
 StructuredBuffer<NoteData> note_data : register(t3);
 
-float3 unpack_color(uint col) {
-    return float3(float((col >> 16) & 0xFF) / 255.0, float((col >> 8) & 0xFF) / 255.0, float(col & 0xFF) / 255.0);
+float4 unpack_color(uint col) {
+    return float4(float((col >> 16) & 0xFF) / 255.0, float((col >> 8) & 0xFF) / 255.0, float(col & 0xFF) / 255.0, float((col >> 24) & 0xFF) / 255.0);
 }
 
 NotePSInput main(uint id : SV_VertexID) {
@@ -55,8 +55,8 @@ NotePSInput main(uint id : SV_VertexID) {
     //uint color_idx = outline ? 2 : right;
     // cheaper runtime cost than checking if track is hidden on cpu
     result.position = colors[track * 16 + chan].colors[2] == 0xFFFFFFFF ? float4(0, 0, 0, 0) : mul(root.proj, float4(position, !sharp * 0.5, 1));
-    result.color = float4(unpack_color(colors[track * 16 + chan].colors[is_right]), 0);
-    result.border = float4(unpack_color(colors[track * 16 + chan].colors[2]), 0);
+    result.color = float4(unpack_color(colors[track * 16 + chan].colors[is_right]));
+    result.border = float4(unpack_color(colors[track * 16 + chan].colors[2]));
     //result.edges = float4(left_top, right_bottom);
     result.edges = float4(x, y, x + cx, y - cy);
     //result.color = outline ? float4(0, 0, 0, 0) : float4(1, 1, 1, 0);

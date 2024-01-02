@@ -75,7 +75,7 @@ void Config::LoadConfigValues()
     LoadConfigValues( txRoot );
 
     // Custom settings need to be loaded from a separate file, otherwise stock PFA will reset them
-    doc = TiXmlDocument(sPath + "\\pfavizkhang.xml");
+    doc = TiXmlDocument(sPath + "\\ConfigAdvanced.xml");
     if (!doc.LoadFile())
         return;
 
@@ -124,7 +124,7 @@ bool Config::SaveConfigValues()
 
     m_VizSettings.SaveConfigValues(txRoot);
 
-    return bStockRet && doc.SaveFile(sPath + "\\pfavizkhang.xml");
+    return bStockRet && doc.SaveFile(sPath + "\\ConfigAdvanced.xml");
 }
 
 bool Config::SaveConfigValues( TiXmlElement *txRoot )
@@ -142,6 +142,7 @@ bool Config::SaveConfigValues( TiXmlElement *txRoot )
 //-----------------------------------------------------------------------------
 // LoadDefaultValues
 //-----------------------------------------------------------------------------
+#define RGBA(r, g, b, a) ((DWORD)(((BYTE)(r) | ((WORD)((BYTE)(g)) << 8)) | (((DWORD)(BYTE)(b)) << 16) | (((DWORD)(BYTE)(a)) << 24)))
 
 void VisualSettings::LoadDefaultValues()
 {
@@ -151,15 +152,20 @@ void VisualSettings::LoadDefaultValues()
     this->iFirstKey = 0;
     this->iLastKey = 127;
 
-    iBkgColor = 0x00303030;
-    int R, G, B = 0, S = 80, V = 100;
-    int iColors = sizeof( this->colors ) / sizeof( this->colors[0] );
-    for ( int i = 10, count = 0; count < iColors; i = ( i + 7 ) % iColors, count++ )
+    this->iBkgColor = 0x00303030;
+
+    int R, G, B, A = 255;
+    int S = 80, V = 100;
+    int iColors = sizeof(this->colors) / sizeof(this->colors[0]);
+
+    for (int i = 10, count = 0; count < iColors; i = (i + 7) % iColors, count++)
     {
-        Util::HSVtoRGB( 360 * i / iColors, S, V, R, G, B );
-        this->colors[count] = RGB( R, G, B );
+        Util::HSVtoRGB(360 * i / iColors, S, V, R, G, B);
+
+        this->colors[count] = RGBA(R, G, B, A);
     }
-    swap( this->colors[2], this->colors[4] );
+
+    swap(this->colors[2], this->colors[4]);
 }
 
 void AudioSettings::LoadDefaultValues()
@@ -177,8 +183,8 @@ void VideoSettings::LoadDefaultValues()
 
 void ControlsSettings::LoadDefaultValues()
 {
-    this->dFwdBackSecs = 3.0;
-    this->dSpeedUpPct = 10.0;
+    this->dFwdBackSecs = 5;
+    this->dSpeedUpPct = 10;
 }
 
 void PlaybackSettings::LoadDefaultValues()
@@ -188,7 +194,7 @@ void PlaybackSettings::LoadDefaultValues()
     this->m_bPlayable = false;
     this->m_bPaused = true;
     this->m_dSpeed = 1.0;
-    this->m_dNSpeed = 1.0;
+    this->m_dNSpeed = 0.25;
     this->m_dVolume = 1.0;
 }
 
@@ -212,8 +218,8 @@ void ViewSettings::LoadDefaultValues()
 void VizSettings::LoadDefaultValues() {
     this->bTickBased = false;
     this->bShowMarkers = true;
-    this->eMarkerEncoding = MarkerEncoding::CP1252;
-    this->bNerdStats = false;
+    this->eMarkerEncoding = MarkerEncoding::CP437;
+    this->bPhigros = false;
     this->sSplashMIDI = L"";
     this->bVisualizePitchBends = false;
     this->bDumpFrames = false;
@@ -264,23 +270,27 @@ void VisualSettings::LoadConfigValues( TiXmlElement *txRoot )
         this->bAssociateFiles = ( iAttrVal != 0 );
 
     //Colors
-    int r, g, b, i = 0;
+    int r, g, b, a, i = 0;
     TiXmlElement *txColors = txVisual->FirstChildElement( "Colors" );
     if ( txColors )
         for ( TiXmlElement *txColor = txColors->FirstChildElement( "Color" );
               txColor && i < sizeof( this->colors ) / sizeof( this->colors[0] );
               txColor = txColor->NextSiblingElement( "Color" ), i++ )
-            if ( txColor->QueryIntAttribute( "R", &r ) == TIXML_SUCCESS &&
-                 txColor->QueryIntAttribute( "G", &g ) == TIXML_SUCCESS &&
-                 txColor->QueryIntAttribute( "B", &b ) == TIXML_SUCCESS )
-                this->colors[i] = ( ( r & 0xFF ) << 0 ) | ( ( g & 0xFF ) << 8 ) | ( ( b & 0xFF ) << 16 );
-    
+            if (txColor->QueryIntAttribute("R", &r) == TIXML_SUCCESS &&
+                txColor->QueryIntAttribute("G", &g) == TIXML_SUCCESS &&
+                txColor->QueryIntAttribute("B", &b) == TIXML_SUCCESS) {
+                txColor->QueryIntAttribute("A", &a);
+                this->colors[i] = ( ( r & 0xFF ) << 0 ) | ( ( g & 0xFF ) << 8 ) | ( ( b & 0xFF ) << 16 ) | ( (a & 0xFF) << 24);
+            }
     TiXmlElement *txBkgColor = txVisual->FirstChildElement( "BkgColor" );
     if ( txBkgColor )
-        if ( txBkgColor->QueryIntAttribute( "R", &r ) == TIXML_SUCCESS &&
-             txBkgColor->QueryIntAttribute( "G", &g ) == TIXML_SUCCESS &&
-             txBkgColor->QueryIntAttribute( "B", &b ) == TIXML_SUCCESS )
-            this->iBkgColor = ( ( r & 0xFF ) << 0 ) | ( ( g & 0xFF ) << 8 ) | ( ( b & 0xFF ) << 16 );
+        if (txBkgColor->QueryIntAttribute("R", &r) == TIXML_SUCCESS &&
+            txBkgColor->QueryIntAttribute("G", &g) == TIXML_SUCCESS &&
+            txBkgColor->QueryIntAttribute("B", &b) == TIXML_SUCCESS) {
+            txBkgColor->QueryIntAttribute("A", &a);
+            this->iBkgColor = ( ( r & 0xFF ) << 0 ) | ( ( g & 0xFF ) << 8 ) | ( ( b & 0xFF ) << 16 ) | ( (a & 0xFF) << 24);
+        }
+
 }
 
 void AudioSettings::LoadConfigValues( TiXmlElement *txRoot )
@@ -368,7 +378,7 @@ void VizSettings::LoadConfigValues(TiXmlElement* txRoot) {
     if (txViz->QueryIntAttribute("ShowMarkers", &iAttrVal) == TIXML_SUCCESS)
         bShowMarkers = (iAttrVal != 0);
     if (txViz->QueryIntAttribute("NerdStats", &iAttrVal) == TIXML_SUCCESS)
-        bNerdStats = (iAttrVal != 0);
+        bPhigros = (iAttrVal != 0);
     if (txViz->QueryIntAttribute("VisualizePitchBends", &iAttrVal) == TIXML_SUCCESS)
         bVisualizePitchBends = (iAttrVal != 0);
     if (txViz->QueryIntAttribute("DumpFrames", &iAttrVal) == TIXML_SUCCESS)
@@ -388,13 +398,16 @@ void VizSettings::LoadConfigValues(TiXmlElement* txRoot) {
     txViz->QueryIntAttribute("MarkerEncoding", (int*)&eMarkerEncoding);
     eMarkerEncoding = max(MarkerEncoding::CP1252, min(eMarkerEncoding, MarkerEncoding::UTF8));
 
-    int r, g, b = 0;
+    int r, g, b, a = 0;
     TiXmlElement* txBarColor = txViz->FirstChildElement("BarColor");
     if (txBarColor)
         if (txBarColor->QueryIntAttribute("R", &r) == TIXML_SUCCESS &&
             txBarColor->QueryIntAttribute("G", &g) == TIXML_SUCCESS &&
-            txBarColor->QueryIntAttribute("B", &b) == TIXML_SUCCESS)
-            iBarColor = ((r & 0xFF) << 0) | ((g & 0xFF) << 8) | ((b & 0xFF) << 16);
+            txBarColor->QueryIntAttribute("B", &b) == TIXML_SUCCESS) {
+            txBarColor->QueryIntAttribute("A", &a);
+            iBarColor = ((r & 0xFF) << 0) | ((g & 0xFF) << 8) | ((b & 0xFF) << 16) | ((a & 0xFF) << 24);
+        }
+
 }
 
 //-----------------------------------------------------------------------------
@@ -420,6 +433,7 @@ bool VisualSettings::SaveConfigValues( TiXmlElement *txRoot )
         txColor->SetAttribute( "R", ( this->colors[i] >>  0 ) & 0xFF );
         txColor->SetAttribute( "G", ( this->colors[i] >>  8 ) & 0xFF );
         txColor->SetAttribute( "B", ( this->colors[i] >> 16 ) & 0xFF );
+        txColor->SetAttribute( "A", ( this->colors[i] >> 24 ) & 0xFF );
     }
 
     TiXmlElement *txBkgColor = new TiXmlElement( "BkgColor" );
@@ -427,6 +441,7 @@ bool VisualSettings::SaveConfigValues( TiXmlElement *txRoot )
     txBkgColor->SetAttribute( "R", ( this->iBkgColor >>  0 ) & 0xFF );
     txBkgColor->SetAttribute( "G", ( this->iBkgColor >>  8 ) & 0xFF );
     txBkgColor->SetAttribute( "B", ( this->iBkgColor >> 16 ) & 0xFF );
+    txBkgColor->SetAttribute( "A", ( this->iBkgColor >> 24 ) & 0xFF );
 
     return true;
 }
@@ -475,7 +490,6 @@ bool ViewSettings::SaveConfigValues( TiXmlElement *txRoot )
 {
     TiXmlElement *txView = new TiXmlElement( "View" );
     txRoot->LinkEndChild( txView );
-    txView->SetAttribute("Library", m_bLibrary);
     txView->SetAttribute( "Controls", m_bControls );
     txView->SetAttribute( "Keyboard", m_bKeyboard );
     txView->SetAttribute( "OnTop", m_bOnTop );
@@ -496,7 +510,7 @@ bool VizSettings::SaveConfigValues(TiXmlElement* txRoot) {
     txViz->SetAttribute("TickBased", bTickBased);
     txViz->SetAttribute("ShowMarkers", bShowMarkers);
     txViz->SetAttribute("MarkerEncoding", eMarkerEncoding);
-    txViz->SetAttribute("NerdStats", bNerdStats);
+    txViz->SetAttribute("NerdStats", bPhigros);
     txViz->SetAttribute("SplashMIDI", Util::WstringToString(sSplashMIDI));
     txViz->SetAttribute("VisualizePitchBends", bVisualizePitchBends);
     txViz->SetAttribute("DumpFrames", bDumpFrames);
@@ -510,5 +524,6 @@ bool VizSettings::SaveConfigValues(TiXmlElement* txRoot) {
     txBarColor->SetAttribute("R", (iBarColor >> 0) & 0xFF);
     txBarColor->SetAttribute("G", (iBarColor >> 8) & 0xFF);
     txBarColor->SetAttribute("B", (iBarColor >> 16) & 0xFF);
+    txBarColor->SetAttribute("A", (iBarColor >> 24) & 0xFF);
     return true;
 }

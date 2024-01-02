@@ -25,8 +25,6 @@
 #define CLASSNAME  TEXT( "PianoFromAbove" )
 #define GFXCLASSNAME  TEXT( "PianoFromAboveGfx" )
 #define POSNCLASSNAME  TEXT( "PianoFromAbovePosCtrl" )
-#define MINWIDTH 0
-#define MINHEIGHT 0
 
 class ISettings;
 class Config;
@@ -49,7 +47,7 @@ struct VisualSettings : public ISettings
     enum KeysShown { All, Song, Custom } eKeysShown;
     int iFirstKey, iLastKey;
     bool bAlwaysShowControls, bAssociateFiles;
-    unsigned int colors[16], iBkgColor;
+    unsigned int colors[24], iBkgColor;
 };
 
 struct AudioSettings : public ISettings
@@ -145,8 +143,8 @@ public:
     void SetFullScreen( bool bFullScreen, bool bUpdateGUI = false ) { m_bFullScreen = bFullScreen; if ( bUpdateGUI ) ::SetFullScreen( bFullScreen ); }
     void SetZoomMove( bool bZoomMove, bool bUpdateGUI = false ) { m_bZoomMove = bZoomMove; if ( bUpdateGUI ) ::SetZoomMove( bZoomMove ); }
 
-    int GetMainLeft() const { return m_iMainLeft == -32000 ? CW_USEDEFAULT : m_iMainLeft; }
-    int GetMainTop() const { return m_iMainTop == -32000 ? CW_USEDEFAULT : m_iMainTop; }
+    int GetMainLeft() const { return m_iMainLeft; }
+    int GetMainTop() const { return m_iMainTop; }
     int GetMainWidth() const { return m_iMainWidth; }
     int GetMainHeight() const { return m_iMainHeight; }
     int GetLibWidth() const { return m_iLibWidth; }
@@ -172,8 +170,8 @@ struct VizSettings : public ISettings {
 
     bool bTickBased;
     bool bShowMarkers;
-    enum MarkerEncoding { CP1252, CP932, UTF8 } eMarkerEncoding;
-    bool bNerdStats;
+    enum MarkerEncoding { CP1252, CP437, CP82, CP886, CP932, CP936, UTF8 } eMarkerEncoding;
+    bool bPhigros;
     std::wstring sSplashMIDI;
     bool bVisualizePitchBends;
     bool bDumpFrames;

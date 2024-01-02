@@ -626,20 +626,15 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     auto imgui_heap = m_pImGuiSRVDescriptorHeap.Get();
     ImGui::CreateContext();
 
-    // Get the fonts directory
-    char fonts_dir[MAX_PATH];
-    if (FAILED(SHGetFolderPathA(NULL, CSIDL_FONTS, NULL, SHGFP_TYPE_CURRENT, fonts_dir)))
-        strcpy_s(fonts_dir, "C:\\Windows\\Fonts");
-
     // Set up font and disable imgui.ini
-    auto& io = ImGui::GetIO();
+    ImGuiIO& io = ImGui::GetIO();
     ImFontConfig font_config = {};
-    font_config.FontNo = 0; // TAHOMA!
-    io.Fonts->AddFontFromFileTTF((std::string(fonts_dir) + "\\Tahoma.ttf").c_str(), 14.0f, &font_config, io.Fonts->GetGlyphRangesDefault());
-    font_config.FontNo = 1; // MS UI Gothic
+    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 16.0f, &font_config, io.Fonts->GetGlyphRangesDefault());
     font_config.MergeMode = true;
-    io.Fonts->AddFontFromFileTTF((std::string(fonts_dir) + "\\msgothic.ttc").c_str(), 14.0f, &font_config, io.Fonts->GetGlyphRangesJapanese());
-    io.IniFilename = nullptr;
+    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 16.0f, &font_config, io.Fonts->GetGlyphRangesJapanese());
+    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 16.0f, &font_config, io.Fonts->GetGlyphRangesKorean());
+    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 16.0f, &font_config, io.Fonts->GetGlyphRangesChineseFull());
+    io.Fonts->Build();
 
     // Theme tweaks
     auto& style = ImGui::GetStyle();

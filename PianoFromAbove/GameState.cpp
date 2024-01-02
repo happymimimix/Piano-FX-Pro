@@ -20,6 +20,11 @@
 #include "ConfigProcs.h"
 #include <d3d9types.h>
 
+long long m_iNoteCount = 0;
+boolean jumped = false;
+double m_msTime = 0.0;
+long long m_PrevStartTime = 0;
+
 const wstring GameState::Errors[] =
 {
     L"Success.",
@@ -166,7 +171,12 @@ void SplashScreen::InitNotes( const vector< MIDIEvent* > &vEvents )
         if ( (*it)->GetEventType() == MIDIEvent::ChannelEvent )
             m_vEvents.push_back( reinterpret_cast< MIDIChannelEvent* >( *it ) );
 }
-
+string GetExePath(void) {
+    char szFilePath[MAX_PATH + 1] = { 0 };
+    GetModuleFileNameA(NULL, szFilePath, MAX_PATH);
+    (strrchr(szFilePath, '\\'))[0] = 0;
+    return szFilePath;
+}
 void SplashScreen::InitState()
 {
     static Config &config = Config::GetConfig();
@@ -239,7 +249,6 @@ void SplashScreen::SetChannelSettings( const vector< bool > &vMuted, const vecto
 GameState::GameError SplashScreen::MsgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
     static Config &config = Config::GetConfig();
-    static PlaybackSettings &cPlayback = config.GetPlaybackSettings();
     static const AudioSettings& cAudio = config.GetAudioSettings();
     static const VizSettings& cViz = config.GetVizSettings();
 
@@ -266,15 +275,6 @@ GameState::GameError SplashScreen::MsgProc( HWND hWnd, UINT msg, WPARAM wParam, 
                     m_OutDevice.Open(cAudio.iOutDevice);
             }
             break;
-        case WM_KEYDOWN:
-        {
-            switch( wParam )
-            {
-                case VK_SPACE:
-                    cPlayback.TogglePaused( true );
-                    return Success;
-            }
-        }
     }
 
     return Success;
@@ -634,6 +634,7 @@ void MainScreen::InitState()
     m_iStartPos = 0;
     m_iEndPos = -1;
     m_llStartTime = GetMinTime();
+    m_msTime = m_llStartTime / 1000;
     m_bTrackPos = m_bTrackZoom = false;
     m_fTempZoomX = 1.0f;
     m_fTempOffsetX = m_fTempOffsetY = 0.0f;
@@ -660,19 +661,12 @@ void MainScreen::InitState()
         int width = rect.right - rect.left;
         int height = rect.bottom - rect.top;
 
+        //Running ffmpeg
         char buf[1024] = {};
-        snprintf(buf, sizeof(buf), "Waiting for connection... (%d x %d)", width, height);
-        SetWindowTextA(g_hWnd, buf);
-        m_hVideoPipe = CreateNamedPipe(TEXT("\\\\.\\pipe\\pfadump"),
-            PIPE_ACCESS_OUTBOUND,
-            PIPE_TYPE_BYTE | PIPE_WAIT,
-            PIPE_UNLIMITED_INSTANCES,
-            static_cast<DWORD>(width * height * 4 * 120),
-            0,
-            0,
-            nullptr);
+        snprintf(buf, sizeof(buf), "%s&cd \"%s\"&md \"%s\\PFA_Framedump\"&start cmd /k \"ffmpeg -r 30 -f rawvideo -s %dx%d -pixel_format rgb32 -i \"async:\\\\.\\pipe\\pfadump\" -c:v h264_nvenc -qp 0 ^\"%s\\PFA_Framedump\\Output.mkv^\"\"", GetExePath().substr(0, 2).c_str(), GetExePath().c_str(), GetExePath().c_str(), width, height, GetExePath().c_str());
+        m_hVideoPipe = CreateNamedPipe(TEXT("\\\\.\\pipe\\pfadump"), PIPE_ACCESS_OUTBOUND, PIPE_TYPE_BYTE | PIPE_WAIT, PIPE_UNLIMITED_INSTANCES, static_cast<DWORD>(width * height * 4 * 120), 0, 0, nullptr);
+        system(buf);
         ConnectNamedPipe(m_hVideoPipe, NULL);
-        SetWindowTextA(g_hWnd, "Connected!");
     }
 
     memset( m_pNoteState, -1, sizeof( m_pNoteState ) );
@@ -713,7 +707,7 @@ GameState::GameError MainScreen::Init()
     }
 
     for (auto& work : m_vThreadWork)
-        work.reserve(262144); // Should be plenty for most MIDIs
+        work.reserve(131072); // Should be plenty for most MIDIs
 
     return Success;
 }
@@ -826,14 +820,17 @@ GameState::GameError MainScreen::MsgProc( HWND hWnd, UINT msg, WPARAM wParam, LP
                     m_pNextState = reinterpret_cast< GameState* >( lParam );
                     return Success;
                 case ID_PLAY_STOP:
-                    JumpTo(GetMinTime());
+                    m_msTime = GetMinTime() / 1000;
+                    JumpTo(static_cast<long long>(m_msTime * 1000));
                     cPlayback.SetStopped(true);
                     return Success;
                 case ID_PLAY_SKIPFWD:
-                    JumpTo(static_cast<long long>(m_llStartTime + cControls.dFwdBackSecs * 1000000));
+                    m_msTime = (m_llStartTime + cControls.dFwdBackSecs * 1000000)/1000;
+                    JumpTo(static_cast<long long>(m_msTime * 1000));
                     return Success;
                 case ID_PLAY_SKIPBACK:
-                    JumpTo(static_cast<long long>(m_llStartTime - cControls.dFwdBackSecs * 1000000));
+                    m_msTime = (m_llStartTime - cControls.dFwdBackSecs * 1000000)/1000;
+                    JumpTo(static_cast<long long>(m_msTime * 1000));
                     return Success;
                 case ID_VIEW_RESETDEVICE:
                     m_pRenderer->ResetDevice();
@@ -844,19 +841,18 @@ GameState::GameError MainScreen::MsgProc( HWND hWnd, UINT msg, WPARAM wParam, LP
                         cView.SetOffsetX( cView.GetOffsetX() + m_fTempOffsetX );
                         cView.SetOffsetY( cView.GetOffsetY() + m_fTempOffsetY );
                         cView.SetZoomX( cView.GetZoomX() * m_fTempZoomX );
+                        cView.SetZoomMove( false, true );
+                        m_bTrackPos = m_bTrackZoom = false;
+                        m_fTempOffsetX = 0.0f;
+                        m_fTempOffsetY = 0.0f;
+                        m_fTempZoomX = 1.0f;
+                        return Success;
                     }
                     else
                     {
                         cView.SetZoomMove( true, true );
                         return Success;
                     }
-                case ID_VIEW_CANCELMOVEANDZOOM:
-                    cView.SetZoomMove( false, true );
-                    m_bTrackPos = m_bTrackZoom = false;
-                    m_fTempOffsetX = 0.0f;
-                    m_fTempOffsetY = 0.0f;
-                    m_fTempZoomX = 1.0f;
-                    return Success;
                 case ID_VIEW_RESETMOVEANDZOOM:
                     cView.SetOffsetX( 0.0f );
                     cView.SetOffsetY( 0.0f );
@@ -864,57 +860,12 @@ GameState::GameError MainScreen::MsgProc( HWND hWnd, UINT msg, WPARAM wParam, LP
                     m_fTempOffsetX = 0.0f;
                     m_fTempOffsetY = 0.0f;
                     m_fTempZoomX = 1.0f;
+                    cView.SetZoomMove(false, false);
                     return Success;
             }
             break;
         }
         // These are doubled from MainProcs.cpp. Allows to get rid of the Ctrl requirement for accellerators
-        case WM_KEYDOWN:
-        {
-            bool bCtrl = GetKeyState( VK_CONTROL ) < 0;
-            bool bAlt = GetKeyState( VK_MENU ) < 0;
-            bool bShift = GetKeyState( VK_SHIFT ) < 0;
-
-            switch( wParam )
-            {
-                case VK_SPACE:
-                    cPlayback.TogglePaused( true );
-                    return Success;
-                case VK_OEM_PERIOD:
-                    JumpTo(GetMinTime());
-                    cPlayback.SetStopped(true);
-                    return Success;
-                case VK_UP:
-                    if ( bAlt && !bCtrl )
-                        cPlayback.SetVolume( min( cPlayback.GetVolume() + 0.1, 1.0 ), true );
-                    else if ( bShift && !bCtrl )
-                        cPlayback.SetNSpeed( cPlayback.GetNSpeed() * ( 1.0 + cControls.dSpeedUpPct / 100.0 ), true );
-                    else if ( !bAlt && !bShift )
-                        cPlayback.SetSpeed( cPlayback.GetSpeed() / ( 1.0 + cControls.dSpeedUpPct / 100.0 ), true );
-                    return Success;
-                case VK_DOWN:
-                    if ( bAlt && !bShift && !bCtrl )
-                        cPlayback.SetVolume( max( cPlayback.GetVolume() - 0.1, 0.0 ), true );
-                    else if ( bShift && !bAlt && !bCtrl )
-                        cPlayback.SetNSpeed( cPlayback.GetNSpeed() / ( 1.0 + cControls.dSpeedUpPct / 100.0 ), true );
-                    else if ( !bAlt && !bShift )
-                        cPlayback.SetSpeed( cPlayback.GetSpeed() * ( 1.0 + cControls.dSpeedUpPct / 100.0 ), true );
-                    return Success;
-                case 'R':
-                    cPlayback.SetSpeed( 1.0, true );
-                    return Success;
-                case VK_LEFT:
-                    JumpTo(static_cast<long long>(m_llStartTime - cControls.dFwdBackSecs * 1000000));
-                    return Success;
-                case VK_RIGHT:
-                    JumpTo(static_cast<long long>(m_llStartTime + cControls.dFwdBackSecs * 1000000));
-                    return Success;
-                case 'M':
-                    cPlayback.ToggleMute( true );
-                    return Success;
-            }
-            break;
-        }
         case WM_DEVICECHANGE:
             if (cViz.bKDMAPI) {
                 m_OutDevice.OpenKDMAPI();
@@ -927,7 +878,8 @@ GameState::GameError MainScreen::MsgProc( HWND hWnd, UINT msg, WPARAM wParam, LP
         {
             long long llFirstTime = GetMinTime();
             long long llLastTime = GetMaxTime();
-            JumpTo(llFirstTime + ((llLastTime - llFirstTime) * lParam) / 1000, false);
+            m_msTime = (llFirstTime + ((llLastTime - llFirstTime) * lParam) / 1000) / 1000;
+            JumpTo(static_cast<long long>(m_msTime * 1000));
             break;
         }
         case WM_LBUTTONDOWN:
@@ -1030,7 +982,7 @@ GameState::GameError MainScreen::Logic( void )
     m_eKeysShown = cVisual.eKeysShown;
     m_iStartNote = min( cVisual.iFirstKey, cVisual.iLastKey );
     m_iEndNote = max( cVisual.iFirstKey, cVisual.iLastKey );
-    m_bShowFPS = cVideo.bShowFPS;
+    m_bDebug = cVideo.bShowFPS;
     if (m_bDumpFrames)
         m_pRenderer->SetLimitFPS(false);
     else if (m_Timer.m_bManualTimer)
@@ -1113,17 +1065,42 @@ GameState::GameError MainScreen::Logic( void )
         while ( m_iStartPos < iEventCount && m_vEvents[m_iStartPos]->GetAbsMicroSec() <= m_llStartTime )
         {
             MIDIChannelEvent *pEvent = m_vEvents[m_iStartPos];
+            MIDIChannelEvent* pChannelEvent = reinterpret_cast<MIDIChannelEvent*>(pEvent);
+
             if (pEvent->GetChannelEventType() != MIDIChannelEvent::NoteOn) {
-                if (pEvent->GetChannelEventType() == MIDIChannelEvent::ProgramChange && pEvent->GetChannel() != MIDI::Drums && config.m_bPianoOverride)
+                if (pEvent->GetChannelEventType() == MIDIChannelEvent::PitchBend) {
+                    m_pBends[pEvent->GetChannel()] = (notex_table[1] - notex_table[0]) * (((short)(((pEvent->GetParam2() << 7) | pEvent->GetParam1()) - 8192)) / (8192.0f / m_pBendsRange[pEvent->GetChannel()]));
+                } else if (pChannelEvent->GetChannelEventType() == MIDIChannelEvent::Controller) {
+                    if (pEvent->GetParam1() == 101 && pEvent->GetParam2() == 0) {
+                        m_RPN_MSB[pEvent->GetChannel()] = true;
+                    } else if (pEvent->GetParam1() == 100 && pEvent->GetParam2() == 0) {
+                        if (m_RPN_MSB[pEvent->GetChannel()]) {
+                            m_RPN_LSB[pEvent->GetChannel()] = true;
+                        }
+                        else {
+                            m_RPN_MSB[pEvent->GetChannel()] = false;
+                            m_RPN_LSB[pEvent->GetChannel()] = false;
+                        }
+                    } else if (pEvent->GetParam1() == 6) {
+                        if (m_RPN_MSB[pEvent->GetChannel()] && m_RPN_LSB[pEvent->GetChannel()]) {
+                            m_pBendsRange[pEvent->GetChannel()] = pEvent->GetParam2();
+                        }
+                        else {
+                            m_RPN_MSB[pEvent->GetChannel()] = false;
+                            m_RPN_LSB[pEvent->GetChannel()] = false;
+                        }
+                    }
+                }
+                else if (config.m_bPianoOverride && pEvent->GetChannelEventType() == MIDIChannelEvent::ProgramChange) {
                     pEvent->SetParam1(0);
-                if (pEvent->GetChannelEventType() == MIDIChannelEvent::PitchBend)
-                    m_pBends[pEvent->GetChannel()] = (notex_table[1] - notex_table[0]) * (((short)(((pEvent->GetParam2() << 7) | pEvent->GetParam1()) - 8192)) / (8192.0f / 12.0f));
+                }
                 m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), pEvent->GetParam2());
             }
             else if (!m_bMute && (!m_bAnyChannelMuted || !m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bMuted)) {
                 m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(),
                     static_cast<int>(pEvent->GetParam2() * dVolumeCorrect + 0.5));
                 notes_played++;
+                m_iNoteCount++;
             }
             if ((pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn || pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOff)
                 && pEvent->GetParam1() < 128 && pEvent->HasSister())
@@ -1152,14 +1129,12 @@ GameState::GameError MainScreen::Logic( void )
         }
         
         // Update NPS
-        if (cViz.bNerdStats) {
             for (; !m_dNPSNotes.empty(); m_dNPSNotes.pop_front()) {
                 if (std::get<0>(m_dNPSNotes.front()) >= m_llStartTime - 1000000)
                     break;
             }
             if (notes_played != 0)
                 m_dNPSNotes.push_back(std::make_tuple(m_llStartTime, notes_played));
-        }
     }
 
     AdvanceIterators( m_llStartTime, false );
@@ -1173,8 +1148,12 @@ GameState::GameError MainScreen::Logic( void )
 
     // Song's over
     if (!m_bPaused && m_llStartTime >= llMaxTime) {
-        if (m_bDumpFrames)
+        if (m_bDumpFrames) {
+            char buf[1024] = {};
+            snprintf(buf, sizeof(buf), "start \"Result\" \"C:\\Windows\\Explorer.exe\" \"%s\\PFA_Framedump\\\"", GetExePath().c_str());
+            system(buf);
             CloseHandle(m_hVideoPipe);
+        }
         cPlayback.SetPaused(true, true);
     }
 
@@ -1232,18 +1211,25 @@ void MainScreen::UpdateState(int key, const thread_work_t& work)
     }
 }
 
-void MainScreen::JumpTo(long long llStartTime, bool bUpdateGUI)
+void MainScreen::JumpTo(long long llStartTime)
 {
-    // Reset NPS
+    static Config& config = Config::GetConfig();
+    static PlaybackSettings& cPlayback = config.GetPlaybackSettings();
+
+    // NC inaccuracy
+    jumped = true;
     m_dNPSNotes.clear();
 
     // Kill the music!
-    m_OutDevice.AllNotesOff();
+    if (cPlayback.GetSpeed() > 0 || cPlayback.GetPaused()) {
+        m_OutDevice.AllNotesOff();
+    }
 
     // Start time. Piece of cake!
     long long llFirstTime = GetMinTime();
     long long llLastTime = GetMaxTime();
     m_llStartTime = min(max(llStartTime, llFirstTime), llLastTime);
+    m_msTime = m_llStartTime / 1000;
     long long llEndTime = m_llStartTime + m_llTimeSpan;
 
     // Start position and current state: hard!
@@ -1307,70 +1293,10 @@ void MainScreen::JumpTo(long long llStartTime, bool bUpdateGUI)
         m_iEndPos++;
 
     // Input position, iterators, tick
-    eventvec_t::const_iterator itOldProgramChange = m_itNextProgramChange;
     AdvanceIterators(llStartTime, true);
-    PlaySkippedEvents(itOldProgramChange);
     m_iStartTick = GetCurrentTick(m_llStartTime);
-
-    if (bUpdateGUI)
-    {
-        static PlaybackSettings& cPlayback = Config::GetConfig().GetPlaybackSettings();
         long long llNewPos = ((m_llStartTime - llFirstTime) * 1000) / (llLastTime - llFirstTime);
         cPlayback.SetPosition(static_cast<int>(llNewPos));
-    }
-}
-
-// Plays skipped program change and controller events. Only plays the one's needed.
-// Linear search assumes a small number of events in the file. Better than 128 maps :/
-void MainScreen::PlaySkippedEvents(eventvec_t::const_iterator itOldProgramChange)
-{
-    if (itOldProgramChange == m_itNextProgramChange)
-        return;
-
-    // Lookup tables to see if we've got an event for a given control or program. faster than map or hash_map.
-    bool aControl[16][128], aProgram[16], aPitchBend[16];
-    bool bPianoOverride = Config::GetConfig().m_bPianoOverride;
-    memset(aControl, 0, sizeof(aControl));
-    memset(aProgram, 0, sizeof(aProgram));
-    memset(aPitchBend, 0, sizeof(aPitchBend));
-
-    // Go from one before the next to the beginning backwards. iterators are so verbose :/
-    vector< MIDIChannelEvent* > vControl;
-    eventvec_t::const_reverse_iterator itBegin = eventvec_t::const_reverse_iterator(m_itNextProgramChange);
-    eventvec_t::const_reverse_iterator itEnd = m_vProgramChange.rend();
-    if (itOldProgramChange < m_itNextProgramChange) itEnd = eventvec_t::const_reverse_iterator(itOldProgramChange);
-
-    for (eventvec_t::const_reverse_iterator it = itBegin; it != itEnd; ++it)
-    {
-        MIDIChannelEvent* pEvent = m_vEvents[it->second];
-        // Order matters because some events affect others, thus store for later use
-        if (pEvent->GetChannelEventType() == MIDIChannelEvent::Controller &&
-            !aControl[pEvent->GetChannel()][pEvent->GetParam1()])
-        {
-            aControl[pEvent->GetChannel()][pEvent->GetParam1()] = true;
-            vControl.push_back(m_vEvents[it->second]);
-        }
-        // Order doesn't matter. Just play as you go by.
-        else if (pEvent->GetChannelEventType() == MIDIChannelEvent::ProgramChange &&
-            !aProgram[pEvent->GetChannel()])
-        {
-            aProgram[pEvent->GetChannel()] = true;
-            if (pEvent->GetChannel() != MIDI::Drums && bPianoOverride)
-                pEvent->SetParam1(0);
-            m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), pEvent->GetParam2());
-        }
-        else if (pEvent->GetChannelEventType() == MIDIChannelEvent::PitchBend &&
-            !aPitchBend[pEvent->GetChannel()])
-        {
-            aPitchBend[pEvent->GetChannel()] = true;
-            m_pBends[pEvent->GetChannel()] = (notex_table[1] - notex_table[0]) * (((short)(((pEvent->GetParam2() << 7) | pEvent->GetParam1()) - 8192)) / (8192.0f / 12.0f));
-            m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), pEvent->GetParam2());
-        }
-    }
-
-    // Finally play the controller events. vControl is in reverse time order
-    for (vector< MIDIChannelEvent* >::reverse_iterator it = vControl.rbegin(); it != vControl.rend(); ++it)
-        m_OutDevice.PlayEvent((*it)->GetEventCode(), (*it)->GetParam1(), (*it)->GetParam2());
 }
 
 void MainScreen::ApplyMarker(unsigned char* data, size_t size) {
@@ -1380,7 +1306,7 @@ void MainScreen::ApplyMarker(unsigned char* data, size_t size) {
         Config& config = Config::GetConfig();
         VizSettings viz = config.GetVizSettings();
 
-        constexpr int codepages[] = {1252, 932, CP_UTF8};
+        constexpr int codepages[] = {1252, 437, 82, 886, 932, 936, CP_UTF8};
 
         auto temp_str = new char[size + 1];
         memcpy(temp_str, data, size);
@@ -1402,11 +1328,6 @@ void MainScreen::ApplyMarker(unsigned char* data, size_t size) {
         } else {
             m_sMarker = temp_str;
         }
-
-        // blacklist common "unset marker" stuff
-        if (m_sMarker == "Setup" || m_sMarker == "Start")
-            m_sMarker = std::string();
-
         delete[] temp_str;
     } else {
         m_sMarker = std::string();
@@ -1597,6 +1518,7 @@ GameState::GameError MainScreen::Render()
     // Update background if it changed
     static Config& config = Config::GetConfig();
     static const VizSettings& cViz = config.GetVizSettings();
+    const PlaybackSettings& cPlayback = config.GetPlaybackSettings();
     if (cViz.sBackground != m_sCurBackground || cViz.sBackground.empty()) {
         m_bBackgroundLoaded = cViz.sBackground.empty() ? false : m_pRenderer->LoadBackgroundBitmap(cViz.sBackground);
         m_sCurBackground = cViz.sBackground;
@@ -1607,7 +1529,6 @@ GameState::GameError MainScreen::Render()
     RenderNotes();
     if ( m_bShowKB )
         RenderKeys();
-    RenderBorder();
     RenderText();
 
     // Present the backbuffer contents to the display
@@ -1615,18 +1536,11 @@ GameState::GameError MainScreen::Render()
     m_pRenderer->Present();
 
     // Dump frame!!!!
-    if (m_bDumpFrames) {
+    if (m_bDumpFrames && !cPlayback.GetPaused()) {
         // Get the current frame
         auto* frame = m_pRenderer->Screenshot();
-
         // Write to pipe
         WriteFile(m_hVideoPipe, frame, static_cast<DWORD>(m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4), nullptr, nullptr);
-
-        // Show dump speed on the title bar
-        const std::wstring& name = m_MIDI.GetInfo().sFilename;
-        TCHAR sTitle[1024];
-        _stprintf_s(sTitle, TEXT("%ws (%.1lf%%)"), name.c_str() + (name.find_last_of(L'\\') + 1), (m_dFPS / m_Timer.m_dFramerate) * 100.0);
-        SetWindowText(g_hWnd, sTitle);
     }
     return Success;
 }
@@ -1895,14 +1809,6 @@ void MainScreen::RenderKeys()
                     m_csKBWhite.iDarkRGB, m_csKBWhite.iDarkRGB, m_csKBWhite.iVeryDarkRGB, m_csKBWhite.iVeryDarkRGB );
                 m_pRenderer->DrawRect( fCurX + fKeyGap1, fCurY + fTopCY, m_fWhiteCX - fKeyGap, 2.0f,
                     m_csKBBackground.iDarkRGB, m_csKBBackground.iDarkRGB, m_csKBWhite.iVeryDarkRGB, m_csKBWhite.iVeryDarkRGB );
-
-                if ( i == MIDI::C4 )
-                {
-                    float fMXGap = floor( m_fWhiteCX * 0.25f + 0.5f );
-                    float fMCX = m_fWhiteCX - fMXGap * 2.0f - fKeyGap;
-                    float fMY = max( fCurY + fTopCY - fMCX - 5.0f, fCurY + fSharpCY + 5.0f );
-                    m_pRenderer->DrawRect( fCurX + fKeyGap1 + fMXGap, fMY, fMCX, fCurY + fTopCY - 5.0f - fMY, m_csKBWhite.iDarkRGB );
-                }
             }
             else
             {
@@ -1914,14 +1820,6 @@ void MainScreen::RenderKeys()
                 m_pRenderer->DrawRect( fCurX + fKeyGap1 , fCurY, m_fWhiteCX - fKeyGap, fTopCY + fNearCY - 2.0f,
                     csKBWhite.iDarkRGB, csKBWhite.iDarkRGB, csKBWhite.iPrimaryRGB, csKBWhite.iPrimaryRGB );
                 m_pRenderer->DrawRect( fCurX + fKeyGap1 , fCurY + fTopCY + fNearCY - 2.0f, m_fWhiteCX - fKeyGap, 2.0f, csKBWhite.iDarkRGB );
-
-                if ( i == MIDI::C4 )
-                {
-                    float fMXGap = floor( m_fWhiteCX * 0.25f + 0.5f );
-                    float fMCX = m_fWhiteCX - fMXGap * 2.0f - fKeyGap;
-                    float fMY = max( fCurY + fTopCY + fNearCY - fMCX - 7.0f, fCurY + fSharpCY + 5.0f );
-                    m_pRenderer->DrawRect( fCurX + fKeyGap1 + fMXGap, fMY, fMCX, fCurY + fTopCY + fNearCY - 7.0f - fMY, csKBWhite.iDarkRGB );
-                }
             }
             m_pRenderer->DrawRect( floor( fCurX + fKeyGap1 + m_fWhiteCX - fKeyGap + 0.5f ), fCurY, fKeyGap, fTopCY + fNearCY,
                 m_csKBBackground.iVeryDarkRGB, m_csKBBackground.iPrimaryRGB, m_csKBBackground.iPrimaryRGB, m_csKBBackground.iVeryDarkRGB );
@@ -1930,8 +1828,8 @@ void MainScreen::RenderKeys()
         }
 
     // Draw the sharps
-    iStartRender = ( m_iStartNote != MIDI::A0 && !MIDI::IsSharp( m_iStartNote ) && m_iStartNote > 0 && MIDI::IsSharp( m_iStartNote - 1 ) ? m_iStartNote - 1 : m_iStartNote );
-    iEndRender = ( m_iEndNote != MIDI::C8 && !MIDI::IsSharp( m_iEndNote ) && m_iEndNote < 127 && MIDI::IsSharp( m_iEndNote + 1 ) ? m_iEndNote + 1 : m_iEndNote );
+    iStartRender = ( m_iStartNote != 0 && !MIDI::IsSharp( m_iStartNote ) && m_iStartNote > 0 && MIDI::IsSharp( m_iStartNote - 1 ) ? m_iStartNote - 1 : m_iStartNote );
+    iEndRender = ( m_iEndNote != 127 && !MIDI::IsSharp( m_iEndNote ) && m_iEndNote < 127 && MIDI::IsSharp( m_iEndNote + 1 ) ? m_iEndNote + 1 : m_iEndNote );
     fStartX = ( MIDI::IsSharp( m_iStartNote ) ? m_fWhiteCX * SharpRatio / 2.0f : 0.0f );
 
     float fSharpTop = SharpRatio * 0.7f;
@@ -2014,47 +1912,18 @@ void MainScreen::RenderKeys()
         }
 }
 
-void MainScreen::RenderBorder()
-{
-    // Top, bottom, left, right
-    const unsigned iBlack = 0x00000000;
-    float fBufferCY = static_cast< float >( m_pRenderer->GetBufferHeight() );
-    m_pRenderer->DrawRect( m_fNotesX - 50.0f, m_fNotesY - 50.0f, m_fNotesCX + 100.0f, 50.0f, iBlack );
-    m_pRenderer->DrawRect( m_fNotesX - 50.0f, m_fNotesY + fBufferCY, m_fNotesCX + 100.0f, 50.0f, iBlack );
-    m_pRenderer->DrawRect( m_fNotesX - m_fWhiteCX, m_fNotesY - 50.0f, m_fWhiteCX, fBufferCY + 100.0f, iBlack );
-    m_pRenderer->DrawRect( m_fNotesX + m_fNotesCX, m_fNotesY - 50.0f, m_fWhiteCX, fBufferCY + 100.0f, iBlack );
-
-    const float fPad = 10.0f;
-    const unsigned iBkg = m_csBackground.iPrimaryRGB;
-    m_pRenderer->DrawSkew( m_fNotesX, m_fNotesY + fBufferCY, m_fNotesX + m_fNotesCX, m_fNotesY + fBufferCY,
-                           m_fNotesX + m_fNotesCX + fPad, m_fNotesY + fBufferCY + fPad, m_fNotesX - fPad, m_fNotesY + fBufferCY + fPad,
-                           iBkg, iBkg, iBlack, iBlack );
-    m_pRenderer->DrawSkew( m_fNotesX - fPad, m_fNotesY - fPad, m_fNotesX + m_fNotesCX + fPad, m_fNotesY - fPad,
-                           m_fNotesX + m_fNotesCX, m_fNotesY, m_fNotesX, m_fNotesY,
-                           iBlack, iBlack, iBkg, iBkg );
-    m_pRenderer->DrawSkew( m_fNotesX - fPad, m_fNotesY - fPad, m_fNotesX, m_fNotesY,
-                           m_fNotesX, m_fNotesY + fBufferCY, m_fNotesX - fPad, m_fNotesY + fBufferCY + fPad,
-                           iBlack, iBkg, iBkg, iBlack );
-    m_pRenderer->DrawSkew( m_fNotesX + m_fNotesCX, m_fNotesY, m_fNotesX + m_fNotesCX + fPad, m_fNotesY - fPad,
-                           m_fNotesX + m_fNotesCX + fPad, m_fNotesY + fBufferCY + fPad, m_fNotesX + m_fNotesCX, m_fNotesY + fBufferCY,
-                           iBkg, iBlack, iBlack, iBkg );
-}
-
 void MainScreen::RenderText()
 {
     Config& config = Config::GetConfig();
     VizSettings viz = config.GetVizSettings();
 
-    int iLines = 2;
-    if (m_bShowFPS && !m_bDumpFrames)
-        iLines++;
-    if (viz.bNerdStats)
-        iLines += 2;
-    if (m_Timer.m_bManualTimer && !m_bDumpFrames)
-        iLines++;
+    int Lines = 9;
+    if (m_bDebug) Lines += 8;
+    if (viz.bPhigros) Lines += 4;
+    if (m_Timer.m_bManualTimer && !m_bDebug) Lines += 1;
 
     // Screen info
-    RECT rcStatus = { m_pRenderer->GetBufferWidth() - 156, 0, m_pRenderer->GetBufferWidth(), 6 + 16 * iLines };
+    RECT rcStatus = { m_pRenderer->GetBufferWidth() - 260, 0, m_pRenderer->GetBufferWidth(), 16 * Lines + 10};
 
     int iMsgCY = 200;
     RECT rcMsg = { 0, static_cast<int>(m_pRenderer->GetBufferHeight() * (1.0f - KBPercent) - iMsgCY) / 2 };
@@ -2067,8 +1936,6 @@ void MainScreen::RenderText()
     RenderStatus(&rcStatus);
     if (!m_sMarker.empty() && viz.bShowMarkers)
         RenderMarker(m_sMarker.c_str());
-    if (m_bZoomMove)
-        RenderMessage(&rcMsg, (TCHAR*)TEXT("- Left-click and drag to move the screen\n- Right-click and drag to zoom horizontally\n- Press Escape to abort changes\n- Press Ctrl+V to save changes"));
 
     m_pRenderer->EndText();
 }
@@ -2081,7 +1948,7 @@ void MainScreen::RenderStatusLine(int line, const char* left, const char* format
     vsnprintf_s(buf, sizeof(buf), format, varargs);
 
     auto draw_list = m_pRenderer->GetDrawList();
-    ImVec2 left_pos = ImVec2(m_pRenderer->GetBufferWidth() - 156 + 6, 3 + line * 16);
+    ImVec2 left_pos = ImVec2(m_pRenderer->GetBufferWidth() - 255, 3 + line * 16);
     ImVec2 right_pos = ImVec2(m_pRenderer->GetBufferWidth() - ImGui::CalcTextSize(buf).x - 6, 3 + line * 16);
     draw_list->AddText(ImVec2(left_pos.x + 2, left_pos.y + 1), 0xFF404040, left);
     draw_list->AddText(ImVec2(left_pos.x, left_pos.y), 0xFFFFFFFF, left);
@@ -2093,9 +1960,17 @@ void MainScreen::RenderStatusLine(int line, const char* left, const char* format
 
 void MainScreen::RenderStatus(LPRECT prcStatus)
 {
-    // Time
+    // Playback statues
+    long long nps = 0;
+        for (int i = 0; i < m_dNPSNotes.size(); i++)
+            nps += std::get<1>(m_dNPSNotes[i]);
+    size_t state_size = 0;
+    for (auto note_state : m_vState)
+        state_size += note_state.size();
     Config& config = Config::GetConfig();
     VizSettings viz = config.GetVizSettings();
+    static ViewSettings& cView = config.GetViewSettings();
+    const PlaybackSettings& cPlayback = config.GetPlaybackSettings();
     const MIDI::MIDIInfo& mInfo = m_MIDI.GetInfo();
     auto starttime = ((m_llStartTime >= 0) ? m_llStartTime : -m_llStartTime);
 
@@ -2109,25 +1984,128 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
 
     int cur_line = 0;
     m_pRenderer->GetDrawList()->AddRectFilled(ImVec2(prcStatus->left, prcStatus->top), ImVec2(prcStatus->right, prcStatus->bottom), 0x80000000);
-
+    RenderStatusLine(cur_line++,"Piano-FX Pro", "v3.2.7");
+    RenderStatusLine(cur_line++,"Made by: happy_mimimix", "");
+    RenderStatusLine(cur_line++,"", "");
+    if (m_llStartTime <= m_MIDI.GetInfo().llFirstNote) {
+        m_iNoteCount = 0;
+        jumped = false;
+    }
     RenderStatusLine(cur_line++, "Time:", "%s%lld:%02d.%d / %lld:%02d.%d",
         m_llStartTime >= 0 ? "" : "-",
         min, sec, cs,
         tmin, tsec, tcs);
+    if (m_bDebug) RenderStatusLine(cur_line++, "Milliseconds:", "%.0lf", m_msTime);
+    RenderStatusLine(cur_line++, "FPS:", "%.2lf", m_dFPS);
     RenderStatusLine(cur_line++, "Tempo:", "%.3lf bpm", tempo);
-
-    // Framerate
-    if (m_bShowFPS && !m_bDumpFrames)
-        RenderStatusLine(cur_line++, "FPS:", "%.1lf", m_dFPS);
-
-    // Nerd stats
-    if (viz.bNerdStats) {
-        long long nps = 0;
-        for (int i = 0; i < m_dNPSNotes.size(); i++)
-            nps += std::get<1>(m_dNPSNotes[i]);
-
-        RenderStatusLine(cur_line++, "NPS:", "%lld", nps);
-        RenderStatusLine(cur_line++, "Rendered:", "%llu", m_pRenderer->GetRenderedNotesCount());
+    if (viz.bPhigros) {
+        if (jumped) {
+            RenderStatusLine(cur_line++,"Combo: (inaccurate)", "%lld", m_iNoteCount);
+        }
+        else {
+            RenderStatusLine(cur_line++,"Combo:", "%lld", m_iNoteCount);
+        }
+        RenderStatusLine(cur_line++,"ClicksPerSecond:", "%lld", nps);
+        RenderStatusLine(cur_line++,"Simultaneity:", "%lld", state_size);
+    }
+    else {
+        if (jumped) {
+            RenderStatusLine(cur_line++,"Notes: (inaccurate)", "%lld", m_iNoteCount);
+        }
+        else {
+            RenderStatusLine(cur_line++,"Notes:", "%lld", m_iNoteCount);
+        }
+        RenderStatusLine(cur_line++,"NotesPerSecond:", "%lld", nps);
+        RenderStatusLine(cur_line++,"Polyphoney:", "%lld", state_size);
+    }
+    if (m_bDebug) {
+        RenderStatusLine(cur_line++,"Rendered:", "%lld", m_pRenderer->GetRenderedNotesCount());
+        RenderStatusLine(cur_line++,"Volume:", "%.0lf%%", cPlayback.GetVolume() * 100);
+    }
+    if (m_msTime > m_llStartTime / 1000 || m_msTime < (m_llStartTime - max(m_llStartTime - m_PrevStartTime, m_PrevStartTime - m_llStartTime)) / 1000) {
+        if (cPlayback.GetSpeed() >= 0) {
+            JumpTo(static_cast<long long>(m_msTime * 1000));
+        }
+        else {
+            m_msTime = m_llStartTime / 1000;
+        }
+    }
+    else {
+        m_msTime = m_llStartTime / 1000;
+    }
+    //Detect time jump request from cheat engine
+    if (m_PrevStartTime != m_llStartTime) {
+        m_PrevStartTime = m_llStartTime;
+    }
+    if (m_Timer.m_bManualTimer && !m_bDebug) {
+        if (cPlayback.GetSpeed() < 0 && m_llStartTime > m_MIDI.GetInfo().llFirstNote) {
+            JumpTo(static_cast<long long>(m_llStartTime)); //Loads previously played notes with the "Jump To" function
+            RenderStatusLine(cur_line++,"PlaybackSpeed: (Rewinding)", "%.0lf%%", (m_dFPS / m_Timer.m_dFramerate) * 100);
+        }
+        else {
+            RenderStatusLine(cur_line++,"PlaybackSpeed:", "%.0lf%%", (m_dFPS / m_Timer.m_dFramerate) * 100);
+        }
+    }
+    if (!m_Timer.m_bManualTimer && m_bDebug) {
+        if (cPlayback.GetSpeed() < 0 && m_llStartTime > m_MIDI.GetInfo().llFirstNote) {
+            JumpTo(static_cast<long long>(m_llStartTime)); //Loads previously played notes with the "Jump To" function
+            RenderStatusLine(cur_line++,"PlaybackSpeed: (Rewinding)", "%.0lf%%", cPlayback.GetSpeed() * 100);
+        }
+        else {
+            RenderStatusLine(cur_line++,"PlaybackSpeed:", "%.0lf%%", cPlayback.GetSpeed() * 100);
+        }
+    }
+    if (m_Timer.m_bManualTimer && m_bDebug) {
+        if (cPlayback.GetSpeed() < 0 && m_llStartTime > m_MIDI.GetInfo().llFirstNote) {
+            JumpTo(static_cast<long long>(m_llStartTime)); //Loads previously played notes with the "Jump To" function
+            RenderStatusLine(cur_line++,"PlaybackSpeed: (Rewinding)", "%.0lf%%", cPlayback.GetSpeed() * (m_dFPS / m_Timer.m_dFramerate) * 100);
+        }
+        else {
+            RenderStatusLine(cur_line++,"PlaybackSpeed:", "%.0lf%%", cPlayback.GetSpeed() * (m_dFPS / m_Timer.m_dFramerate) * 100);
+        }
+    }
+    if (m_bDebug) {
+        RenderStatusLine(cur_line++,"NoteSpeed:", "%f", cPlayback.GetNSpeed());
+        RenderStatusLine(cur_line++,"Offset-X:", "%f", cView.GetOffsetX() + m_fTempOffsetX);
+        RenderStatusLine(cur_line++,"Offset-Y:", "%f", cView.GetOffsetY() + m_fTempOffsetY);
+        RenderStatusLine(cur_line++,"Zoom:", "%f", cView.GetZoomX() * m_fTempZoomX);
+    }
+    if (viz.bPhigros) { //Calculate song level
+        RenderStatusLine(cur_line++, "Score:", "%07.0f", (m_iNoteCount == mInfo.iNoteCount ? 1000000 : floor(static_cast<float>(m_iNoteCount) / static_cast<float>(mInfo.iNoteCount) * 1000000)));
+             if (mInfo.iNoteCount < 100000) {RenderStatusLine(cur_line++,"Level:", "EZ Lv.1");}
+        else if (mInfo.iNoteCount < 200000) {RenderStatusLine(cur_line++,"Level:", "EZ Lv.2");}
+        else if (mInfo.iNoteCount < 400000) {RenderStatusLine(cur_line++,"Level:", "EZ Lv.3");}
+        else if (mInfo.iNoteCount < 600000) {RenderStatusLine(cur_line++,"Level:", "EZ Lv.4");}
+        else if (mInfo.iNoteCount < 800000) {RenderStatusLine(cur_line++,"Level:", "EZ Lv.5");}
+        else if (mInfo.iNoteCount < 1000000) {RenderStatusLine(cur_line++,"Level:", "HD Lv.6");}
+        else if (mInfo.iNoteCount < 2000000) {RenderStatusLine(cur_line++,"Level:", "HD Lv.7");}
+        else if (mInfo.iNoteCount < 4000000) {RenderStatusLine(cur_line++,"Level:", "HD Lv.8");}
+        else if (mInfo.iNoteCount < 6000000) {RenderStatusLine(cur_line++,"Level:", "HD Lv.9");}
+        else if (mInfo.iNoteCount < 8000000) {RenderStatusLine(cur_line++,"Level:", "HD Lv.10");}
+        else if (mInfo.iNoteCount < 10000000) {RenderStatusLine(cur_line++,"Level:", "IN Lv.11");}
+        else if (mInfo.iNoteCount < 20000000) {RenderStatusLine(cur_line++,"Level:", "IN Lv.12");}
+        else if (mInfo.iNoteCount < 40000000) {RenderStatusLine(cur_line++,"Level:", "IN Lv.13");}
+        else if (mInfo.iNoteCount < 60000000) {RenderStatusLine(cur_line++,"Level:", "IN Lv.14");}
+        else if (mInfo.iNoteCount < 80000000) {RenderStatusLine(cur_line++,"Level:", "IN Lv.15");}
+        else if (mInfo.iNoteCount < 100000000) {RenderStatusLine(cur_line++,"Level:", "AT Lv.16");}
+        else if (mInfo.iNoteCount < 200000000) {RenderStatusLine(cur_line++,"Level:", "AT Lv.17");}
+        else if (mInfo.iNoteCount < 400000000) {RenderStatusLine(cur_line++,"Level:", "AT Lv.18");}
+        else {RenderStatusLine(cur_line++,"Level:", "SP Lv.?");}
+        RenderStatusLine(cur_line++, "AutoPlay:", "ON ");
+        if (static_cast<float>(m_iNoteCount == mInfo.iNoteCount ? 1000000 : floor(static_cast<float>(m_iNoteCount) / static_cast<float>(mInfo.iNoteCount) * 1000000)) == static_cast<float>(1000000)) {
+            RenderStatusLine(cur_line++,"FULL COMBO!!! ", "");
+        }
+        else if(static_cast<float>(m_iNoteCount == mInfo.iNoteCount ? 1000000 : floor(static_cast<float>(m_iNoteCount) / static_cast<float>(mInfo.iNoteCount) * 1000000)) < static_cast<float>(1000000)) {
+            if (!cPlayback.GetPaused()) {
+                RenderStatusLine(cur_line++,"Deomonstration in progress... ", "");
+            }
+            else {
+                RenderStatusLine(cur_line++, "Game paused... ", "");
+            }
+        }
+        else if (static_cast<float>(m_iNoteCount == mInfo.iNoteCount ? 1000000 : floor(static_cast<float>(m_iNoteCount) / static_cast<float>(mInfo.iNoteCount) * 1000000)) > static_cast<float>(1000000)) {
+            RenderStatusLine(cur_line++,"ERROR: Score overflow! ", "");
+        }
     }
 }
 
