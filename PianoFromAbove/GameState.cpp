@@ -163,14 +163,6 @@ SplashScreen::SplashScreen( HWND hWnd, D3D12Renderer *pRenderer ) : GameState( h
     InitState();
 }
 
-void SplashScreen::InitNotes( const vector< MIDIEvent* > &vEvents )
-{
-    //Get only the channel events
-    m_vEvents.reserve( vEvents.size() );
-    for ( vector< MIDIEvent* >::const_iterator it = vEvents.begin(); it != vEvents.end(); ++it )
-        if ( (*it)->GetEventType() == MIDIEvent::ChannelEvent )
-            m_vEvents.push_back( reinterpret_cast< MIDIChannelEvent* >( *it ) );
-}
 string GetExePath(void) {
     char szFilePath[MAX_PATH + 1] = { 0 };
     GetModuleFileNameA(NULL, szFilePath, MAX_PATH);
@@ -593,6 +585,7 @@ MainScreen::MainScreen( wstring sMIDIFile, State eGameMode, HWND hWnd, D3D12Rend
 {
     // Finish off midi processing
     if ( !m_MIDI.IsValid() ) return;
+    vector< MIDIEvent* > vEvents;
     m_MIDI.ConnectNotes(); // Order's important here
     m_vEvents.reserve(m_MIDI.GetInfo().iEventCount);
     m_MIDI.PostProcess(m_vEvents, &m_vProgramChange, &m_vMetaEvents, &m_vTempo, &m_vSignature, &m_vMarkers);
@@ -603,12 +596,35 @@ MainScreen::MainScreen( wstring sMIDIFile, State eGameMode, HWND hWnd, D3D12Rend
         note_state.reserve(m_MIDI.GetInfo().iNumTracks * 16);
 
     // Initialize
+	InitNoteMap( vEvents ); // Longish
     InitColors();
     InitState();
 
     g_LoadingProgress.stage = MIDILoadingProgress::Stage::Done;
 }
 
+void MainScreen::InitNoteMap( const vector< MIDIEvent* > &vEvents )
+{
+    m_vColorOverridden.resize(m_MIDI.GetInfo().iNumTracks * 16);
+
+    cout << "InitNoteMap " << endl;
+    //Get only the channel events
+    m_vEvents.reserve(vEvents.size());
+    for (vector< MIDIEvent* >::const_iterator it = vEvents.begin(); it != vEvents.end(); ++it) {
+        MIDIMetaEvent* pEvent = reinterpret_cast<MIDIMetaEvent*>(*it);
+        m_vMetaEvents.push_back(pEvent);
+        MIDIMetaEvent::MetaEventType eEventType = pEvent->GetMetaEventType();
+        cout << eEventType << ',' << MIDIMetaEvent::ColorEvent << endl;
+        if (eEventType == MIDIMetaEvent::ColorEvent) {
+            cout << "color event found! " << endl;
+                if (!m_vColorOverridden[pEvent->GetTrack() * 16 + pEvent->GetData()[2]])
+                    ApplyColorEvent(pEvent);
+                m_vColorOverridden[pEvent->GetTrack() * 16 + pEvent->GetData()[2]] = true;
+                m_vColorEvents.push_back(pair< long long, int >(pEvent->GetAbsMicroSec(), m_vMetaEvents.size() - 1));
+            break;
+        }
+    }
+}
 // Display colors
 void MainScreen::InitColors()
 {
@@ -781,6 +797,10 @@ void MainScreen::SetChannelSettings( const vector< bool > &vMuted, const vector<
         const MIDITrack::MIDITrackInfo& mTrackInfo = vTracks[i]->GetInfo();
         for (int j = 0; j < 16; j++) {
             if (mTrackInfo.aNoteCount[j] > 0) {
+            	if (m_vColorOverridden[i * 16 + j] == true) {
+                    iPos++;
+                    continue;
+                }
                 MuteChannel(i, j, bMuted ? vMuted[min(iPos, vMuted.size() - 1)] : false);
                 HideChannel(i, j, bHidden ? vHidden[min(iPos, vHidden.size() - 1)] : false);
                 if (cViz.bColorLoop && bColor) {
@@ -1384,6 +1404,14 @@ void MainScreen::AdvanceIterators( long long llTime, bool bIsJump )
                 ApplyMarker(nullptr, 0);
             }
         }
+
+        m_itNextColorEvent = upper_bound(m_vColorEvents.begin(), m_vColorEvents.end(), pair< long long, int >(llTime, m_vMetaEvents.size()));
+        if (itCurMarker != m_itNextColorEvent) {
+            if (m_itNextColorEvent != m_vColorEvents.begin() && (m_itNextColorEvent - 1)->second != -1) {
+                auto eEvent = m_vMetaEvents[(m_itNextColorEvent - 1)->second];
+                ApplyColorEvent(eEvent);
+            }
+        }
     }
     else
     {
@@ -1421,6 +1449,12 @@ void MainScreen::AdvanceIterators( long long llTime, bool bIsJump )
                 ApplyMarker(nullptr, 0);
             }
         }
+
+        for (; m_itNextColorEvent != m_vColorEvents.end() && m_itNextColorEvent->first <= llTime; ++m_itNextColorEvent)
+        {
+            MIDIMetaEvent* pEvent = m_vMetaEvents[m_itNextColorEvent->second];
+            ApplyColorEvent(pEvent);
+        }
     }
 }
 
@@ -1443,6 +1477,22 @@ MIDIMetaEvent* MainScreen::GetPrevious( eventvec_t::const_iterator &itCurrent,
         return pPrevious;
     }
     return NULL;
+}
+
+void MainScreen::ApplyColorEvent(MIDIMetaEvent* event) {
+    // logic basically copied from mmf
+    // partial transparency and gradients not supported
+    const auto size = event->GetDataLen();
+    const auto data = event->GetData();
+    if (event->GetMetaEventType() == MIDIMetaEvent::ColorEvent &&
+        (size == 8 || size == 12) &&
+        data[0] == 0x00 && data[1] == 0x0F &&
+        (data[2] < 16 || data[2] == 0x7F) &&
+        data[3] == 0) {
+        unsigned color = (data[7] << 24) | (data[6] << 16) | (data[5] << 8) | data[4];
+        auto& chan_settings = m_vTrackSettings[event->GetTrack()].aChannels[data[2]];
+        chan_settings.SetColor(color);
+    }
 }
 
 // Gets the tick corresponding to llStartTime using current tempo

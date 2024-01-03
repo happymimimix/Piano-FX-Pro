@@ -22,7 +22,7 @@ StructuredBuffer<TrackColor> colors : register(t2);
 StructuredBuffer<NoteData> note_data : register(t3);
 
 float4 unpack_color(uint col) {
-    return float4(float((col >> 0) & 0xFF) / 255.0, float((col >> 8) & 0xFF) / 255.0, float((col >> 16) & 0xFF) / 255.0, float((col >> 24) & 0xFF) / 255.0);
+    return float4(float((col >> 16) & 0xFF) / 255.0, float((col >> 8) & 0xFF) / 255.0, float(col & 0xFF) / 255.0, float((col >> 24) & 0xFF) / 255.0);
 }
 
 NotePSInput main(uint id : SV_VertexID) {

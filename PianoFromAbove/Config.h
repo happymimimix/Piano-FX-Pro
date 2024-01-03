@@ -47,7 +47,7 @@ struct VisualSettings : public ISettings
     enum KeysShown { All, Song, Custom } eKeysShown;
     int iFirstKey, iLastKey;
     bool bAlwaysShowControls, bAssociateFiles;
-    unsigned int colors[24], iBkgColor;
+    unsigned int colors[16], iBkgColor;
 };
 
 struct AudioSettings : public ISettings

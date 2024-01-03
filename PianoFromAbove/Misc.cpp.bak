@@ -176,7 +176,7 @@ unsigned Util::RandColor()
 {
     int R, G, B;
     HSVtoRGB( rand() % 360, rand() % 40 + 60, rand() % 20 + 80, R, G, B );
-    return (0xFF << 24) | ( B << 16 ) | ( G << 8 ) | R;
+    return ( B << 16 ) | ( G << 8 ) | R;
 }
 
 void Util::RGBtoHSV( int R, int G, int B, int &H, int &S, int &V )
