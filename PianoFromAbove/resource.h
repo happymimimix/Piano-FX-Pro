@@ -86,6 +86,7 @@
 #define IDC_WIDTH2                      1080
 #define IDC_HEIGHT                      1080
 #define IDC_BUTTON7                     1081
+#define IDC_FONT                        1081
 #define IDC_RADIO1                      1086
 #define IDC_RADIO2                      1087
 #define IDC_RADIO3                      1088
@@ -116,8 +117,11 @@
 #define IDC_SPLASHRESET2                1110
 #define IDC_BACKGROUNDRESET             1110
 #define IDC_COLORLOOP                   1111
+#define IDC_FONTBROWSE                  1112
 #define IDC_COLORLOOP2                  1113
 #define IDC_DISABLEUI                   1113
+#define IDC_BACKGROUNDRESET2            1114
+#define IDC_FONTRESET                   1114
 #define ID_FILE_PLAYFILE                40001
 #define ID_FILE_ADDFILE                 40002
 #define ID_FILE_ADDFOLDER               40003

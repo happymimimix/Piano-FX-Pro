@@ -221,8 +221,8 @@ private:
     void RenderKeys();
     void RenderBorder();
     void RenderText();
-    void RenderStatusLine(int line, const char* left, const char* format, ...);
-    void RenderStatus( LPRECT prcPos );
+    void RenderStatusLine(int line, float width, const char* left, const char* format, ...);
+    void RenderStatus(int lines);
     void RenderMarker(const char* str);
     void RenderMessage( LPRECT prcMsg, TCHAR *sMsg );
 

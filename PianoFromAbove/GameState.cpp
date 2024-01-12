@@ -2054,8 +2054,6 @@ void MainScreen::RenderText()
         iLines++;
 
     // Screen info
-    RECT rcStatus = { (LONG)(m_pRenderer->GetBufferWidth() - 156 * viz.fUIScale), 0, m_pRenderer->GetBufferWidth(), (LONG)((6 + 16 * iLines) * viz.fUIScale) };
-
     int iMsgCY = 200;
     RECT rcMsg = { 0, static_cast<int>(m_pRenderer->GetBufferHeight() * (1.0f - KBPercent) - iMsgCY) / 2 };
     rcMsg.right = m_pRenderer->GetBufferWidth();
@@ -2064,7 +2062,7 @@ void MainScreen::RenderText()
     // Draw the text
     m_pRenderer->BeginText();
 
-    RenderStatus(&rcStatus);
+    RenderStatus(iLines);
     if (!m_sMarker.empty() && viz.bShowMarkers)
         RenderMarker(m_sMarker.c_str());
     if (m_bZoomMove)
@@ -2073,7 +2071,7 @@ void MainScreen::RenderText()
     m_pRenderer->EndText();
 }
 
-void MainScreen::RenderStatusLine(int line, const char* left, const char* format, ...) {
+void MainScreen::RenderStatusLine(int line, float width, const char* left, const char* format, ...) {
     va_list varargs;
     va_start(varargs, format);
 
@@ -2082,7 +2080,7 @@ void MainScreen::RenderStatusLine(int line, const char* left, const char* format
     vsnprintf_s(buf, sizeof(buf), format, varargs);
 
     auto draw_list = m_pRenderer->GetDrawList();
-    ImVec2 left_pos = ImVec2(m_pRenderer->GetBufferWidth() - (156 - 6) * scale, (3 + line * 16) * scale);
+    ImVec2 left_pos = ImVec2(m_pRenderer->GetBufferWidth() - (width - 6) * scale, (3 + line * 16) * scale);
     ImVec2 right_pos = ImVec2(m_pRenderer->GetBufferWidth() - ImGui::CalcTextSize(buf).x - 6 * scale, (3 + line * 16) * scale);
     draw_list->AddText(ImVec2(left_pos.x + 2, left_pos.y + 1), 0xFF404040, left);
     draw_list->AddText(ImVec2(left_pos.x, left_pos.y), 0xFFFFFFFF, left);
@@ -2092,7 +2090,7 @@ void MainScreen::RenderStatusLine(int line, const char* left, const char* format
     va_end(varargs);
 }
 
-void MainScreen::RenderStatus(LPRECT prcStatus)
+void MainScreen::RenderStatus(int lines)
 {
     // Time
     Config& config = Config::GetConfig();
@@ -2108,18 +2106,26 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
     auto tcs = (mInfo.llTotalMicroSecs % 1000000) / 100000;
     auto tempo = 60000000.0 / m_iMicroSecsPerBeat;
 
-    int cur_line = 0;
-    m_pRenderer->GetDrawList()->AddRectFilled(ImVec2(prcStatus->left, prcStatus->top), ImVec2(prcStatus->right, prcStatus->bottom), 0x80000000);
-
-    RenderStatusLine(cur_line++, "Time:", "%s%lld:%02d.%d / %lld:%02d.%d",
+    char time_buf[1024] = {};
+    snprintf(time_buf, sizeof(time_buf) - 1,
+        "%s%lld:%02d.%d / %lld:%02d.%d",
         m_llStartTime >= 0 ? "" : "-",
         min, sec, cs,
         tmin, tsec, tcs);
-    RenderStatusLine(cur_line++, "Tempo:", "%.3lf bpm", tempo);
+    float width = max(156 * viz.fUIScale, ImGui::CalcTextSize("Time:").x + ImGui::CalcTextSize(time_buf).x + 24.0f * viz.fUIScale);
+    int cur_line = 0;
+    m_pRenderer->GetDrawList()->AddRectFilled(
+        ImVec2(m_pRenderer->GetBufferWidth() - width, 0.0f),
+        ImVec2(m_pRenderer->GetBufferWidth(), (6 + 16 * lines) * viz.fUIScale),
+        0x80000000
+    );
+
+    RenderStatusLine(cur_line++, width, "Time:", time_buf);
+    RenderStatusLine(cur_line++, width, "Tempo:", "%.3lf bpm", tempo);
 
     // Framerate
     if (m_bShowFPS && !m_bDumpFrames)
-        RenderStatusLine(cur_line++, "FPS:", "%.1lf", m_dFPS);
+        RenderStatusLine(cur_line++, width, "FPS:", "%.1lf", m_dFPS);
 
     // Nerd stats
     if (viz.bNerdStats) {
@@ -2127,8 +2133,8 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
         for (int i = 0; i < m_dNPSNotes.size(); i++)
             nps += std::get<1>(m_dNPSNotes[i]);
 
-        RenderStatusLine(cur_line++, "NPS:", "%lld", nps);
-        RenderStatusLine(cur_line++, "Rendered:", "%llu", m_pRenderer->GetRenderedNotesCount());
+        RenderStatusLine(cur_line++, width, "NPS:", "%lld", nps);
+        RenderStatusLine(cur_line++, width, "Rendered:", "%llu", m_pRenderer->GetRenderedNotesCount());
     }
 }
 

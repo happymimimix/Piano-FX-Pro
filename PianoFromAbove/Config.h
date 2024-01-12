@@ -183,6 +183,7 @@ struct VizSettings : public ISettings {
     bool bKDMAPI;
     bool bDisableUI;
     float fUIScale;
+    std::wstring sUIFont;
 };
 
 class Config : public ISettings

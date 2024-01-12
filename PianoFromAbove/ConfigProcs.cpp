@@ -463,6 +463,7 @@ INT_PTR WINAPI VizProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
         SetDlgItemTextW(hWnd, IDC_SPLASHMIDI, viz.sSplashMIDI.c_str());
         SetDlgItemTextW(hWnd, IDC_BACKGROUND, viz.sBackground.c_str());
+        SetDlgItemTextW(hWnd, IDC_FONT, viz.sUIFont.c_str());
 
         char buf[128] = {};
         snprintf(buf, sizeof(buf) - 1, "%.2f", viz.fUIScale);
@@ -511,6 +512,25 @@ INT_PTR WINAPI VizProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             SetDlgItemTextW(hWnd, IDC_BACKGROUND, L"");
             return TRUE;
         }
+        case IDC_FONTBROWSE: {
+            OPENFILENAME ofn = { 0 };
+            TCHAR sFilename[1024] = { 0 };
+            ofn.lStructSize = sizeof(OPENFILENAME);
+            ofn.hwndOwner = hWnd;
+            ofn.lpstrFilter = TEXT("Font files\0*.ttf;*.ttc;*.cff;*.otf;*.woff\0");
+            ofn.lpstrFile = sFilename;
+            ofn.nMaxFile = sizeof(sFilename) / sizeof(TCHAR);
+            ofn.lpstrTitle = TEXT("Select a font!");
+            ofn.Flags = OFN_EXPLORER | OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
+            if (GetOpenFileName(&ofn))
+                SetDlgItemTextW(hWnd, IDC_FONT, sFilename);
+            return TRUE;
+        }
+        case IDC_FONTRESET: {
+            Changed(hWnd);
+            SetDlgItemTextW(hWnd, IDC_FONT, L"");
+            return TRUE;
+        }
         }
         break;
     }
@@ -522,6 +542,7 @@ INT_PTR WINAPI VizProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             VizSettings viz = config.GetVizSettings();
             wchar_t splash[1024]{};
             wchar_t background[1024]{};
+            wchar_t font[1024]{};
 
             viz.bTickBased = IsDlgButtonChecked(hWnd, IDC_TICKBASED);
             viz.bShowMarkers = IsDlgButtonChecked(hWnd, IDC_MARKERS);
@@ -535,6 +556,8 @@ INT_PTR WINAPI VizProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             viz.bDumpFrames = IsDlgButtonChecked(hWnd, IDC_FFMPEG);
             viz.bColorLoop = IsDlgButtonChecked(hWnd, IDC_COLORLOOP);
             viz.bDisableUI = IsDlgButtonChecked(hWnd, IDC_DISABLEUI);
+            GetWindowTextW(GetDlgItem(hWnd, IDC_FONT), font, 1024);
+            viz.sUIFont = font;
 
             char scale_str[128] = {};
             GetWindowTextA(GetDlgItem(hWnd, IDC_UISCALE), scale_str, sizeof(scale_str));

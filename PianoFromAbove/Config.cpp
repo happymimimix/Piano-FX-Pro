@@ -223,6 +223,7 @@ void VizSettings::LoadDefaultValues() {
     this->bKDMAPI = true;
     this->bDisableUI = false;
     this->fUIScale = 1.0f;
+    this->sUIFont = L"";
 }
 
 void AudioSettings::LoadMIDIDevices()
@@ -392,6 +393,8 @@ void VizSettings::LoadConfigValues(TiXmlElement* txRoot) {
     fUIScale = max(0.1f, min(fUIScale, 10.0f));
     if (std::isnan(fUIScale))
         fUIScale = 1.0f;
+    txViz->QueryStringAttribute("UIFont", &sTempStr);
+    sUIFont = Util::StringToWstring(sTempStr);
 
     int r, g, b = 0;
     TiXmlElement* txBarColor = txViz->FirstChildElement("BarColor");
@@ -510,6 +513,7 @@ bool VizSettings::SaveConfigValues(TiXmlElement* txRoot) {
     txViz->SetAttribute("KDMAPI", bKDMAPI);
     txViz->SetAttribute("DisableUI", bDisableUI);
     txViz->SetAttribute("UIScale", fUIScale);
+    txViz->SetAttribute("UIFont", Util::WstringToString(sUIFont));
 
     TiXmlElement* txBarColor = new TiXmlElement("BarColor");
     txViz->LinkEndChild(txBarColor);

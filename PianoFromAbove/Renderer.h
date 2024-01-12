@@ -189,4 +189,5 @@ private:
 
     ImDrawList* m_pDrawList;
     float m_fLastUIScale = 1.0f;
+    std::wstring m_sLastFont;
 };

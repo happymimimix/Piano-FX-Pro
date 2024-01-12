@@ -1373,7 +1373,8 @@ bool D3D12Renderer::UploadBackgroundBitmap() {
 
 void D3D12Renderer::ImGuiStartFrame()
 {
-    if (m_fLastUIScale != Config::GetConfig().GetVizSettings().fUIScale)
+    const auto& viz = Config::GetConfig().GetVizSettings();
+    if (m_fLastUIScale != viz.fUIScale || m_sLastFont != viz.sUIFont)
         UpdateImGuiSettings();
     ImGui_ImplDX12_NewFrame();
     ImGui_ImplWin32_NewFrame();
@@ -1381,8 +1382,10 @@ void D3D12Renderer::ImGuiStartFrame()
 }
 
 void D3D12Renderer::UpdateImGuiSettings() {
-    float scale = Config::GetConfig().GetVizSettings().fUIScale;
+    const auto& viz = Config::GetConfig().GetVizSettings();
+    float scale = viz.fUIScale;
     m_fLastUIScale = scale;
+    m_sLastFont = viz.sUIFont;
 
     // Get the fonts directory
     char fonts_dir[MAX_PATH];
@@ -1393,13 +1396,20 @@ void D3D12Renderer::UpdateImGuiSettings() {
     auto& io = ImGui::GetIO();
     io.Fonts->Clear();
     ImFontConfig font_config = {};
-    font_config.FontNo = 0; // TAHOMA!
-    io.Fonts->AddFontFromFileTTF((std::string(fonts_dir) + "\\Tahoma.ttf").c_str(), 14.0f * scale, &font_config, io.Fonts->GetGlyphRangesDefault());
-    font_config.FontNo = 1; // MS UI Gothic
-    font_config.MergeMode = true;
-    io.Fonts->AddFontFromFileTTF((std::string(fonts_dir) + "\\msgothic.ttc").c_str(), 14.0f * scale, &font_config, io.Fonts->GetGlyphRangesJapanese());
+    if (!viz.sUIFont.empty()) {
+        io.Fonts->AddFontFromFileTTF(Util::WstringToString(viz.sUIFont), 14.0f * scale, &font_config, io.Fonts->GetGlyphRangesDefault());
+    } else {
+        font_config.FontNo = 0; // TAHOMA!
+        io.Fonts->AddFontFromFileTTF((std::string(fonts_dir) + "\\Tahoma.ttf").c_str(), 14.0f * scale, &font_config, io.Fonts->GetGlyphRangesDefault());
+        font_config.FontNo = 1; // MS UI Gothic
+        font_config.MergeMode = true;
+        io.Fonts->AddFontFromFileTTF((std::string(fonts_dir) + "\\msgothic.ttc").c_str(), 14.0f * scale, &font_config, io.Fonts->GetGlyphRangesJapanese());
+    }
     io.IniFilename = nullptr;
-    io.Fonts->Build();
+    if (!io.Fonts->Build()) {
+        io.Fonts->Clear();
+        io.Fonts->AddFontDefault();
+    }
     ImGui_ImplDX12_CreateDeviceObjects();
 
     // Theme tweaks
