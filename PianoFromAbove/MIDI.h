@@ -14,6 +14,7 @@
 #include <string>
 #include <map>
 #include <atomic>
+#include <stdint.h>
 using namespace std;
 
 #include "Misc.h"
@@ -349,8 +350,8 @@ public:
 
     Stage stage;
     std::wstring name;
-    std::atomic<unsigned> progress;
-    unsigned max;
+    std::atomic<uint64_t> progress;
+    uint64_t max;
 };
 
 extern MIDILoadingProgress g_LoadingProgress;

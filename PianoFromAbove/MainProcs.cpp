@@ -1139,7 +1139,7 @@ INT_PTR LoadingProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 
         char buf[1024];
         auto prog = g_LoadingProgress.progress.load();
-        snprintf(buf, sizeof(buf), "%d / %d", prog, g_LoadingProgress.max);
+        snprintf(buf, sizeof(buf), "%llu / %llu", prog, g_LoadingProgress.max);
         SetWindowTextA(GetDlgItem(hwnd, IDC_LOADINGNUM), buf);
 
         PROCESS_MEMORY_COUNTERS mem{};
