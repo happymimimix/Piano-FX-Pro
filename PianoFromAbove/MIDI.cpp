@@ -258,34 +258,6 @@ MIDI::MIDI ( const wstring &sFilename )
         constexpr uint8_t lzma_magic[] = {0xFD, 0x37, 0x7A, 0x58, 0x5A, 0x00};
         while (iSize >= LZMA_STREAM_HEADER_SIZE * 2 && !memcmp(pcMemBlock, lzma_magic, sizeof(lzma_magic))) {
             auto compressed = pcMemBlock;
-            
-            // Get the decompressed size
-            // TODO: Concatenated .xz files
-            // https://stackoverflow.com/questions/2171775/how-to-get-the-uncompressed-size-of-an-lzma2-file-xz-liblzma
-            /*
-            char err[1024] = {};
-            uint64_t mem_limit = UINT64_MAX;
-            uint64_t in_pos = 0;
-            lzma_index* index = nullptr;
-            lzma_stream_flags stream_flags;
-            uint8_t* footer_ptr = &pcMemBlock[iSize - LZMA_STREAM_HEADER_SIZE];
-            lzma_stream_footer_decode(&stream_flags, footer_ptr);
-            lzma_index_buffer_decode(&index, &mem_limit, NULL, footer_ptr - stream_flags.backward_size, &in_pos, stream_flags.backward_size);
-            if (!index) {
-                delete[] pcMemBlock;
-                MessageBoxA(NULL, "lzma_index_buffer_decode failed. Corrupted file?", "Piano From Above", MB_OK | MB_ICONERROR);
-                return;
-            }
-            snprintf(err, sizeof(err) - 1, "debug %llu", stream_flags.backward_size);
-            MessageBoxA(NULL, err, "Piano From Above", MB_OK | MB_ICONERROR);
-            if (in_pos != stream_flags.backward_size) {
-                MessageBoxA(NULL, "stream_flags.backward_size mismatch. Corrupted file?", "Piano From Above", MB_OK | MB_ICONERROR);
-                lzma_index_end(index, NULL);
-                return;
-            }
-            auto decompressed_size = lzma_index_uncompressed_size(index);
-            lzma_index_end(index, NULL);
-            */
 
             // Get the decompressed size
             // This is a real pain in the ass for concatenated .xz files, lots of sanity checking is skipped here

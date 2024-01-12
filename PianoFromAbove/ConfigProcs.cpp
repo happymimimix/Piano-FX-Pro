@@ -479,7 +479,7 @@ INT_PTR WINAPI VizProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             TCHAR sFilename[1024] = { 0 };
             ofn.lStructSize = sizeof(OPENFILENAME);
             ofn.hwndOwner = hWnd;
-            ofn.lpstrFilter = TEXT("MIDI Files\0*.mid\0");
+            ofn.lpstrFilter = TEXT("MIDI Files\0*.mid;*.xz\0");
             ofn.lpstrFile = sFilename;
             ofn.nMaxFile = sizeof(sFilename) / sizeof(TCHAR);
             ofn.lpstrTitle = TEXT("Select a splash MIDI!");
