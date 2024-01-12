@@ -463,6 +463,10 @@ INT_PTR WINAPI VizProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
         SetDlgItemTextW(hWnd, IDC_SPLASHMIDI, viz.sSplashMIDI.c_str());
         SetDlgItemTextW(hWnd, IDC_BACKGROUND, viz.sBackground.c_str());
+
+        char buf[128] = {};
+        snprintf(buf, sizeof(buf) - 1, "%.2f", viz.fUIScale);
+        SetDlgItemTextA(hWnd, IDC_UISCALE, buf);
         return TRUE;
     }
     case WM_COMMAND: {
@@ -531,6 +535,11 @@ INT_PTR WINAPI VizProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             viz.bDumpFrames = IsDlgButtonChecked(hWnd, IDC_FFMPEG);
             viz.bColorLoop = IsDlgButtonChecked(hWnd, IDC_COLORLOOP);
             viz.bDisableUI = IsDlgButtonChecked(hWnd, IDC_DISABLEUI);
+
+            char scale_str[128] = {};
+            GetWindowTextA(GetDlgItem(hWnd, IDC_UISCALE), scale_str, sizeof(scale_str));
+            float scale = atof(scale_str);
+            viz.fUIScale = scale == 0.0f ? 1.0f : min(max(0.1f, scale), 10.0f);
 
             config.SetVizSettings(viz);
             SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_NOERROR);

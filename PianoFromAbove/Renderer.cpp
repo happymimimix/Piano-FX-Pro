@@ -626,27 +626,8 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     auto imgui_heap = m_pImGuiSRVDescriptorHeap.Get();
     ImGui::CreateContext();
 
-    // Get the fonts directory
-    char fonts_dir[MAX_PATH];
-    if (FAILED(SHGetFolderPathA(NULL, CSIDL_FONTS, NULL, SHGFP_TYPE_CURRENT, fonts_dir)))
-        strcpy_s(fonts_dir, "C:\\Windows\\Fonts");
-
-    // Set up font and disable imgui.ini
-    auto& io = ImGui::GetIO();
-    ImFontConfig font_config = {};
-    font_config.FontNo = 0; // TAHOMA!
-    io.Fonts->AddFontFromFileTTF((std::string(fonts_dir) + "\\Tahoma.ttf").c_str(), 14.0f, &font_config, io.Fonts->GetGlyphRangesDefault());
-    font_config.FontNo = 1; // MS UI Gothic
-    font_config.MergeMode = true;
-    io.Fonts->AddFontFromFileTTF((std::string(fonts_dir) + "\\msgothic.ttc").c_str(), 14.0f, &font_config, io.Fonts->GetGlyphRangesJapanese());
-    io.IniFilename = nullptr;
-
-    // Theme tweaks
-    auto& style = ImGui::GetStyle();
-    style.WindowMinSize = ImVec2(1, 1);
-    style.WindowBorderSize = 0.0f;
-    style.WindowPadding = ImVec2(6, 6);
-    style.Colors[ImGuiCol_WindowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.50f);
+    // Update ImGui settings
+    UpdateImGuiSettings();
 
     ImGui_ImplWin32_Init(hWnd);
     ImGui_ImplDX12_Init(m_pDevice.Get(), FrameCount, DXGI_FORMAT_B8G8R8A8_UNORM, imgui_heap, imgui_heap->GetCPUDescriptorHandleForHeapStart(), imgui_heap->GetGPUDescriptorHandleForHeapStart());
@@ -1388,4 +1369,43 @@ bool D3D12Renderer::UploadBackgroundBitmap() {
     WaitForGPU();
 
     return true;
+}
+
+void D3D12Renderer::ImGuiStartFrame()
+{
+    if (m_fLastUIScale != Config::GetConfig().GetVizSettings().fUIScale)
+        UpdateImGuiSettings();
+    ImGui_ImplDX12_NewFrame();
+    ImGui_ImplWin32_NewFrame();
+    ImGui::NewFrame();
+}
+
+void D3D12Renderer::UpdateImGuiSettings() {
+    float scale = Config::GetConfig().GetVizSettings().fUIScale;
+    m_fLastUIScale = scale;
+
+    // Get the fonts directory
+    char fonts_dir[MAX_PATH];
+    if (FAILED(SHGetFolderPathA(NULL, CSIDL_FONTS, NULL, SHGFP_TYPE_CURRENT, fonts_dir)))
+        strcpy_s(fonts_dir, "C:\\Windows\\Fonts");
+
+    // Set up font and disable imgui.ini
+    auto& io = ImGui::GetIO();
+    io.Fonts->Clear();
+    ImFontConfig font_config = {};
+    font_config.FontNo = 0; // TAHOMA!
+    io.Fonts->AddFontFromFileTTF((std::string(fonts_dir) + "\\Tahoma.ttf").c_str(), 14.0f * scale, &font_config, io.Fonts->GetGlyphRangesDefault());
+    font_config.FontNo = 1; // MS UI Gothic
+    font_config.MergeMode = true;
+    io.Fonts->AddFontFromFileTTF((std::string(fonts_dir) + "\\msgothic.ttc").c_str(), 14.0f * scale, &font_config, io.Fonts->GetGlyphRangesJapanese());
+    io.IniFilename = nullptr;
+    io.Fonts->Build();
+    ImGui_ImplDX12_CreateDeviceObjects();
+
+    // Theme tweaks
+    auto& style = ImGui::GetStyle();
+    style.WindowMinSize = ImVec2(1, 1);
+    style.WindowBorderSize = 0.0f;
+    style.WindowPadding = ImVec2(6 * scale, 6 * scale);
+    style.Colors[ImGuiCol_WindowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.50f);
 }

@@ -222,6 +222,7 @@ void VizSettings::LoadDefaultValues() {
     this->bColorLoop = false;
     this->bKDMAPI = true;
     this->bDisableUI = false;
+    this->fUIScale = 1.0f;
 }
 
 void AudioSettings::LoadMIDIDevices()
@@ -387,6 +388,10 @@ void VizSettings::LoadConfigValues(TiXmlElement* txRoot) {
     sBackground = Util::StringToWstring(sTempStr);
     txViz->QueryIntAttribute("MarkerEncoding", (int*)&eMarkerEncoding);
     eMarkerEncoding = max(MarkerEncoding::CP1252, min(eMarkerEncoding, MarkerEncoding::UTF8));
+    txViz->QueryFloatAttribute("UIScale", &fUIScale);
+    fUIScale = max(0.1f, min(fUIScale, 10.0f));
+    if (std::isnan(fUIScale))
+        fUIScale = 1.0f;
 
     int r, g, b = 0;
     TiXmlElement* txBarColor = txViz->FirstChildElement("BarColor");
@@ -504,6 +509,7 @@ bool VizSettings::SaveConfigValues(TiXmlElement* txRoot) {
     txViz->SetAttribute("ColorLoop", bColorLoop);
     txViz->SetAttribute("KDMAPI", bKDMAPI);
     txViz->SetAttribute("DisableUI", bDisableUI);
+    txViz->SetAttribute("UIScale", fUIScale);
 
     TiXmlElement* txBarColor = new TiXmlElement("BarColor");
     txViz->LinkEndChild(txBarColor);

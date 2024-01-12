@@ -91,7 +91,7 @@ GameState::GameError IntroScreen::Init()
 GameState::GameError IntroScreen::Logic()
 {
     // Start new ImGui frame
-    m_pRenderer->ImguiStartFrame();
+    m_pRenderer->ImGuiStartFrame();
 
     Sleep( 10 );
     return Success;
@@ -283,7 +283,7 @@ GameState::GameError SplashScreen::MsgProc( HWND hWnd, UINT msg, WPARAM wParam, 
 GameState::GameError SplashScreen::Logic()
 {
     // Start new ImGui frame
-    m_pRenderer->ImguiStartFrame();
+    m_pRenderer->ImGuiStartFrame();
 
     static Config &config = Config::GetConfig();
     static PlaybackSettings &cPlayback = config.GetPlaybackSettings();
@@ -992,7 +992,7 @@ GameState::GameError MainScreen::MsgProc( HWND hWnd, UINT msg, WPARAM wParam, LP
 GameState::GameError MainScreen::Logic( void )
 {
     // Start new ImGui frame
-    m_pRenderer->ImguiStartFrame();
+    m_pRenderer->ImGuiStartFrame();
 
     static Config &config = Config::GetConfig();
     static PlaybackSettings &cPlayback = config.GetPlaybackSettings();
@@ -2054,7 +2054,7 @@ void MainScreen::RenderText()
         iLines++;
 
     // Screen info
-    RECT rcStatus = { m_pRenderer->GetBufferWidth() - 156, 0, m_pRenderer->GetBufferWidth(), 6 + 16 * iLines };
+    RECT rcStatus = { (LONG)(m_pRenderer->GetBufferWidth() - 156 * viz.fUIScale), 0, m_pRenderer->GetBufferWidth(), (LONG)((6 + 16 * iLines) * viz.fUIScale) };
 
     int iMsgCY = 200;
     RECT rcMsg = { 0, static_cast<int>(m_pRenderer->GetBufferHeight() * (1.0f - KBPercent) - iMsgCY) / 2 };
@@ -2077,12 +2077,13 @@ void MainScreen::RenderStatusLine(int line, const char* left, const char* format
     va_list varargs;
     va_start(varargs, format);
 
+    float scale = Config::GetConfig().GetVizSettings().fUIScale;
     char buf[1024] = {};
     vsnprintf_s(buf, sizeof(buf), format, varargs);
 
     auto draw_list = m_pRenderer->GetDrawList();
-    ImVec2 left_pos = ImVec2(m_pRenderer->GetBufferWidth() - 156 + 6, 3 + line * 16);
-    ImVec2 right_pos = ImVec2(m_pRenderer->GetBufferWidth() - ImGui::CalcTextSize(buf).x - 6, 3 + line * 16);
+    ImVec2 left_pos = ImVec2(m_pRenderer->GetBufferWidth() - (156 - 6) * scale, (3 + line * 16) * scale);
+    ImVec2 right_pos = ImVec2(m_pRenderer->GetBufferWidth() - ImGui::CalcTextSize(buf).x - 6 * scale, (3 + line * 16) * scale);
     draw_list->AddText(ImVec2(left_pos.x + 2, left_pos.y + 1), 0xFF404040, left);
     draw_list->AddText(ImVec2(left_pos.x, left_pos.y), 0xFFFFFFFF, left);
     draw_list->AddText(ImVec2(right_pos.x + 2, right_pos.y + 1), 0xFF404040, buf);
@@ -2132,14 +2133,15 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
 }
 
 void MainScreen::RenderMarker(const char* str) {
+    float scale = Config::GetConfig().GetVizSettings().fUIScale;
     ImVec2 size = ImGui::CalcTextSize(str);
-    size.x += 12;
-    size.y += 6;
+    size.x += 12 * scale;
+    size.y += 6 * scale;
 
     auto draw_list = m_pRenderer->GetDrawList();
     draw_list->AddRectFilled(ImVec2(0, 0), size, 0x80000000);
-    draw_list->AddText(ImVec2(6 + 2, 3 + 1), 0xFF404040, str);
-    draw_list->AddText(ImVec2(6, 3), 0xFFFFFFFF, str);
+    draw_list->AddText(ImVec2((6 + 2) * scale, (3 + 1) * scale), 0xFF404040, str);
+    draw_list->AddText(ImVec2(6 * scale, 3 * scale), 0xFFFFFFFF, str);
 }
 
 void MainScreen::RenderMessage(LPRECT prcMsg, TCHAR* sMsg)

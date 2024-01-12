@@ -92,6 +92,7 @@
 #define IDC_PICTURE                     1089
 #define IDC_EDIT2                       1090
 #define IDC_VQSIZE                      1090
+#define IDC_UISCALE                     1090
 #define IDC_LICENSE                     1093
 #define IDC_LOCK                        1094
 #define IDC_NSPEED                      1095
