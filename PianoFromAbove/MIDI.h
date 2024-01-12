@@ -345,7 +345,7 @@ private:
 
 class MIDILoadingProgress {
 public:
-    enum Stage { CopyToMem, ParseTracks, ConnectNotes, SortEvents, Finalize, Done };
+    enum Stage { CopyToMem, Decompress, ParseTracks, ConnectNotes, SortEvents, Finalize, Done };
 
     Stage stage;
     std::wstring name;

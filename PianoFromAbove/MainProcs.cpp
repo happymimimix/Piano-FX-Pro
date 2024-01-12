@@ -1115,6 +1115,9 @@ INT_PTR LoadingProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
         case MIDILoadingProgress::Stage::CopyToMem:
             desc = "Copying MIDI into memory...";
             break;
+        case MIDILoadingProgress::Stage::Decompress:
+            desc = "Decompressing...";
+            break;
         case MIDILoadingProgress::Stage::ParseTracks:
             desc = "Parsing tracks...";
             break;

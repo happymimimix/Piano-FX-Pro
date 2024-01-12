@@ -14,6 +14,7 @@
 #include <ppl.h>
 #include <intrin.h>
 #include <smmintrin.h>
+#include "lzma.h"
 
 //std::map<int, std::pair<std::vector<MIDIEvent*>::iterator, std::vector<MIDIEvent*>>> midi_map;
 MIDILoadingProgress g_LoadingProgress;
@@ -242,14 +243,178 @@ MIDI::MIDI ( const wstring &sFilename )
         unsigned char* pcMemBlock = new unsigned char[iSize];
 
         // Go to the beginning of the file to prepare for parsing
-        if (_fseeki64(stream, 0, SEEK_SET))
+        if (_fseeki64(stream, 0, SEEK_SET)) {
             MessageBoxA(NULL, "_fseeki64 encountered an error.", "Piano From Above", MB_OK | MB_ICONERROR);
+            return;
+        }
 
         // Parse the entire MIDI to memory
         fread(reinterpret_cast<char*>(pcMemBlock), 1, iSize, stream);
 
         // Close the stream, since it's not needed anymore
         fclose(stream);
+
+        // Decompress the MIDI if needed
+        constexpr uint8_t lzma_magic[] = {0xFD, 0x37, 0x7A, 0x58, 0x5A, 0x00};
+        while (iSize >= LZMA_STREAM_HEADER_SIZE * 2 && !memcmp(pcMemBlock, lzma_magic, sizeof(lzma_magic))) {
+            auto compressed = pcMemBlock;
+            
+            // Get the decompressed size
+            // TODO: Concatenated .xz files
+            // https://stackoverflow.com/questions/2171775/how-to-get-the-uncompressed-size-of-an-lzma2-file-xz-liblzma
+            /*
+            char err[1024] = {};
+            uint64_t mem_limit = UINT64_MAX;
+            uint64_t in_pos = 0;
+            lzma_index* index = nullptr;
+            lzma_stream_flags stream_flags;
+            uint8_t* footer_ptr = &pcMemBlock[iSize - LZMA_STREAM_HEADER_SIZE];
+            lzma_stream_footer_decode(&stream_flags, footer_ptr);
+            lzma_index_buffer_decode(&index, &mem_limit, NULL, footer_ptr - stream_flags.backward_size, &in_pos, stream_flags.backward_size);
+            if (!index) {
+                delete[] pcMemBlock;
+                MessageBoxA(NULL, "lzma_index_buffer_decode failed. Corrupted file?", "Piano From Above", MB_OK | MB_ICONERROR);
+                return;
+            }
+            snprintf(err, sizeof(err) - 1, "debug %llu", stream_flags.backward_size);
+            MessageBoxA(NULL, err, "Piano From Above", MB_OK | MB_ICONERROR);
+            if (in_pos != stream_flags.backward_size) {
+                MessageBoxA(NULL, "stream_flags.backward_size mismatch. Corrupted file?", "Piano From Above", MB_OK | MB_ICONERROR);
+                lzma_index_end(index, NULL);
+                return;
+            }
+            auto decompressed_size = lzma_index_uncompressed_size(index);
+            lzma_index_end(index, NULL);
+            */
+
+            // Get the decompressed size
+            // This is a real pain in the ass for concatenated .xz files, lots of sanity checking is skipped here
+            // See https://github.com/kobolabs/liblzma/blob/master/src/xz/list.c
+            char err[1024] = {};
+            uint64_t decompressed_size = 0;
+            lzma_stream strm = LZMA_STREAM_INIT;
+            lzma_stream_flags stream_flags;
+            lzma_index* index = nullptr;
+            auto pos = (int64_t)iSize;
+            lzma_ret ret;
+            do {
+                // Position sanity check
+                if (pos < LZMA_STREAM_HEADER_SIZE * 2) {
+                    MessageBoxA(NULL, "Position sanity check failed. Corrupted file?", "Piano From Above", MB_OK | MB_ICONERROR);
+                    lzma_index_end(index, NULL);
+                    delete[] pcMemBlock;
+                    return;
+                }
+                pos -= LZMA_STREAM_HEADER_SIZE;
+
+                // Locate and decode stream footer
+                uint64_t footer_pos;
+                while (true) {
+                    if (pos < LZMA_STREAM_HEADER_SIZE) {
+                        MessageBoxA(NULL, "Locating stream footer failed. Corrupted file?", "Piano From Above", MB_OK | MB_ICONERROR);
+                        lzma_index_end(index, NULL);
+                        delete[] pcMemBlock;
+                        return;
+                    }
+                    footer_pos = pos;
+
+                    int i = 2;
+                    if (*(uint32_t*)&compressed[footer_pos + 8] != 0)
+                        break;
+
+                    do {
+                        pos -= 4;
+                        --i;
+                    } while (i >= 0 && *(uint32_t*)&compressed[footer_pos + i * 4] == 0);
+                }
+                ret = lzma_stream_footer_decode(&stream_flags, &compressed[footer_pos]);
+                if (ret != LZMA_OK) {
+                    snprintf(err, sizeof(err) - 1, "Decoding stream footer failed: %d\nCorrupt file?", ret);
+                    MessageBoxA(NULL, err, "Piano From Above", MB_OK | MB_ICONERROR);
+                    lzma_index_end(index, NULL);
+                    delete[] pcMemBlock;
+                    return;
+                }
+                if (pos < stream_flags.backward_size + LZMA_STREAM_HEADER_SIZE) {
+                    MessageBoxA(NULL, "Stream footer position sanity check failed. Corrupted file?", "Piano From Above", MB_OK | MB_ICONERROR);
+                    lzma_index_end(index, NULL);
+                    delete[] pcMemBlock;
+                    return;
+                }
+
+                // Decode index
+                pos -= stream_flags.backward_size;
+                lzma_index_decoder(&strm, &index, UINT64_MAX);
+                strm.avail_in = stream_flags.backward_size;
+                strm.next_in = &compressed[pos];
+                pos += stream_flags.backward_size;
+                ret = lzma_code(&strm, LZMA_RUN);
+                if (ret != LZMA_STREAM_END) {
+                    snprintf(err, sizeof(err) - 1, "Index decode failed: %d\nCorrupt file?", ret);
+                    MessageBoxA(NULL, err, "Piano From Above", MB_OK | MB_ICONERROR);
+                    lzma_index_end(index, NULL);
+                    delete[] pcMemBlock;
+                    return;
+                }
+                pos -= stream_flags.backward_size + LZMA_STREAM_HEADER_SIZE;
+                if (pos < lzma_index_total_size(index)) {
+                    MessageBoxA(NULL, "Index position sanity check failed. Corrupted file?", "Piano From Above", MB_OK | MB_ICONERROR);
+                    lzma_index_end(index, NULL);
+                    delete[] pcMemBlock;
+                    return;
+                }
+                pos -= lzma_index_total_size(index);
+                decompressed_size += lzma_index_uncompressed_size(index);
+            } while (pos > 0);
+
+            // Initialize progress
+            g_LoadingProgress.stage = MIDILoadingProgress::Stage::Decompress;
+            g_LoadingProgress.progress = 0;
+            g_LoadingProgress.max = decompressed_size;
+            
+            // Decompress it
+            pcMemBlock = new unsigned char[decompressed_size];
+            uint8_t* write_ptr = pcMemBlock;
+            lzma_end(&strm);
+            strm = LZMA_STREAM_INIT;
+            lzma_stream_decoder(&strm, UINT64_MAX, LZMA_CONCATENATED);
+            strm.next_in = compressed;
+            strm.avail_in = iSize;
+            bool done = false;
+            lzma_action action = LZMA_RUN;
+            while (!done) {
+                if (strm.avail_in == 0)
+                    action = LZMA_FINISH;
+                lzma_ret ret = lzma_code(&strm, action);
+                if (strm.avail_out == 0) {
+                    auto remaining = min(decompressed_size - (write_ptr - pcMemBlock), 1 << 20);
+                    strm.next_out = write_ptr;
+                    strm.avail_out = remaining;
+                    g_LoadingProgress.progress = write_ptr - pcMemBlock;
+                    write_ptr += remaining;
+                }
+                switch (ret) {
+                case LZMA_STREAM_END:
+                    done = true;
+                    break;
+                case LZMA_OK:
+                    break;
+                case LZMA_MEM_ERROR:
+                    MessageBoxA(NULL, "Ran out of memory while decompressing.", "Piano From Above", MB_OK | MB_ICONERROR);
+                    delete[] compressed;
+                    delete[] pcMemBlock;
+                    return;
+                default:
+                    snprintf(err, sizeof(err) - 1, "An error occurred while decompressing: %d\nCorrupt file?", ret);
+                    MessageBoxA(NULL, err, "Piano From Above", MB_OK | MB_ICONERROR);
+                    delete[] compressed;
+                    delete[] pcMemBlock;
+                    return;
+                }
+            }
+            iSize = decompressed_size;
+            delete[] compressed;
+        }
 
         // Parse it
         ParseMIDI(pcMemBlock, iSize);
