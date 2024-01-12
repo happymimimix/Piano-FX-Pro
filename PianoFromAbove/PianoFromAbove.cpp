@@ -267,7 +267,11 @@ DWORD WINAPI GameThread( LPVOID lpParameter )
 
     // Put the adapter in the window title
     wchar_t buf[1024] = {};
-    _snwprintf_s(buf, 1024, L"pfavizkhang-dx12 %S (Device: %s)", __DATE__, pRenderer->GetAdapterName().c_str());
+#ifdef __AVX2__
+    _snwprintf_s(buf, 1024, L"pfavizkhang-dx12 %S (AVX2 build, Device: %s)", __DATE__, pRenderer->GetAdapterName().c_str());
+#else
+    _snwprintf_s(buf, 1024, L"pfavizkhang-dx12 %S (SSE4.2 build, Device: %s)", __DATE__, pRenderer->GetAdapterName().c_str());
+#endif
     SetWindowTextW(g_hWnd, buf);
 
     // Event, logic, render...
