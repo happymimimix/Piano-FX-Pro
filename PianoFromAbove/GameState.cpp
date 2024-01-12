@@ -2080,7 +2080,7 @@ void MainScreen::RenderStatusLine(int line, float width, const char* left, const
     vsnprintf_s(buf, sizeof(buf), format, varargs);
 
     auto draw_list = m_pRenderer->GetDrawList();
-    ImVec2 left_pos = ImVec2(m_pRenderer->GetBufferWidth() - (width - 6) * scale, (3 + line * 16) * scale);
+    ImVec2 left_pos = ImVec2(m_pRenderer->GetBufferWidth() - width + 6 * scale, (3 + line * 16) * scale);
     ImVec2 right_pos = ImVec2(m_pRenderer->GetBufferWidth() - ImGui::CalcTextSize(buf).x - 6 * scale, (3 + line * 16) * scale);
     draw_list->AddText(ImVec2(left_pos.x + 2, left_pos.y + 1), 0xFF404040, left);
     draw_list->AddText(ImVec2(left_pos.x, left_pos.y), 0xFFFFFFFF, left);
