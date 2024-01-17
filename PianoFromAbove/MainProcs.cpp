@@ -26,7 +26,7 @@
 static WNDPROC g_pPrevBarProc; // Have to override the toolbar proc to make controls transparent
 
 VOID SizeWindows(int iMainWidth, int iMainHeight);
-INT_PTR SetResolutionProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+INT_PTR SetResolutionProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM) {
     switch (msg) {
     case WM_INITDIALOG: {
         RECT rect = {};
@@ -105,7 +105,7 @@ LRESULT WINAPI WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                 {
                     CheckActivity( TRUE );
                     // Get the file(s) to add
-                    OPENFILENAME ofn = { 0 };
+                    OPENFILENAME ofn = {};
                     TCHAR sFilename[1024] = { 0 };
                     ofn.lStructSize = sizeof( OPENFILENAME );
                     ofn.hwndOwner = hWnd;
@@ -115,7 +115,7 @@ LRESULT WINAPI WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                     ofn.lpstrTitle = TEXT( "Please select a song to play" );
                     ofn.Flags = OFN_EXPLORER | OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
                     if ( GetOpenFileName( &ofn ) )
-                        PlayFile( sFilename, iId == ID_FILE_PRACTICESONGCUSTOM, true );
+                        PlayFile( sFilename, iId == ID_FILE_PRACTICESONGCUSTOM );
                     return 0;
                 }
                 case ID_FILE_CLOSEFILE:
@@ -858,7 +858,7 @@ VOID GetChannelRect( HWND hWnd, RECT *rcChannel )
         rcChannel->bottom--;
 }
 
-VOID GetThumbRect( HWND hWnd, int iPosition, const RECT *rcChannel, RECT *rcThumb )
+VOID GetThumbRect( HWND, int iPosition, const RECT *rcChannel, RECT *rcThumb )
 {
     int iSize = rcChannel->bottom - rcChannel->top;
     int iPixel = ( 2 * iPosition * ( rcChannel->right - rcChannel->left - 1 ) + 1000 ) / ( 2 * 1000 );
@@ -895,7 +895,7 @@ VOID MoveThumbPosition( int iPositionNew, int &iPosition, HWND hWnd, RECT *rcCha
     }
 }
 
-INT_PTR WINAPI AboutProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
+INT_PTR WINAPI AboutProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM )
 {
     static HANDLE hSplash = NULL;
 
@@ -942,7 +942,7 @@ INT_PTR WINAPI AboutProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 
 VOID HandOffMsg( UINT msg, WPARAM wParam, LPARAM lParam )
 {
-    MSG msgGameThread = { g_hWndGfx, msg, wParam, lParam };
+    MSG msgGameThread = { g_hWndGfx, msg, wParam, lParam, 0, {0, 0} };
     g_MsgQueue.ForcePush( msgGameThread );
 }
 
@@ -982,7 +982,7 @@ VOID SetFullScreen( BOOL bFullScreen )
 {
     static const ViewSettings &cView = Config::GetConfig().GetViewSettings();
     static const VisualSettings &cVisual = Config::GetConfig().GetVisualSettings();
-    static RECT rcOld = { 0 };
+    static RECT rcOld = {};
     HMENU hMenu = GetMainMenu();
 
     if ( bFullScreen )
@@ -1067,10 +1067,10 @@ VOID SetPlayMode( INT ePlayMode )
     BOOL bPractice = ( ePlayMode == GameState::Practice );
 
     int iPlayButtons[] = { ID_PLAY_PLAY, ID_PLAY_PAUSE, ID_PLAY_STOP };
-    for ( int i = 0; i < sizeof( iPlayButtons ) / sizeof( int ); i++ )
+    for ( size_t i = 0; i < sizeof( iPlayButtons ) / sizeof( int ); i++ )
         SendMessage( hWndToolbar, TB_ENABLEBUTTON, iPlayButtons[i], bPractice );
     int iPracticeButtons[] = { ID_PLAY_SKIPFWD, ID_PLAY_SKIPBACK };
-    for ( int i = 0; i < sizeof( iPracticeButtons ) / sizeof( int ); i++ )
+    for (size_t i = 0; i < sizeof( iPracticeButtons ) / sizeof( int ); i++ )
         SendMessage( hWndToolbar, TB_ENABLEBUTTON, iPracticeButtons[i], bPractice );
 
     SendMessage( hWndToolbar, TB_PRESSBUTTON, ID_PLAY_PLAY, TRUE );
@@ -1080,7 +1080,7 @@ VOID SetPlayMode( INT ePlayMode )
                             { 3, bPractice, ID_PLAY_PLAYPAUSE, ID_PLAY_STOP, ID_VIEW_MOVEANDZOOM },
                             { 2, bPractice, ID_PLAY_SKIPFWD, ID_PLAY_SKIPBACK },
                             { 3, true, ID_PLAY_INCREASERATE, ID_PLAY_DECREASERATE, ID_PLAY_RESETRATE } };
-    for ( int i = 0; i < sizeof( iMenuItems ) / sizeof( iMenuItems[0] ); i++ )
+    for (size_t i = 0; i < sizeof( iMenuItems ) / sizeof( iMenuItems[0] ); i++ )
     {
         UINT uEnable = ( iMenuItems[i][1] ? MF_ENABLED : MF_GRAYED );
         for ( int j = 0; j < iMenuItems[i][0]; j++ )
@@ -1100,7 +1100,7 @@ VOID SetPlayPauseStop( BOOL bPlay, BOOL bPause, BOOL bStop )
     SendMessage( hWndToolbar, TB_PRESSBUTTON, ID_PLAY_STOP, bStop );
 }
 
-INT_PTR LoadingProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+INT_PTR LoadingProc(HWND hwnd, UINT msg, WPARAM, LPARAM) {
     switch (msg) {
     case WM_INITDIALOG: {
         SetWindowTextW(hwnd, (L"Loading " + g_LoadingProgress.name).c_str());
@@ -1176,7 +1176,7 @@ INT_PTR LoadingProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
     return false;
 }
 
-BOOL PlayFile( const wstring &sFile, bool bCustomSettings, bool bLibraryEligible )
+BOOL PlayFile( const wstring &sFile, bool bCustomSettings )
 {
     Config &config = Config::GetConfig();
     const VisualSettings &cVisual = config.GetVisualSettings();

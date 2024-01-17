@@ -28,7 +28,7 @@ VOID DoPreferences( HWND hWndOwner )
     PROPSHEETPAGE psp[sizeof(pDialogs) / sizeof(int)];
     PROPSHEETHEADER psh;
 
-    for ( int i = 0; i < sizeof( psp ) / sizeof( PROPSHEETPAGE ); i++ )
+    for ( size_t i = 0; i < sizeof( psp ) / sizeof( PROPSHEETPAGE ); i++ )
     {
         psp[i].dwSize = sizeof( PROPSHEETPAGE );
         psp[i].dwFlags = PSP_USETITLE;
@@ -118,7 +118,7 @@ INT_PTR WINAPI VisualProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                     HWND hWndBtn = ( HWND )lParam;
 
                     // Choose and save the color
-                    CHOOSECOLOR cc = { 0 };
+                    CHOOSECOLOR cc = {};
                     cc.lStructSize = sizeof( cc );
                     cc.hwndOwner = hWnd;
                     cc.lpCustColors = (LPDWORD) acrCustClr;
@@ -282,7 +282,7 @@ VOID SetAudioProc( HWND hWnd, const AudioSettings &cAudio )
     SendMessage( hWndOutDevs, LB_SETCURSEL, cAudio.iOutDevice, 0 );
 }
 
-INT_PTR WINAPI VideoProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
+INT_PTR WINAPI VideoProc( HWND hWnd, UINT msg, WPARAM, LPARAM lParam )
 {
     switch (msg)
     {
@@ -331,7 +331,7 @@ INT_PTR WINAPI VideoProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
     return FALSE;
 }
 
-INT_PTR WINAPI ControlsProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
+INT_PTR WINAPI ControlsProc( HWND hWnd, UINT msg, WPARAM, LPARAM lParam )
 {
     switch (msg)
     {
@@ -457,7 +457,7 @@ INT_PTR WINAPI VizProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         CheckDlgButton(hWnd, IDC_DISABLEUI, viz.bDisableUI);
 
         const wchar_t* codepages[] = { L"CP-1252 (Western)", L"CP-932 (Japanese)", L"UTF-8" };
-        for (int i = 0; i < sizeof(codepages) / sizeof(const wchar_t*); i++)
+        for (size_t i = 0; i < sizeof(codepages) / sizeof(const wchar_t*); i++)
             SendMessage(GetDlgItem(hWnd, IDC_MARKERENC), CB_ADDSTRING, i, (LPARAM)codepages[i]);
         SendMessage(GetDlgItem(hWnd, IDC_MARKERENC), CB_SETCURSEL, viz.eMarkerEncoding, 0);
 
@@ -475,7 +475,7 @@ INT_PTR WINAPI VizProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         int id = LOWORD(wParam);
         switch (id) {
         case IDC_SPLASHBROWSE: {
-            OPENFILENAME ofn = { 0 };
+            OPENFILENAME ofn = {};
             TCHAR sFilename[1024] = { 0 };
             ofn.lStructSize = sizeof(OPENFILENAME);
             ofn.hwndOwner = hWnd;
@@ -494,7 +494,7 @@ INT_PTR WINAPI VizProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             return TRUE;
         }
         case IDC_BACKGROUNDBROWSE: {
-            OPENFILENAME ofn = { 0 };
+            OPENFILENAME ofn = {};
             TCHAR sFilename[1024] = { 0 };
             ofn.lStructSize = sizeof(OPENFILENAME);
             ofn.hwndOwner = hWnd;
@@ -513,7 +513,7 @@ INT_PTR WINAPI VizProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             return TRUE;
         }
         case IDC_FONTBROWSE: {
-            OPENFILENAME ofn = { 0 };
+            OPENFILENAME ofn = {};
             TCHAR sFilename[1024] = { 0 };
             ofn.lStructSize = sizeof(OPENFILENAME);
             ofn.hwndOwner = hWnd;
@@ -637,8 +637,8 @@ INT_PTR WINAPI TracksProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
             vMuted.resize( mInfo.iNumChannels );
             vHidden.resize( mInfo.iNumChannels );
             vColors.resize( mInfo.iNumChannels );
-            int iMax = sizeof( cVisual.colors ) / sizeof ( cVisual.colors[0] );
-            for ( int i = 0; i < mInfo.iNumChannels; i++ )
+            size_t iMax = sizeof( cVisual.colors ) / sizeof ( cVisual.colors[0] );
+            for (size_t i = 0; i < mInfo.iNumChannels; i++)
             {
                 vMuted[i] = vHidden[i] = false;
                 if (cViz.bColorLoop) {
@@ -656,9 +656,9 @@ INT_PTR WINAPI TracksProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
             int aCx[6] = { 27, rcTracks.right - 27 - 55 - 50 - 50 - 50, 55, 50, 50, 50 };
             CONST TCHAR *aText[6] = { TEXT( "Trk" ), TEXT( "Instrument" ), TEXT( "Notes" ), TEXT( "Muted" ), TEXT( "Hidden" ), TEXT( "Color" ) };
 
-            LVCOLUMN lvc = { 0 };
+            LVCOLUMN lvc = {};
             lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT;
-            for ( int i = 0; i < sizeof( aFmt ) / sizeof( int ); i++ )
+            for ( size_t i = 0; i < sizeof( aFmt ) / sizeof( int ); i++ )
             {
                 lvc.fmt = aFmt[i];
                 lvc.cx = aCx[i];
@@ -667,12 +667,12 @@ INT_PTR WINAPI TracksProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
             }
 
             // Set rows of the list view
-            LVITEM lvi = { 0 };
+            LVITEM lvi = {};
             lvi.mask = LVIF_TEXT;
             lvi.pszText = buf;
 
             int iPos = 0;
-            for ( int i = 0; i < mInfo.iNumTracks; i++ )
+            for ( uint32_t i = 0; i < mInfo.iNumTracks; i++ )
             {
                 const MIDITrack::MIDITrackInfo &mTrackInfo = vTracks[i]->GetInfo();
                 for ( int j = 0; j < 16; j++ )
@@ -698,7 +698,7 @@ INT_PTR WINAPI TracksProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
             if ( GetWindowLongPtr( hWndTracks, GWL_STYLE ) & WS_VSCROLL )
                 SendMessage( hWndTracks, LVM_SETCOLUMNWIDTH, 1, aCx[1] - 17 );
 
-            RECT rcItem = { LVIR_BOUNDS };
+            RECT rcItem = { LVIR_BOUNDS, 0, 0, 0 };
             SendMessage( hWndTracks, LVM_GETITEMRECT, 0, ( LPARAM )&rcItem );
 
             return TRUE;
@@ -759,11 +759,11 @@ INT_PTR WINAPI TracksProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                     {
                         // Have to manually figure out the corresponding item. Silly.
                         LPNMITEMACTIVATE lpnmia = ( LPNMITEMACTIVATE )lpnmhdr;
-                        LVHITTESTINFO lvhti = { lpnmia->ptAction };
+                        LVHITTESTINFO lvhti = { lpnmia->ptAction, 0, 0, 0, 0 };
                         SendMessage( lpnmia->hdr.hwndFrom, LVM_SUBITEMHITTEST, 0, ( LPARAM )&lvhti );
                         if ( lvhti.iItem < 0 || lvhti.iItem >= ( int )vMuted.size() ) return FALSE;
 
-                        RECT rcItem = { LVIR_BOUNDS };
+                        RECT rcItem = { LVIR_BOUNDS, 0, 0, 0 };
                         SendMessage( lpnmia->hdr.hwndFrom, LVM_GETITEMRECT, lvhti.iItem, ( LPARAM )&rcItem );
                         switch ( lvhti.iSubItem )
                         {
@@ -779,7 +779,7 @@ INT_PTR WINAPI TracksProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                             {
                                 static COLORREF acrCustClr[16] = { 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 
                                                                    0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF }; 
-                                CHOOSECOLOR cc = { 0 };
+                                CHOOSECOLOR cc = {};
                                 cc.lStructSize = sizeof( cc );
                                 cc.hwndOwner = hWnd;
                                 cc.lpCustColors = (LPDWORD) acrCustClr;

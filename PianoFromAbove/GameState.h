@@ -215,7 +215,7 @@ private:
     void RenderGlobals();
     void RenderLines();
     void RenderNotes();
-    void RenderNote(const MIDIChannelEvent* pNote, bool bVisualizeBends);
+    void RenderNote(const MIDIChannelEvent* pNote);
     void GenNoteXTable();
     float GetNoteX( int iNote );
     void RenderKeys();
@@ -240,7 +240,7 @@ private:
     eventvec_t::const_iterator m_itNextTempo;
     eventvec_t::const_iterator m_itNextSignature;
     eventvec_t::const_iterator m_itNextMarker;
-    int m_iMicroSecsPerBeat, m_iLastTempoTick; // Tempo
+    uint32_t m_iMicroSecsPerBeat, m_iLastTempoTick; // Tempo
     long long m_llLastTempoTime; // Tempo
     int m_CurBeat, m_iBeatsPerMeasure, m_iBeatType, m_iClocksPerMet, m_iLastSignatureTick; // Time signature
     std::string m_sMarker; // Current marker to display on the screen

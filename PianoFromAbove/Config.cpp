@@ -266,7 +266,8 @@ void VisualSettings::LoadConfigValues( TiXmlElement *txRoot )
         this->bAssociateFiles = ( iAttrVal != 0 );
 
     //Colors
-    int r, g, b, i = 0;
+    int r, g, b = 0;
+    size_t i = 0;
     TiXmlElement *txColors = txVisual->FirstChildElement( "Colors" );
     if ( txColors )
         for ( TiXmlElement *txColor = txColors->FirstChildElement( "Color" );
@@ -421,7 +422,7 @@ bool VisualSettings::SaveConfigValues( TiXmlElement *txRoot )
 
     TiXmlElement *txColors = new TiXmlElement( "Colors" );
     txVisual->LinkEndChild( txColors );
-    for ( int i = 0; i < sizeof( this->colors ) / sizeof( this->colors[0] ); i++ )
+    for ( size_t i = 0; i < sizeof( this->colors ) / sizeof( this->colors[0] ); i++ )
     {
         TiXmlElement *txColor = new TiXmlElement( "Color" );
         txColors->LinkEndChild( txColor );

@@ -152,7 +152,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
 
     // Allocate note shader resource views
     D3D12_CPU_DESCRIPTOR_HANDLE srv_handle = m_pSRVDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-    for (int i = 0; i < FrameCount; i++) {
+    for (uint32_t i = 0; i < FrameCount; i++) {
         D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc = {
             .Format = DXGI_FORMAT_UNKNOWN,
             .ViewDimension = D3D12_SRV_DIMENSION_BUFFER,
@@ -211,7 +211,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     m_uTextureSRVDescriptorSize = m_pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
     // Create command allocators
-    for (int i = 0; i < FrameCount; i++) {
+    for (uint32_t i = 0; i < FrameCount; i++) {
         res = m_pDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_pCommandAllocator[i]));
         if (FAILED(res))
             return std::make_tuple(res, "CreateCommandAllocator (direct)");
@@ -512,7 +512,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     // Create dynamic rect vertex buffers
     // Each in-flight frame has its own vertex buffer
     auto vertex_buffer_desc = CD3DX12_RESOURCE_DESC::Buffer(RectsPerPass * 6 * sizeof(RectVertex));
-    for (int i = 0; i < FrameCount; i++) {
+    for (uint32_t i = 0; i < FrameCount; i++) {
         res = m_pDevice->CreateCommittedResource(
             &upload_heap,
             D3D12_HEAP_FLAG_NONE,
@@ -531,7 +531,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
 
     // Create dynamic note buffers
     auto note_buffer_desc = CD3DX12_RESOURCE_DESC::Buffer(NotesPerPass * sizeof(NoteData));
-    for (int i = 0; i < FrameCount; i++) {
+    for (uint32_t i = 0; i < FrameCount; i++) {
         res = m_pDevice->CreateCommittedResource(
             &upload_heap,
             D3D12_HEAP_FLAG_NONE,
@@ -579,7 +579,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     // Generate index buffer data
     std::vector<uint32_t> index_buffer_vec;
     index_buffer_vec.resize(IndexBufferCount);
-    for (int i = 0; i < IndexBufferCount / 6; i++) {
+    for (uint32_t i = 0; i < IndexBufferCount / 6; i++) {
         index_buffer_vec[i * 6] = i * 4;
         index_buffer_vec[i * 6 + 1] = i * 4 + 1;
         index_buffer_vec[i * 6 + 2] = i * 4 + 2;
@@ -644,7 +644,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::CreateWindowDependentObjects(HWN
         WaitForGPU();
 
         // Release the current render target views
-        for (int i = 0; i < FrameCount; i++) {
+        for (uint32_t i = 0; i < FrameCount; i++) {
             m_pRenderTargets[i].Reset();
             m_pFenceValues[i] = m_pFenceValues[m_uFrameIndex];
         }
@@ -694,7 +694,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::CreateWindowDependentObjects(HWN
 
     // Create render target views
     D3D12_CPU_DESCRIPTOR_HANDLE rtv_handle = m_pRTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-    for (int i = 0; i < FrameCount; i++) {
+    for (uint32_t i = 0; i < FrameCount; i++) {
         res = m_pSwapChain->GetBuffer(i, IID_PPV_ARGS(&m_pRenderTargets[i]));
         if (FAILED(res))
             return std::make_tuple(res, "GetBuffer");
@@ -1086,12 +1086,12 @@ HRESULT D3D12Renderer::BeginText() {
     return S_OK;
 }
 
-HRESULT D3D12Renderer::DrawTextW(const WCHAR* sText, FontSize fsFont, LPRECT rcPos, DWORD dwFormat, DWORD dwColor, INT iChars) {
+HRESULT D3D12Renderer::DrawTextW(const WCHAR*, FontSize, LPRECT, DWORD, DWORD, INT) {
     // TODO
     return S_OK;
 }
 
-HRESULT D3D12Renderer::DrawTextA(const CHAR* sText, FontSize fsFont, LPRECT rcPos, DWORD dwFormat, DWORD dwColor, INT iChars) {
+HRESULT D3D12Renderer::DrawTextA(const CHAR*, FontSize, LPRECT, DWORD, DWORD, INT) {
     // TODO
     return S_OK;
 }
@@ -1129,7 +1129,7 @@ HRESULT D3D12Renderer::DrawSkew(float x1, float y1, float x2, float y2, float x3
     return S_OK;
 }
 
-HRESULT D3D12Renderer::RenderBatch(bool bWithDepth) {
+HRESULT D3D12Renderer::RenderBatch(bool) {
     // TODO
     return S_OK;
 }
@@ -1270,7 +1270,7 @@ char* D3D12Renderer::Screenshot() {
     char* staging = nullptr;
     if (FAILED(m_pScreenshotStaging->Map(0, &staging_range, (void**)&staging)))
         return nullptr;
-    for (size_t y = 0; y < m_iBufferHeight; y++)
+    for (int y = 0; y < m_iBufferHeight; y++)
         memcpy(&m_vScreenshotOutput[y * m_iBufferWidth * 4], &staging[y * m_ullScreenshotPitch], m_iBufferWidth * 4);
     m_pScreenshotStaging->Unmap(0, &staging_range);
 

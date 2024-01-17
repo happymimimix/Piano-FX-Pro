@@ -85,7 +85,7 @@ DWORD WINAPI UpdateCheckProc(LPVOID) {
             // C locale sucks so much
             auto old_locale = std::setlocale(LC_NUMERIC, nullptr);
             std::setlocale(LC_NUMERIC, "C");
-            for (int i = 1; i < matches.size(); i++) {
+            for (size_t i = 1; i < matches.size(); i++) {
                 double parsed = 0.0;
                 try {
                     parsed = std::stod(matches[i].str());
@@ -114,7 +114,7 @@ DWORD WINAPI UpdateCheckProc(LPVOID) {
 // Name: wWinMain()
 // Desc: The application's entry point
 //-----------------------------------------------------------------------------
-INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, INT nCmdShow )
+INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
 {
     g_hInstance = hInstance;
     srand( ( unsigned )time( NULL ) );
@@ -218,7 +218,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
     CreateThread(NULL, 0, UpdateCheckProc, NULL, 0, NULL);
 
     // Enter the message loop
-    MSG msg = { 0 };
+    MSG msg = {};
     while( GetMessage( &msg, NULL, 0, 0 ) )
     {
         if( !TranslateAccelerator( g_hWnd, hAccel, &msg ) &&
@@ -275,7 +275,7 @@ DWORD WINAPI GameThread( LPVOID lpParameter )
     SetWindowTextW(g_hWnd, buf);
 
     // Event, logic, render...
-    MSG msg = { 0 };
+    MSG msg = {};
     while( msg.message != WM_QUIT )
     {
         while ( g_MsgQueue.Pop( msg ) )

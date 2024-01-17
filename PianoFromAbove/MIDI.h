@@ -57,7 +57,7 @@ private:
 
     // Tempo variables
     bool m_bIsStandard;
-    int m_iTicksPerBeat, m_iMicroSecsPerBeat; // For standard division
+    uint32_t m_iTicksPerBeat, m_iMicroSecsPerBeat; // For standard division
     int m_iTicksPerSecond; // For SMPTE division
 
     // Position variables
@@ -85,11 +85,11 @@ public:
     static int WhiteCount( int iMinNote, int iMaxNote );
 
     //Generally usefull static parsing functions
-    static int ParseVarNum( const unsigned char *pcData, size_t iMaxSize, int *piOut );
-    static int Parse32Bit( const unsigned char *pcData, size_t iMaxSize, int *piOut );
-    static int Parse24Bit( const unsigned char *pcData, size_t iMaxSize, int *piOut );
-    static int Parse16Bit( const unsigned char *pcData, size_t iMaxSize, int *piOut );
-    static int ParseNChars( const unsigned char *pcData, int iNChars, size_t iMaxSize, char *pcOut );
+    static uint32_t ParseVarNum( const unsigned char *pcData, size_t iMaxSize, uint32_t *piOut );
+    static uint32_t Parse32Bit( const unsigned char *pcData, size_t iMaxSize, uint32_t *piOut );
+    static uint32_t Parse24Bit( const unsigned char *pcData, size_t iMaxSize, uint32_t *piOut );
+    static uint32_t Parse16Bit( const unsigned char *pcData, size_t iMaxSize, uint32_t *piOut );
+    static uint32_t ParseNChars( const unsigned char *pcData, size_t iNChars, size_t iMaxSize, char *pcOut );
 
     MIDI( void ) {};
     MIDI( const wstring &sFilename );
@@ -123,9 +123,9 @@ public:
 
         wstring sFilename;
         string sMd5;
-        int iFormatType;
-        int iNumTracks, iNumChannels;
-        int iDivision;
+        uint32_t iFormatType;
+        uint32_t iNumTracks, iNumChannels;
+        uint32_t iDivision;
         int iMinNote, iMaxNote;
         size_t iNoteCount, iEventCount;
         int iMaxVolume, iVolumeSum;
@@ -174,7 +174,7 @@ public:
                        sSequenceName.clear(); }
         void AddEventInfo( const MIDIEvent &mTrack );
 
-        int iSequenceNumber;
+        uint32_t iSequenceNumber;
         string sSequenceName;
         int iMinNote, iMaxNote;
         size_t iNoteCount, iEventCount;
@@ -236,10 +236,10 @@ public:
     unsigned char GetParam1() const { return m_cParam1; }
     unsigned char GetParam2() const { return m_cParam2; }
     MIDIChannelEvent *GetSister(const std::vector<MIDIChannelEvent*>& events) const {
-        return m_iSisterIdx == -1 ? nullptr : events[m_iSisterIdx];
+        return m_iSisterIdx == UINT32_MAX ? nullptr : events[m_iSisterIdx];
     }
     MIDIChannelEvent *GetSister(const std::vector<MIDIEvent*>& events) const {
-        return m_iSisterIdx == -1 ? nullptr : (MIDIChannelEvent*)events[m_iSisterIdx];
+        return m_iSisterIdx == UINT32_MAX ? nullptr : (MIDIChannelEvent*)events[m_iSisterIdx];
     }
     unsigned GetSisterIdx() const { return m_iSisterIdx; }
     unsigned GetSimultaneous() const { return m_iSimultaneous; }
@@ -254,7 +254,7 @@ public:
     void SetLength(unsigned length) { m_uLength = length; }
     void SetPassDone(bool done) { m_bPassDone = done; }
 
-    bool HasSister() const { return m_iSisterIdx != -1; }
+    bool HasSister() const { return m_iSisterIdx != UINT32_MAX; }
 
 private:
     unsigned m_iSisterIdx;
@@ -285,7 +285,7 @@ public:
 
 private:
     MetaEventType m_eMetaEventType;
-    int m_iDataLen;
+    uint32_t m_iDataLen;
     unsigned char *m_pcData;
 };
 
@@ -299,7 +299,7 @@ public:
     int ParseEvent( const unsigned char *pcData, size_t iMaxSize );
 
 private:
-    int m_iDataLen;
+    uint32_t m_iDataLen;
     unsigned char *m_pcData;
     bool m_bHasMoreData;
 };

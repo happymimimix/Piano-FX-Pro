@@ -61,7 +61,7 @@ GameState::GameError GameState::ChangeState( GameState *pNextState, GameState **
 // IntroScreen GameState object
 //-----------------------------------------------------------------------------
 
-GameState::GameError IntroScreen::MsgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
+GameState::GameError IntroScreen::MsgProc( HWND, UINT msg, WPARAM wParam, LPARAM lParam )
 {
     switch (msg)
     {
@@ -208,7 +208,7 @@ void SplashScreen::ColorChannel( int iTrack, int iChannel, unsigned int iColor, 
         m_vTrackSettings[iTrack].aChannels[iChannel].SetColor( iColor );
 }
 
-void SplashScreen::SetChannelSettings( const vector< bool > &vMuted, const vector< bool > &vHidden, const vector< unsigned > &vColor )
+void SplashScreen::SetChannelSettings( const vector< bool > &, const vector< bool > &, const vector< unsigned > &vColor )
 {
     const MIDI::MIDIInfo &mInfo = m_MIDI.GetInfo();
     const vector< MIDITrack* > &vTracks = m_MIDI.GetTracks();
@@ -217,7 +217,7 @@ void SplashScreen::SetChannelSettings( const vector< bool > &vMuted, const vecto
     static const VizSettings& cViz = config.GetVizSettings();
 
     size_t iPos = 0;
-    for ( int i = 0; i < mInfo.iNumTracks; i++ )
+    for ( int i = 0; i < (int)mInfo.iNumTracks; i++ )
     {
         const MIDITrack::MIDITrackInfo &mTrackInfo = vTracks[i]->GetInfo();
         for ( int j = 0; j < 16; j++ )
@@ -236,7 +236,7 @@ void SplashScreen::SetChannelSettings( const vector< bool > &vMuted, const vecto
     }
 }
 
-GameState::GameError SplashScreen::MsgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
+GameState::GameError SplashScreen::MsgProc( HWND, UINT msg, WPARAM wParam, LPARAM lParam )
 {
     static Config &config = Config::GetConfig();
     static PlaybackSettings &cPlayback = config.GetPlaybackSettings();
@@ -357,8 +357,8 @@ GameState::GameError SplashScreen::Logic()
     // Update track colors
     // TODO: Only update track colors lazily
     auto* track_colors = m_pRenderer->GetTrackColors();
-    for (int i = 0; i < min(m_vTrackSettings.size(), MaxTrackColors); i++) {
-        for (int j = 0; j < 16; j++) {
+    for (size_t i = 0; i < min(m_vTrackSettings.size(), MaxTrackColors); i++) {
+        for (size_t j = 0; j < 16; j++) {
             auto& src = m_vTrackSettings[i].aChannels[j];
             auto& dst = track_colors[i * 16 + j];
             dst.primary = src.iPrimaryRGB;
@@ -756,11 +756,11 @@ ChannelSettings* MainScreen::GetChannelSettings( int iTrack )
     const MIDI::MIDIInfo &mInfo = m_MIDI.GetInfo();
     const vector< MIDITrack* > &vTracks = m_MIDI.GetTracks();
 
-    size_t iPos = 0;
-    for ( int i = 0; i < mInfo.iNumTracks; i++ )
+    int iPos = 0;
+    for ( uint32_t i = 0; i < mInfo.iNumTracks; i++ )
     {
         const MIDITrack::MIDITrackInfo &mTrackInfo = vTracks[i]->GetInfo();
-        for ( int j = 0; j < 16; j++ )
+        for (uint32_t j = 0; j < 16; j++ )
             if ( mTrackInfo.aNoteCount[j] > 0 )
             {
                 if ( iPos == iTrack ) return &m_vTrackSettings[i].aChannels[j];
@@ -783,7 +783,7 @@ void MainScreen::SetChannelSettings( const vector< bool > &vMuted, const vector<
 
     size_t iPos = 0;
     unsigned int last_col = bColor ? vColor[0] : 0;
-    for (int i = 0; i < vTracks.size(); i++) {
+    for (int i = 0; i < (int)vTracks.size(); i++) {
         const MIDITrack::MIDITrackInfo& mTrackInfo = vTracks[i]->GetInfo();
         for (int j = 0; j < 16; j++) {
             if (mTrackInfo.aNoteCount[j] > 0) {
@@ -804,7 +804,7 @@ void MainScreen::SetChannelSettings( const vector< bool > &vMuted, const vector<
     }
 }
 
-GameState::GameError MainScreen::MsgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
+GameState::GameError MainScreen::MsgProc( HWND, UINT msg, WPARAM wParam, LPARAM lParam )
 {
     // Not thread safe, blah
     static Config &config = Config::GetConfig();
@@ -1092,7 +1092,7 @@ GameState::GameError MainScreen::Logic( void )
     RenderGlobals();
 
     // Advance end position
-    size_t iEventCount = m_vEvents.size();
+    auto iEventCount = (int64_t)m_vEvents.size();
     if (m_bTickMode) {
         while (m_iEndPos + 1 < iEventCount && m_vEvents[m_iEndPos + 1]->GetAbsT() < llEndTime)
             m_iEndPos++;
@@ -1200,8 +1200,8 @@ GameState::GameError MainScreen::Logic( void )
     // Update track colors
     // TODO: Only update track colors lazily
     auto* track_colors = m_pRenderer->GetTrackColors();
-    for (int i = 0; i < min(m_vTrackSettings.size(), MaxTrackColors); i++) {
-        for (int j = 0; j < 16; j++) {
+    for (size_t i = 0; i < min(m_vTrackSettings.size(), MaxTrackColors); i++) {
+        for (size_t j = 0; j < 16; j++) {
             auto& src = m_vTrackSettings[i].aChannels[j];
             auto& dst = track_colors[i * 16 + j];
             dst.primary = src.iPrimaryRGB;
@@ -1216,7 +1216,7 @@ GameState::GameError MainScreen::Logic( void )
 void MainScreen::UpdateState(int key, const thread_work_t& work)
 {
     auto& note_state = m_vState[key];
-    if (work.sister_idx == ~0) {
+    if (work.sister_idx == UINT32_MAX) {
         note_state.push_back(work.idx);
         m_pNoteState[key] = work.idx;
     } else {
@@ -1712,8 +1712,8 @@ void MainScreen::RenderLines()
         long long llEndTime = (m_bTickMode ? m_iStartTick : m_llStartTime) + m_llTimeSpan;
 
         // Copy tempo state vars
-        int iLastTempoTick = m_iLastTempoTick;
-        int iMicroSecsPerBeat = m_iMicroSecsPerBeat;
+        uint32_t iLastTempoTick = m_iLastTempoTick;
+        uint32_t iMicroSecsPerBeat = m_iMicroSecsPerBeat;
         long long llLastTempoTime = m_llLastTempoTime;
         eventvec_t::const_iterator itNextTempo = m_itNextTempo;
 
@@ -1771,32 +1771,30 @@ void MainScreen::RenderLines()
 void MainScreen::RenderNotes()
 {
     // Do we have any notes to render?
-    if ( m_iEndPos < 0 || m_iStartPos >= m_vEvents.size() )
+    if ( m_iEndPos < 0 || m_iStartPos >= (int64_t)m_vEvents.size() )
         return;
 
     // Ensure that any rects rendered after this point render over the notes
     m_pRenderer->SplitRect();
 
-    bool visualize_bends = Config::GetConfig().GetVizSettings().bVisualizePitchBends;
-
     for (auto i = m_iEndPos; i >= m_iStartPos; i--) {
         MIDIChannelEvent* pEvent = m_vEvents[i];
         if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn &&
             pEvent->GetParam2() > 0 && pEvent->HasSister()) {
-            RenderNote(pEvent, visualize_bends);
+            RenderNote(pEvent);
         }
     }
 
     for (int i = 0; i < 128; i++) {
         for (vector< int >::reverse_iterator it = (m_vState[i]).rbegin(); it != (m_vState[i]).rend(); it++) {
-            RenderNote(m_vEvents[*it], visualize_bends);
+            RenderNote(m_vEvents[*it]);
         }
     }
 
     m_pRenderer->RenderBatch(true);
 }
 
-void MainScreen::RenderNote(const MIDIChannelEvent* pNote, bool bVisualizeBends)
+void MainScreen::RenderNote(const MIDIChannelEvent* pNote)
 {
     int iNote = pNote->GetParam1();
     int iTrack = pNote->GetTrack();
@@ -2055,7 +2053,7 @@ void MainScreen::RenderText()
 
     // Screen info
     int iMsgCY = 200;
-    RECT rcMsg = { 0, static_cast<int>(m_pRenderer->GetBufferHeight() * (1.0f - KBPercent) - iMsgCY) / 2 };
+    RECT rcMsg = { 0, static_cast<int>(m_pRenderer->GetBufferHeight() * (1.0f - KBPercent) - iMsgCY) / 2, 0, 0 };
     rcMsg.right = m_pRenderer->GetBufferWidth();
     rcMsg.bottom = rcMsg.top + iMsgCY;
 
@@ -2108,7 +2106,7 @@ void MainScreen::RenderStatus(int lines)
 
     char time_buf[1024] = {};
     snprintf(time_buf, sizeof(time_buf) - 1,
-        "%s%lld:%02d.%d / %lld:%02d.%d",
+        "%s%lld:%02lld.%lld / %lld:%02lld.%lld",
         m_llStartTime >= 0 ? "" : "-",
         min, sec, cs,
         tmin, tsec, tcs);
@@ -2130,7 +2128,7 @@ void MainScreen::RenderStatus(int lines)
     // Nerd stats
     if (viz.bNerdStats) {
         long long nps = 0;
-        for (int i = 0; i < m_dNPSNotes.size(); i++)
+        for (size_t i = 0; i < m_dNPSNotes.size(); i++)
             nps += std::get<1>(m_dNPSNotes[i]);
 
         RenderStatusLine(cur_line++, width, "NPS:", "%lld", nps);
@@ -2152,7 +2150,7 @@ void MainScreen::RenderMarker(const char* str) {
 
 void MainScreen::RenderMessage(LPRECT prcMsg, TCHAR* sMsg)
 {
-    RECT rcMsg = { 0 };
+    RECT rcMsg = {};
     D3D12Renderer::FontSize eFontSize = D3D12Renderer::Medium;
     m_pRenderer->DrawText(sMsg, eFontSize, &rcMsg, DT_CALCRECT, 0xFF000000);
     if (rcMsg.right > m_pRenderer->GetBufferWidth())
