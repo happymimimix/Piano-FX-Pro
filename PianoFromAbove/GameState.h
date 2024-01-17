@@ -300,6 +300,7 @@ private:
     int m_iAllWhiteKeys; // Number of white keys are on the screen
     float m_fWhiteCX; // Width of the white keys
     long long m_llRndStartTime; // Rounded start time to make stuff drop at the same time
+    uint64_t m_aSkipRender[4];
     
     // Frame dumping stuff
     bool m_bDumpFrames = false;
