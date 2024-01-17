@@ -137,6 +137,11 @@ public:
     const vector< MIDITrack* >& GetTracks() const { return m_vTracks; }
 
 private:
+    struct EventPool {
+        MIDIChannelEvent* events;
+        size_t count;
+    };
+
     static void InitArrays();
     static wstring aNoteNames[KEYS + 1];
     static Note aNoteVal[KEYS];
@@ -146,7 +151,7 @@ private:
     MIDIInfo m_Info;
     vector< MIDITrack* > m_vTracks;
 
-    std::vector<std::vector<MIDIChannelEvent>> event_pools;
+    std::vector<EventPool> event_pools;
 };
 
 //Holds all the event of one MIDI track

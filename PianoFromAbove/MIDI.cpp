@@ -404,13 +404,17 @@ MIDI::~MIDI( void )
 
 #define EVENT_POOL_MAX 1000000
 MIDIChannelEvent* MIDI::AllocChannelEvent() {
-    if (event_pools.size() == 0 || event_pools.back().size() == EVENT_POOL_MAX) {
+    if (event_pools.size() == 0 || event_pools.back().count == EVENT_POOL_MAX) {
+        // Currently, MIDIChannelEvent is 32 bytes large.
+        // This is conveniently exactly half the size of an x86 cache line.
+        // Making sure the pool allocation is aligned to at least 32 bytes should ensure that all member accesses are in cache.
+        static_assert(sizeof(MIDIChannelEvent) == 32);
         event_pools.emplace_back();
-        event_pools.back().reserve(EVENT_POOL_MAX);
+        event_pools.back().events = (MIDIChannelEvent*)_aligned_malloc(EVENT_POOL_MAX * sizeof(MIDIChannelEvent), 32);
+        event_pools.back().count = 0;
     }
     auto& pool = event_pools.back();
-    pool.emplace_back();
-    return &pool.back();
+    return &pool.events[pool.count++];
 }
 
 
@@ -536,6 +540,8 @@ void MIDI::clear( void )
         delete *it;
     m_vTracks.clear();
     m_Info.clear();
+    for (auto& pool : event_pools)
+        _aligned_free(pool.events);
     event_pools.clear();
 }
 
