@@ -414,7 +414,9 @@ MIDIChannelEvent* MIDI::AllocChannelEvent() {
         event_pools.back().count = 0;
     }
     auto& pool = event_pools.back();
-    return &pool.events[pool.count++];
+    auto ev = &pool.events[pool.count++];
+    new (ev) MIDIChannelEvent();
+    return ev;
 }
 
 

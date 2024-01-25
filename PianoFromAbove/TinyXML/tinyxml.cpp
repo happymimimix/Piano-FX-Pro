@@ -35,6 +35,8 @@ FILE* TiXmlFOpen( const char* filename, const char* mode );
 
 bool TiXmlBase::condenseWhiteSpace = true;
 
+const static _locale_t g_cLocale = _create_locale(LC_ALL, "C");
+
 // Microsoft compiler security
 FILE* TiXmlFOpen( const char* filename, const char* mode )
 {
@@ -1197,7 +1199,7 @@ int TiXmlAttribute::QueryIntValue( int* ival ) const
 
 int TiXmlAttribute::QueryDoubleValue( double* dval ) const
 {
-	if ( TIXML_SSCANF( value.c_str(), "%lf", dval ) == 1 )
+	if (_sscanf_s_l(value.c_str(), "%lf", g_cLocale, dval) == 1)
 		return TIXML_SUCCESS;
 	return TIXML_WRONG_TYPE;
 }
@@ -1216,11 +1218,7 @@ void TiXmlAttribute::SetIntValue( int _value )
 void TiXmlAttribute::SetDoubleValue( double _value )
 {
 	char buf [256];
-	#if defined(TIXML_SNPRINTF)		
-		TIXML_SNPRINTF( buf, sizeof(buf), "%g", _value);
-	#else
-		sprintf (buf, "%g", _value);
-	#endif
+	_snprintf_s_l(buf, sizeof(buf), _TRUNCATE, "%g", g_cLocale, _value);
 	SetValue (buf);
 }
 
