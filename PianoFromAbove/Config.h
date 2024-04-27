@@ -165,6 +165,27 @@ private:
     int m_iMainLeft, m_iMainTop, m_iMainWidth, m_iMainHeight, m_iLibWidth;
 };
 
+// Minimal stub just so Viz doesn't stomp stock PFA library settings
+class SongLibrary : public ISettings
+{
+public:
+    void LoadDefaultValues() {};
+    void LoadConfigValues(TiXmlElement* txRoot);
+    bool SaveConfigValues(TiXmlElement* txRoot);
+
+    enum Source { File, Folder, FolderWSubdirs } eRenderer;
+
+    int AddSource(const wstring& sSource, Source eSource, bool bExpand = true);
+
+private:
+
+    bool m_bAlwaysAdd;
+    int m_iSortCol;
+
+    // Source maps
+    map< wstring, Source > m_mSources;
+};
+
 struct VizSettings : public ISettings {
     void LoadDefaultValues();
     void LoadConfigValues(TiXmlElement* txRoot);
@@ -231,6 +252,7 @@ private:
     AudioSettings m_AudioSettings;
     VideoSettings m_VideoSettings;
     ControlsSettings m_ControlsSettings;
+    SongLibrary m_SongLibrary;
     PlaybackSettings m_PlaybackSettings;
     ViewSettings m_ViewSettings;
     VizSettings m_VizSettings;

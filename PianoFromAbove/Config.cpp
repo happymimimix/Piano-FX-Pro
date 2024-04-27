@@ -92,6 +92,7 @@ void Config::LoadConfigValues( TiXmlElement *txRoot )
     m_AudioSettings.LoadConfigValues( txRoot );
     m_VideoSettings.LoadConfigValues( txRoot );
     m_ControlsSettings.LoadConfigValues( txRoot );
+    m_SongLibrary.LoadConfigValues( txRoot );
     m_PlaybackSettings.LoadConfigValues( txRoot );
     m_ViewSettings.LoadConfigValues( txRoot );
 }
@@ -134,6 +135,7 @@ bool Config::SaveConfigValues( TiXmlElement *txRoot )
     bSaved &= m_AudioSettings.SaveConfigValues( txRoot );
     bSaved &= m_VideoSettings.SaveConfigValues( txRoot );
     bSaved &= m_ControlsSettings.SaveConfigValues( txRoot );
+    bSaved &= m_SongLibrary.SaveConfigValues( txRoot );
     bSaved &= m_PlaybackSettings.SaveConfigValues( txRoot );
     bSaved &= m_ViewSettings.SaveConfigValues( txRoot );
     return bSaved;
@@ -324,6 +326,30 @@ void ControlsSettings::LoadConfigValues( TiXmlElement *txRoot )
     txControls->QueryDoubleAttribute( "SpeedUpPct", &this->dSpeedUpPct );
 }
 
+void SongLibrary::LoadConfigValues(TiXmlElement* txRoot)
+{
+    TiXmlElement* txLibrary = txRoot->FirstChildElement("Library");
+    if (!txLibrary) return;
+
+    int iAttrVal;
+    if (txLibrary->QueryIntAttribute("AlwaysAdd", &iAttrVal) == TIXML_SUCCESS)
+        m_bAlwaysAdd = (iAttrVal != 0);
+    txLibrary->QueryIntAttribute("SortCol", &m_iSortCol);
+
+    TiXmlElement* txSources = txLibrary->FirstChildElement("Sources");
+    if (txSources)
+    {
+        m_mSources.clear();
+        int iSourceType;
+        string sSource;
+        for (TiXmlElement* txSource = txSources->FirstChildElement("Source"); txSource;
+            txSource = txSource->NextSiblingElement("Source"))
+            if (txSource->QueryStringAttribute("Name", &sSource) == TIXML_SUCCESS &&
+                txSource->QueryIntAttribute("Type", &iSourceType) == TIXML_SUCCESS)
+                AddSource(Util::StringToWstring(sSource), static_cast<Source>(iSourceType), false);
+    }
+}
+
 void PlaybackSettings::LoadConfigValues( TiXmlElement *txRoot )
 {
     TiXmlElement *txPlayback = txRoot->FirstChildElement( "Playback" );
@@ -472,6 +498,25 @@ bool ControlsSettings::SaveConfigValues( TiXmlElement *txRoot )
     return true;
 }
 
+bool SongLibrary::SaveConfigValues(TiXmlElement* txRoot)
+{
+    TiXmlElement* txLibrary = new TiXmlElement("Library");
+    txRoot->LinkEndChild(txLibrary);
+    txLibrary->SetAttribute("AlwaysAdd", m_bAlwaysAdd);
+    txLibrary->SetAttribute("SortCol", m_iSortCol);
+
+    TiXmlElement* txSources = new TiXmlElement("Sources");
+    txLibrary->LinkEndChild(txSources);
+    for (map< wstring, Source >::const_iterator it = m_mSources.begin(); it != m_mSources.end(); ++it)
+    {
+        TiXmlElement* txSource = new TiXmlElement("Source");
+        txSources->LinkEndChild(txSource);
+        txSource->SetAttribute("Name", Util::WstringToString(it->first));
+        txSource->SetAttribute("Type", it->second);
+    }
+    return true;
+}
+
 bool PlaybackSettings::SaveConfigValues( TiXmlElement *txRoot )
 {
     TiXmlElement *txPlayback = new TiXmlElement( "Playback" );
@@ -524,4 +569,12 @@ bool VizSettings::SaveConfigValues(TiXmlElement* txRoot) {
     txBarColor->SetAttribute("G", (iBarColor >> 8) & 0xFF);
     txBarColor->SetAttribute("B", (iBarColor >> 16) & 0xFF);
     return true;
+}
+
+// Library stubs
+
+int SongLibrary::AddSource(const wstring& sSource, Source eSource, bool)
+{
+    m_mSources[sSource] = eSource;
+    return 1;
 }
