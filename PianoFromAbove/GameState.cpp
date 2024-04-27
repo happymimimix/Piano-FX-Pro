@@ -1781,8 +1781,8 @@ void MainScreen::RenderNotes()
     for (auto i = m_iEndPos; i >= m_iStartPos; i--) {
         MIDIChannelEvent* pEvent = m_vEvents[i];
         if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn &&
-            pEvent->GetParam2() > 0 && pEvent->HasSister() &&
-            ((m_aSkipRender[pEvent->GetParam1() / 64] >> (pEvent->GetParam1() & 63)) & 1) == 0) {
+            pEvent->GetParam2() > 0 && pEvent->HasSister() /* &&
+            ((m_aSkipRender[pEvent->GetParam1() / 64] >> (pEvent->GetParam1() & 63)) & 1) == 0 */) {
             RenderNote(pEvent);
         }
     }
@@ -1790,8 +1790,10 @@ void MainScreen::RenderNotes()
     for (size_t i = 0; i < 128; i++) {
         for (vector< int >::reverse_iterator it = (m_vState[i]).rbegin(); it != (m_vState[i]).rend(); it++) {
             RenderNote(m_vEvents[*it]);
+            /*
             if ((m_aSkipRender[i / 64] >> (i & 63)) & 1)
                 break;
+            */
         }
     }
 
@@ -1811,8 +1813,10 @@ void MainScreen::RenderNote(const MIDIChannelEvent* pNote)
     }
 
     // If a note is taking up the whole column, we can reasonably assume nothing behind it is visible
+    /*
     if (llNoteStart < m_llRndStartTime && llNoteEnd > m_llRndStartTime + m_llTimeSpan)
         m_aSkipRender[iNote / 64] |= (1uLL << (iNote & 63));
+    */
 
     m_pRenderer->PushNoteData(
         NoteData{
