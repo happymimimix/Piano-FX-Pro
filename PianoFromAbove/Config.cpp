@@ -333,6 +333,8 @@ void PlaybackSettings::LoadConfigValues( TiXmlElement *txRoot )
     if ( txPlayback->QueryIntAttribute( "Mute", &iAttrVal ) == TIXML_SUCCESS )
         m_bMute = ( iAttrVal != 0 );
     txPlayback->QueryDoubleAttribute( "NoteSpeed", &m_dNSpeed);
+    if (m_dNSpeed < 0.00001)
+        m_dNSpeed = 1.0;
     txPlayback->QueryDoubleAttribute( "Volume", &m_dVolume );
 }
 
