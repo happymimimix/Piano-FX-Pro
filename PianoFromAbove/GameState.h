@@ -80,7 +80,43 @@ struct TrackSettings { ChannelSettings aChannels[16]; };
 class SplashScreen : public GameState
 {
 public:
-    SplashScreen( HWND hWnd, D3D12Renderer *pRenderer );
+    SplashScreen(HWND hWnd, D3D12Renderer* pRenderer) : GameState(hWnd, pRenderer)
+    {
+        HRSRC hResInfo = FindResource(NULL, MAKEINTRESOURCE(IDR_SPLASHMIDI), TEXT("MIDI"));
+        HGLOBAL hRes = LoadResource(NULL, hResInfo);
+        int iSize = SizeofResource(NULL, hResInfo);
+        unsigned char* pData = (unsigned char*)LockResource(hRes);
+
+        Config& config = Config::GetConfig();
+        VizSettings viz = config.GetVizSettings();
+
+        // Parse MIDI
+        if (!viz.sSplashMIDI.empty()) {
+            // this is REALLY BAD, but i can't figure out how to make it move ownership of the memory pool vector instead of copying
+            m_MIDI.~MIDI();
+            new (&m_MIDI) MIDI(viz.sSplashMIDI);
+            if (!m_MIDI.IsValid()) {
+                MessageBox(hWnd, L"The custom splash MIDI failed to load. Please choose a different MIDI.", L"", MB_ICONWARNING);
+                m_MIDI = MIDI();
+                m_MIDI.ParseMIDI(pData, iSize);
+            }
+        }
+        else {
+            m_MIDI.ParseMIDI(pData, iSize);
+        }
+        vector< MIDIEvent* > vEvents;
+        vEvents.reserve(m_MIDI.GetInfo().iEventCount);
+        m_MIDI.ConnectNotes(); // Order's important here
+        m_MIDI.PostProcess(m_vTrackSettings, m_vEvents);
+
+        // Allocate
+        m_vTrackSettings.resize(m_MIDI.GetInfo().iNumTracks);
+        for (int i = 0; i < 128; i++)
+            m_vState[i].reserve(128);
+
+        // Initialize
+        InitState();
+    }
 
     GameError MsgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
     GameError Init();
@@ -189,7 +225,6 @@ public:
 
 private:
     // Initialization
-    void InitNoteMap( const vector< MIDIEvent* > &vEvents );
     void InitColors();
     void InitState();
 

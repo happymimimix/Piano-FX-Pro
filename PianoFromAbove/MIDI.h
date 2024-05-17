@@ -103,8 +103,7 @@ public:
     size_t ParseEvents( const unsigned char *pcData, size_t iMaxSize );
     bool IsValid() const { return ( m_vTracks.size() > 0 && m_Info.iNoteCount > 0 && m_Info.iDivision > 0 ); }
 
-    void PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vProgramChanges = nullptr,
-        vector<MIDIMetaEvent*>* vMetaEvents = nullptr, eventvec_t* vTempo = nullptr, eventvec_t* vSignature = nullptr, eventvec_t* vMarkers = nullptr);
+    void MIDI::PostProcess(vector<TrackSettings>& vTrackSettings, vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vProgramChanges, vector<MIDIMetaEvent*>* vMetaEvents, eventvec_t* vTempo, eventvec_t* vSignature, eventvec_t* vMarkers, eventvec_t* vColorEvents, vector<bool>* vColorOverridden);
     void ConnectNotes();
     void clear( void );
 

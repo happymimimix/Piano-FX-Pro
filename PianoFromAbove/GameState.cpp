@@ -125,44 +125,6 @@ GameState::GameError IntroScreen::Render()
 // SplashScreen GameState object
 //-----------------------------------------------------------------------------
 
-SplashScreen::SplashScreen( HWND hWnd, D3D12Renderer *pRenderer ) : GameState( hWnd, pRenderer )
-{
-    HRSRC hResInfo = FindResource( NULL, MAKEINTRESOURCE( IDR_SPLASHMIDI ), TEXT( "MIDI" ) );
-    HGLOBAL hRes = LoadResource( NULL, hResInfo );
-    int iSize = SizeofResource( NULL, hResInfo );
-    unsigned char *pData = ( unsigned char * )LockResource( hRes );
-
-    Config& config = Config::GetConfig();
-    VizSettings viz = config.GetVizSettings();
-
-    // Parse MIDI
-    if (!viz.sSplashMIDI.empty()) {
-        // this is REALLY BAD, but i can't figure out how to make it move ownership of the memory pool vector instead of copying
-        m_MIDI.~MIDI();
-        new (&m_MIDI) MIDI(viz.sSplashMIDI);
-        if (!m_MIDI.IsValid()) {
-            MessageBox(hWnd, L"The custom splash MIDI failed to load. Please choose a different MIDI.", L"", MB_ICONWARNING);
-            m_MIDI = MIDI();
-            m_MIDI.ParseMIDI(pData, iSize);
-        }
-    } else {
-        m_MIDI.ParseMIDI(pData, iSize);
-    }
-    vector< MIDIEvent* > vEvents;
-    vEvents.reserve( m_MIDI.GetInfo().iEventCount );
-    m_MIDI.ConnectNotes(); // Order's important here
-    m_MIDI.PostProcess(m_vEvents);
-
-    // Allocate
-    m_vTrackSettings.resize( m_MIDI.GetInfo().iNumTracks );
-    for (int i = 0; i < 128; i++)
-        m_vState[i].reserve(128);
-
-    // Initialize
-    //InitNotes( vEvents );
-    InitState();
-}
-
 string GetExePath(void) {
     char szFilePath[MAX_PATH + 1] = { 0 };
     GetModuleFileNameA(NULL, szFilePath, MAX_PATH);
@@ -545,15 +507,29 @@ void SplashScreen::RenderNote(MIDIChannelEvent* pNote)
     int iChannel = pNote->GetChannel();
     long long llNoteStart = pNote->GetAbsMicroSec();
     long long llNoteEnd = llNoteStart + pNote->GetLength();
-    m_pRenderer->PushNoteData(
-        NoteData {
-            .key = (uint8_t)iNote,
-            .channel = (uint8_t)iChannel,
-            .track = (uint16_t)iTrack,
-            .pos = static_cast<float>(llNoteStart - m_llRndStartTime),
-            .length = static_cast<float>(llNoteEnd - llNoteStart),
-        }
-    );
+
+    ChannelSettings& csTrack = m_vTrackSettings[iTrack].aChannels[iChannel];
+
+    // Compute true positions
+    float x = GetNoteX(iNote);
+    float y = m_fNotesY + m_fNotesCY * (1.0f - static_cast<float>(llNoteStart - m_llRndStartTime) / TimeSpan);
+    float cx = MIDI::IsSharp(iNote) ? m_fWhiteCX * SharpRatio : m_fWhiteCX;
+    float cy = m_fNotesCY * (static_cast<float>(llNoteEnd - llNoteStart) / TimeSpan);
+    float fDeflate = m_fWhiteCX * 0.15f / 2.0f;
+
+    // Visualize!
+    //long long llDuration = m_llStartTime - (m_MIDI.GetInfo().llFirstNote);
+    int iAlpha = 0xFF - static_cast<int>((0xFF) / 500000);
+    int iAlpha1 = static_cast<int>((0xFF * (m_fNotesCY - y) / m_fNotesCY) + 0.5f);
+    int iAlpha2 = static_cast<int>((0xFF * (m_fNotesCY - (y + cy)) / m_fNotesCY) + 0.5f);
+    iAlpha1 = max(iAlpha1, 0);
+    iAlpha2 = min(iAlpha1, 0xFF);
+    iAlpha <<= 24;
+    iAlpha1 <<= 24;
+    iAlpha2 <<= 24;
+    m_pRenderer->DrawRect(x + fDeflate, y - cy + fDeflate,
+        cx - fDeflate * 2.0f, cy - fDeflate * 2.0f,
+        csTrack.iPrimaryRGB | iAlpha1, csTrack.iDarkRGB | iAlpha1, csTrack.iDarkRGB | iAlpha2, csTrack.iPrimaryRGB | iAlpha2);
 }
 
 void SplashScreen::GenNoteXTable() {
@@ -585,10 +561,11 @@ MainScreen::MainScreen( wstring sMIDIFile, State eGameMode, HWND hWnd, D3D12Rend
 {
     // Finish off midi processing
     if ( !m_MIDI.IsValid() ) return;
-    vector< MIDIEvent* > vEvents;
+    m_vColorOverridden.resize(m_MIDI.GetInfo().iNumTracks * 16);
     m_MIDI.ConnectNotes(); // Order's important here
     m_vEvents.reserve(m_MIDI.GetInfo().iEventCount);
-    m_MIDI.PostProcess(m_vEvents, &m_vProgramChange, &m_vMetaEvents, &m_vTempo, &m_vSignature, &m_vMarkers);
+    m_MIDI.PostProcess(m_vTrackSettings, m_vEvents, &m_vProgramChange, &m_vMetaEvents, &m_vTempo, &m_vSignature, &m_vMarkers, &m_vColorEvents, &m_vColorOverridden);
+
 
     // Allocate
     m_vTrackSettings.resize( m_MIDI.GetInfo().iNumTracks );
@@ -596,35 +573,11 @@ MainScreen::MainScreen( wstring sMIDIFile, State eGameMode, HWND hWnd, D3D12Rend
         note_state.reserve(m_MIDI.GetInfo().iNumTracks * 16);
 
     // Initialize
-	InitNoteMap( vEvents ); // Longish
     InitColors();
     InitState();
-
     g_LoadingProgress.stage = MIDILoadingProgress::Stage::Done;
 }
 
-void MainScreen::InitNoteMap( const vector< MIDIEvent* > &vEvents )
-{
-    m_vColorOverridden.resize(m_MIDI.GetInfo().iNumTracks * 16);
-
-    cout << "InitNoteMap " << endl;
-    //Get only the channel events
-    m_vEvents.reserve(vEvents.size());
-    for (vector< MIDIEvent* >::const_iterator it = vEvents.begin(); it != vEvents.end(); ++it) {
-        MIDIMetaEvent* pEvent = reinterpret_cast<MIDIMetaEvent*>(*it);
-        m_vMetaEvents.push_back(pEvent);
-        MIDIMetaEvent::MetaEventType eEventType = pEvent->GetMetaEventType();
-        cout << eEventType << ',' << MIDIMetaEvent::ColorEvent << endl;
-        if (eEventType == MIDIMetaEvent::ColorEvent) {
-            cout << "color event found! " << endl;
-                if (!m_vColorOverridden[pEvent->GetTrack() * 16 + pEvent->GetData()[2]])
-                    ApplyColorEvent(pEvent);
-                m_vColorOverridden[pEvent->GetTrack() * 16 + pEvent->GetData()[2]] = true;
-                m_vColorEvents.push_back(pair< long long, int >(pEvent->GetAbsMicroSec(), m_vMetaEvents.size() - 1));
-            break;
-        }
-    }
-}
 // Display colors
 void MainScreen::InitColors()
 {
@@ -723,7 +676,7 @@ GameState::GameError MainScreen::Init()
     }
 
     for (auto& work : m_vThreadWork)
-        work.reserve(131072); // Should be plenty for most MIDIs
+        work.reserve(1<<20); // Should be plenty for most MIDIs
 
     return Success;
 }
@@ -1405,8 +1358,13 @@ void MainScreen::AdvanceIterators( long long llTime, bool bIsJump )
             }
         }
 
+        auto itCurColorEvent = m_itNextColorEvent;
         m_itNextColorEvent = upper_bound(m_vColorEvents.begin(), m_vColorEvents.end(), pair< long long, int >(llTime, m_vMetaEvents.size()));
-        if (itCurMarker != m_itNextColorEvent) {
+        if (!m_bNextColorInited || itCurMarker != m_itNextColorEvent) {
+            if (!m_bNextColorInited) {
+                m_bNextColorInited = true;
+                return;
+            }
             if (m_itNextColorEvent != m_vColorEvents.begin() && (m_itNextColorEvent - 1)->second != -1) {
                 auto eEvent = m_vMetaEvents[(m_itNextColorEvent - 1)->second];
                 ApplyColorEvent(eEvent);
@@ -1489,9 +1447,13 @@ void MainScreen::ApplyColorEvent(MIDIMetaEvent* event) {
         data[0] == 0x00 && data[1] == 0x0F &&
         (data[2] < 16 || data[2] == 0x7F) &&
         data[3] == 0) {
-        unsigned color = (data[7] << 24) | (data[6] << 16) | (data[5] << 8) | data[4];
+        unsigned color = ((0xFF - data[7]) << 24) | (data[6] << 16) | (data[5] << 8) | data[4];
         auto& chan_settings = m_vTrackSettings[event->GetTrack()].aChannels[data[2]];
         chan_settings.SetColor(color);
+        if (data[7] == 0)
+            chan_settings.bHidden = true;
+        else
+            chan_settings.bHidden = false;
     }
 }
 
@@ -1851,6 +1813,18 @@ void MainScreen::RenderKeys()
     for ( int i = iStartRender; i <= iEndRender; i++ )
         if ( !MIDI::IsSharp( i ) )
         {
+            int state = m_vState[i].size() == 0 ? -1 : m_vState[i].back();
+            MIDIChannelEvent* pEvent = (state >= 0 ? m_vEvents[state] : NULL);
+            if (pEvent && m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bHidden) {
+                state = -1;
+                for (auto it = m_vState[i].rbegin(); it != m_vState[i].rend(); it++) {
+                    pEvent = m_vEvents[*it];
+                    if (!m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bHidden) {
+                        state = *it;
+                        break;
+                    }
+                }
+            }
             if ( m_pNoteState[i] == -1 )
             {
                 m_pRenderer->DrawRect( fCurX + fKeyGap1 , fCurY, m_fWhiteCX - fKeyGap, fTopCY + fNearCY,
@@ -1899,6 +1873,19 @@ void MainScreen::RenderKeys()
             const float x = fCurX - m_fWhiteCX * ( SharpRatio / 2.0f - fNudgeX );
             const float fSharpTopX1 = x + m_fWhiteCX * ( SharpRatio - fSharpTop ) / 2.0f;
             const float fSharpTopX2 = fSharpTopX1 + m_fWhiteCX * fSharpTop;
+
+            int state = m_vState[i].size() == 0 ? -1 : m_vState[i].back();
+            MIDIChannelEvent* pEvent = (state >= 0 ? m_vEvents[state] : NULL);
+            if (pEvent && m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bHidden) {
+                state = -1;
+                for (auto it = m_vState[i].rbegin(); it != m_vState[i].rend(); it++) {
+                    pEvent = m_vEvents[*it];
+                    if (!m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bHidden) {
+                        state = *it;
+                        break;
+                    }
+                }
+            }
 
             if ( m_pNoteState[i] == -1 )
             {

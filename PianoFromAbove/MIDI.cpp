@@ -512,7 +512,7 @@ void MIDI::MIDIInfo::AddTrackInfo( const MIDITrack &mTrack )
 
 // Sets absolute time variables. A lot of code for not much happening...
 // Has to be EXACT. Even a little drift and things start messing up a few minutes in (metronome, etc)
-void MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vProgramChanges, vector<MIDIMetaEvent*>* vMetaEvents, eventvec_t* vTempo, eventvec_t* vSignature, eventvec_t* vMarkers)
+void MIDI::PostProcess(vector<TrackSettings>& vTrackSettings, vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vProgramChanges, vector<MIDIMetaEvent*>* vMetaEvents, eventvec_t* vTempo, eventvec_t* vSignature, eventvec_t* vMarkers, eventvec_t* vColorEvents, vector<bool>* vColorOverridden)
 {
     // Iterator like class
     MIDIPos midiPos( *this );
@@ -525,7 +525,7 @@ void MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vP
     int iSimultaneous = 0;
 
     size_t event_count = 0;
-    for (int i = 0; i < m_vTracks.size(); i++) {
+    for (size_t i = 0; i < m_vTracks.size(); i++) {
         event_count += m_vTracks[i]->m_vEvents.size();
         if (!m_vTracks[i]->m_vEvents.empty())
             midiPos.m_pTrackTime[i] = m_vTracks[i]->m_vEvents[0]->GetAbsT();
@@ -604,6 +604,36 @@ void MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vP
                 case MIDIMetaEvent::Marker:
                     if (vMarkers)
                         vMarkers->push_back(pair< long long, int >(pEvent->GetAbsMicroSec(), vMetaEvents->size() - 1));
+                    break;
+                case MIDIMetaEvent::ColorEvent:
+                    if (vColorEvents && vColorOverridden && pMetaEvent->GetDataLen() >= 8) {
+                        if (!(*vColorOverridden)[pEvent->GetTrack() * 16 + pMetaEvent->GetData()[2]]) {
+                            const auto size = pMetaEvent->GetDataLen();
+                            const auto data = pMetaEvent->GetData();
+                            if (pMetaEvent->GetMetaEventType() == MIDIMetaEvent::ColorEvent &&
+                                (size == 8 || size == 12) &&
+                                data[0] == 0x00 && data[1] == 0x0F &&
+                                (data[2] < 16 || data[2] == 0x7F) &&
+                                data[3] == 0) {
+                                unsigned color = (0x0 << 24) | (data[6] << 16) | (data[5] << 8) | data[4];
+                                if (data[2] == 0x7F) {
+                                    //all channels
+                                    for (char i = 0; i < 16; i++) {
+                                        auto& chan_settings = vTrackSettings[pMetaEvent->GetTrack()].aChannels[i];
+                                        chan_settings.SetColor(color);
+                                        chan_settings.bHidden = data[7] == 0;
+                                    }
+                                }
+                                else {
+                                    auto& chan_settings = vTrackSettings[pMetaEvent->GetTrack()].aChannels[data[2]];
+                                    chan_settings.SetColor(color);
+                                    chan_settings.bHidden = data[7] == 0;
+                                }
+                            }
+                        }
+                        (*vColorOverridden)[pEvent->GetTrack() * 16 + pMetaEvent->GetData()[2]] = true;
+                        vColorEvents->push_back(pair< long long, int >(pEvent->GetAbsMicroSec(), vMetaEvents->size() - 1));
+                    }
                     break;
                 default:
                     break;
