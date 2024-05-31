@@ -4,6 +4,14 @@ Welcome to my viz branch. This includes all the changes of upstream's viz branch
 
 This is currently (much) faster than upstream viz.
 
+## Binaries
+
+https://github.com/brian-pantano/PianoFromAbove/releases
+
+## Viz branch
+
+There's now a viz branch which will house graphics and performance updates going forward (if there is a forward).
+
 ## How to build
 
 * Clone this repo
