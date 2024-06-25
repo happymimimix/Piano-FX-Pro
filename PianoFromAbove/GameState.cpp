@@ -259,9 +259,7 @@ GameState::GameError SplashScreen::MsgProc( HWND, UINT msg, WPARAM wParam, LPARA
             }
         }
         case WM_DEVICECHANGE:
-            if (cViz.bKDMAPI) {
-                m_OutDevice.OpenKDMAPI();
-            } else {
+            if (!cViz.bKDMAPI) {
                 if (cAudio.iOutDevice >= 0 && m_OutDevice.GetDevice() != cAudio.vMIDIOutDevices[cAudio.iOutDevice])
                     m_OutDevice.Open(cAudio.iOutDevice);
             }
@@ -916,9 +914,7 @@ GameState::GameError MainScreen::MsgProc( HWND, UINT msg, WPARAM wParam, LPARAM 
             break;
         }
         case WM_DEVICECHANGE:
-            if (cViz.bKDMAPI) {
-                m_OutDevice.OpenKDMAPI();
-            } else {
+            if (!cViz.bKDMAPI) {
                 if (cAudio.iOutDevice >= 0 && m_OutDevice.GetDevice() != cAudio.vMIDIOutDevices[cAudio.iOutDevice])
                     m_OutDevice.Open(cAudio.iOutDevice);
             }
