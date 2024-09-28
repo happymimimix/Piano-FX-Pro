@@ -66,17 +66,6 @@ protected:
     static const int QueueSize = 50;
 };
 
-struct ChannelSettings
-{
-    ChannelSettings() { bHidden = bMuted = false; SetColor( 0x00000000 ); }
-    void SetColor();
-    void SetColor( unsigned int iColor, double dDark = 0.5, double dVeryDark = 0.2 );
-
-    bool bHidden, bMuted;
-    unsigned int iPrimaryRGB, iDarkRGB, iVeryDarkRGB, iOrigBGR;
-};
-struct TrackSettings { ChannelSettings aChannels[16]; };
-
 class SplashScreen : public GameState
 {
 public:
@@ -91,7 +80,7 @@ private:
     void InitNotes( const vector< MIDIEvent* > &vEvents );
     void InitState();
     void ColorChannel( int iTrack, int iChannel, unsigned int iColor, bool bRandom = false );
-    void SetChannelSettings( const vector< bool > &vMuted, const vector< bool > &vHidden, const vector< unsigned > &vColor );
+    void SetChannelSettings( const vector< unsigned > &vColor );
 
     void UpdateState( int iPos );
 
@@ -104,6 +93,7 @@ private:
     // MIDI info
     MIDI m_MIDI; // The song to display
     vector< MIDIChannelEvent* > m_vEvents; // The channel events of the song
+    vector<bool> m_vColorOverridden;
     int m_iStartPos;
     int m_iEndPos;
     long long m_llStartTime;
@@ -113,11 +103,12 @@ private:
     bool m_bPaused;
     bool m_bMute;
 
+    // Devices
     MIDIOutDevice m_OutDevice;
 
     static const float SharpRatio;
     static const long long TimeSpan = 3000000;
-    vector< TrackSettings > m_vTrackSettings;
+    vector<TrackSettings> m_vTrackSettings;
 
     // Computed in RenderGlobal
     int m_iStartNote, m_iEndNote; // Start and end notes of the songs
@@ -194,9 +185,9 @@ private:
 
     // Logic
     void UpdateState(int key, const thread_work_t& work);
-    void JumpTo(long long llStartTime, bool bUpdateGUI = true);
-    void PlaySkippedEvents(eventvec_t::const_iterator itOldProgramChange);
+    void JumpTo(long long llStartTime, boolean loadingMode = false);
     void ApplyMarker(unsigned char* data, size_t size);
+    void ApplyColor(MIDIMetaEvent* event);
     void AdvanceIterators( long long llTime, bool bIsJump );
     MIDIMetaEvent* GetPrevious( eventvec_t::const_iterator &itCurrent,
                                 const eventvec_t &vEventMap, int iDataLen );
@@ -219,27 +210,29 @@ private:
     void GenNoteXTable();
     float GetNoteX( int iNote );
     void RenderKeys();
-    void RenderBorder();
     void RenderText();
-    void RenderStatusLine(int line, float width, const char* left, const char* format, ...);
-    void RenderStatus(int lines);
+    void RenderStatusLine(int line, const char* left, const char* format, ...);
+    void RenderStatus( LPRECT prcPos );
     void RenderMarker(const char* str);
-    void RenderMessage( LPRECT prcMsg, TCHAR *sMsg );
+    void RenderMessage(LPRECT prcMsg, const char* sMsg);
 
     // MIDI info
     MIDI m_MIDI; // The song to display
     vector< MIDIChannelEvent* > m_vEvents; // The channel events of the song
     vector< MIDIMetaEvent* > m_vMetaEvents; // The meta events of the song
+    vector<bool> m_vColorOverridden;
     eventvec_t m_vNoteOns; // Map: note->time->Event pos. Used for fast(er) random access to the song.
     eventvec_t m_vNonNotes; // Tracked for jumping
     eventvec_t m_vProgramChange; // Tracked so we don't jump over them during random access
     eventvec_t m_vTempo; // Tracked for drawing measure lines
     eventvec_t m_vSignature; // Measure lines again
     eventvec_t m_vMarkers; // Tracked for section names in some longer MIDIs
+    eventvec_t m_vColors; // Tracked for section names in some longer MIDIs
     eventvec_t::const_iterator m_itNextProgramChange;
     eventvec_t::const_iterator m_itNextTempo;
     eventvec_t::const_iterator m_itNextSignature;
     eventvec_t::const_iterator m_itNextMarker;
+    eventvec_t::const_iterator m_itNextColor;
     uint32_t m_iMicroSecsPerBeat, m_iLastTempoTick; // Tempo
     long long m_llLastTempoTime; // Tempo
     int m_CurBeat, m_iBeatsPerMeasure, m_iBeatType, m_iClocksPerMet, m_iLastSignatureTick; // Time signature
@@ -247,12 +240,17 @@ private:
     unsigned char* m_pMarkerData = nullptr; // Used for refreshing marker data when changing encoding on the fly
     size_t m_iMarkerSize = 0;
     int m_iCurEncoding;
+    std::atomic<long long> m_llPolyphony;
+
+    // color events and bend range and such
+    bool Next_is_PBS[16] = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
+    short m_pBendsRange[16] = { 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12 };
 
     // Playback
     State m_eGameMode;
-    long long m_iStartPos, m_iEndPos; // Postions of the start and end events that occur in the current window
-    long long m_llStartTime, m_llTimeSpan;  // Times of the start and end events of the current window
-    int m_iStartTick; // Tick that corresponds with m_llStartTime. Used to help with beat and metronome detection
+    long long m_iStartPos, m_iEndPos, m_iPrevStartPos; // Postions of the start and end events that occur in the current window
+    long long m_llTimeSpan;  // Times of the start and end events of the current window
+    long long m_llPrevTime;
     vector<int> m_vState[128];  // The notes that are on at time m_llStartTime.
     vector<thread_work_t> m_vThreadWork[128];
     int m_pNoteState[128]; // The last note that was turned on
@@ -266,7 +264,7 @@ private:
     bool m_bTickMode = false;
 
     // FPS variables
-    bool m_bShowFPS;
+    bool m_bDebug;
     int m_iFPSCount;
     long long m_llFPSTime;
     double m_dFPS;
@@ -283,7 +281,7 @@ private:
     ChannelSettings m_csKBRed, m_csKBWhite, m_csKBSharp, m_csKBBackground;
     vector< TrackSettings > m_vTrackSettings;
     float m_pBends[16] = {};
-    deque<tuple<long long, long long>> m_dNPSNotes;
+    float m_pBendsValue[16] = {};
     std::wstring m_sCurBackground;
     bool m_bBackgroundLoaded;
 
@@ -300,7 +298,6 @@ private:
     int m_iAllWhiteKeys; // Number of white keys are on the screen
     float m_fWhiteCX; // Width of the white keys
     long long m_llRndStartTime; // Rounded start time to make stuff drop at the same time
-    uint64_t m_aSkipRender[4];
     
     // Frame dumping stuff
     bool m_bDumpFrames = false;
@@ -309,4 +306,5 @@ private:
 
     // Debug assertion fail workaround
     bool m_bNextMarkerInited = false;
+    bool m_bNextColorInited = false;
 };

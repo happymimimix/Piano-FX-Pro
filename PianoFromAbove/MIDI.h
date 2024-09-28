@@ -27,12 +27,23 @@ class MIDIChannelEvent;
 class MIDIMetaEvent;
 class MIDISysExEvent;
 class MIDIPos;
-
 class MIDIOutDevice;
 
 //
 // MIDI File Classes
 //
+
+struct ChannelSettings
+{
+    ChannelSettings() { bHidden = bMuted = false; SetColor(0x00000000); }
+    void SetColor();
+    void SetColor(unsigned int iColor, double dDark = 0.5, double dVeryDark = 0.2);
+
+    bool bHidden, bMuted;
+    unsigned int iPrimaryRGB, iDarkRGB, iVeryDarkRGB, iOrigBGR;
+};
+struct TrackSettings { ChannelSettings aChannels[16]; };
+
 
 class MIDIPos
 {
@@ -104,8 +115,7 @@ public:
     size_t ParseEvents( const unsigned char *pcData, size_t iMaxSize );
     bool IsValid() const { return ( m_vTracks.size() > 0 && m_Info.iNoteCount > 0 && m_Info.iDivision > 0 ); }
 
-    void PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vProgramChanges = nullptr,
-        vector<MIDIMetaEvent*>* vMetaEvents = nullptr, eventvec_t* vTempo = nullptr, eventvec_t* vSignature = nullptr, eventvec_t* vMarkers = nullptr);
+    void PostProcess(vector<TrackSettings> vTrackSettings, vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vProgramChanges = nullptr, vector<MIDIMetaEvent*>* vMetaEvents = nullptr, eventvec_t* vNoteOns = nullptr, eventvec_t* vTempo = nullptr, eventvec_t* vSignature = nullptr, eventvec_t* vMarkers = nullptr, eventvec_t* vColors = nullptr, vector<bool>* vColorOverridden = nullptr);
     void ConnectNotes();
     void clear( void );
 
@@ -151,7 +161,7 @@ private:
     MIDIInfo m_Info;
     vector< MIDITrack* > m_vTracks;
 
-    std::vector<EventPool> event_pools;
+    std::vector<std::vector<MIDIChannelEvent>> event_pools;
 };
 
 //Holds all the event of one MIDI track
@@ -238,8 +248,8 @@ public:
     //Accessors
     ChannelEventType GetChannelEventType() const { return static_cast<ChannelEventType>(m_iEventCode >> 4); }
     unsigned char GetChannel() const { return m_cChannel; }
-    unsigned char GetParam1() const { return m_cParam1; }
-    unsigned char GetParam2() const { return m_cParam2; }
+    unsigned char GetParam1() const { return m_cParam1 % (1<<7); }
+    unsigned char GetParam2() const { return m_cParam2 % (1<<7); }
     MIDIChannelEvent *GetSister(const std::vector<MIDIChannelEvent*>& events) const {
         return m_iSisterIdx == UINT32_MAX ? nullptr : events[m_iSisterIdx];
     }
@@ -279,7 +289,7 @@ public:
     ~MIDIMetaEvent() { if ( m_pcData ) delete[] m_pcData; }
 
     enum MetaEventType { SequenceNumber, TextEvent, Copyright, SequenceName, InstrumentName, Lyric, Marker,
-                         CuePoint, ChannelPrefix = 0x20, PortPrefix = 0x21, EndOfTrack = 0x2F, SetTempo = 0x51,
+                         CuePoint, GenericTextA = 0x0a, ChannelPrefix = 0x20, PortPrefix = 0x21, EndOfTrack = 0x2F, SetTempo = 0x51,
                          SMPTEOffset = 0x54, TimeSignature = 0x58, KeySignature = 0x59, Proprietary = 0x7F };
     int ParseEvent( const unsigned char *pcData, size_t iMaxSize );
 

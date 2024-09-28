@@ -25,8 +25,6 @@
 #define CLASSNAME  TEXT( "PianoFromAbove" )
 #define GFXCLASSNAME  TEXT( "PianoFromAboveGfx" )
 #define POSNCLASSNAME  TEXT( "PianoFromAbovePosCtrl" )
-#define MINWIDTH 0
-#define MINHEIGHT 0
 
 class ISettings;
 class Config;
@@ -165,27 +163,6 @@ private:
     int m_iMainLeft, m_iMainTop, m_iMainWidth, m_iMainHeight, m_iLibWidth;
 };
 
-// Minimal stub just so Viz doesn't stomp stock PFA library settings
-class SongLibrary : public ISettings
-{
-public:
-    void LoadDefaultValues() {};
-    void LoadConfigValues(TiXmlElement* txRoot);
-    bool SaveConfigValues(TiXmlElement* txRoot);
-
-    enum Source { File, Folder, FolderWSubdirs } eRenderer;
-
-    int AddSource(const wstring& sSource, Source eSource, bool bExpand = true);
-
-private:
-
-    bool m_bAlwaysAdd;
-    int m_iSortCol;
-
-    // Source maps
-    map< wstring, Source > m_mSources;
-};
-
 struct VizSettings : public ISettings {
     void LoadDefaultValues();
     void LoadConfigValues(TiXmlElement* txRoot);
@@ -193,8 +170,8 @@ struct VizSettings : public ISettings {
 
     bool bTickBased;
     bool bShowMarkers;
-    enum MarkerEncoding { CP1252, CP932, UTF8 } eMarkerEncoding;
-    bool bNerdStats;
+    enum MarkerEncoding { CP1252, CP437, CP82, CP886, CP932, CP936, UTF8 } eMarkerEncoding;
+    bool bPhigros;
     std::wstring sSplashMIDI;
     bool bVisualizePitchBends;
     bool bDumpFrames;
@@ -203,8 +180,6 @@ struct VizSettings : public ISettings {
     bool bColorLoop;
     bool bKDMAPI;
     bool bDisableUI;
-    float fUIScale;
-    std::wstring sUIFont;
 };
 
 class Config : public ISettings
@@ -252,7 +227,6 @@ private:
     AudioSettings m_AudioSettings;
     VideoSettings m_VideoSettings;
     ControlsSettings m_ControlsSettings;
-    SongLibrary m_SongLibrary;
     PlaybackSettings m_PlaybackSettings;
     ViewSettings m_ViewSettings;
     VizSettings m_VizSettings;

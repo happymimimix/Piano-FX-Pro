@@ -24,9 +24,6 @@
 #include "Renderer.h"
 #include "Misc.h"
 
-// Yes, I know you shouldn't store build numbers as doubles
-constexpr double BUILD_VERSION = 20240112;
-
 INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, INT nCmdShow );
 DWORD WINAPI GameThread( LPVOID lpParameter );
 
@@ -40,82 +37,24 @@ HWND g_hWndGfx = NULL;
 bool g_bGfxDestroyed = false;
 TSQueue< MSG > g_MsgQueue; // Producer/consumer to hold events for our game thread
 
-DWORD WINAPI UpdateCheckProc(LPVOID) {
-    HINTERNET session = WinHttpOpen(L"pfavizkhang", WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
-        WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0);
-    if (!session)
-        return 0;
-
-    HINTERNET connect = WinHttpConnect(session, L"api.github.com",
-        INTERNET_DEFAULT_HTTPS_PORT, 0);
-    if (!connect) {
-        WinHttpCloseHandle(session);
-        return 0;
-    }
-
-    HINTERNET request = WinHttpOpenRequest(connect, L"GET", L"/repos/khang06/PianoFromAbove/releases",
-        NULL, WINHTTP_NO_REFERER, WINHTTP_DEFAULT_ACCEPT_TYPES, WINHTTP_FLAG_SECURE);
-    if (!request) {
-        WinHttpCloseHandle(connect);
-        WinHttpCloseHandle(session);
-        return 0;
-    }
-
-    if (WinHttpSendRequest(request, WINHTTP_NO_ADDITIONAL_HEADERS, 0, WINHTTP_NO_REQUEST_DATA, 0, 0, NULL) &&
-        WinHttpReceiveResponse(request, NULL))
-    {
-        std::string total;
-        DWORD expected_len = 0;
-        DWORD recv_len = 0;
-        do {
-            if (!WinHttpQueryDataAvailable(request, &expected_len))
-                break;
-
-            auto old_len = total.size();
-            total.resize(old_len + expected_len);
-            if (!WinHttpReadData(request, total.data() + old_len, expected_len, &recv_len))
-                break;
-        } while (expected_len != 0 && recv_len != 0);
-
-        // Who needs a JSON library anyway
-        std::regex regex("\"tag_name\":\\s*\"([0-9.]+)\",");
-        std::smatch matches;
-        
-        if (std::regex_search(total, matches, regex)) {
-            // C locale sucks so much
-            auto old_locale = std::setlocale(LC_NUMERIC, nullptr);
-            std::setlocale(LC_NUMERIC, "C");
-            for (size_t i = 1; i < matches.size(); i++) {
-                double parsed = 0.0;
-                try {
-                    parsed = std::stod(matches[i].str());
-                } catch (...) {
-                    continue;
-                }
-                if (parsed > BUILD_VERSION) {
-                    auto menu = GetMenu(g_hWnd);
-                    AppendMenu(menu, MF_STRING, ID_UPDATE, L"Update available!");
-                    DrawMenuBar(g_hWnd);
-                    break;
-                }
-            }
-            std::setlocale(LC_NUMERIC, old_locale);
-        }
-    }
-
-    WinHttpCloseHandle(request);
-    WinHttpCloseHandle(connect);
-    WinHttpCloseHandle(session);
-
-    return 0;
-}
-
 //-----------------------------------------------------------------------------
 // Name: wWinMain()
 // Desc: The application's entry point
 //-----------------------------------------------------------------------------
 INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
 {
+    //Debug console
+    AllocConsole();
+    freopen("CONOUT$", "w", stdout);
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    COORD pos;
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    GetConsoleScreenBufferInfo(hConsole, &csbi);
+    pos.X = 4;
+    pos.Y = 2;
+    SetConsoleCursorPosition(hConsole, pos);
+    cout << "Welcome to Piano-FX Pro\n\n";
+
     g_hInstance = hInstance;
     srand( ( unsigned )time( NULL ) );
 
@@ -169,7 +108,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
 
     // Bug the user if WinMM isn't patched
     if (!config.GetVizSettings().bKDMAPI || !LoadLibrary(L"OmniMIDI")) {
-        wchar_t winmm_path[1024] = {};
+        wchar_t winmm_path[1<<10] = {};
         wchar_t win_dir[MAX_PATH] = {};
         if (GetModuleFileName(GetModuleHandle(L"winmm.dll"), winmm_path, _countof(winmm_path)) &&
             GetWindowsDirectory(win_dir, MAX_PATH) &&
@@ -179,7 +118,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
     }
 
     // Create the application window
-    g_hWnd = CreateWindowEx( 0, CLASSNAME, L"pfavizkhang-dx12 " __DATE__, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, cView.GetMainLeft(), cView.GetMainTop(),
+    g_hWnd = CreateWindowEx( 0, CLASSNAME, L"Piano-FX Pro | Made by: happy_mimimix | Ver 1.01 | Now playing: None", WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, cView.GetMainLeft(), cView.GetMainTop(),
                              cView.GetMainWidth(), cView.GetMainHeight(), NULL, NULL, wc.hInstance, NULL );
     if ( !g_hWnd ) return 1;
 
@@ -213,9 +152,6 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
     UpdateWindow( g_hWnd );
     SetFocus( g_hWndGfx );
     cPlayback.SetPaused( false, false );
-
-    // Spawn update check thread
-    CreateThread(NULL, 0, UpdateCheckProc, NULL, 0, NULL);
 
     // Enter the message loop
     MSG msg = {};
@@ -251,7 +187,7 @@ DWORD WINAPI GameThread( LPVOID lpParameter )
     auto init_res = pRenderer->Init(g_hWndGfx, Config::GetConfig().GetVideoSettings().bLimitFPS);
     if( FAILED(std::get<0>(init_res)) )
     {
-        wchar_t msg[1024] = {};
+        wchar_t msg[1<<10] = {};
         _snwprintf_s(msg, 1024, L"Fatal error initializing D3D12.\n%S failed with code 0x%x.", std::get<1>(init_res), std::get<0>(init_res));
         MessageBox( g_hWnd, msg, TEXT( "Error" ), MB_OK | MB_ICONEXCLAMATION );
         PostMessage( g_hWnd, WM_QUIT, 1, 0 );
@@ -266,12 +202,8 @@ DWORD WINAPI GameThread( LPVOID lpParameter )
     GameState::GameError ge;
 
     // Put the adapter in the window title
-    wchar_t buf[1024] = {};
-#ifdef __AVX2__
-    _snwprintf_s(buf, 1024, L"pfavizkhang-dx12 %S (AVX2 build, Device: %s)", __DATE__, pRenderer->GetAdapterName().c_str());
-#else
-    _snwprintf_s(buf, 1024, L"pfavizkhang-dx12 %S (SSE4.2 build, Device: %s)", __DATE__, pRenderer->GetAdapterName().c_str());
-#endif
+    wchar_t buf[1<<10] = {};
+    _snwprintf_s(buf, 1<<10, L"Piano-FX Pro | Made by: happy_mimimix | Ver 1.01 | Now playing: Splash MIDI");
     SetWindowTextW(g_hWnd, buf);
 
     // Event, logic, render...

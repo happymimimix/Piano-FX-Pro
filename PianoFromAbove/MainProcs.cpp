@@ -33,7 +33,7 @@ INT_PTR SetResolutionProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM) {
         GetWindowRect(g_hWndGfx, &rect);
         int width = rect.right - rect.left;
         int height = rect.bottom - rect.top;
-        char buf[1024] = {};
+        char buf[1<<10] = {};
 
         _snprintf_s(buf, sizeof(buf), "%d", width);
         SetWindowTextA(GetDlgItem(hwnd, IDC_WIDTH), buf);
@@ -46,11 +46,11 @@ INT_PTR SetResolutionProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM) {
         int iId = LOWORD(wparam);
         switch (iId) {
         case IDOK: {
-            char buf[1024] = {};
+            char buf[1<<10] = {};
             GetWindowTextA(GetDlgItem(hwnd, IDC_WIDTH), buf, sizeof(buf));
-            int width = max(MINWIDTH, min(atoi(buf), 65535));
+            int width = atoi(buf);
             GetWindowTextA(GetDlgItem(hwnd, IDC_HEIGHT), buf, sizeof(buf));
-            int height = max(MINHEIGHT, min(atoi(buf), 65535));
+            int height = atoi(buf);
 
             if (Config::GetConfig().GetViewSettings().GetControls()) {
                 RECT rcBarDlg;
@@ -101,12 +101,12 @@ LRESULT WINAPI WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                 {
                     return 0;
                 }
-                case ID_FILE_PRACTICESONG: case ID_FILE_PRACTICESONGCUSTOM:
+                case ID_FILE_PRACTICESONGCUSTOM:
                 {
                     CheckActivity( TRUE );
                     // Get the file(s) to add
                     OPENFILENAME ofn = {};
-                    TCHAR sFilename[1024] = { 0 };
+                    TCHAR sFilename[1<<10] = { 0 };
                     ofn.lStructSize = sizeof( OPENFILENAME );
                     ofn.hwndOwner = hWnd;
                     ofn.lpstrFilter = TEXT( "MIDI Files\0*.mid;*.xz\0" );
@@ -115,7 +115,7 @@ LRESULT WINAPI WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                     ofn.lpstrTitle = TEXT( "Please select a song to play" );
                     ofn.Flags = OFN_EXPLORER | OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
                     if ( GetOpenFileName( &ofn ) )
-                        PlayFile( sFilename, iId == ID_FILE_PRACTICESONGCUSTOM );
+                        PlayFile( sFilename, iId == ID_FILE_PRACTICESONGCUSTOM);
                     return 0;
                 }
                 case ID_FILE_CLOSEFILE:
@@ -124,12 +124,10 @@ LRESULT WINAPI WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                     cPlayback.SetPlayMode( GameState::Intro, true );
                     cPlayback.SetPlayable( false, true );
                     cPlayback.SetPosition( 0 );
-                    SetWindowText( g_hWnd, L"pfavizkhang-dx12 " __DATE__ );
+                    SetWindowText( g_hWnd, L"Piano-FX Pro | Made by: happy_mimimix | Ver 1.01 | Now playing: None");
                     HandOffMsg( WM_COMMAND, ID_CHANGESTATE, ( LPARAM )new IntroScreen( NULL, NULL ) );
                     return 0;
                 }
-                case ID_PRACTICE_DEFAULT:
-                case ID_PRACTICE_CUSTOM:
                 case ID_PLAY_PLAY:
                     if ( cPlayback.GetPlayMode() && iId == ID_PLAY_PLAY )
                         cPlayback.SetPaused( false, true );
@@ -162,7 +160,7 @@ LRESULT WINAPI WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                     cPlayback.SetNSpeed( cPlayback.GetNSpeed() * ( 1.0 + cControls.dSpeedUpPct / 100.0 ), true );
                     return 0;
                 case ID_PLAY_NRESET:
-                    cPlayback.SetNSpeed( 1.0, true );
+                    cPlayback.SetNSpeed( 0.25, true );
                     return 0;
                 case ID_PLAY_VOLUMEUP:
                     cPlayback.SetVolume( min( cPlayback.GetVolume() + 0.1, 1.0 ), true );
@@ -209,9 +207,6 @@ LRESULT WINAPI WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                 case ID_GAMEERROR:
                     MessageBoxW( hWnd, GameState::Errors[lParam].c_str(), L"Error", MB_OK | MB_ICONEXCLAMATION );
                     return 0;
-                case ID_UPDATE:
-                    ShellExecute(NULL, L"open", L"https://github.com/khang06/PianoFromAbove/releases", NULL, NULL, SW_SHOWNORMAL);
-                    return 0;
             }
             break;
         }
@@ -229,10 +224,8 @@ LRESULT WINAPI WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
         case WM_GETMINMAXINFO:
         {
             LPMINMAXINFO lpmmi = ( LPMINMAXINFO )lParam;
-            lpmmi->ptMinTrackSize.x = MINWIDTH;
-            lpmmi->ptMinTrackSize.y = MINHEIGHT;
-            lpmmi->ptMaxTrackSize.x = 65535;
-            lpmmi->ptMaxTrackSize.y = 65535;
+            lpmmi->ptMinTrackSize.x = 640;
+            lpmmi->ptMinTrackSize.y = 480;
             return 0;
         }
         case WM_SIZE:
@@ -942,7 +935,7 @@ INT_PTR WINAPI AboutProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM )
 
 VOID HandOffMsg( UINT msg, WPARAM wParam, LPARAM lParam )
 {
-    MSG msgGameThread = { g_hWndGfx, msg, wParam, lParam, 0, {0, 0} };
+    MSG msgGameThread = { g_hWndGfx, msg, wParam, lParam };
     g_MsgQueue.ForcePush( msgGameThread );
 }
 
@@ -1110,7 +1103,7 @@ INT_PTR LoadingProc(HWND hwnd, UINT msg, WPARAM, LPARAM) {
     }
     case WM_TIMER: {
         // lots of race conditions possible but hopefully nobody notices them
-        const char* desc = "placeholder";
+        const char* desc = "Loading...";
         switch (g_LoadingProgress.stage) {
         case MIDILoadingProgress::Stage::CopyToMem:
             desc = "Copying MIDI into memory...";
@@ -1137,7 +1130,7 @@ INT_PTR LoadingProc(HWND hwnd, UINT msg, WPARAM, LPARAM) {
 
         SetWindowTextA(GetDlgItem(hwnd, IDC_LOADINGDESC), desc);
 
-        char buf[1024];
+        char buf[1<<10];
         auto prog = g_LoadingProgress.progress.load();
         snprintf(buf, sizeof(buf), "%llu / %llu", prog, g_LoadingProgress.max);
         SetWindowTextA(GetDlgItem(hwnd, IDC_LOADINGNUM), buf);
@@ -1149,22 +1142,8 @@ INT_PTR LoadingProc(HWND hwnd, UINT msg, WPARAM, LPARAM) {
         SetWindowTextA(GetDlgItem(hwnd, IDC_MEMUSAGE), buf);
 
         auto bar = GetDlgItem(hwnd, IDC_LOADINGPROGRESS);
-        static bool marquee = false;
-        if (g_LoadingProgress.stage == MIDILoadingProgress::Stage::CopyToMem) {
-            if (!marquee) {
-                SetWindowLong(bar, GWL_STYLE, WS_CHILD | WS_VISIBLE | PBS_MARQUEE);
-                SendMessage(bar, PBM_SETMARQUEE, 1, 0);
-                marquee = true;
-            }
-        } else {
-            if (marquee) {
-                SetWindowLong(bar, GWL_STYLE, WS_CHILD | WS_VISIBLE);
-                SendMessage(bar, PBM_SETMARQUEE, 0, 0);
-            }
-            SendMessage(bar, PBM_SETRANGE32, 0, g_LoadingProgress.max);
-            SendMessage(bar, PBM_SETPOS, prog, 0);
-            SendMessage(bar, PBM_SETPOS, max(1, prog) - 1, 0); // Bypass progress bar interpolation
-        }
+        SendMessage(bar, PBM_SETRANGE32, 0, g_LoadingProgress.max);
+        SendMessage(bar, PBM_SETPOS, prog, 0);
         UpdateWindow(bar);
         return true;
     }
@@ -1182,6 +1161,7 @@ BOOL PlayFile( const wstring &sFile, bool bCustomSettings )
     const VisualSettings &cVisual = config.GetVisualSettings();
     PlaybackSettings &cPlayback = config.GetPlaybackSettings();
     ViewSettings &cView = config.GetViewSettings();
+    VizSettings& cViz = config.GetVizSettings();
 
     const GameState::State ePlayMode = GameState::Practice;
 
@@ -1225,7 +1205,15 @@ BOOL PlayFile( const wstring &sFile, bool bCustomSettings )
     cPlayback.SetPaused( ePlayMode != GameState::Practice, true );
     cPlayback.SetPosition( 0 );
     cView.SetZoomMove( false, true );
-    SetWindowText( g_hWnd, sFile.c_str() + ( sFile.find_last_of( L'\\' ) + 1 ) );
+    TCHAR sTitle[1<<10];
+    if (cViz.bDumpFrames) {
+        _stprintf_s(sTitle, TEXT("Piano-FX Pro | Made by: happy_mimimix | Ver 1.01 | Now rendering: %ws"), sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
+    }
+    else {
+        _stprintf_s(sTitle, TEXT("Piano-FX Pro | Made by: happy_mimimix | Ver 1.01 | Now playing: %ws"), sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
+    }
+    SetWindowText(g_hWnd, sTitle);
+
 
     // Switch game state
     HandOffMsg( WM_COMMAND, ID_CHANGESTATE, ( LPARAM )pGameState );

@@ -75,7 +75,7 @@ void Config::LoadConfigValues()
     LoadConfigValues( txRoot );
 
     // Custom settings need to be loaded from a separate file, otherwise stock PFA will reset them
-    doc = TiXmlDocument(sPath + "\\pfavizkhang.xml");
+    doc = TiXmlDocument(sPath + "\\ConfigAdvanced.xml");
     if (!doc.LoadFile())
         return;
 
@@ -92,7 +92,6 @@ void Config::LoadConfigValues( TiXmlElement *txRoot )
     m_AudioSettings.LoadConfigValues( txRoot );
     m_VideoSettings.LoadConfigValues( txRoot );
     m_ControlsSettings.LoadConfigValues( txRoot );
-    m_SongLibrary.LoadConfigValues( txRoot );
     m_PlaybackSettings.LoadConfigValues( txRoot );
     m_ViewSettings.LoadConfigValues( txRoot );
 }
@@ -125,7 +124,7 @@ bool Config::SaveConfigValues()
 
     m_VizSettings.SaveConfigValues(txRoot);
 
-    return bStockRet && doc.SaveFile(sPath + "\\pfavizkhang.xml");
+    return bStockRet && doc.SaveFile(sPath + "\\ConfigAdvanced.xml");
 }
 
 bool Config::SaveConfigValues( TiXmlElement *txRoot )
@@ -135,7 +134,6 @@ bool Config::SaveConfigValues( TiXmlElement *txRoot )
     bSaved &= m_AudioSettings.SaveConfigValues( txRoot );
     bSaved &= m_VideoSettings.SaveConfigValues( txRoot );
     bSaved &= m_ControlsSettings.SaveConfigValues( txRoot );
-    bSaved &= m_SongLibrary.SaveConfigValues( txRoot );
     bSaved &= m_PlaybackSettings.SaveConfigValues( txRoot );
     bSaved &= m_ViewSettings.SaveConfigValues( txRoot );
     return bSaved;
@@ -179,8 +177,8 @@ void VideoSettings::LoadDefaultValues()
 
 void ControlsSettings::LoadDefaultValues()
 {
-    this->dFwdBackSecs = 3.0;
-    this->dSpeedUpPct = 10.0;
+    this->dFwdBackSecs = 5;
+    this->dSpeedUpPct = 10;
 }
 
 void PlaybackSettings::LoadDefaultValues()
@@ -190,7 +188,7 @@ void PlaybackSettings::LoadDefaultValues()
     this->m_bPlayable = false;
     this->m_bPaused = true;
     this->m_dSpeed = 1.0;
-    this->m_dNSpeed = 1.0;
+    this->m_dNSpeed = 0.25;
     this->m_dVolume = 1.0;
 }
 
@@ -214,8 +212,8 @@ void ViewSettings::LoadDefaultValues()
 void VizSettings::LoadDefaultValues() {
     this->bTickBased = false;
     this->bShowMarkers = true;
-    this->eMarkerEncoding = MarkerEncoding::CP1252;
-    this->bNerdStats = false;
+    this->eMarkerEncoding = MarkerEncoding::CP437;
+    this->bPhigros = false;
     this->sSplashMIDI = L"";
     this->bVisualizePitchBends = false;
     this->bDumpFrames = false;
@@ -224,8 +222,6 @@ void VizSettings::LoadDefaultValues() {
     this->bColorLoop = false;
     this->bKDMAPI = true;
     this->bDisableUI = false;
-    this->fUIScale = 1.0f;
-    this->sUIFont = L"";
 }
 
 void AudioSettings::LoadMIDIDevices()
@@ -268,7 +264,7 @@ void VisualSettings::LoadConfigValues( TiXmlElement *txRoot )
         this->bAssociateFiles = ( iAttrVal != 0 );
 
     //Colors
-    int r, g, b = 0;
+    int r, g, b, a = 0;
     size_t i = 0;
     TiXmlElement *txColors = txVisual->FirstChildElement( "Colors" );
     if ( txColors )
@@ -277,15 +273,16 @@ void VisualSettings::LoadConfigValues( TiXmlElement *txRoot )
               txColor = txColor->NextSiblingElement( "Color" ), i++ )
             if ( txColor->QueryIntAttribute( "R", &r ) == TIXML_SUCCESS &&
                  txColor->QueryIntAttribute( "G", &g ) == TIXML_SUCCESS &&
-                 txColor->QueryIntAttribute( "B", &b ) == TIXML_SUCCESS )
-                this->colors[i] = ( ( r & 0xFF ) << 0 ) | ( ( g & 0xFF ) << 8 ) | ( ( b & 0xFF ) << 16 );
-    
+                 txColor->QueryIntAttribute( "B", &b ) == TIXML_SUCCESS &&
+                 txColor->QueryIntAttribute( "A", &a ) == TIXML_SUCCESS )
+                this->colors[i] = ( ( r & 0xFF ) << 0 ) | ( ( g & 0xFF ) << 8 ) | ( ( b & 0xFF ) << 16 ) | ( ( a & 0xFF ) << 24 );
     TiXmlElement *txBkgColor = txVisual->FirstChildElement( "BkgColor" );
     if ( txBkgColor )
         if ( txBkgColor->QueryIntAttribute( "R", &r ) == TIXML_SUCCESS &&
              txBkgColor->QueryIntAttribute( "G", &g ) == TIXML_SUCCESS &&
-             txBkgColor->QueryIntAttribute( "B", &b ) == TIXML_SUCCESS )
-            this->iBkgColor = ( ( r & 0xFF ) << 0 ) | ( ( g & 0xFF ) << 8 ) | ( ( b & 0xFF ) << 16 );
+             txBkgColor->QueryIntAttribute( "B", &b ) == TIXML_SUCCESS &&
+             txBkgColor->QueryIntAttribute( "A", &a ) == TIXML_SUCCESS )
+            this->iBkgColor = ( ( r & 0xFF ) << 0 ) | ( ( g & 0xFF ) << 8 ) | ( ( b & 0xFF ) << 16 ) | ( ( a & 0xFF ) << 24 );
 }
 
 void AudioSettings::LoadConfigValues( TiXmlElement *txRoot )
@@ -326,30 +323,6 @@ void ControlsSettings::LoadConfigValues( TiXmlElement *txRoot )
     txControls->QueryDoubleAttribute( "SpeedUpPct", &this->dSpeedUpPct );
 }
 
-void SongLibrary::LoadConfigValues(TiXmlElement* txRoot)
-{
-    TiXmlElement* txLibrary = txRoot->FirstChildElement("Library");
-    if (!txLibrary) return;
-
-    int iAttrVal;
-    if (txLibrary->QueryIntAttribute("AlwaysAdd", &iAttrVal) == TIXML_SUCCESS)
-        m_bAlwaysAdd = (iAttrVal != 0);
-    txLibrary->QueryIntAttribute("SortCol", &m_iSortCol);
-
-    TiXmlElement* txSources = txLibrary->FirstChildElement("Sources");
-    if (txSources)
-    {
-        m_mSources.clear();
-        int iSourceType;
-        string sSource;
-        for (TiXmlElement* txSource = txSources->FirstChildElement("Source"); txSource;
-            txSource = txSource->NextSiblingElement("Source"))
-            if (txSource->QueryStringAttribute("Name", &sSource) == TIXML_SUCCESS &&
-                txSource->QueryIntAttribute("Type", &iSourceType) == TIXML_SUCCESS)
-                AddSource(Util::StringToWstring(sSource), static_cast<Source>(iSourceType), false);
-    }
-}
-
 void PlaybackSettings::LoadConfigValues( TiXmlElement *txRoot )
 {
     TiXmlElement *txPlayback = txRoot->FirstChildElement( "Playback" );
@@ -359,8 +332,6 @@ void PlaybackSettings::LoadConfigValues( TiXmlElement *txRoot )
     if ( txPlayback->QueryIntAttribute( "Mute", &iAttrVal ) == TIXML_SUCCESS )
         m_bMute = ( iAttrVal != 0 );
     txPlayback->QueryDoubleAttribute( "NoteSpeed", &m_dNSpeed);
-    if (m_dNSpeed < 0.00001)
-        m_dNSpeed = 1.0;
     txPlayback->QueryDoubleAttribute( "Volume", &m_dVolume );
 }
 
@@ -399,7 +370,7 @@ void VizSettings::LoadConfigValues(TiXmlElement* txRoot) {
     if (txViz->QueryIntAttribute("ShowMarkers", &iAttrVal) == TIXML_SUCCESS)
         bShowMarkers = (iAttrVal != 0);
     if (txViz->QueryIntAttribute("NerdStats", &iAttrVal) == TIXML_SUCCESS)
-        bNerdStats = (iAttrVal != 0);
+        bPhigros = (iAttrVal != 0);
     if (txViz->QueryIntAttribute("VisualizePitchBends", &iAttrVal) == TIXML_SUCCESS)
         bVisualizePitchBends = (iAttrVal != 0);
     if (txViz->QueryIntAttribute("DumpFrames", &iAttrVal) == TIXML_SUCCESS)
@@ -418,20 +389,15 @@ void VizSettings::LoadConfigValues(TiXmlElement* txRoot) {
     sBackground = Util::StringToWstring(sTempStr);
     txViz->QueryIntAttribute("MarkerEncoding", (int*)&eMarkerEncoding);
     eMarkerEncoding = max(MarkerEncoding::CP1252, min(eMarkerEncoding, MarkerEncoding::UTF8));
-    txViz->QueryFloatAttribute("UIScale", &fUIScale);
-    fUIScale = max(0.1f, min(fUIScale, 10.0f));
-    if (std::isnan(fUIScale))
-        fUIScale = 1.0f;
-    txViz->QueryStringAttribute("UIFont", &sTempStr);
-    sUIFont = Util::StringToWstring(sTempStr);
 
-    int r, g, b = 0;
+    int r, g, b, a = 0;
     TiXmlElement* txBarColor = txViz->FirstChildElement("BarColor");
     if (txBarColor)
         if (txBarColor->QueryIntAttribute("R", &r) == TIXML_SUCCESS &&
             txBarColor->QueryIntAttribute("G", &g) == TIXML_SUCCESS &&
-            txBarColor->QueryIntAttribute("B", &b) == TIXML_SUCCESS)
-            iBarColor = ((r & 0xFF) << 0) | ((g & 0xFF) << 8) | ((b & 0xFF) << 16);
+            txBarColor->QueryIntAttribute("B", &b) == TIXML_SUCCESS &&
+            txBarColor->QueryIntAttribute("A", &a) == TIXML_SUCCESS)
+            iBarColor = ((r & 0xFF) << 0) | ((g & 0xFF) << 8) | ((b & 0xFF) << 16) | ((a & 0xFF) << 24);
 }
 
 //-----------------------------------------------------------------------------
@@ -457,6 +423,7 @@ bool VisualSettings::SaveConfigValues( TiXmlElement *txRoot )
         txColor->SetAttribute( "R", ( this->colors[i] >>  0 ) & 0xFF );
         txColor->SetAttribute( "G", ( this->colors[i] >>  8 ) & 0xFF );
         txColor->SetAttribute( "B", ( this->colors[i] >> 16 ) & 0xFF );
+        txColor->SetAttribute( "A", ( this->colors[i] >> 24 ) & 0xFF );
     }
 
     TiXmlElement *txBkgColor = new TiXmlElement( "BkgColor" );
@@ -464,6 +431,7 @@ bool VisualSettings::SaveConfigValues( TiXmlElement *txRoot )
     txBkgColor->SetAttribute( "R", ( this->iBkgColor >>  0 ) & 0xFF );
     txBkgColor->SetAttribute( "G", ( this->iBkgColor >>  8 ) & 0xFF );
     txBkgColor->SetAttribute( "B", ( this->iBkgColor >> 16 ) & 0xFF );
+    txBkgColor->SetAttribute( "A", ( this->iBkgColor >> 24 ) & 0xFF );
 
     return true;
 }
@@ -498,25 +466,6 @@ bool ControlsSettings::SaveConfigValues( TiXmlElement *txRoot )
     return true;
 }
 
-bool SongLibrary::SaveConfigValues(TiXmlElement* txRoot)
-{
-    TiXmlElement* txLibrary = new TiXmlElement("Library");
-    txRoot->LinkEndChild(txLibrary);
-    txLibrary->SetAttribute("AlwaysAdd", m_bAlwaysAdd);
-    txLibrary->SetAttribute("SortCol", m_iSortCol);
-
-    TiXmlElement* txSources = new TiXmlElement("Sources");
-    txLibrary->LinkEndChild(txSources);
-    for (map< wstring, Source >::const_iterator it = m_mSources.begin(); it != m_mSources.end(); ++it)
-    {
-        TiXmlElement* txSource = new TiXmlElement("Source");
-        txSources->LinkEndChild(txSource);
-        txSource->SetAttribute("Name", Util::WstringToString(it->first));
-        txSource->SetAttribute("Type", it->second);
-    }
-    return true;
-}
-
 bool PlaybackSettings::SaveConfigValues( TiXmlElement *txRoot )
 {
     TiXmlElement *txPlayback = new TiXmlElement( "Playback" );
@@ -531,7 +480,6 @@ bool ViewSettings::SaveConfigValues( TiXmlElement *txRoot )
 {
     TiXmlElement *txView = new TiXmlElement( "View" );
     txRoot->LinkEndChild( txView );
-    txView->SetAttribute("Library", m_bLibrary);
     txView->SetAttribute( "Controls", m_bControls );
     txView->SetAttribute( "Keyboard", m_bKeyboard );
     txView->SetAttribute( "OnTop", m_bOnTop );
@@ -552,7 +500,7 @@ bool VizSettings::SaveConfigValues(TiXmlElement* txRoot) {
     txViz->SetAttribute("TickBased", bTickBased);
     txViz->SetAttribute("ShowMarkers", bShowMarkers);
     txViz->SetAttribute("MarkerEncoding", eMarkerEncoding);
-    txViz->SetAttribute("NerdStats", bNerdStats);
+    txViz->SetAttribute("NerdStats", bPhigros);
     txViz->SetAttribute("SplashMIDI", Util::WstringToString(sSplashMIDI));
     txViz->SetAttribute("VisualizePitchBends", bVisualizePitchBends);
     txViz->SetAttribute("DumpFrames", bDumpFrames);
@@ -560,21 +508,12 @@ bool VizSettings::SaveConfigValues(TiXmlElement* txRoot) {
     txViz->SetAttribute("ColorLoop", bColorLoop);
     txViz->SetAttribute("KDMAPI", bKDMAPI);
     txViz->SetAttribute("DisableUI", bDisableUI);
-    txViz->SetAttribute("UIScale", fUIScale);
-    txViz->SetAttribute("UIFont", Util::WstringToString(sUIFont));
 
     TiXmlElement* txBarColor = new TiXmlElement("BarColor");
     txViz->LinkEndChild(txBarColor);
     txBarColor->SetAttribute("R", (iBarColor >> 0) & 0xFF);
     txBarColor->SetAttribute("G", (iBarColor >> 8) & 0xFF);
     txBarColor->SetAttribute("B", (iBarColor >> 16) & 0xFF);
+    txBarColor->SetAttribute("A", (iBarColor >> 24) & 0xFF);
     return true;
-}
-
-// Library stubs
-
-int SongLibrary::AddSource(const wstring& sSource, Source eSource, bool)
-{
-    m_mSources[sSource] = eSource;
-    return 1;
 }

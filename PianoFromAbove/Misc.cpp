@@ -176,7 +176,7 @@ unsigned Util::RandColor()
 {
     int R, G, B;
     HSVtoRGB( rand() % 360, rand() % 40 + 60, rand() % 20 + 80, R, G, B );
-    return ( B << 16 ) | ( G << 8 ) | R;
+    return (0x00 << 24) | ( B << 16 ) | ( G << 8 ) | R;
 }
 
 void Util::RGBtoHSV( int R, int G, int B, int &H, int &S, int &V )
@@ -246,13 +246,4 @@ void Util::HSVtoRGB( int H, int S, int V, int &R, int &G, int &B )
     R = static_cast< int >( ( dR1 + m ) * 255.0 + 0.5 );
     G = static_cast< int >( ( dG1 + m ) * 255.0 + 0.5 );
     B = static_cast< int >( ( dB1 + m ) * 255.0 + 0.5 );
-}
-
-void Util::CommaPrintf( TCHAR buf[32], int iVal )
-{
-    int iAbsVal = abs( iVal );
-    if ( iAbsVal < 1000 ) _stprintf_s( buf, 32, TEXT( "%d" ), iVal );
-    else if ( iAbsVal < 1000000 ) _stprintf_s( buf, 32, TEXT( "%d,%03d" ), iVal / 1000, iAbsVal % 1000 );
-    else if ( iAbsVal < 1000000000 ) _stprintf_s( buf, 32, TEXT( "%d,%03d,%03d" ), iVal / 1000000, ( iAbsVal / 1000 ) % 1000, iAbsVal % 1000 );
-    else _stprintf_s( buf, 32, TEXT( "%d,%03d,%03d,%03d" ), iVal / 1000000000, ( iAbsVal / 1000000 ) % 1000, ( iAbsVal / 1000 ) % 1000, iAbsVal % 1000 );
 }

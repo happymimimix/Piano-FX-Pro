@@ -89,10 +89,6 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
             //return std::make_tuple(res, "D3D12CreateDevice");
         break;
     }
-    if (m_pDevice == nullptr) {
-        MessageBoxW(NULL, L"Couldn't find a suitable D3D12 device.", L"DirectX Error", MB_ICONERROR);
-        exit(1);
-    }
 
 #ifdef _DEBUG
     // Break on errors
@@ -626,8 +622,22 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     auto imgui_heap = m_pImGuiSRVDescriptorHeap.Get();
     ImGui::CreateContext();
 
-    // Update ImGui settings
-    UpdateImGuiSettings();
+    // Set up font and disable imgui.ini
+    ImGuiIO& io = ImGui::GetIO();
+    ImFontConfig font_config = {};
+    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 16.0f, &font_config, io.Fonts->GetGlyphRangesDefault());
+    font_config.MergeMode = true;
+    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 16.0f, &font_config, io.Fonts->GetGlyphRangesJapanese());
+    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 16.0f, &font_config, io.Fonts->GetGlyphRangesKorean());
+    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 16.0f, &font_config, io.Fonts->GetGlyphRangesChineseFull());
+    io.Fonts->Build();
+
+    // Theme tweaks
+    auto& style = ImGui::GetStyle();
+    style.WindowMinSize = ImVec2(1, 1);
+    style.WindowBorderSize = 0.0f;
+    style.WindowPadding = ImVec2(6, 6);
+    style.Colors[ImGuiCol_WindowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.50f);
 
     ImGui_ImplWin32_Init(hWnd);
     ImGui_ImplDX12_Init(m_pDevice.Get(), FrameCount, DXGI_FORMAT_B8G8R8A8_UNORM, imgui_heap, imgui_heap->GetCPUDescriptorHandleForHeapStart(), imgui_heap->GetGPUDescriptorHandleForHeapStart());
@@ -1369,53 +1379,4 @@ bool D3D12Renderer::UploadBackgroundBitmap() {
     WaitForGPU();
 
     return true;
-}
-
-void D3D12Renderer::ImGuiStartFrame()
-{
-    const auto& viz = Config::GetConfig().GetVizSettings();
-    if (m_fLastUIScale != viz.fUIScale || m_sLastFont != viz.sUIFont)
-        UpdateImGuiSettings();
-    ImGui_ImplDX12_NewFrame();
-    ImGui_ImplWin32_NewFrame();
-    ImGui::NewFrame();
-}
-
-void D3D12Renderer::UpdateImGuiSettings() {
-    const auto& viz = Config::GetConfig().GetVizSettings();
-    float scale = viz.fUIScale;
-    m_fLastUIScale = scale;
-    m_sLastFont = viz.sUIFont;
-
-    // Get the fonts directory
-    char fonts_dir[MAX_PATH];
-    if (FAILED(SHGetFolderPathA(NULL, CSIDL_FONTS, NULL, SHGFP_TYPE_CURRENT, fonts_dir)))
-        strcpy_s(fonts_dir, "C:\\Windows\\Fonts");
-
-    // Set up font and disable imgui.ini
-    auto& io = ImGui::GetIO();
-    io.Fonts->Clear();
-    ImFontConfig font_config = {};
-    if (!viz.sUIFont.empty()) {
-        io.Fonts->AddFontFromFileTTF(Util::WstringToString(viz.sUIFont), 14.0f * scale, &font_config, io.Fonts->GetGlyphRangesDefault());
-    } else {
-        font_config.FontNo = 0; // TAHOMA!
-        io.Fonts->AddFontFromFileTTF((std::string(fonts_dir) + "\\Tahoma.ttf").c_str(), 14.0f * scale, &font_config, io.Fonts->GetGlyphRangesDefault());
-        font_config.FontNo = 1; // MS UI Gothic
-        font_config.MergeMode = true;
-        io.Fonts->AddFontFromFileTTF((std::string(fonts_dir) + "\\msgothic.ttc").c_str(), 14.0f * scale, &font_config, io.Fonts->GetGlyphRangesJapanese());
-    }
-    io.IniFilename = nullptr;
-    if (!io.Fonts->Build()) {
-        io.Fonts->Clear();
-        io.Fonts->AddFontDefault();
-    }
-    ImGui_ImplDX12_CreateDeviceObjects();
-
-    // Theme tweaks
-    auto& style = ImGui::GetStyle();
-    style.WindowMinSize = ImVec2(1, 1);
-    style.WindowBorderSize = 0.0f;
-    style.WindowPadding = ImVec2(6 * scale, 6 * scale);
-    style.Colors[ImGuiCol_WindowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.50f);
 }
