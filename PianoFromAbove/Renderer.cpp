@@ -631,6 +631,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 16.0f, &font_config, io.Fonts->GetGlyphRangesKorean());
     io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 16.0f, &font_config, io.Fonts->GetGlyphRangesChineseFull());
     io.Fonts->Build();
+    io.IniFilename = nullptr;
 
     // Theme tweaks
     auto& style = ImGui::GetStyle();
