@@ -2145,10 +2145,13 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
         }
         });
 
-    std::string llStartTimeFormatted = std::to_string(m_llStartTime);
+    std::string llStartTimeFormatted = std::to_string(abs(m_llStartTime));
 
     for (int i = llStartTimeFormatted.length() - 3; i > 0; i -= 3)
         llStartTimeFormatted.insert(i, " ");
+
+    if (m_llStartTime < 0)
+        llStartTimeFormatted.insert(0, "-");
 
     long long polyphony = m_llPolyphony.load();
 
