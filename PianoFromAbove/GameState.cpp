@@ -2062,7 +2062,7 @@ void MainScreen::RenderText()
     Config& config = Config::GetConfig();
     VizSettings viz = config.GetVizSettings();
 
-    int Lines = 11;
+    int Lines = 10;
     if (m_bDebug) Lines += 9;
     if (viz.bPhigros) Lines += 4;
     if (m_Timer.m_bManualTimer && !m_bDebug) Lines += 1;
@@ -2179,7 +2179,6 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
         min, sec, cs,
         tmin, tsec, tcs);
     RenderStatusLine(cur_line++, "Tick:", "%d/%d", m_iStartTick, mInfo.iDivision);
-    RenderStatusLine(cur_line++, "Measure:", "%d", m_iStartTick/(mInfo.iDivision*4));
     if (m_bDebug) RenderStatusLine(cur_line++, "Microseconds:", llStartTimeFormatted.c_str());
     RenderStatusLine(cur_line++, "FPS:", "%.2lf", m_dFPS);
     RenderStatusLine(cur_line++, "Tempo:", "%.3lf bpm", tempo);
