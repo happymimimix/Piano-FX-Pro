@@ -630,6 +630,10 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 16.0f, &font_config, io.Fonts->GetGlyphRangesJapanese());
     io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 16.0f, &font_config, io.Fonts->GetGlyphRangesKorean());
     io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 16.0f, &font_config, io.Fonts->GetGlyphRangesChineseFull());
+    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 16.0f, &font_config, io.Fonts->GetGlyphRangesVietnamese());
+    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 16.0f, &font_config, io.Fonts->GetGlyphRangesThai());
+    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 16.0f, &font_config, io.Fonts->GetGlyphRangesGreek());
+    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 16.0f, &font_config, io.Fonts->GetGlyphRangesCyrillic());
     io.Fonts->Build();
     io.IniFilename = nullptr;
 
@@ -1029,11 +1033,9 @@ HRESULT D3D12Renderer::EndScene(bool draw_bg) {
     }
 
     // Draw ImGui
-    if (!Config::GetConfig().GetVizSettings().bDisableUI) {
-        ID3D12DescriptorHeap* heaps[] = { m_pImGuiSRVDescriptorHeap.Get() };
-        m_pCommandList->SetDescriptorHeaps(_countof(heaps), heaps);
-        ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), m_pCommandList.Get());
-    }
+    ID3D12DescriptorHeap* heaps[] = { m_pImGuiSRVDescriptorHeap.Get() };
+    m_pCommandList->SetDescriptorHeaps(_countof(heaps), heaps);
+    ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), m_pCommandList.Get());
 
     // Transition backbuffer state to present
     auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_pRenderTargets[m_uFrameIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
@@ -1137,11 +1139,6 @@ HRESULT D3D12Renderer::DrawSkew(float x1, float y1, float x2, float y2, float x3
         {x3, y3, c3},
         {x4, y4, c4},
     });
-    return S_OK;
-}
-
-HRESULT D3D12Renderer::RenderBatch(bool) {
-    // TODO
     return S_OK;
 }
 

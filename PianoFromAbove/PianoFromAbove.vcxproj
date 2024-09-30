@@ -405,7 +405,7 @@
     <ClCompile Include="tinyxml\tinyxmlparser.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\FunkyStars.mid" />
+    <None Include="Images\chase.mid.xz" />
     <None Include="Images\PFA Icon.ico" />
     <None Include="Images\mediaiconssmall.bmp" />
     <None Include="common.hlsli" />

@@ -107,7 +107,7 @@ private:
     MIDIOutDevice m_OutDevice;
 
     static const float SharpRatio;
-    static const long long TimeSpan = 3000000;
+    static const long long TimeSpan = 500000;
     vector<TrackSettings> m_vTrackSettings;
 
     // Computed in RenderGlobal

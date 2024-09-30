@@ -20,11 +20,11 @@
 #include "GameState.h"
 #include "MainProcs.h"
 
-#define APPNAME "Piano From Above"
-#define APPNAMENOSPACES "PianoFromAbove"
-#define CLASSNAME  TEXT( "PianoFromAbove" )
-#define GFXCLASSNAME  TEXT( "PianoFromAboveGfx" )
-#define POSNCLASSNAME  TEXT( "PianoFromAbovePosCtrl" )
+#define APPNAME "Piano-FX Pro"
+#define APPNAMENOSPACES "PFX"
+#define CLASSNAME  TEXT( "PFX" )
+#define GFXCLASSNAME  TEXT( "PFXGFX" )
+#define POSNCLASSNAME  TEXT( "PFXPOSN" )
 
 class ISettings;
 class Config;

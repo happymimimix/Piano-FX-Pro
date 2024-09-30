@@ -244,7 +244,7 @@ MIDI::MIDI ( const wstring &sFilename )
 
         // Go to the beginning of the file to prepare for parsing
         if (_fseeki64(stream, 0, SEEK_SET)) {
-            MessageBoxA(NULL, "_fseeki64 encountered an error.", "Piano From Above", MB_OK | MB_ICONERROR);
+            MessageBoxA(NULL, "_fseeki64 encountered an error.", "Piano-FX Pro", MB_OK | MB_ICONERROR);
             //return;
         }
 
@@ -272,7 +272,7 @@ MIDI::MIDI ( const wstring &sFilename )
             do {
                 // Position sanity check
                 if (pos < LZMA_STREAM_HEADER_SIZE * 2) {
-                    MessageBoxA(NULL, "Position sanity check failed. Corrupted file?", "Piano From Above", MB_OK | MB_ICONERROR);
+                    MessageBoxA(NULL, "Position sanity check failed. Corrupted file?", "Piano-FX Pro", MB_OK | MB_ICONERROR);
                     lzma_index_end(index, NULL);
                     delete[] pcMemBlock;
                     return;
@@ -283,7 +283,7 @@ MIDI::MIDI ( const wstring &sFilename )
                 uint64_t footer_pos;
                 while (true) {
                     if (pos < LZMA_STREAM_HEADER_SIZE) {
-                        MessageBoxA(NULL, "Locating stream footer failed. Corrupted file?", "Piano From Above", MB_OK | MB_ICONERROR);
+                        MessageBoxA(NULL, "Locating stream footer failed. Corrupted file?", "Piano-FX Pro", MB_OK | MB_ICONERROR);
                         lzma_index_end(index, NULL);
                         delete[] pcMemBlock;
                         return;
@@ -302,13 +302,13 @@ MIDI::MIDI ( const wstring &sFilename )
                 ret = lzma_stream_footer_decode(&stream_flags, &compressed[footer_pos]);
                 if (ret != LZMA_OK) {
                     snprintf(err, sizeof(err) - 1, "Decoding stream footer failed: %d\nCorrupt file?", ret);
-                    MessageBoxA(NULL, err, "Piano From Above", MB_OK | MB_ICONERROR);
+                    MessageBoxA(NULL, err, "Piano-FX Pro", MB_OK | MB_ICONERROR);
                     lzma_index_end(index, NULL);
                     delete[] pcMemBlock;
                     return;
                 }
                 if ((lzma_vli)pos < stream_flags.backward_size + LZMA_STREAM_HEADER_SIZE) {
-                    MessageBoxA(NULL, "Stream footer position sanity check failed. Corrupted file?", "Piano From Above", MB_OK | MB_ICONERROR);
+                    MessageBoxA(NULL, "Stream footer position sanity check failed. Corrupted file?", "Piano-FX Pro", MB_OK | MB_ICONERROR);
                     lzma_index_end(index, NULL);
                     delete[] pcMemBlock;
                     return;
@@ -323,14 +323,14 @@ MIDI::MIDI ( const wstring &sFilename )
                 ret = lzma_code(&strm, LZMA_RUN);
                 if (ret != LZMA_STREAM_END) {
                     snprintf(err, sizeof(err) - 1, "Index decode failed: %d\nCorrupt file?", ret);
-                    MessageBoxA(NULL, err, "Piano From Above", MB_OK | MB_ICONERROR);
+                    MessageBoxA(NULL, err, "Piano-FX Pro", MB_OK | MB_ICONERROR);
                     lzma_index_end(index, NULL);
                     delete[] pcMemBlock;
                     return;
                 }
                 pos -= stream_flags.backward_size + LZMA_STREAM_HEADER_SIZE;
                 if ((lzma_vli)pos < lzma_index_total_size(index)) {
-                    MessageBoxA(NULL, "Index position sanity check failed. Corrupted file?", "Piano From Above", MB_OK | MB_ICONERROR);
+                    MessageBoxA(NULL, "Index position sanity check failed. Corrupted file?", "Piano-FX Pro", MB_OK | MB_ICONERROR);
                     lzma_index_end(index, NULL);
                     delete[] pcMemBlock;
                     return;
@@ -372,13 +372,13 @@ MIDI::MIDI ( const wstring &sFilename )
                 case LZMA_OK:
                     break;
                 case LZMA_MEM_ERROR:
-                    MessageBoxA(NULL, "Ran out of memory while decompressing.", "Piano From Above", MB_OK | MB_ICONERROR);
+                    MessageBoxA(NULL, "Ran out of memory while decompressing.", "Piano-FX Pro", MB_OK | MB_ICONERROR);
                     delete[] compressed;
                     delete[] pcMemBlock;
                     return;
                 default:
                     snprintf(err, sizeof(err) - 1, "An error occurred while decompressing: %d\nCorrupt file?", ret);
-                    MessageBoxA(NULL, err, "Piano From Above", MB_OK | MB_ICONERROR);
+                    MessageBoxA(NULL, err, "Piano-FX Pro", MB_OK | MB_ICONERROR);
                     delete[] compressed;
                     delete[] pcMemBlock;
                     return;

@@ -1120,9 +1120,6 @@ INT_PTR LoadingProc(HWND hwnd, UINT msg, WPARAM, LPARAM) {
         case MIDILoadingProgress::Stage::SortEvents:
             desc = "Sorting events...";
             break;
-        case MIDILoadingProgress::Stage::Finalize:
-            desc = "Finalizing...";
-            break;
         case MIDILoadingProgress::Stage::Done:
             EndDialog(hwnd, 0);
             return true;
