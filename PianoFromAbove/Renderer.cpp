@@ -625,15 +625,15 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     // Set up font and disable imgui.ini
     ImGuiIO& io = ImGui::GetIO();
     ImFontConfig font_config = {};
-    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 16.0f, &font_config, io.Fonts->GetGlyphRangesDefault());
+    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1<<5, &font_config, io.Fonts->GetGlyphRangesDefault());
     font_config.MergeMode = true;
-    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 16.0f, &font_config, io.Fonts->GetGlyphRangesJapanese());
-    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 16.0f, &font_config, io.Fonts->GetGlyphRangesKorean());
-    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 16.0f, &font_config, io.Fonts->GetGlyphRangesChineseFull());
-    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 16.0f, &font_config, io.Fonts->GetGlyphRangesVietnamese());
-    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 16.0f, &font_config, io.Fonts->GetGlyphRangesThai());
-    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 16.0f, &font_config, io.Fonts->GetGlyphRangesGreek());
-    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 16.0f, &font_config, io.Fonts->GetGlyphRangesCyrillic());
+    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1<<5, &font_config, io.Fonts->GetGlyphRangesJapanese());
+    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1<<5, &font_config, io.Fonts->GetGlyphRangesKorean());
+    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1<<5, &font_config, io.Fonts->GetGlyphRangesChineseFull());
+    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1<<5, &font_config, io.Fonts->GetGlyphRangesVietnamese());
+    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1<<5, &font_config, io.Fonts->GetGlyphRangesThai());
+    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1<<5, &font_config, io.Fonts->GetGlyphRangesGreek());
+    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1<<5, &font_config, io.Fonts->GetGlyphRangesCyrillic());
     io.Fonts->Build();
     io.IniFilename = nullptr;
 

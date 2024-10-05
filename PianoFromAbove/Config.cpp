@@ -147,7 +147,6 @@ void VisualSettings::LoadDefaultValues()
 {
     this->eKeysShown = All;
     this->bAlwaysShowControls = false;
-    this->bAssociateFiles = false;
     this->iFirstKey = 0;
     this->iLastKey = 127;
 
@@ -172,7 +171,6 @@ void VideoSettings::LoadDefaultValues()
 {
     this->bLimitFPS = true;
     this->bShowFPS = false;
-    this->eRenderer = Direct3D;
 }
 
 void ControlsSettings::LoadDefaultValues()
@@ -194,7 +192,6 @@ void PlaybackSettings::LoadDefaultValues()
 
 void ViewSettings::LoadDefaultValues()
 {
-    this->m_bLibrary = true;
     this->m_bControls = true;
     this->m_bKeyboard = true;
     this->m_bOnTop = false;
@@ -206,7 +203,6 @@ void ViewSettings::LoadDefaultValues()
     this->m_iMainTop = CW_USEDEFAULT;
     this->m_iMainWidth = 960;
     this->m_iMainHeight = 589;
-    this->m_iLibWidth = 0;
 }
 
 void VizSettings::LoadDefaultValues() {
@@ -260,8 +256,8 @@ void VisualSettings::LoadConfigValues( TiXmlElement *txRoot )
         this->eKeysShown = static_cast< KeysShown >( iAttrVal );
     if ( txVisual->QueryIntAttribute( "AlwaysShowControls", &iAttrVal ) == TIXML_SUCCESS )
         this->bAlwaysShowControls = ( iAttrVal != 0 );
-    if ( txVisual->QueryIntAttribute( "AssociateFiles", &iAttrVal ) == TIXML_SUCCESS )
-        this->bAssociateFiles = ( iAttrVal != 0 );
+    txVisual->QueryIntAttribute("FirstKey", &iFirstKey);
+    txVisual->QueryIntAttribute("LastKey", &iLastKey);
 
     //Colors
     int r, g, b, a = 0;
@@ -310,8 +306,6 @@ void VideoSettings::LoadConfigValues( TiXmlElement *txRoot )
         this->bShowFPS = ( iAttrVal != 0 );
     if ( txVideo->QueryIntAttribute( "LimitFPS", &iAttrVal ) == TIXML_SUCCESS )
         this->bLimitFPS = ( iAttrVal != 0 );
-    if ( txVideo->QueryIntAttribute( "Renderer", &iAttrVal ) == TIXML_SUCCESS )
-        this->eRenderer = static_cast< Renderer >( iAttrVal );
 }
 
 void ControlsSettings::LoadConfigValues( TiXmlElement *txRoot )
@@ -341,8 +335,6 @@ void ViewSettings::LoadConfigValues( TiXmlElement *txRoot )
     if ( !txView ) return;
 
     int iAttrVal;
-    if (txView->QueryIntAttribute("Library", &iAttrVal) == TIXML_SUCCESS)
-        m_bLibrary = (iAttrVal != 0);
     if ( txView->QueryIntAttribute( "Controls", &iAttrVal ) == TIXML_SUCCESS )
         m_bControls = ( iAttrVal != 0 );
     if ( txView->QueryIntAttribute( "Keyboard", &iAttrVal ) == TIXML_SUCCESS )
@@ -356,7 +348,6 @@ void ViewSettings::LoadConfigValues( TiXmlElement *txRoot )
     txView->QueryIntAttribute( "MainTop", &m_iMainTop );
     txView->QueryIntAttribute( "MainWidth", &m_iMainWidth );
     txView->QueryIntAttribute( "MainHeight", &m_iMainHeight );
-    txView->QueryIntAttribute( "LibWidth", &m_iLibWidth );
 }
 
 void VizSettings::LoadConfigValues(TiXmlElement* txRoot) {
@@ -410,7 +401,6 @@ bool VisualSettings::SaveConfigValues( TiXmlElement *txRoot )
     txRoot->LinkEndChild( txVisual );
     txVisual->SetAttribute( "KeysShown", this->eKeysShown );
     txVisual->SetAttribute( "AlwaysShowControls", this->bAlwaysShowControls );
-    txVisual->SetAttribute( "AssociateFiles", this->bAssociateFiles );
     txVisual->SetAttribute( "FirstKey", this->iFirstKey );
     txVisual->SetAttribute( "LastKey", this->iLastKey );
 
@@ -451,7 +441,6 @@ bool VideoSettings::SaveConfigValues( TiXmlElement *txRoot )
 {
     TiXmlElement *txVideo = new TiXmlElement( "Video" );
     txRoot->LinkEndChild( txVideo );
-    txVideo->SetAttribute( "Renderer", this->eRenderer );
     txVideo->SetAttribute( "ShowFPS", this->bShowFPS );
     txVideo->SetAttribute( "LimitFPS", this->bLimitFPS );
     return true;
@@ -490,7 +479,6 @@ bool ViewSettings::SaveConfigValues( TiXmlElement *txRoot )
     txView->SetAttribute( "MainTop", m_iMainTop );
     txView->SetAttribute( "MainWidth", m_iMainWidth );
     txView->SetAttribute( "MainHeight", m_iMainHeight );
-    txView->SetAttribute( "LibWidth", m_iLibWidth );
     return true;
 }
 

@@ -46,7 +46,7 @@ struct VisualSettings : public ISettings
 
     enum KeysShown { All, Song, Custom } eKeysShown;
     int iFirstKey, iLastKey;
-    bool bAlwaysShowControls, bAssociateFiles;
+    bool bAlwaysShowControls;
     unsigned int colors[16], iBkgColor;
 };
 
@@ -68,7 +68,6 @@ struct VideoSettings : public ISettings
     void LoadConfigValues( TiXmlElement *txRoot );
     bool SaveConfigValues( TiXmlElement *txRoot );
 
-    enum Renderer { Direct3D, OpenGL, GDI } eRenderer;
     bool bShowFPS, bLimitFPS;
 };
 
@@ -136,7 +135,6 @@ public:
     void SetOffsetX( float fOffsetX ) { m_fOffsetX = fOffsetX; }
     void SetOffsetY( float fOffsetY ) { m_fOffsetY = fOffsetY; }
     void SetZoomX( float fZoomX ) { m_fZoomX = fZoomX; }
-    void SetLibWidth( int iLibWidth ) { m_iLibWidth = iLibWidth; }
     void SetControls( bool bControls, bool bUpdateGUI = false ) { m_bControls = bControls; if ( bUpdateGUI ) ::ShowControls( bControls ); }
     void SetKeyboard( bool bKeyboard, bool bUpdateGUI = false ) { m_bKeyboard = bKeyboard; if ( bUpdateGUI ) ::ShowKeyboard( bKeyboard ); }
     void SetOnTop( bool bOnTop, bool bUpdateGUI = false ) { m_bOnTop = bOnTop; if ( bUpdateGUI ) ::SetOnTop( bOnTop ); }
@@ -147,7 +145,6 @@ public:
     int GetMainTop() const { return m_iMainTop == -32000 ? CW_USEDEFAULT : m_iMainTop; }
     int GetMainWidth() const { return m_iMainWidth; }
     int GetMainHeight() const { return m_iMainHeight; }
-    int GetLibWidth() const { return m_iLibWidth; }
     float GetOffsetX() const { return m_fOffsetX; }
     float GetOffsetY() const { return m_fOffsetY; }
     float GetZoomX() const { return m_fZoomX; }
@@ -158,9 +155,9 @@ public:
     bool GetZoomMove() const { return m_bZoomMove; }
 
 private:
-    bool m_bLibrary, m_bControls, m_bKeyboard, m_bOnTop, m_bFullScreen, m_bZoomMove;
+    bool m_bControls, m_bKeyboard, m_bOnTop, m_bFullScreen, m_bZoomMove;
     float m_fOffsetX, m_fOffsetY, m_fZoomX;
-    int m_iMainLeft, m_iMainTop, m_iMainWidth, m_iMainHeight, m_iLibWidth;
+    int m_iMainLeft, m_iMainTop, m_iMainWidth, m_iMainHeight;
 };
 
 struct VizSettings : public ISettings {
@@ -212,7 +209,6 @@ public:
     void SetControlsSettings(const ControlsSettings &ControlsSettings) { m_ControlsSettings = ControlsSettings; }
     void SetVizSettings(const VizSettings& VizSettings) { m_VizSettings = VizSettings; }
 
-    // i really need to start writting getters and setters
     bool m_bManualTimer = false;
     bool m_bPianoOverride = false;
 

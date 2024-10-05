@@ -118,7 +118,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
     }
 
     // Create the application window
-    g_hWnd = CreateWindowEx( 0, CLASSNAME, L"Piano-FX Pro | Made by: happy_mimimix | Ver 1.05 | Now playing: None", WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, cView.GetMainLeft(), cView.GetMainTop(),
+    g_hWnd = CreateWindowEx( 0, CLASSNAME, L"Piano-FX Pro | Made by: happy_mimimix | Ver 1.06 | Now playing: None", WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, cView.GetMainLeft(), cView.GetMainTop(),
                              cView.GetMainWidth(), cView.GetMainHeight(), NULL, NULL, wc.hInstance, NULL );
     if ( !g_hWnd ) return 1;
 
@@ -203,7 +203,7 @@ DWORD WINAPI GameThread( LPVOID lpParameter )
 
     // Put the adapter in the window title
     wchar_t buf[1<<10] = {};
-    _snwprintf_s(buf, 1<<10, L"Piano-FX Pro | Made by: happy_mimimix | Ver 1.05 | Now playing: Splash MIDI");
+    _snwprintf_s(buf, 1<<10, L"Piano-FX Pro | Made by: happy_mimimix | Ver 1.06 | Now playing: Splash MIDI");
     SetWindowTextW(g_hWnd, buf);
 
     // Event, logic, render...

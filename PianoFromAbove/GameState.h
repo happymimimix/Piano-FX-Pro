@@ -294,6 +294,7 @@ private:
 
     // Computed in RenderGlobal
     int m_iStartNote, m_iEndNote; // Start and end notes of the songs
+    bool m_bFlipKeyboard;
     float m_fNotesX, m_fNotesY, m_fNotesCX, m_fNotesCY; // Notes position
     int m_iAllWhiteKeys; // Number of white keys are on the screen
     float m_fWhiteCX; // Width of the white keys

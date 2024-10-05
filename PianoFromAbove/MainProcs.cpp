@@ -124,16 +124,15 @@ LRESULT WINAPI WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                     cPlayback.SetPlayMode( GameState::Intro, true );
                     cPlayback.SetPlayable( false, true );
                     cPlayback.SetPosition( 0 );
-                    SetWindowText( g_hWnd, L"Piano-FX Pro | Made by: happy_mimimix | Ver 1.05 | Now playing: None");
+                    SetWindowText( g_hWnd, L"Piano-FX Pro | Made by: happy_mimimix | Ver 1.06 | Now playing: None");
                     HandOffMsg( WM_COMMAND, ID_CHANGESTATE, ( LPARAM )new IntroScreen( NULL, NULL ) );
                     return 0;
                 }
                 case ID_PLAY_PLAY:
-                    if ( cPlayback.GetPlayMode() && iId == ID_PLAY_PLAY )
-                        cPlayback.SetPaused( false, true );
+                    if ( cPlayback.GetPlayMode() && iId == ID_PLAY_PLAY ) cPlayback.SetPaused( false, true );
                     return 0;
                 case ID_PLAY_PAUSE:
-                    cPlayback.SetPaused( true, true );
+                    if ( cPlayback.GetPlayMode() ) cPlayback.SetPaused( true, true );
                     return 0;
                 case ID_PLAY_PLAYPAUSE:
                     if ( cPlayback.GetPlayMode() ) cPlayback.TogglePaused( true );
@@ -1200,14 +1199,14 @@ BOOL PlayFile( const wstring &sFile, bool bCustomSettings )
     if ( !cPlayback.GetPlayable() ) cPlayback.SetPlayable( true, true );
     if ( cPlayback.GetPlayMode() != ePlayMode ) cPlayback.SetPlayMode( ePlayMode, true );
     cPlayback.SetPaused( ePlayMode != GameState::Practice, true );
-    cPlayback.SetPosition( 0 );
+    cPlayback.SetPosition(0);
     cView.SetZoomMove( false, true );
     TCHAR sTitle[1<<10];
     if (cViz.bDumpFrames) {
-        _stprintf_s(sTitle, TEXT("Piano-FX Pro | Made by: happy_mimimix | Ver 1.05 | Now rendering: %ws"), sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
+        _stprintf_s(sTitle, TEXT("Piano-FX Pro | Made by: happy_mimimix | Ver 1.06 | Now rendering: %ws"), sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
     }
     else {
-        _stprintf_s(sTitle, TEXT("Piano-FX Pro | Made by: happy_mimimix | Ver 1.05 | Now playing: %ws"), sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
+        _stprintf_s(sTitle, TEXT("Piano-FX Pro | Made by: happy_mimimix | Ver 1.06 | Now playing: %ws"), sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
     }
     SetWindowText(g_hWnd, sTitle);
 

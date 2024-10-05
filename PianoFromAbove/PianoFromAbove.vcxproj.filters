@@ -396,10 +396,10 @@
     <None Include="Images\PFA Icon.ico">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="Images\FunkyStars.mid" />
     <None Include="common.hlsli">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="Images\chase.mid.xz" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="rect_vs.hlsl">
