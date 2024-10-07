@@ -575,9 +575,11 @@ ECHO.table.insert(ThreadList,SmoothAnimationByTime(CenterX(0),CenterX(1),-S,0,Ea
 ECHO.table.insert(ThreadList,SmoothAnimationByTime(CenterY(0),CenterY(1),-S,0,EaseOutBack,SetOffsetY)) >>"%~dp0x"
 ECHO.table.insert(ThreadList,InstantaneousAnimationByTime(^"^",0,SetCaption)) >>"%~dp0x"
 ECHO.RunThreads(ThreadList) >>"%~dp0x"
-ECHO.-- Notice: >>"%~dp0x"
-ECHO.-- Cheat Engine's UI may freeze and stop responding while the script is running. >>"%~dp0x"
-ECHO.-- This is a normal phenomenon, please do not kill this process^^^! >>"%~dp0x"
+ECHO.--[[ >>"%~dp0x"
+ECHO.Notice: >>"%~dp0x"
+ECHO.Cheat Engine's UI may freeze and stop responding while the script is running. >>"%~dp0x"
+ECHO.This is a normal phenomenon, please do not kill this process^^^! >>"%~dp0x"
+ECHO.]] >>"%~dp0x"
 type "%~dp0x" | clip
 del "%~dp0x" /f /q
 mshta vbscript:msgbox("Cheat Engine lua code template has been copied to clipboard."+vbCrLf+"Open Cheat Engine and paste them into Table -> Show Cheat Table Lua Script."+vbCrLf,48,"Success")(window.close)
