@@ -338,10 +338,8 @@ GameState::GameError SplashScreen::MsgProc( HWND, UINT msg, WPARAM wParam, LPARA
         case WM_DEVICECHANGE:
             if (cViz.bKDMAPI) {
                 m_OutDevice.OpenKDMAPI();
-            }
-            else {
-                if (cAudio.iOutDevice >= 0)
-                    m_OutDevice.Open(cAudio.iOutDevice);
+            } else {
+                m_OutDevice.Open(cAudio.iOutDevice);
             }
             break;
     }
@@ -408,6 +406,52 @@ GameState::GameError SplashScreen::Logic()
     return Success;
 }
 
+// https://github.com/WojciechMula/simd-search/blob/master/sse-binsearch-block.cpp
+int sse_bin_search(const std::vector<int>& data, int key) {
+
+    const __m128i keys = _mm_set1_epi32(key);
+    __m128i v;
+
+    int limit = data.size() - 1;
+    int a = 0;
+    int b = limit;
+
+    while (a <= b) {
+        const int c = (a + b) / 2;
+
+        if (data[c] == key) {
+            return c;
+        }
+
+        if (key < data[c]) {
+            b = c - 1;
+
+            if (b >= 4) {
+                v = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&data[b - 4]));
+                v = _mm_cmpeq_epi32(v, keys);
+                const uint16_t mask = _mm_movemask_epi8(v);
+                if (mask) {
+                    return b - 4 + __builtin_ctz(mask) / 4;
+                }
+            }
+        }
+        else {
+            a = c + 1;
+
+            if (a + 4 < limit) {
+                v = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&data[a]));
+                v = _mm_cmpeq_epi32(v, keys);
+                const uint16_t mask = _mm_movemask_epi8(v);
+                if (mask) {
+                    return a + __builtin_ctz(mask) / 4;
+                }
+            }
+        }
+    }
+
+    return -1;
+}
+
 void SplashScreen::UpdateState(int iPos)
 {
     // Event data
@@ -417,6 +461,8 @@ void SplashScreen::UpdateState(int iPos)
     MIDIChannelEvent::ChannelEventType eEventType = pEvent->GetChannelEventType();
     int iNote = pEvent->GetParam1();
     int iVelocity = pEvent->GetParam2();
+
+    int iSisterIdx = pEvent->GetSisterIdx();
     auto& note_state = m_vState[iNote];
 
     // Turn note on
@@ -424,15 +470,25 @@ void SplashScreen::UpdateState(int iPos)
         note_state.push_back(iPos);
     else
     {
-        vector< int >::iterator it = note_state.begin();
-        MIDIChannelEvent* pSearch = pEvent->GetSister(m_vEvents);
-        while (it != note_state.end())
-        {
-            if (m_vEvents[*it] == pSearch) {
-                it = note_state.erase(it);
-            }
-            else {
-                ++it;
+        if (iSisterIdx != -1) {
+            // binary search
+            auto pos = sse_bin_search(note_state, iSisterIdx);
+            if (pos != -1)
+                note_state.erase(note_state.begin() + pos);
+        }
+        else {
+            // slow path, should rarely happen
+            vector< int >::iterator it = note_state.begin();
+            MIDIChannelEvent* pSearch = pEvent->GetSister(m_vEvents);
+            while (it != note_state.end())
+            {
+                if (m_vEvents[*it] == pSearch) {
+                    it = note_state.erase(it);
+                    break;
+                }
+                else {
+                    ++it;
+                }
             }
         }
     }
@@ -442,16 +498,16 @@ const float SplashScreen::SharpRatio = 0.65f;
 
 GameState::GameError SplashScreen::Render()
 {
-    if (FAILED(m_pRenderer->ResetDeviceIfNeeded())) return DirectXError;
+    if ( FAILED( m_pRenderer->ResetDeviceIfNeeded() ) ) return DirectXError;
 
     // Clear the backbuffer to a blue color
-    m_pRenderer->ClearAndBeginScene(D3DCOLOR_XRGB(0, 0, 0));
-    m_pRenderer->DrawRect(0.0f, 0.0f, static_cast<float>(m_pRenderer->GetBufferWidth()),
-        static_cast<float>(m_pRenderer->GetBufferHeight()), 0x00000000);
+    m_pRenderer->ClearAndBeginScene( D3DCOLOR_XRGB( 0, 0, 0 ) );
+    m_pRenderer->DrawRect( 0.0f, 0.0f, static_cast< float >( m_pRenderer->GetBufferWidth() ),
+                           static_cast< float >( m_pRenderer->GetBufferHeight() ), 0x00000000 );
     RenderNotes();
-    m_pRenderer->EndScene();
 
     // Present the backbuffer contents to the display
+    m_pRenderer->EndScene();
     m_pRenderer->Present();
     return Success;
 }
@@ -598,53 +654,6 @@ float SplashScreen::GetNoteX(int iNote) {
 // MainScreen GameState object
 //-----------------------------------------------------------------------------
 
-
-// https://github.com/WojciechMula/simd-search/blob/master/sse-binsearch-block.cpp
-int sse_bin_search(const std::vector<int>& data, int key) {
-
-    const __m128i keys = _mm_set1_epi32(key);
-    __m128i v;
-
-    int limit = data.size() - 1;
-    int a = 0;
-    int b = limit;
-
-    while (a <= b) {
-        const int c = (a + b) / 2;
-
-        if (data[c] == key) {
-            return c;
-        }
-
-        if (key < data[c]) {
-            b = c - 1;
-
-            if (b >= 4) {
-                v = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&data[b - 4]));
-                v = _mm_cmpeq_epi32(v, keys);
-                const uint16_t mask = _mm_movemask_epi8(v);
-                if (mask) {
-                    return b - 4 + __builtin_ctz(mask) / 4;
-                }
-            }
-        }
-        else {
-            a = c + 1;
-
-            if (a + 4 < limit) {
-                v = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&data[a]));
-                v = _mm_cmpeq_epi32(v, keys);
-                const uint16_t mask = _mm_movemask_epi8(v);
-                if (mask) {
-                    return a + __builtin_ctz(mask) / 4;
-                }
-            }
-        }
-    }
-
-    return -1;
-}
-
 string GetExePath(void) {
     char szFilePath[MAX_PATH + 1] = { 0 };
     GetModuleFileNameA(NULL, szFilePath, MAX_PATH);
@@ -774,7 +783,7 @@ GameState::GameError MainScreen::Init()
     }
 
     for (auto& work : m_vThreadWork)
-        work.reserve(1<<20); // Should be plenty for most MIDIs
+        work.reserve(1<<(1<<4)*1<<(1<<2)); // Should be plenty for most MIDIs
 
     return Success;
 }
@@ -936,10 +945,8 @@ GameState::GameError MainScreen::MsgProc( HWND, UINT msg, WPARAM wParam, LPARAM 
         case WM_DEVICECHANGE:
             if (cViz.bKDMAPI) {
                 m_OutDevice.OpenKDMAPI();
-            }
-            else {
-                if (cAudio.iOutDevice >= 0)
-                    m_OutDevice.Open(cAudio.iOutDevice);
+            } else {
+                m_OutDevice.Open(cAudio.iOutDevice);
             }
             break;
         case TBM_SETPOS:
@@ -2407,7 +2414,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
     for (int i = passedFormatted.length() - 3; i > 0; i -= 3)
         passedFormatted.insert(i, ",");
 
-    RenderStatusLine(cur_line++,"Piano-FX Pro", "v1.06");
+    RenderStatusLine(cur_line++,"Piano-FX Pro", "v2.01");
     RenderStatusLine(cur_line++,"Made by: happy_mimimix", "");
     RenderStatusLine(cur_line++,"", "");
     RenderStatusLine(cur_line++, "Time:", "%s%lld:%02d.%d / %lld:%02d.%d",

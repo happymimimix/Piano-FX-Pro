@@ -127,26 +127,30 @@ ECHO|set/p=[9;12H[103m[30m (A) Copy lua script template to clipboard         
 ECHO|set/p=[10;12H[40m[93m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ 
 ECHO.-- Definitions: (DO NOT CHANGE^^^!) >"%~dp0x"
 ECHO.openProcess(^"Piano-FX-Pro.exe^") >>"%~dp0x"
-ECHO.Microseconds=^"Piano-FX-Pro.exe+940650^" >>"%~dp0x"
-ECHO.Ticks=^"Piano-FX-Pro.exe+94065C^" >>"%~dp0x"
-ECHO.Resolution=^"Piano-FX-Pro.exe+93C318^" >>"%~dp0x"
-ECHO.Volume=^"Piano-FX-Pro.exe+940508^" >>"%~dp0x"
-ECHO.PlaybackSpeed=^"Piano-FX-Pro.exe+9404F8^" >>"%~dp0x"
-ECHO.NoteSpeed=^"Piano-FX-Pro.exe+940500^" >>"%~dp0x"
-ECHO.OffsetX=^"Piano-FX-Pro.exe+940520^" >>"%~dp0x"
-ECHO.OffsetY=^"Piano-FX-Pro.exe+940524^" >>"%~dp0x"
-ECHO.Zoom=^"Piano-FX-Pro.exe+940528^" >>"%~dp0x"
-ECHO.Width=^"Piano-FX-Pro.exe+93C310^" >>"%~dp0x"
-ECHO.Height=^"Piano-FX-Pro.exe+93C314^" >>"%~dp0x"
-ECHO.Paused=^"Piano-FX-Pro.exe+9404F5^" >>"%~dp0x"
-ECHO.Keyboard=^"Piano-FX-Pro.exe+94051A^" >>"%~dp0x"
-ECHO.VisualizePitchBends=^"Piano-FX-Pro.exe+940578^" >>"%~dp0x"
-ECHO.PhigrosMode=^"Piano-FX-Pro.exe+940550^" >>"%~dp0x"
-ECHO.ShowMarkers=^"Piano-FX-Pro.exe+940549^" >>"%~dp0x"
-ECHO.TickBased=^"Piano-FX-Pro.exe+940548^" >>"%~dp0x"
-ECHO.DisableUI=^"Piano-FX-Pro.exe+9405A2^" >>"%~dp0x"
-ECHO.LimitFPS=^"Piano-FX-Pro.exe+9404CD^" >>"%~dp0x"
-ECHO.Caption=^"Piano-FX-Pro.exe+93C320^" >>"%~dp0x"
+ECHO.Microseconds=^"Piano-FX-Pro.exe+941650^" >>"%~dp0x"
+ECHO.Ticks=^"Piano-FX-Pro.exe+94165C^" >>"%~dp0x"
+ECHO.Resolution=^"Piano-FX-Pro.exe+93D318^" >>"%~dp0x"
+ECHO.Volume=^"Piano-FX-Pro.exe+941508^" >>"%~dp0x"
+ECHO.Mute=^"Piano-FX-Pro.exe+9414F6^" >>"%~dp0x"
+ECHO.PlaybackSpeed=^"Piano-FX-Pro.exe+9414F8^" >>"%~dp0x"
+ECHO.NoteSpeed=^"Piano-FX-Pro.exe+941500^" >>"%~dp0x"
+ECHO.OffsetX=^"Piano-FX-Pro.exe+941520^" >>"%~dp0x"
+ECHO.OffsetY=^"Piano-FX-Pro.exe+941524^" >>"%~dp0x"
+ECHO.Zoom=^"Piano-FX-Pro.exe+941528^" >>"%~dp0x"
+ECHO.StartKey=^"Piano-FX-Pro.exe+941424^" >>"%~dp0x"
+ECHO.EndKey=^"Piano-FX-Pro.exe+941428^" >>"%~dp0x"
+ECHO.KeyMode=^"Piano-FX-Pro.exe+941420^" >>"%~dp0x"
+ECHO.Width=^"Piano-FX-Pro.exe+93D310^" >>"%~dp0x"
+ECHO.Height=^"Piano-FX-Pro.exe+93D314^" >>"%~dp0x"
+ECHO.Paused=^"Piano-FX-Pro.exe+9414F5^" >>"%~dp0x"
+ECHO.Keyboard=^"Piano-FX-Pro.exe+941519^" >>"%~dp0x"
+ECHO.VisualizePitchBends=^"Piano-FX-Pro.exe+941578^" >>"%~dp0x"
+ECHO.PhigrosMode=^"Piano-FX-Pro.exe+941550^" >>"%~dp0x"
+ECHO.ShowMarkers=^"Piano-FX-Pro.exe+941549^" >>"%~dp0x"
+ECHO.TickBased=^"Piano-FX-Pro.exe+941548^" >>"%~dp0x"
+ECHO.DisableUI=^"Piano-FX-Pro.exe+9415A2^" >>"%~dp0x"
+ECHO.LimitFPS=^"Piano-FX-Pro.exe+9414C9^" >>"%~dp0x"
+ECHO.Caption=^"Piano-FX-Pro.exe+93D320^" >>"%~dp0x"
 ECHO.MS=1e+3 >>"%~dp0x"
 ECHO.S=1e+6 >>"%~dp0x"
 ECHO.function GetMicroseconds() >>"%~dp0x"
@@ -161,11 +165,23 @@ ECHO.end >>"%~dp0x"
 ECHO.function GetVolume() >>"%~dp0x"
 ECHO.return readDouble(Volume) >>"%~dp0x"
 ECHO.end >>"%~dp0x"
+ECHO.function GetMute() >>"%~dp0x"
+ECHO.return readByte(Mute) >>"%~dp0x"
+ECHO.end >>"%~dp0x"
 ECHO.function GetPlaybackSpeed() >>"%~dp0x"
 ECHO.return readDouble(PlaybackSpeed) >>"%~dp0x"
 ECHO.end >>"%~dp0x"
 ECHO.function GetNoteSpeed() >>"%~dp0x"
 ECHO.return readDouble(NoteSpeed) >>"%~dp0x"
+ECHO.end >>"%~dp0x"
+ECHO.function GetStartKey() >>"%~dp0x"
+ECHO.return readInteger(StartKey) >>"%~dp0x"
+ECHO.end >>"%~dp0x"
+ECHO.function GetEndKey() >>"%~dp0x"
+ECHO.return readInteger(EndKey) >>"%~dp0x"
+ECHO.end >>"%~dp0x"
+ECHO.function GetKeyMode() >>"%~dp0x"
+ECHO.return readInteger(KeyMod) >>"%~dp0x"
 ECHO.end >>"%~dp0x"
 ECHO.function GetOffsetX() >>"%~dp0x"
 ECHO.return readFloat(OffsetX) >>"%~dp0x"
@@ -215,11 +231,23 @@ ECHO.end >>"%~dp0x"
 ECHO.function SetVolume(VAL) >>"%~dp0x"
 ECHO.writeDouble(Volume,VAL) >>"%~dp0x"
 ECHO.end >>"%~dp0x"
+ECHO.function SetMute(VAL) >>"%~dp0x"
+ECHO.writeByte(Mute,VAL) >>"%~dp0x"
+ECHO.end >>"%~dp0x"
 ECHO.function SetPlaybackSpeed(VAL) >>"%~dp0x"
 ECHO.writeDouble(PlaybackSpeed,VAL) >>"%~dp0x"
 ECHO.end >>"%~dp0x"
 ECHO.function SetNoteSpeed(VAL) >>"%~dp0x"
 ECHO.writeDouble(NoteSpeed,VAL) >>"%~dp0x"
+ECHO.end >>"%~dp0x"
+ECHO.function SetStartKey(VAL) >>"%~dp0x"
+ECHO.writeInteger(StartKey,VAL) >>"%~dp0x"
+ECHO.end >>"%~dp0x"
+ECHO.function SetEndKey(VAL) >>"%~dp0x"
+ECHO.writeInteger(EndKey,VAL) >>"%~dp0x"
+ECHO.end >>"%~dp0x"
+ECHO.function SetKeyMode(VAL) >>"%~dp0x"
+ECHO.writeInteger(KeyMode,VAL) >>"%~dp0x"
 ECHO.end >>"%~dp0x"
 ECHO.function SetOffsetX(VAL) >>"%~dp0x"
 ECHO.writeFloat(OffsetX,VAL) >>"%~dp0x"
@@ -774,18 +802,22 @@ echo.Animation target:
 echo.1. Volume
 echo.2. PlaybackSpeed
 echo.3. NoteSpeed
-echo.4. Offset-X
-echo.5. Offset-Y
-echo.6. Zoom
+echo.4. StartKey
+echo.5. EndKey
+echo.6. Offset-X
+echo.7. Offset-Y
+echo.8. Zoom
 echo|set/p=^^^>
-choice /C 123456 /n
+choice /C 12345678 /n
 echo.
 if "%errorlevel%" equ "1" (set AnimationTarget=SetVolume&set AnimationSource=GetVolume)
 if "%errorlevel%" equ "2" (set AnimationTarget=SetPlaybackSpeed&set AnimationSource=GetPlaybackSpeed)
 if "%errorlevel%" equ "3" (set AnimationTarget=SetNoteSpeed&set AnimationSource=GetNoteSpeed)
-if "%errorlevel%" equ "4" (set AnimationTarget=SetOffsetX&set AnimationSource=GetOffsetX)
-if "%errorlevel%" equ "5" (set AnimationTarget=SetOffsetY&set AnimationSource=GetOffsetY)
-if "%errorlevel%" equ "6" (set AnimationTarget=SetZoom&set AnimationSource=GetZoom)
+if "%errorlevel%" equ "4" (set AnimationTarget=SetOffsetX&set AnimationSource=StartKey)
+if "%errorlevel%" equ "5" (set AnimationTarget=SetOffsetY&set AnimationSource=EndKey)
+if "%errorlevel%" equ "6" (set AnimationTarget=SetOffsetX&set AnimationSource=GetOffsetX)
+if "%errorlevel%" equ "7" (set AnimationTarget=SetOffsetY&set AnimationSource=GetOffsetY)
+if "%errorlevel%" equ "8" (set AnimationTarget=SetZoom&set AnimationSource=GetZoom)
 echo.Slicing: 
 echo.1. Sliced
 echo.2. Normal
@@ -839,39 +871,47 @@ set "Time=!Input!"
 echo.Animation target: 
 echo.1. Microseconds 
 echo.2. Volume
-echo.3. PlaybackSpeed
-echo.4. NoteSpeed
-echo.5. Offset-X
-echo.6. Offset-Y
-echo.7. Zoom
-echo.8. Paused
-echo.9. Keyboard
-echo.0. VisualizePitchBends
-echo.A. PhigrosMode
-echo.B. ShorMarkers
-echo.C. TickBased
-echo.D. DisableUI
-echo.E. LimitFPS
-echo.F. Caption
+echo.3. Mute
+echo.4. PlaybackSpeed
+echo.5. NoteSpeed
+echo.6. StartKey
+echo.7. EndKey
+echo.8. KeyMode
+echo.9. Offset-X
+echo.0. Offset-Y
+echo.A. Zoom
+echo.B. Paused
+echo.C. Keyboard
+echo.D. VisualizePitchBends
+echo.E. PhigrosMode
+echo.F. ShorMarkers
+echo.G. TickBased
+echo.H. DisableUI
+echo.I. LimitFPS
+echo.J. Caption
 echo|set/p=^^^>
-choice /C 1234567890abcdef /n
+choice /C 1234567890abcdefghij /n
 echo.
 if "%errorlevel%" equ "1" (set AnimationTarget=SetMicroseconds)
 if "%errorlevel%" equ "2" (set AnimationTarget=SetVolume)
-if "%errorlevel%" equ "3" (set AnimationTarget=SetPlaybackSpeed)
-if "%errorlevel%" equ "4" (set AnimationTarget=SetNoteSpeed)
-if "%errorlevel%" equ "5" (set AnimationTarget=SetOffsetX)
-if "%errorlevel%" equ "6" (set AnimationTarget=SetOffsetY)
-if "%errorlevel%" equ "7" (set AnimationTarget=SetZoom)
-if "%errorlevel%" equ "8" (set AnimationTarget=SetPaused)
-if "%errorlevel%" equ "9" (set AnimationTarget=SetKeyboard)
-if "%errorlevel%" equ "10" (set AnimationTarget=SetVisualizePitchBends)
-if "%errorlevel%" equ "11" (set AnimationTarget=SetPhigrosMode)
-if "%errorlevel%" equ "12" (set AnimationTarget=SetShowMarkers)
-if "%errorlevel%" equ "13" (set AnimationTarget=SetTickBased)
-if "%errorlevel%" equ "14" (set AnimationTarget=SetDisableUI)
-if "%errorlevel%" equ "15" (set AnimationTarget=SetLimitFPS)
-if "%errorlevel%" equ "16" (set AnimationTarget=SetCaption)
+if "%errorlevel%" equ "3" (set AnimationTarget=SetMute)
+if "%errorlevel%" equ "4" (set AnimationTarget=SetPlaybackSpeed)
+if "%errorlevel%" equ "5" (set AnimationTarget=SetNoteSpeed)
+if "%errorlevel%" equ "6" (set AnimationTarget=StartKey)
+if "%errorlevel%" equ "7" (set AnimationTarget=EndKey)
+if "%errorlevel%" equ "8" (set AnimationTarget=KeyMode)
+if "%errorlevel%" equ "9" (set AnimationTarget=SetOffsetX)
+if "%errorlevel%" equ "10" (set AnimationTarget=SetOffsetY)
+if "%errorlevel%" equ "11" (set AnimationTarget=SetZoom)
+if "%errorlevel%" equ "12" (set AnimationTarget=SetPaused)
+if "%errorlevel%" equ "13" (set AnimationTarget=SetKeyboard)
+if "%errorlevel%" equ "14" (set AnimationTarget=SetVisualizePitchBends)
+if "%errorlevel%" equ "15" (set AnimationTarget=SetPhigrosMode)
+if "%errorlevel%" equ "16" (set AnimationTarget=SetShowMarkers)
+if "%errorlevel%" equ "17" (set AnimationTarget=SetTickBased)
+if "%errorlevel%" equ "18" (set AnimationTarget=SetDisableUI)
+if "%errorlevel%" equ "19" (set AnimationTarget=SetLimitFPS)
+if "%errorlevel%" equ "20" (set AnimationTarget=SetCaption)
 set "Output=!Output!^&echo.table.insert(ThreadList,InstantaneousAnimationBy!TimingUnit!(!Value!,!Time!,!AnimationTarget!)) >>^"%~dp0x^""
 :Finish
 echo|set/p=Do you want to add another animation? 

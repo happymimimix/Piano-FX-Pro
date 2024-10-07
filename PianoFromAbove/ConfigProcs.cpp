@@ -230,10 +230,6 @@ INT_PTR WINAPI AudioProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                 Changed( hWnd );
             break;
         }
-        case WM_DEVICECHANGE:
-            Sleep( 200 );
-            SetAudioProc( hWnd, Config::GetConfig().GetAudioSettings() );
-            break;
         case WM_NOTIFY:
         {
             LPNMHDR lpnmhdr = ( LPNMHDR )lParam;
@@ -250,11 +246,20 @@ INT_PTR WINAPI AudioProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                     // Get the values
                     cAudio.iOutDevice = (int)SendDlgItemMessage( hWnd, IDC_MIDIOUT, LB_GETCURSEL, 0, 0 );
                     cViz.bKDMAPI = IsDlgButtonChecked(hWnd, IDC_KDMAPI) == BST_CHECKED;
-                    if ( cAudio.iOutDevice >= 0 ) cAudio.sDesiredOut = cAudio.vMIDIOutDevices[cAudio.iOutDevice];
+                    cAudio.sDesiredOut = cAudio.vMIDIOutDevices[cAudio.iOutDevice];
 
                     // Set the values
-                    bool bChanged = (cAudio.iOutDevice != config.GetAudioSettings().iOutDevice) ||
-                        (cViz.bKDMAPI != config.GetVizSettings().bKDMAPI);
+                    bool bChanged = false;
+                    if (cViz.bKDMAPI) {
+                        if (cViz.bKDMAPI != config.GetVizSettings().bKDMAPI) {
+                            bChanged = true;
+                        }
+                    }
+                    else {
+                        if (cViz.bKDMAPI != config.GetVizSettings().bKDMAPI || cAudio.iOutDevice != config.GetAudioSettings().iOutDevice) {
+                            bChanged = true;
+                        }
+                    }
                     config.SetAudioSettings(cAudio);
                     config.SetVizSettings(cViz);
 
