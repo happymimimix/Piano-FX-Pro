@@ -93,6 +93,8 @@ ECHO|set/p=[13;12H[40m[97m▀[100m▀▀▀▀▀▀▀▀▀▀▀▀▀▀
 CHOICE /C 12ab /N >nul
 if "%errorlevel%" equ "1" (goto Setup)
 if "%errorlevel%" equ "2" (goto Animate)
+if "%errorlevel%" equ "3" (call :CA & goto Color)
+if "%errorlevel%" equ "4" (call :CB & goto Color)
 :SA
 ECHO|set/p=[8;12H[40m[93m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 ECHO|set/p=[9;12H[103m[30m (A) Install Black MIDI templates for FL Studio 12.3      [40m 
@@ -116,7 +118,7 @@ explorer http://www.cheatengine.org/
 exit /b
 :SC
 ECHO|set/p=[14;12H[40m[93m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-ECHO|set/p=[15;12H[103m[30m (C) Run Piano FX Pro v1.05                               [40m 
+ECHO|set/p=[15;12H[103m[30m (C) Run Piano FX Pro v2.01                               [40m 
 ECHO|set/p=[16;12H[40m[93m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ 
 timeout 1 /nobreak >nul
 start "" "%~dp0Piano-FX-Pro.exe"
@@ -283,10 +285,7 @@ ECHO.function SetLimitFPS(VAL) >>"%~dp0x"
 ECHO.writeByte(LimitFPS,VAL) >>"%~dp0x"
 ECHO.end >>"%~dp0x"
 ECHO.function SetCaption(VAL) >>"%~dp0x"
-ECHO.for offset=0,1024 do >>"%~dp0x"
-ECHO.writeByte(getAddress(Caption)+offset,0) >>"%~dp0x"
-ECHO.end >>"%~dp0x"
-ECHO.writeString(Caption,VAL) >>"%~dp0x"
+ECHO.writeByte(getAddress(Caption)+#VAL,0);writeString(Caption,VAL) >>"%~dp0x"
 ECHO.end >>"%~dp0x"
 ECHO.function EaseLinear(x) >>"%~dp0x"
 ECHO.return x >>"%~dp0x"
@@ -949,3 +948,51 @@ ECHO|set/p=[19;12H[40m[93m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
 timeout 1 /nobreak >nul
 start "" "%~dp0CheatEngineTutorial.rtf"
 exit /b
+:CA
+ECHO|set/p=[8;12H[40m[93m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+ECHO|set/p=[9;12H[103m[30m (A) Generate color events from lyrics (Domino only^^^!)     [40m 
+ECHO|set/p=[10;12H[40m[93m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ 
+timeout 1 /nobreak >nul
+for /l %%a in (25 1 40) do (
+set /a "cols=30+%%a*2"
+call mode con:cols=%%cols%% lines=%%a >nul
+)
+echo|set/p=[2J[H[?25h[40m[97m
+"%~dp0mmfstuff.exe"
+echo.
+set "Input= "
+set /P "InputMIDI=MIDI file path: "
+set "Output=!InputMIDI!.colored.mid"
+echo.
+"%~dp0mmfstuff.exe" "!InputMIDI!" "!Output!"
+echo.
+pause
+for /l %%a in (40 -1 25) do (
+set /a "cols=30+%%a*2"
+call mode con:cols=%%cols%% lines=%%a >nul
+)
+exit/b
+:CB
+ECHO|set/p=[11;12H[40m[93m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+ECHO|set/p=[12;12H[103m[30m (B) Generate color events from a color event script      [40m 
+ECHO|set/p=[13;12H[40m[93m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ 
+timeout 1 /nobreak >nul
+for /l %%a in (25 1 40) do (
+set /a "cols=30+%%a*2"
+call mode con:cols=%%cols%% lines=%%a >nul
+)
+echo|set/p=[2J[H[?25h[40m[97m
+"%~dp0easycolorevents.exe"
+echo.
+set "Input= "
+set /P "InputMIDI=MIDI file path: "
+set /P "InputCES=Color event script path: "
+echo.
+"%~dp0easycolorevents.exe" "!InputMIDI!" "!InputCES!"
+echo.
+pause
+for /l %%a in (40 -1 25) do (
+set /a "cols=30+%%a*2"
+call mode con:cols=%%cols%% lines=%%a >nul
+)
+exit/b
