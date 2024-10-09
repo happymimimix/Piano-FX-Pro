@@ -150,15 +150,19 @@ void VisualSettings::LoadDefaultValues()
     this->iFirstKey = 0;
     this->iLastKey = 127;
 
-    iBkgColor = 0x00303030;
+    VisualSettings::LoadDefaultColors();
+}
+
+void VisualSettings::LoadDefaultColors()
+{
     int R, G, B = 0, S = 80, V = 100;
-    int iColors = sizeof( this->colors ) / sizeof( this->colors[0] );
-    for ( int i = 10, count = 0; count < iColors; i = ( i + 7 ) % iColors, count++ )
+    int iColors = sizeof(this->colors) / sizeof(this->colors[0]);
+    for (int i = 10, count = 0; count < iColors; i = (i + 7) % iColors, count++)
     {
-        Util::HSVtoRGB( 360 * i / iColors, S, V, R, G, B );
-        this->colors[count] = RGB( R, G, B );
+        Util::HSVtoRGB(360 * i / iColors, S, V, R, G, B);
+        this->colors[count] = RGB(R, G, B);
     }
-    swap( this->colors[2], this->colors[4] );
+    swap(this->colors[2], this->colors[4]);
 }
 
 void AudioSettings::LoadDefaultValues()
@@ -218,6 +222,10 @@ void VizSettings::LoadDefaultValues() {
     this->bColorLoop = false;
     this->bKDMAPI = true;
     this->bDisableUI = false;
+}
+
+void VizSettings::LoadDefaultColors() {
+    this->iBarColor = 0x00FF0080;
 }
 
 void AudioSettings::LoadMIDIDevices()
@@ -483,7 +491,7 @@ bool ViewSettings::SaveConfigValues( TiXmlElement *txRoot )
 }
 
 bool VizSettings::SaveConfigValues(TiXmlElement* txRoot) {
-    TiXmlElement* txViz = new TiXmlElement("Viz");
+    TiXmlElement* txViz = new TiXmlElement("Other");
     txRoot->LinkEndChild(txViz);
     txViz->SetAttribute("TickBased", bTickBased);
     txViz->SetAttribute("ShowMarkers", bShowMarkers);

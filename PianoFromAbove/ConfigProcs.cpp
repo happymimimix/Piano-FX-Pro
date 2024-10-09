@@ -77,7 +77,7 @@ INT_PTR WINAPI VisualProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 
             // Config to fill out the form
             Config &config = Config::GetConfig();
-            SetVisualProc( hWnd, config.GetVisualSettings(), config.GetVizSettings() );
+            SetVisualProc( hWnd, config.GetVisualSettings(), config.GetVizSettings());
             return TRUE;
         }
         // Draws the colored buttons
@@ -137,16 +137,21 @@ INT_PTR WINAPI VisualProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                 }
                 case IDC_RESTOREDEFAULTS:
                 {
-                    VisualSettings cVisualSettings;
-                    cVisualSettings.LoadDefaultValues();
-
-                    VizSettings cVizSettings;
-                    cVizSettings.LoadDefaultValues();
-
+                    PSHNOTIFY pshn;
+                    pshn.hdr.hwndFrom = hWnd;
+                    pshn.hdr.idFrom = GetDlgCtrlID(hWnd);
+                    pshn.hdr.code = PSN_APPLY;
+                    pshn.lParam = 0;
+                    SendMessage(hWnd, WM_NOTIFY, (WPARAM)pshn.hdr.idFrom, (LPARAM)&pshn);
+                    VisualSettings cVisualSettings = Config::GetConfig().GetVisualSettings();
+                    cVisualSettings.LoadDefaultColors();
+                    VizSettings cVizSettings = Config::GetConfig().GetVizSettings();
+                    cVizSettings.LoadDefaultColors();
                     SendMessage( hWnd, WM_SETREDRAW, FALSE, 0 );
-                    SetVisualProc( hWnd, cVisualSettings, cVizSettings );
+                    SetVisualProc(hWnd, cVisualSettings, cVizSettings);
                     SendMessage( hWnd, WM_SETREDRAW, TRUE, 0 );
                     InvalidateRect( hWnd, NULL, FALSE );
+                    SendMessage(hWnd, WM_NOTIFY, (WPARAM)pshn.hdr.idFrom, (LPARAM)&pshn);
                     return TRUE;
                 }
             }

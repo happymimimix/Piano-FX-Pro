@@ -41,6 +41,7 @@ public:
 struct VisualSettings : public ISettings
 {
     void LoadDefaultValues();
+    void LoadDefaultColors();
     void LoadConfigValues( TiXmlElement *txRoot );
     bool SaveConfigValues( TiXmlElement *txRoot );
 
@@ -162,6 +163,7 @@ private:
 
 struct VizSettings : public ISettings {
     void LoadDefaultValues();
+    void LoadDefaultColors();
     void LoadConfigValues(TiXmlElement* txRoot);
     bool SaveConfigValues(TiXmlElement* txRoot);
 
