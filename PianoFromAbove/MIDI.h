@@ -115,7 +115,7 @@ public:
     size_t ParseEvents( const unsigned char *pcData, size_t iMaxSize );
     bool IsValid() const { return ( m_vTracks.size() > 0 && m_Info.iNoteCount > 0 && m_Info.iDivision > 0 ); }
 
-    void PostProcess(vector<TrackSettings> vTrackSettings, vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vProgramChanges = nullptr, vector<MIDIMetaEvent*>* vMetaEvents = nullptr, eventvec_t* vNoteOns = nullptr, eventvec_t* vTempo = nullptr, eventvec_t* vSignature = nullptr, eventvec_t* vMarkers = nullptr, eventvec_t* vColors = nullptr, vector<bool>* vColorOverridden = nullptr);
+    void PostProcess(vector<TrackSettings> vTrackSettings, vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vProgramChanges = nullptr, vector<MIDIMetaEvent*>* vMetaEvents = nullptr, eventvec_t* vNoteOns = nullptr, eventvec_t* vTempo = nullptr, eventvec_t* vSignature = nullptr, eventvec_t* vMarkers = nullptr, eventvec_t* vColors = nullptr);
     void ConnectNotes();
     void clear( void );
 

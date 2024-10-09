@@ -1,6 +1,7 @@
 Setlocal enabledelayedexpansion
 cd "%~dp0"
 CHCP 65001 >nul
+title Piano FX Studio v2.01
 color 0f
 echo off
 for /l %%a in (3 1 25) do (

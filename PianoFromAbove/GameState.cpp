@@ -668,14 +668,13 @@ MainScreen::MainScreen( wstring sMIDIFile, State eGameMode, HWND hWnd, D3D12Rend
     if ( !m_MIDI.IsValid() ) return;
     m_MIDI.ConnectNotes(); // Order's important here
     m_vEvents.reserve(m_MIDI.GetInfo().iEventCount);
-    m_vColorOverridden.resize(m_MIDI.GetInfo().iNumTracks * 16);
 
     // Allocate
     m_vTrackSettings.resize( m_MIDI.GetInfo().iNumTracks );
     for (auto note_state : m_vState)
         note_state.reserve(m_MIDI.GetInfo().iNumTracks * 16);
 
-    m_MIDI.PostProcess(m_vTrackSettings, m_vEvents, &m_vProgramChange, &m_vMetaEvents, &m_vNoteOns, &m_vTempo, &m_vSignature, &m_vMarkers, &m_vColors, &m_vColorOverridden);
+    m_MIDI.PostProcess(m_vTrackSettings, m_vEvents, &m_vProgramChange, &m_vMetaEvents, &m_vNoteOns, &m_vTempo, &m_vSignature, &m_vMarkers, &m_vColors);
 
     // Initialize
     InitColors();
@@ -857,10 +856,6 @@ void MainScreen::SetChannelSettings( const vector< bool > &vMuted, const vector<
         const MIDITrack::MIDITrackInfo& mTrackInfo = vTracks[i]->GetInfo();
         for (int j = 0; j < 16; j++) {
             if (mTrackInfo.aNoteCount[j] > 0) {
-                if (m_vColorOverridden[i * 16 + j] == true) {
-                    iPos++;
-                    continue;
-                }
                 MuteChannel(i, j, bMuted ? vMuted[min(iPos, vMuted.size() - 1)] : false);
                 HideChannel(i, j, bHidden ? vHidden[min(iPos, vHidden.size() - 1)] : false);
                 if (cViz.bColorLoop && bColor) {
@@ -2006,14 +2001,7 @@ void MainScreen::RenderKeys()
             int state = m_vState[i].size() == 0 ? -1 : m_vState[i].back();
             MIDIChannelEvent* pEvent = (state >= 0 ? m_vEvents[state] : NULL);
             if (pEvent && m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bHidden) {
-                state = -1;
-                for (auto it = m_vState[i].rbegin(); it != m_vState[i].rend(); it++) {
-                    pEvent = m_vEvents[*it];
-                    if (!m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bHidden) {
-                        state = *it;
-                        break;
-                    }
-                }
+                m_pNoteState[i] = -1;
             }
             if ( m_pNoteState[i] == -1 )
             {
@@ -2113,14 +2101,7 @@ void MainScreen::RenderKeys()
             int state = m_vState[i].size() == 0 ? -1 : m_vState[i].back();
             MIDIChannelEvent* pEvent = (state >= 0 ? m_vEvents[state] : NULL);
             if (pEvent && m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bHidden) {
-                state = -1;
-                for (auto it = m_vState[i].rbegin(); it != m_vState[i].rend(); it++) {
-                    pEvent = m_vEvents[*it];
-                    if (!m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bHidden) {
-                        state = *it;
-                        break;
-                    }
-                }
+                m_pNoteState[i] = -1;
             }
 
             if ( m_pNoteState[i] == -1 )
@@ -2414,7 +2395,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
     for (int i = passedFormatted.length() - 3; i > 0; i -= 3)
         passedFormatted.insert(i, ",");
 
-    RenderStatusLine(cur_line++,"Piano-FX Pro", "v2.01");
+    RenderStatusLine(cur_line++,"Piano-FX Pro", "v2.03");
     RenderStatusLine(cur_line++,"Made by: happy_mimimix", "");
     RenderStatusLine(cur_line++,"", "");
     RenderStatusLine(cur_line++, "Time:", "%s%lld:%02d.%d / %lld:%02d.%d",
