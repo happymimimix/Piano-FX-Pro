@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7BD036AC-EA65-4968-9C62-C6E43234E3C4}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Colorizer</RootNamespace>
+    <AssemblyName>Colorizer</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>
+    </DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
+    <GenerateSerializationAssemblies>On</GenerateSerializationAssemblies>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="mmf\BatchBlockingCollection.cs" />
+    <Compile Include="mmf\BufferByteReader.cs" />
+    <Compile Include="mmf\ChannelEvent.cs" />
+    <Compile Include="mmf\ChannelModeMessageEvent.cs" />
+    <Compile Include="mmf\ChannelPrefixEvent.cs" />
+    <Compile Include="mmf\ChannelPressureEvent.cs" />
+    <Compile Include="mmf\ColorEvent.cs" />
+    <Compile Include="mmf\ControlChangeEvent.cs" />
+    <Compile Include="mmf\CustomEvent.cs" />
+    <Compile Include="mmf\EndOfExclusiveEvent.cs" />
+    <Compile Include="mmf\EventParser.cs" />
+    <Compile Include="mmf\EventSequenceExtensions.cs" />
+    <Compile Include="mmf\FastList.cs" />
+    <Compile Include="mmf\Fields.cs" />
+    <Compile Include="mmf\IByteReader.cs" />
+    <Compile Include="mmf\Keep.cs" />
+    <Compile Include="mmf\KeySignatureEvent.cs" />
+    <Compile Include="mmf\Lines.cs" />
+    <Compile Include="mmf\Loop.cs" />
+    <Compile Include="mmf\MajorMidiMessageEvent.cs" />
+    <Compile Include="mmf\MathHelper.cs" />
+    <Compile Include="mmf\Mergers.cs" />
+    <Compile Include="mmf\MIDIEvent.cs" />
+    <Compile Include="mmf\MidiFile.cs" />
+    <Compile Include="mmf\MIDIPortEvent.cs" />
+    <Compile Include="mmf\MidiWriter.cs" />
+    <Compile Include="mmf\Note.cs" />
+    <Compile Include="mmf\NoteConversion.cs" />
+    <Compile Include="mmf\NoteEvent.cs" />
+    <Compile Include="mmf\NoteOffEvent.cs" />
+    <Compile Include="mmf\NoteOnEvent.cs" />
+    <Compile Include="mmf\NoteSequenceExtensions.cs" />
+    <Compile Include="mmf\NoteSequenceFunctions.cs" />
+    <Compile Include="mmf\ParallelStream.cs" />
+    <Compile Include="mmf\PitchWheelChangeEvent.cs" />
+    <Compile Include="mmf\PolyphonicKeyPressureEvent.cs" />
+    <Compile Include="mmf\ProgramChangeEvent.cs" />
+    <Compile Include="mmf\SequenceFunctions.cs" />
+    <Compile Include="mmf\SMPTEOffsetEvent.cs" />
+    <Compile Include="mmf\SongPositionPointerEvent.cs" />
+    <Compile Include="mmf\SongSelectEvent.cs" />
+    <Compile Include="mmf\SystemExclusiveMessageEvent.cs" />
+    <Compile Include="mmf\TempoEvent.cs" />
+    <Compile Include="mmf\TextEvent.cs" />
+    <Compile Include="mmf\ThreadedSequenceFunctions.cs" />
+    <Compile Include="mmf\TimeSignatureEvent.cs" />
+    <Compile Include="mmf\TrackNote.cs" />
+    <Compile Include="mmf\TrackStartEvent.cs" />
+    <Compile Include="mmf\TransformExtensions.cs" />
+    <Compile Include="mmf\TuneRequestEvent.cs" />
+    <Compile Include="mmf\UndefinedEvent.cs" />
+    <Compile Include="mmf\XZ.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
