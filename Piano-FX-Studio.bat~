@@ -90,7 +90,7 @@ ECHO|set/p=[21;10H[97m┌───────────┐ ┌────�
 ECHO|set/p=[22;10H[97m│ [90m(1) Setup[97m │ │ [90m(2) Animate[97m │ │ [91m(3) Color[97m │
 ECHO|set/p=[23;10H[97m╧═══════════╧═╧═════════════╧═╧═══════════╧
 ECHO|set/p=[8;12H[40m[97m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-ECHO|set/p=[9;12H[107m[30m (A) Generate color events from lyrics                    [100m [40m
+ECHO|set/p=[9;12H[107m[30m (A) Generate color events from lyrics                     [100m [40m
 ECHO|set/p=[10;12H[40m[97m▀[100m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ [40m
 ECHO|set/p=[11;12H[40m[97m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 ECHO|set/p=[12;12H[107m[30m (B) Restore editable lyrics from color events            [100m [40m
@@ -970,7 +970,7 @@ start "" "%~dp0CheatEngineTutorial.rtf"
 exit /b
 :CA
 ECHO|set/p=[8;12H[40m[93m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-ECHO|set/p=[9;12H[103m[30m (A) Generate color events from lyrics                    [40m 
+ECHO|set/p=[9;12H[103m[30m (A) Generate color events from lyrics                     [40m 
 ECHO|set/p=[10;12H[40m[93m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ 
 timeout 1 /nobreak >nul
 for /l %%a in (25 1 40) do (
@@ -980,14 +980,11 @@ call mode con:cols=%%cols%% lines=%%a >nul
 echo|set/p=[2J[H[?25h[40m[97m
 @echo on
 "%~dp0Colorizer.exe" generate
-@echo off
 echo.
 set "Input= "
 set /P "InputMIDI=MIDI file path: "
 echo.
-@echo on
 "%~dp0Colorizer.exe" "!InputMIDI!" generate
-@echo off
 echo.
 pause
 for /l %%a in (40 -1 25) do (
@@ -997,7 +994,7 @@ call mode con:cols=%%cols%% lines=%%a >nul
 exit/b
 :CB
 ECHO|set/p=[11;12H[40m[93m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-ECHO|set/p=[12;12H[103m[30m (B) Restore editable lyrics from color events            [40m 
+ECHO|set/p=[12;12H[103m[30m (B) Generate color events from a color event script      [40m 
 ECHO|set/p=[13;12H[40m[93m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ 
 timeout 1 /nobreak >nul
 for /l %%a in (25 1 40) do (
@@ -1005,16 +1002,13 @@ set /a "cols=30+%%a*2"
 call mode con:cols=%%cols%% lines=%%a >nul
 )
 echo|set/p=[2J[H[?25h[40m[97m
-@echo on
-"%~dp0Colorizer.exe" restore
-@echo off
+"%~dp0easycolorevents.exe"
 echo.
 set "Input= "
 set /P "InputMIDI=MIDI file path: "
+set /P "InputCES=Color event script path: "
 echo.
-@echo on
-"%~dp0Colorizer.exe" "!InputMIDI!" restore
-@echo off
+"%~dp0easycolorevents.exe" "!InputMIDI!" "!InputCES!"
 echo.
 pause
 for /l %%a in (40 -1 25) do (

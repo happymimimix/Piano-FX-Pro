@@ -91,7 +91,7 @@ namespace Colorizer
                                 if (midievent is ColorEvent)
                                 {
                                     newtrack.Add(new TextEvent(midievent.DeltaTime, 5, Encoding.ASCII.GetBytes("COLOR " + ((ColorEvent)midievent).Channel + " " + ((ColorEvent)midievent).R + " " + ((ColorEvent)midievent).G + " " + ((ColorEvent)midievent).B + " " + ((ColorEvent)midievent).A)));
-                                    Console.WriteLine("Created lyric from color event: \"" + midievent.ToString() + "\"");
+                                    Console.WriteLine("Created lyric from color event: \"COLOR " + ((ColorEvent)midievent).Channel + " " + ((ColorEvent)midievent).R + " " + ((ColorEvent)midievent).G + " " + ((ColorEvent)midievent).B + " " + ((ColorEvent)midievent).A + "\"");
                                 }
                                 else
                                 {
