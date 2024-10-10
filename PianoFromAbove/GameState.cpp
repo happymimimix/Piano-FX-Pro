@@ -2654,9 +2654,12 @@ void MainScreen::RenderMarker(const char* str) {
 
 void MainScreen::RenderMessage(LPRECT prcMsg, const char* sMsg)
 {
-    ImVec2 textSize = ImGui::CalcTextSize(sMsg, NULL, false, -1.0f, (1<<4)+(1<<2));
+    uint16_t fontsize = (1<<5)-(1<<2);
+    while (ImGui::CalcTextSize(sMsg, NULL, false, -1.0f, fontsize).x >= m_pRenderer->GetBufferWidth() && fontsize > 1) {
+        fontsize--;
+    }
+    ImVec2 textSize = ImGui::CalcTextSize(sMsg, NULL, false, -1.0f, fontsize);
     ImVec2 messageSize;
-
     messageSize.x = prcMsg->left + (prcMsg->right - prcMsg->left - textSize.x) / 2;
     messageSize.y = prcMsg->top + (prcMsg->bottom - prcMsg->top - textSize.y) / 2;
     auto draw_list = m_pRenderer->GetDrawList();
@@ -2667,14 +2670,14 @@ void MainScreen::RenderMessage(LPRECT prcMsg, const char* sMsg)
     );
     draw_list->AddText(
         NULL,
-        (1<<4)+(1<<2),
+        fontsize,
         ImVec2(messageSize.x + 2, messageSize.y + 1),
         0xFF404040,
         sMsg
     );
     draw_list->AddText(
         NULL,
-        (1<<4)+(1<<2),
+        fontsize,
         ImVec2(messageSize.x, messageSize.y),
         0xFFFFFFFF,
         sMsg
