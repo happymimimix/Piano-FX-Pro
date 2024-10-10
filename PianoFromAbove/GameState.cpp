@@ -1908,25 +1908,27 @@ void MainScreen::RenderNotes()
 void MainScreen::RenderNote(const MIDIChannelEvent* pNote)
 {
     int iNote = pNote->GetParam1();
-    int iTrack = pNote->GetTrack();
-    int iChannel = pNote->GetChannel();
-    long long llNoteStart = pNote->GetAbsMicroSec();
-    long long llNoteEnd = llNoteStart + pNote->GetLength();
-    if (m_bTickMode) {
-        llNoteStart = pNote->GetAbsT();
-        llNoteEnd = pNote->GetSister(m_vEvents)->GetAbsT();
-    }
-    if (m_bFlipKeyboard) iNote = (m_iEndNote - m_iStartNote) - (iNote-m_iStartNote) + m_iStartNote;
-    float notePos = static_cast<float>(Config::GetConfig().GetPlaybackSettings().GetNSpeed() < 0 ? m_llTimeSpan - (llNoteStart - m_llRndStartTime) - m_llTimeSpan - (llNoteEnd - llNoteStart) : llNoteStart - m_llRndStartTime);
-    m_pRenderer->PushNoteData(
-        NoteData{
-            .key = (uint8_t)iNote,
-            .channel = (uint8_t)iChannel,
-            .track = (uint16_t)iTrack,
-            .pos = notePos,
-            .length = static_cast<float>(llNoteEnd - llNoteStart),
+    if (m_iStartNote <= iNote && iNote <= m_iEndNote) { // Don't make a mess with out of bounds note! Just don't render them. 
+        int iTrack = pNote->GetTrack();
+        int iChannel = pNote->GetChannel();
+        long long llNoteStart = pNote->GetAbsMicroSec();
+        long long llNoteEnd = llNoteStart + pNote->GetLength();
+        if (m_bTickMode) {
+            llNoteStart = pNote->GetAbsT();
+            llNoteEnd = pNote->GetSister(m_vEvents)->GetAbsT();
         }
-    );
+        if (m_bFlipKeyboard) iNote = (m_iEndNote - m_iStartNote) - (iNote - m_iStartNote) + m_iStartNote;
+        float notePos = static_cast<float>(Config::GetConfig().GetPlaybackSettings().GetNSpeed() < 0 ? m_llTimeSpan - (llNoteStart - m_llRndStartTime) - m_llTimeSpan - (llNoteEnd - llNoteStart) : llNoteStart - m_llRndStartTime);
+        m_pRenderer->PushNoteData(
+            NoteData{
+                .key = (uint8_t)iNote,
+                .channel = (uint8_t)iChannel,
+                .track = (uint16_t)iTrack,
+                .pos = notePos,
+                .length = static_cast<float>(llNoteEnd - llNoteStart),
+            }
+        );
+    }
 }
 
 void MainScreen::GenNoteXTable() {
