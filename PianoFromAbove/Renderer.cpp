@@ -86,18 +86,24 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
         res = D3D12CreateDevice(m_pAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&m_pDevice));
         if (FAILED(res))
             continue;
-            //return std::make_tuple(res, "D3D12CreateDevice");
         break;
     }
+    if (m_pDevice == nullptr) { //Oh we love software rendering! 
+        ComPtr<IDXGIAdapter> warpAdapter;
+        res = m_pFactory->EnumWarpAdapter(IID_PPV_ARGS(&warpAdapter));
+        if (FAILED(res))
+            return std::make_tuple(res, "EnumWarpAdapter");
+        res = D3D12CreateDevice(warpAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&m_pDevice));
+        if (FAILED(res))
+            return std::make_tuple(res, "D3D12CreateDevice");
+    }
 
-#ifdef _DEBUG
     // Break on errors
     ComPtr<ID3D12InfoQueue> info_queue;
     if (SUCCEEDED(m_pDevice->QueryInterface(IID_PPV_ARGS(&info_queue)))) {
         info_queue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, TRUE);
         info_queue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, TRUE);
     }
-#endif
 
     // Create command queue
     D3D12_COMMAND_QUEUE_DESC queue_desc = {
