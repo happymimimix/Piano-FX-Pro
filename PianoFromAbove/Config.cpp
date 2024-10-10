@@ -491,7 +491,7 @@ bool ViewSettings::SaveConfigValues( TiXmlElement *txRoot )
 }
 
 bool VizSettings::SaveConfigValues(TiXmlElement* txRoot) {
-    TiXmlElement* txViz = new TiXmlElement("Other");
+    TiXmlElement* txViz = new TiXmlElement("Viz");
     txRoot->LinkEndChild(txViz);
     txViz->SetAttribute("TickBased", bTickBased);
     txViz->SetAttribute("ShowMarkers", bShowMarkers);

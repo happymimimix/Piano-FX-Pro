@@ -108,7 +108,7 @@ namespace Colorizer
                     {
                         if (args.Length <= 1)
                         {
-                            Console.WriteLine("Usage: \nExecute this program with parameters \"<channel> <r1> <g1> <b1> <a1> <r2> <g2> <b2> <a2> <duration> <spacing> <path/to/output.mid> gradient\". \nThen multiple lyric events formatted as \"COLOR <channel> <r> <g> <b> <a>\" will be generated in the midi. ");
+                            Console.WriteLine("Usage: \nExecute this program with parameters \"<channel> <r1> <g1> <b1> <a1> <r2> <g2> <b2> <a2> <duration> <spacing> <path/to/output.mid> gradient\". \nThen multiple lyric events formatted as \"COLOR <channel> <r> <g> <b> <a>\" will be generated in the midi. \nChannel can be any integer value between 0~15 or 127 for all channels on the current track. ");
                             return;
                         }
                         MidiWriter writer = new MidiWriter(args[11]);

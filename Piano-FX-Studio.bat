@@ -106,8 +106,8 @@ if "%errorlevel%" equ "1" (goto Setup)
 if "%errorlevel%" equ "2" (goto Animate)
 if "%errorlevel%" equ "3" (call :CA & goto Color)
 if "%errorlevel%" equ "4" (call :CB & goto Color)
-if "%errorlevel%" equ "5" (call :CA & goto Color)
-if "%errorlevel%" equ "6" (call :CB & goto Color)
+if "%errorlevel%" equ "5" (call :CC & goto Color)
+if "%errorlevel%" equ "6" (call :CD & goto Color)
 :SA
 ECHO|set/p=[8;12H[40m[93m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 ECHO|set/p=[9;12H[103m[30m (A) Install Black MIDI templates for FL Studio 12.3      [40m 
@@ -982,7 +982,6 @@ echo|set/p=[2J[H[?25h[40m[97m
 "%~dp0Colorizer.exe" generate
 @echo off
 echo.
-set "Input= "
 set /P "InputMIDI=MIDI file path: "
 echo.
 @echo on
@@ -1009,11 +1008,81 @@ echo|set/p=[2J[H[?25h[40m[97m
 "%~dp0Colorizer.exe" restore
 @echo off
 echo.
-set "Input= "
 set /P "InputMIDI=MIDI file path: "
 echo.
 @echo on
 "%~dp0Colorizer.exe" "!InputMIDI!" restore
+@echo off
+echo.
+pause
+for /l %%a in (40 -1 25) do (
+set /a "cols=30+%%a*2"
+call mode con:cols=%%cols%% lines=%%a >nul
+)
+exit/b
+:CC
+ECHO|set/p=[14;12H[40m[93m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+ECHO|set/p=[15;12H[103m[30m (C) Make a gradient color effect                         [40m 
+ECHO|set/p=[16;12H[40m[93m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ 
+timeout 1 /nobreak >nul
+for /l %%a in (25 1 40) do (
+set /a "cols=30+%%a*2"
+call mode con:cols=%%cols%% lines=%%a >nul
+)
+echo|set/p=[2J[H[?25h[40m[97m
+@echo on
+"%~dp0Colorizer.exe" gradient
+@echo off
+echo.
+set /P "Channel=Channel: "
+set /P "StartColorR=Start color (R): "
+set /P "StartColorG=Start color (G): "
+set /P "StartColorB=Start color (B): "
+set /P "StartColorA=Start color (A): "
+set /P "EndColorR=End color (R): "
+set /P "EndColorG=End color (G): "
+set /P "EndColorB=End color (B): "
+set /P "EndColorA=End color (A): "
+set /P "Duration=Duration: "
+set /P "Spacing=Spacing: "
+set /P "OutputMIDI=MIDI file path: "
+echo.
+@echo on
+"%~dp0Colorizer.exe" "!Channel!" "!StartColorR!" "!StartColorG!" "!StartColorB!" "!StartColorA!" "!EndColorR!" "!EndColorG!" "!EndColorB!" "!EndColorA!" "!Duration!" "!Spacing!" "!OutputMIDI!" gradient
+@echo off
+echo.
+pause
+for /l %%a in (40 -1 25) do (
+set /a "cols=30+%%a*2"
+call mode con:cols=%%cols%% lines=%%a >nul
+)
+exit/b
+:CD
+ECHO|set/p=[17;12H[40m[93m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+ECHO|set/p=[18;12H[103m[30m (D) Convert PFA config to color events                   [40m 
+ECHO|set/p=[19;12H[40m[93m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ 
+timeout 1 /nobreak >nul
+for /l %%a in (25 1 40) do (
+set /a "cols=30+%%a*2"
+call mode con:cols=%%cols%% lines=%%a >nul
+)
+echo|set/p=[2J[H[?25h[40m[97m
+@echo on
+"%~dp0Colorizer.exe" config
+@echo off
+echo.
+echo.Color mode: 
+echo.1. Color MIDI by track
+echo.2. Color MIDI by channel
+echo|set/p=^^^>
+choice /C 12 /n
+echo.
+if "%errorlevel%" equ "1" (set ColorMode=track)
+if "%errorlevel%" equ "2" (set ColorMode=channel)
+set /P "OutputMIDI=MIDI file path: "
+echo.
+@echo on
+"%~dp0Colorizer.exe" "!OutputMIDI!" "!ColorMode!" config
 @echo off
 echo.
 pause

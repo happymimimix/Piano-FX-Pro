@@ -24,7 +24,7 @@ VOID DoPreferences( HWND hWndOwner )
 {
     int pDialogs[] = { IDD_PP1_VISUAL, IDD_PP2_AUDIO, IDD_PP3_VIDEO, IDD_PP4_CONTROLS, IDD_PP5_VIZ };
     DLGPROC pProcs[] = { VisualProc, AudioProc, VideoProc, ControlsProc, VizProc };
-    LPCWSTR pTitles[] = { TEXT( "Visual" ), TEXT( "Audio" ), TEXT("Video"), TEXT( "Controls" ), TEXT("Viz") };
+    LPCWSTR pTitles[] = { TEXT( "Visual" ), TEXT( "Audio" ), TEXT("Video"), TEXT( "Controls" ), TEXT("Other") };
     PROPSHEETPAGE psp[sizeof(pDialogs) / sizeof(int)];
     PROPSHEETHEADER psh;
 
@@ -625,7 +625,7 @@ INT_PTR WINAPI TracksProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
             RECT rcTracks;
             GetClientRect( hWndTracks, &rcTracks );
             int aFmt[6] = { LVCFMT_LEFT, LVCFMT_LEFT, LVCFMT_RIGHT, LVCFMT_CENTER, LVCFMT_CENTER, LVCFMT_CENTER };
-            int aCx[6] = { 27, rcTracks.right - 27 - 55 - 50 - 50 - 50, 55, 50, 50, 50 };
+            int aCx[6] = { 40, rcTracks.right-50*5, 60, 50, 50, 50 };
             CONST TCHAR *aText[6] = { TEXT( "Track" ), TEXT( "Instrument" ), TEXT( "Notes" ), TEXT( "Muted" ), TEXT( "Hidden" ), TEXT( "Color" ) };
 
             LVCOLUMN lvc = {};
@@ -770,6 +770,13 @@ INT_PTR WINAPI TracksProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                     {
                         LPNMCUSTOMDRAW lpnmcd = ( LPNMCUSTOMDRAW )lParam;
                         LPNMLVCUSTOMDRAW lpnmlvcd = ( LPNMLVCUSTOMDRAW )lParam;
+                        HWND hWndTracks = GetDlgItem(hWnd, IDC_TRACKS);
+                        RECT rcTracks;
+                        GetClientRect(hWndTracks, &rcTracks);
+                        int aCx[6] = { 40, rcTracks.right - 50 * 5, 60, 50, 50, 50 };
+                        for (int i = 0; i < sizeof(aCx) / sizeof(int); i++) {
+                            SendMessage(hWndTracks, LVM_SETCOLUMNWIDTH, i, aCx[i]); //Please don't resize this, it makes the interface look very ridiculous! 
+                        }
                         switch ( lpnmcd->dwDrawStage )
                         {
                             case CDDS_PREPAINT: case CDDS_ITEMPREPAINT:

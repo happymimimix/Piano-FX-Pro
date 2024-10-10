@@ -104,7 +104,6 @@ LRESULT WINAPI WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                 case ID_FILE_PRACTICESONGCUSTOM:
                 {
                     CheckActivity( TRUE );
-                    // Get the file(s) to add
                     OPENFILENAME ofn = {};
                     TCHAR sFilename[1<<10] = { 0 };
                     ofn.lStructSize = sizeof( OPENFILENAME );
@@ -114,8 +113,16 @@ LRESULT WINAPI WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                     ofn.nMaxFile = sizeof( sFilename ) / sizeof( TCHAR );
                     ofn.lpstrTitle = TEXT( "Please select a song to play" );
                     ofn.Flags = OFN_EXPLORER | OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
-                    if ( GetOpenFileName( &ofn ) )
-                        PlayFile( sFilename, iId == ID_FILE_PRACTICESONGCUSTOM);
+                    if (GetOpenFileName(&ofn)) {
+                        if (cPlayback.GetPlayMode()) { //Close the current file first before opening another one! 
+                            cPlayback.SetPlayMode(GameState::Intro, true);
+                            cPlayback.SetPlayable(false, true);
+                            cPlayback.SetPosition(0);
+                            SetWindowText(g_hWnd, L"Piano-FX Pro | Made by: happy_mimimix | Ver 2.03 | Now playing: None");
+                            HandOffMsg(WM_COMMAND, ID_CHANGESTATE, (LPARAM)new IntroScreen(NULL, NULL));
+                        }
+                        PlayFile(sFilename, iId == ID_FILE_PRACTICESONGCUSTOM);
+                    }
                     return 0;
                 }
                 case ID_FILE_CLOSEFILE:
