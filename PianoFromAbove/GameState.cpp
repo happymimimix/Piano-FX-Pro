@@ -2655,7 +2655,15 @@ void MainScreen::RenderMarker(const char* str) {
 void MainScreen::RenderMessage(LPRECT prcMsg, const char* sMsg)
 {
     uint16_t fontsize = (1<<5)-(1<<2);
-    while (ImGui::CalcTextSize(sMsg, NULL, false, -1.0f, fontsize).x >= m_pRenderer->GetBufferWidth() && fontsize > 1) {
+    while (
+            (
+                ImGui::CalcTextSize(sMsg, NULL, false, -1.0f, fontsize).x >= m_pRenderer->GetBufferWidth()
+                || 
+                ImGui::CalcTextSize(sMsg, NULL, false, -1.0f, fontsize).y >= m_pRenderer->GetBufferHeight()
+            )
+            && 
+            fontsize > (1<<3)
+        ) {
         fontsize--;
     }
     ImVec2 textSize = ImGui::CalcTextSize(sMsg, NULL, false, -1.0f, fontsize);

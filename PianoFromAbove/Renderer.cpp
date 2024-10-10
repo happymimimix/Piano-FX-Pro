@@ -155,7 +155,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
             .Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
             .Buffer = {
                 .FirstElement = 0,
-                .NumElements = NotesPerPass,
+                .NumElements = RectsPerPass,
                 .StructureByteStride = sizeof(NoteData),
                 .Flags = D3D12_BUFFER_SRV_FLAG_NONE,
             }
@@ -526,7 +526,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     }
 
     // Create dynamic note buffers
-    auto note_buffer_desc = CD3DX12_RESOURCE_DESC::Buffer(NotesPerPass * sizeof(NoteData));
+    auto note_buffer_desc = CD3DX12_RESOURCE_DESC::Buffer(RectsPerPass * sizeof(NoteData));
     for (uint32_t i = 0; i < FrameCount; i++) {
         res = m_pDevice->CreateCommittedResource(
             &upload_heap,
@@ -978,12 +978,12 @@ HRESULT D3D12Renderer::EndScene(bool draw_bg) {
 
     // Flush the intermediate note buffer
     if (!m_vNotesIntermediate.empty()) {
-        for (size_t i = 0; i < m_vNotesIntermediate.size(); i += NotesPerPass) {
+        for (size_t i = 0; i < m_vNotesIntermediate.size(); i += RectsPerPass) {
             if (i == 0)
                 SetPipeline(Pipeline::Note);
 
             auto remaining = m_vNotesIntermediate.size() - i;
-            auto note_count = min(remaining, NotesPerPass);
+            auto note_count = min(remaining, RectsPerPass);
             D3D12_RANGE note_range = {
                 .Begin = 0,
                 .End = note_count * sizeof(NoteData),
