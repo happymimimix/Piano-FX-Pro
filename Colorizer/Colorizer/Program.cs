@@ -20,7 +20,7 @@ namespace Colorizer
                 {
                     if (args[args.Length - 1].ToLower().CompareTo("generate") == 0)
                     {
-                        if (args.Length <= 1)
+                        if (args.Length != 2)
                         {
                             Console.WriteLine("Usage: \nCreate lyric events in your midi formatted as \"COLOR <channel> <r> <g> <b> <a>\". \nChannel can be any integer value between 0~15 or 127 for all channels on the current track. \nThen execute this program with parameters \"<path/to/input.mid> generate\". ");
                             return;
@@ -74,7 +74,7 @@ namespace Colorizer
                     }
                     else if (args[args.Length - 1].ToLower().CompareTo("restore") == 0)
                     {
-                        if (args.Length <= 1)
+                        if (args.Length != 2)
                         {
                             Console.WriteLine("Usage: \nExecute this program with parameters \"<path/to/input.mid> restore\". \nThen all color events in your midi will be replaced with lyric events that you can easily edit. ");
                             return;
@@ -106,7 +106,7 @@ namespace Colorizer
                     }
                     else if (args[args.Length - 1].ToLower().CompareTo("gradient") == 0)
                     {
-                        if (args.Length <= 1)
+                        if (args.Length != 13)
                         {
                             Console.WriteLine("Usage: \nExecute this program with parameters \"<channel> <r1> <g1> <b1> <a1> <r2> <g2> <b2> <a2> <duration> <spacing> <path/to/output.mid> gradient\". \nThen multiple lyric events formatted as \"COLOR <channel> <r> <g> <b> <a>\" will be generated in the midi. \nChannel can be any integer value between 0~15 or 127 for all channels on the current track. ");
                             return;
@@ -150,7 +150,7 @@ namespace Colorizer
                     }
                     else if (args[args.Length - 1].ToLower().CompareTo("config") == 0)
                     {
-                        if (args.Length <= 1)
+                        if (args.Length != 3)
                         {
                             Console.WriteLine("Usage: \nExecute this program with parameters \"<path/to/output.mid> track config\". \nThen multiple lyric events formatted as \"COLOR <channel> <r> <g> <b> <a>\" will be generated base on PFA config for each track in the midi. \nAlternatively execute this program with parameters \"<path/to/output.mid> channel config\". \nThen multiple lyric events formatted as \"COLOR <channel> <r> <g> <b> <a>\" will be generated base on PFA config for each channel in the midi. ");
                             return;

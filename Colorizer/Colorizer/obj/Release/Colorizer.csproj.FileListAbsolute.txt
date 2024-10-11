@@ -1,7 +1,6 @@
 D:\Piano-FX-Pro\Colorizer\Colorizer\bin\Release\Colorizer.exe.config
 D:\Piano-FX-Pro\Colorizer\Colorizer\bin\Release\Colorizer.exe
 D:\Piano-FX-Pro\Colorizer\Colorizer\bin\Release\Colorizer.pdb
-D:\Piano-FX-Pro\Colorizer\Colorizer\obj\Release\Colorizer.csproj.AssemblyReference.cache
 D:\Piano-FX-Pro\Colorizer\Colorizer\obj\Release\Colorizer.csproj.CoreCompileInputs.cache
 D:\Piano-FX-Pro\Colorizer\Colorizer\obj\Release\Colorizer.exe
 D:\Piano-FX-Pro\Colorizer\Colorizer\obj\Release\Colorizer.pdb
