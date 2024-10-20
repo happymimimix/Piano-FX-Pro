@@ -107,7 +107,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
     PlaybackSettings &cPlayback = config.GetPlaybackSettings();
 
     // Create the application window
-    g_hWnd = CreateWindowEx( 0, CLASSNAME, L"Piano-FX Pro | Made by: happy_mimimix | Ver 2.03 | Now playing: None", WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, cView.GetMainLeft(), cView.GetMainTop(),
+    g_hWnd = CreateWindowEx( 0, CLASSNAME, L"Piano-FX Pro | Made by: happy_mimimix | Ver 2.04 | Now playing: None", WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, cView.GetMainLeft(), cView.GetMainTop(),
                              cView.GetMainWidth(), cView.GetMainHeight(), NULL, NULL, wc.hInstance, NULL );
     if ( !g_hWnd ) return 1;
 
@@ -122,7 +122,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
 
     // Create the graphics window
     g_hWndGfx = CreateWindowEx( 0, GFXCLASSNAME, NULL, WS_CHILD | WS_TABSTOP | WS_CLIPSIBLINGS,
-                                0, 0, 800, 600, g_hWnd, NULL, wc.hInstance, NULL );
+                                0, 0, 0, 0, g_hWnd, NULL, wc.hInstance, NULL );
     if ( !g_hWndGfx ) return 1;
 
     HACCEL hAccel = LoadAccelerators( hInstance, MAKEINTRESOURCE( IDA_MAINMENU ) );
@@ -192,7 +192,7 @@ DWORD WINAPI GameThread( LPVOID lpParameter )
 
     // Put the adapter in the window title
     wchar_t buf[1<<10] = {};
-    _snwprintf_s(buf, 1<<10, L"Piano-FX Pro | Made by: happy_mimimix | Ver 2.03 | Now playing: Splash MIDI");
+    _snwprintf_s(buf, 1<<10, L"Piano-FX Pro | Made by: happy_mimimix | Ver 2.04 | Now playing: Splash MIDI");
     SetWindowTextW(g_hWnd, buf);
 
     // Event, logic, render...

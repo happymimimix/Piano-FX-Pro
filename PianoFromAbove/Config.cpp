@@ -206,8 +206,8 @@ void ViewSettings::LoadDefaultValues()
     this->m_fZoomX = 1.0f;
     this->m_iMainLeft = CW_USEDEFAULT;
     this->m_iMainTop = CW_USEDEFAULT;
-    this->m_iMainWidth = 960;
-    this->m_iMainHeight = 589;
+    this->m_iMainWidth = 640;
+    this->m_iMainHeight = 480;
 }
 
 void VizSettings::LoadDefaultValues() {
@@ -216,12 +216,12 @@ void VizSettings::LoadDefaultValues() {
     this->eMarkerEncoding = MarkerEncoding::CP437;
     this->bPhigros = false;
     this->sSplashMIDI = L"";
-    this->bVisualizePitchBends = false;
+    this->bVisualizePitchBends = true;
     this->bDumpFrames = false;
     this->iBarColor = 0x00FF0080;
     this->sBackground = L"";
-    this->bColorLoop = false;
-    this->bKDMAPI = true;
+    this->bColorLoop = true;
+    this->bKDMAPI = false;
     this->bDisableUI = false;
 }
 

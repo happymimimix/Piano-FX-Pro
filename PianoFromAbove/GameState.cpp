@@ -738,7 +738,7 @@ void MainScreen::InitState()
 
         //Running ffmpeg
         char buf[1<<10] = {};
-        snprintf(buf, sizeof(buf), "%s&cd \"%s\"&md \"%s\\PianoFX_Framedump\"&start cmd /k \"ffmpeg -r 60 -f rawvideo -s %dx%d -pixel_format rgb32 -i \"async:\\\\.\\pipe\\PFXdump\" -c:v h264_nvenc -qp 0 ^\"%s\\PianoFX_Framedump\\Output.mkv^\"\"", GetExePath().substr(0, 2).c_str(), GetExePath().c_str(), GetExePath().c_str(), width, height, GetExePath().c_str());
+        snprintf(buf, sizeof(buf), "%s&cd \"%s\"&md \"%s\\PianoFX_Framedump\"&start cmd /k ffmpeg -r 60 -f rawvideo -s %dx%d -pix_fmt bgra -i async:\\\\.\\pipe\\PFXdump -c:v h264 -qp 1 -pix_fmt yuv420p \"%s\\PianoFX_Framedump\\Output.mp4\"", GetExePath().substr(0, 2).c_str(), GetExePath().c_str(), GetExePath().c_str(), width, height, GetExePath().c_str());
         m_hVideoPipe = CreateNamedPipe(TEXT("\\\\.\\pipe\\PFXdump"), PIPE_ACCESS_OUTBOUND, PIPE_TYPE_BYTE | PIPE_WAIT, PIPE_UNLIMITED_INSTANCES, static_cast<DWORD>(width * height * 4 * 120), 0, 0, nullptr);
         system(buf);
         ConnectNamedPipe(m_hVideoPipe, NULL);
@@ -1724,13 +1724,31 @@ GameState::GameError MainScreen::Render()
     m_pRenderer->EndScene(m_bBackgroundLoaded);
     m_pRenderer->Present();
 
+    // Get the current frame
+    auto* frame = m_pRenderer->Screenshot();
     // Dump frame!!!!
     if (m_bDumpFrames && !cPlayback.GetPaused()) {
-        // Get the current frame
-        auto* frame = m_pRenderer->Screenshot();
         // Write to pipe
         WriteFile(m_hVideoPipe, frame, static_cast<DWORD>(m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4), nullptr, nullptr);
     }
+    //Don't let BitBlt capture a blank screen! 
+    HDC hdcGFX = GetDC(g_hWndGfx);
+    HDC hdcMem = CreateCompatibleDC(hdcGFX);
+    HBITMAP hBitmap = CreateCompatibleBitmap(hdcGFX, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight());
+    SelectObject(hdcMem, hBitmap);
+    BITMAPINFO bmpInfo = {};
+    bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bmpInfo.bmiHeader.biWidth = m_pRenderer->GetBufferWidth();
+    bmpInfo.bmiHeader.biHeight = -m_pRenderer->GetBufferHeight();
+    bmpInfo.bmiHeader.biPlanes = 1;
+    bmpInfo.bmiHeader.biBitCount = 32;
+    bmpInfo.bmiHeader.biCompression = BI_RGB;
+    SetDIBits(hdcMem, hBitmap, 0, m_pRenderer->GetBufferHeight(), frame, &bmpInfo, DIB_RGB_COLORS);
+    BitBlt(hdcGFX, 0, 0, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(), hdcMem, 0, 0, SRCCOPY);
+    DeleteObject(hBitmap);
+    DeleteDC(hdcMem);
+    ReleaseDC(g_hWndGfx, hdcGFX);
+
     return Success;
 }
 
@@ -2284,6 +2302,8 @@ void MainScreen::RenderText()
     if (m_bDebug) Lines += 10;
     if (viz.bPhigros) Lines += 4;
     if (m_Timer.m_bManualTimer && !m_bDebug) Lines += 1;
+    if (viz.bDumpFrames && !m_bDebug) Lines -= 2;
+    if (viz.bDumpFrames && m_bDebug) Lines -= 1;
 
     // Screen info
     RECT rcStatus = { m_pRenderer->GetBufferWidth() - 260, 0, m_pRenderer->GetBufferWidth(), 16 * Lines + 10};
@@ -2397,7 +2417,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
     for (int i = passedFormatted.length() - 3; i > 0; i -= 3)
         passedFormatted.insert(i, ",");
 
-    RenderStatusLine(cur_line++,"Piano-FX Pro", "v2.03");
+    RenderStatusLine(cur_line++,"Piano-FX Pro", "v2.04");
     RenderStatusLine(cur_line++,"Made by: happy_mimimix", "");
     RenderStatusLine(cur_line++,"", "");
     RenderStatusLine(cur_line++, "Time:", "%s%lld:%02d.%d / %lld:%02d.%d",
@@ -2406,7 +2426,9 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
         tmin, tsec, tcs);
     RenderStatusLine(cur_line++, "Tick:", "%d/%d", m_iStartTick, mInfo.iDivision);
     if (m_bDebug) RenderStatusLine(cur_line++, "Microseconds:", llStartTimeFormatted.c_str());
-    RenderStatusLine(cur_line++, "FPS:", "%.2lf", m_dFPS);
+    if (!viz.bDumpFrames) {
+        RenderStatusLine(cur_line++, "FPS:", "%.2lf", m_dFPS);
+    }
     RenderStatusLine(cur_line++, "Tempo:", "%.3lf bpm", tempo);
     if (viz.bPhigros) {
         RenderStatusLine(cur_line++,"Combo:", passedFormatted.c_str());
@@ -2426,13 +2448,13 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
             RenderStatusLine(cur_line++, "Volume:", "%.0lf%%", cPlayback.GetVolume() * 100);
         }
     }
-    if (m_Timer.m_bManualTimer && !m_bDebug) {
+    if (m_Timer.m_bManualTimer && !m_bDebug && !viz.bDumpFrames) {
         RenderStatusLine(cur_line++,"PlaybackSpeed:", "%.0lf%%", (m_dFPS / m_Timer.m_dFramerate) * 100);
     }
-    if (!m_Timer.m_bManualTimer && m_bDebug) {
+    if ((!m_Timer.m_bManualTimer || viz.bDumpFrames) && m_bDebug) {
         RenderStatusLine(cur_line++,"PlaybackSpeed:", "%.0lf%%", cPlayback.GetSpeed() * 100);
     }
-    if (m_Timer.m_bManualTimer && m_bDebug) {
+    if (m_Timer.m_bManualTimer && !viz.bDumpFrames && m_bDebug) {
         RenderStatusLine(cur_line++,"PlaybackSpeed:", "%.0lf%%", cPlayback.GetSpeed() * (m_dFPS / m_Timer.m_dFramerate) * 100);
     }
     if (m_bDebug) {

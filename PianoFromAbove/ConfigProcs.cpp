@@ -479,10 +479,10 @@ INT_PTR WINAPI VizProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             TCHAR sFilename[1024] = { 0 };
             ofn.lStructSize = sizeof(OPENFILENAME);
             ofn.hwndOwner = hWnd;
-            ofn.lpstrFilter = TEXT("MIDI Files\0*.mid;*.xz\0");
+            ofn.lpstrFilter = TEXT( "MIDI Files (*.mid, *.mid.xz)\0*.mid;*.xz\0" );
             ofn.lpstrFile = sFilename;
             ofn.nMaxFile = sizeof(sFilename) / sizeof(TCHAR);
-            ofn.lpstrTitle = TEXT("Select a splash MIDI!");
+            ofn.lpstrTitle = TEXT( "Select a splash MIDI!" );
             ofn.Flags = OFN_EXPLORER | OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
             if (GetOpenFileName(&ofn))
                 SetDlgItemTextW(hWnd, IDC_SPLASHMIDI, sFilename);
@@ -672,6 +672,17 @@ INT_PTR WINAPI TracksProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 
             RECT rcItem = { LVIR_BOUNDS };
             SendMessage( hWndTracks, LVM_GETITEMRECT, 0, ( LPARAM )&rcItem );
+
+            if (Config::GetConfig().GetVizSettings().bDumpFrames) {
+                SendMessage(GetDlgItem(hWnd, IDC_CHECK1), BM_SETCHECK, BST_CHECKED, 0);
+                EnableWindow(GetDlgItem(hWnd, IDC_CHECK1), FALSE);
+            }
+            else {
+                SendMessage(GetDlgItem(hWnd, IDC_CHECK1), BM_SETCHECK, BST_UNCHECKED, 0);
+                EnableWindow(GetDlgItem(hWnd, IDC_CHECK1), TRUE);
+            }
+            SendMessage(GetDlgItem(hWnd, IDC_CHECK2), BM_SETCHECK, BST_UNCHECKED, 0);
+            EnableWindow(GetDlgItem(hWnd, IDC_CHECK2), TRUE);
 
             return TRUE;
         }

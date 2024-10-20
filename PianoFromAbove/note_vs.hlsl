@@ -40,7 +40,7 @@ NotePSInput main(uint id : SV_VertexID) {
     float x = fixed[0].note_x[note] + fixed[0].bends[chan];
     float y = round(root.notes_y + root.notes_cy * (1.0f - note_data[note_index].pos / root.timespan));
     float cx = sharp ? root.white_cx * 0.65f : root.white_cx;
-    float cy = max(round(root.notes_cy * note_data[note_index].length / root.timespan), 1);
+    float cy = max(round(root.notes_cy * note_data[note_index].length / root.timespan),0) + 1;
 
     bool is_right = vertex == 1 || vertex == 2;
     float2 position = float2(x, y);
