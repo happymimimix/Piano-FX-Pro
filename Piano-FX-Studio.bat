@@ -621,7 +621,7 @@ set /a "cols=30+%%a*2"
 call mode con:cols=%%cols%% lines=%%a >nul
 )
 echo|set/p=[2J[H[?25h[40m[97m
-set Output=echo.ThreadList = {} ^>"x"
+set Output=echo.ThreadList={} ^>"x"
 :Again
 echo.Animation type: 
 echo.1. Smooth
