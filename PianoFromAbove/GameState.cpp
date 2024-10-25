@@ -23,6 +23,13 @@
 #include "lzma.h"
 
 long long m_llStartTime;
+std::string llStartTimeFormatted;
+long long polyphony;
+std::string polyFormatted;
+long long nps;
+std::string npsFormatted;
+long long passed;
+std::string passedFormatted;
 uint8_t FrameCount = 0;
 int width = -1;
 int height = -1;
@@ -2409,7 +2416,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
         }
         });
 
-    std::string llStartTimeFormatted = std::to_string(abs(m_llStartTime));
+    llStartTimeFormatted = std::to_string(abs(m_llStartTime));
 
     for (int i = llStartTimeFormatted.length() - 3; i > 0; i -= 3)
         llStartTimeFormatted.insert(i, " ");
@@ -2417,23 +2424,23 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
     if (m_llStartTime < 0)
         llStartTimeFormatted.insert(0, "-");
 
-    long long polyphony = m_llPolyphony.load();
+    polyphony = m_llPolyphony.load();
 
-    std::string polyFormatted = std::to_string(polyphony);
+    polyFormatted = std::to_string(polyphony);
 
     for (int i = polyFormatted.length() - 3; i > 0; i -= 3)
         polyFormatted.insert(i, ",");
 
     long long nps = std::distance(upper_bound(m_vNoteOns.begin(), m_vNoteOns.end(), pair< long long, int >(m_llStartTime - 1000000, m_vEvents.size())), upper_bound(m_vNoteOns.begin(), m_vNoteOns.end(), pair< long long, int >(m_llStartTime, m_vEvents.size())));
     
-    std::string npsFormatted = std::to_string(nps);
+    npsFormatted = std::to_string(nps);
 
     for (int i = npsFormatted.length() - 3; i > 0; i -= 3)
         npsFormatted.insert(i, ",");
 
-    long long passed = std::distance(m_vNoteOns.begin(), upper_bound(m_vNoteOns.begin(), m_vNoteOns.end(), pair< long long, int >(m_llStartTime, m_vEvents.size())));
+    passed = std::distance(m_vNoteOns.begin(), upper_bound(m_vNoteOns.begin(), m_vNoteOns.end(), pair< long long, int >(m_llStartTime, m_vEvents.size())));
 
-    std::string passedFormatted = std::to_string(passed);
+    passedFormatted = std::to_string(passed);
 
     for (int i = passedFormatted.length() - 3; i > 0; i -= 3)
         passedFormatted.insert(i, ",");
