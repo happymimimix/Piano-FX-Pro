@@ -15,7 +15,7 @@ ECHO.[H[?25l[40m
 ECHO.                                                                                
 ECHO.       [97m╔════════════════════════════════════════════════════════════════╗       
 ECHO.       [97m║                   [93m┌────────────────────────┐                   [97m║       
-ECHO.       [97m║ [91m»»»»»»»»»»»»»»»»» [93m│ [95mPiano FX Studio v2.04  [93m│ [91m««««««««««««««««« [97m║       
+ECHO.       [97m║ [91m»»»»»»»»»»»»»»»»» [93m│ [95mPiano-FX Studio v3.01  [93m│ [91m««««««««««««««««« [97m║       
 ECHO.       [97m║                   [93m│ [95mMade by: Happy_mimimix [93m│                   [97m║       
 ECHO.       [97m║                   [93m└────────────────────────┘                   [97m║       
 ECHO.       [97m║                                                                ║       
@@ -45,13 +45,13 @@ ECHO|set/p=[8;12H[40m[97m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄�
 ECHO|set/p=[9;12H[107m[30m (A) Install Black MIDI templates for FL Studio 12.3      [100m [40m
 ECHO|set/p=[10;12H[40m[97m▀[100m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ [40m
 ECHO|set/p=[11;12H[40m[97m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-ECHO|set/p=[12;12H[107m[30m (B) Download ffmpeg.exe from official website            [100m [40m
+ECHO|set/p=[12;12H[107m[30m (B) Download Cheat Engine from official website          [100m [40m
 ECHO|set/p=[13;12H[40m[97m▀[100m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ [40m
 ECHO|set/p=[14;12H[40m[97m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-ECHO|set/p=[15;12H[107m[30m (C) Download Cheat Engine from official website          [100m [40m
+ECHO|set/p=[15;12H[107m[30m (C) Run Piano-FX GDI Overlay                             [100m [40m
 ECHO|set/p=[16;12H[40m[97m▀[100m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ [40m
 ECHO|set/p=[17;12H[40m[97m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-ECHO|set/p=[18;12H[107m[30m (D) Run Piano FX Pro v2.03                               [100m [40m
+ECHO|set/p=[18;12H[107m[30m (D) Run Piano-FX Pro v2.03                               [100m [40m
 ECHO|set/p=[19;12H[40m[97m▀[100m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ [40m
 CHOICE /C 23abcd /N >nul
 if "%errorlevel%" equ "1" (goto Animate)
@@ -124,17 +124,17 @@ POWERSHELL -Command "Expand-Archive -Path "^""%~dp0FlTemplates.zip"^"" -Destinat
 exit /b
 :SB
 ECHO|set/p=[11;12H[40m[93m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-ECHO|set/p=[12;12H[103m[30m (B) Download ffmpeg.exe from official website            [40m 
+ECHO|set/p=[12;12H[103m[30m (B) Download Cheat Engine from official website          [40m 
 ECHO|set/p=[13;12H[40m[93m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ 
 timeout 1 /nobreak >nul
-explorer http://github.com/BtbN/FFmpeg-Builds/releases
+explorer http://www.cheatengine.org/
 exit /b
 :SC
 ECHO|set/p=[14;12H[40m[93m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-ECHO|set/p=[15;12H[103m[30m (C) Download Cheat Engine from official website          [40m 
+ECHO|set/p=[15;12H[103m[30m (C) Run Piano-FX GDI Overlay                             [40m 
 ECHO|set/p=[16;12H[40m[93m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ 
 timeout 1 /nobreak >nul
-explorer http://www.cheatengine.org/
+start "" "%~dp0Piano-FX-GDI-Overlay.exe"
 exit /b
 :SD
 ECHO|set/p=[17;12H[40m[93m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
@@ -150,7 +150,7 @@ ECHO|set/p=[10;12H[40m[93m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
 ECHO.-- Definitions: (DO NOT CHANGE^^^!) >"%~dp0x"
 ECHO.openProcess(^"Piano-FX-Pro.exe^") >>"%~dp0x"
 ECHO.Microseconds=^"Piano-FX-Pro.exe+941650^" >>"%~dp0x"
-ECHO.Ticks=^"Piano-FX-Pro.exe+94165C^" >>"%~dp0x"
+ECHO.Ticks=^"Piano-FX-Pro.exe+9416F4^" >>"%~dp0x"
 ECHO.Resolution=^"Piano-FX-Pro.exe+93D318^" >>"%~dp0x"
 ECHO.Volume=^"Piano-FX-Pro.exe+941508^" >>"%~dp0x"
 ECHO.Mute=^"Piano-FX-Pro.exe+9414F6^" >>"%~dp0x"
@@ -709,32 +709,8 @@ ECHO.ShaderFunction((GetTicks()-StartTime)/(EndTime-StartTime),table.unpack(Effe
 ECHO.end >>"%~dp0x"
 ECHO.end).resume() >>"%~dp0x"
 ECHO.end >>"%~dp0x"
-ECHO.-- Initialization: >>"%~dp0x"
-ECHO.TotalTicks=GetPPQ()*4*10 >>"%~dp0x"
-ECHO.SetMicroseconds(-3*S) >>"%~dp0x"
-ECHO.SetVolume(1.00) >>"%~dp0x"
-ECHO.SetMute(0) >>"%~dp0x"
-ECHO.SetPlaybackSpeed(1.00) >>"%~dp0x"
-ECHO.SetNoteSpeed(0.25) >>"%~dp0x"
-ECHO.SetStartKey(0) >>"%~dp0x"
-ECHO.SetEndKey(127) >>"%~dp0x"
-ECHO.SetKeyMode(0) >>"%~dp0x"
-ECHO.SetOffsetX(0.00) >>"%~dp0x"
-ECHO.SetOffsetY(0.00) >>"%~dp0x"
-ECHO.SetZoom(-1.00) >>"%~dp0x"
-ECHO.SetPaused(0) >>"%~dp0x"
-ECHO.SetKeyboard(1) >>"%~dp0x"
-ECHO.SetVisualizePitchBends(1) >>"%~dp0x"
-ECHO.SetPhigrosMode(1) >>"%~dp0x"
-ECHO.SetShowMarkers(1) >>"%~dp0x"
-ECHO.SetTickBased(1) >>"%~dp0x"
-ECHO.SetDisableUI(0) >>"%~dp0x"
-ECHO.SetLimitFPS(1) >>"%~dp0x"
-ECHO.SetCaption(^"Welcome to Piano-FX Pro^") >>"%~dp0x"
-ECHO.-- Do this if you have color events on the first tick: >>"%~dp0x"
-ECHO.SetMicroseconds(0) >>"%~dp0x"
-ECHO.while (GetMicroseconds()^<1) do end >>"%~dp0x"
-ECHO.SetMicroseconds(-3*S) >>"%~dp0x"
+ECHO.-- Custom Definitions: (Version: x.xx) >>"%~dp0x"
+ECHO.>>"%~dp0x"
 ECHO.-- GDI Shaders: >>"%~dp0x"
 ECHO.function PlainShader(t) >>"%~dp0x"
 ECHO.EXE(^"BitBlt^",GDIdc,0,0,GetWidth(),GetHeight(),PFXdc,0,0,SRCCOPY) >>"%~dp0x"
@@ -788,46 +764,48 @@ ECHO.EXE(^"DeleteDC^",MEMdc) >>"%~dp0x"
 ECHO.end >>"%~dp0x"
 ECHO.function ColorOffsetShader(t,OffsettingAmount) >>"%~dp0x"
 ECHO.if OffsettingAmount==nil then OffsettingAmount=20 end >>"%~dp0x"
+ECHO.local W=GetWidth() >>"%~dp0x"
+ECHO.local H=GetHeight() >>"%~dp0x"
 ECHO.local MEMdc=EXE(^"CreateCompatibleDC^",GDIdc) >>"%~dp0x"
-ECHO.local BMP=EXE(^"CreateCompatibleBitmap^",GDIdc,GetWidth(),GetHeight()) >>"%~dp0x"
+ECHO.local BMP=EXE(^"CreateCompatibleBitmap^",GDIdc,W,H) >>"%~dp0x"
 ECHO.local MEMdc2=EXE(^"CreateCompatibleDC^",GDIdc) >>"%~dp0x"
-ECHO.local BMP2=EXE(^"CreateCompatibleBitmap^",GDIdc,GetWidth(),GetHeight()) >>"%~dp0x"
+ECHO.local BMP2=EXE(^"CreateCompatibleBitmap^",GDIdc,W,H) >>"%~dp0x"
 ECHO.EXE(^"SelectObject^",MEMdc2,BMP2) >>"%~dp0x"
-ECHO.EXE(^"BitBlt^",MEMdc2,0,0,GetWidth(),GetHeight(),PFXdc,0,0,SRCCOPY) >>"%~dp0x"
+ECHO.EXE(^"BitBlt^",MEMdc2,0,0,W,H,PFXdc,0,0,SRCCOPY) >>"%~dp0x"
 ECHO.local Brush=EXE(^"CreateSolidBrush^",0x00FFFF) >>"%~dp0x"
 ECHO.EXE(^"SelectObject^",MEMdc2,Brush) >>"%~dp0x"
-ECHO.EXE(^"PatBlt^",MEMdc2,0,0,GetWidth(),GetHeight(),PATINVERT) >>"%~dp0x"
+ECHO.EXE(^"PatBlt^",MEMdc2,0,0,W,H,PATINVERT) >>"%~dp0x"
 ECHO.EXE(^"DeleteObject^",Brush) >>"%~dp0x"
 ECHO.EXE(^"SelectObject^",MEMdc,BMP) >>"%~dp0x"
-ECHO.EXE(^"BitBlt^",MEMdc,math.random(-math.abs(OffsettingAmount),math.abs(OffsettingAmount)),math.random(-math.abs(OffsettingAmount),math.abs(OffsettingAmount)),GetWidth(),GetHeight(),MEMdc2,0,0,SRCPAINT) >>"%~dp0x"
+ECHO.EXE(^"BitBlt^",MEMdc,math.random(-math.abs(OffsettingAmount),math.abs(OffsettingAmount)),math.random(-math.abs(OffsettingAmount),math.abs(OffsettingAmount)),W,H,MEMdc2,0,0,SRCPAINT) >>"%~dp0x"
 ECHO.EXE(^"DeleteObject^",BMP2) >>"%~dp0x"
 ECHO.EXE(^"DeleteDC^",MEMdc2) >>"%~dp0x"
 ECHO.local MEMdc2=EXE(^"CreateCompatibleDC^",GDIdc) >>"%~dp0x"
-ECHO.local BMP2=EXE(^"CreateCompatibleBitmap^",GDIdc,GetWidth(),GetHeight()) >>"%~dp0x"
+ECHO.local BMP2=EXE(^"CreateCompatibleBitmap^",GDIdc,W,H) >>"%~dp0x"
 ECHO.EXE(^"SelectObject^",MEMdc2,BMP2) >>"%~dp0x"
-ECHO.EXE(^"BitBlt^",MEMdc2,0,0,GetWidth(),GetHeight(),PFXdc,0,0,SRCCOPY) >>"%~dp0x"
+ECHO.EXE(^"BitBlt^",MEMdc2,0,0,W,H,PFXdc,0,0,SRCCOPY) >>"%~dp0x"
 ECHO.local Brush=EXE(^"CreateSolidBrush^",0xFF00FF) >>"%~dp0x"
 ECHO.EXE(^"SelectObject^",MEMdc2,Brush) >>"%~dp0x"
-ECHO.EXE(^"PatBlt^",MEMdc2,0,0,GetWidth(),GetHeight(),PATINVERT) >>"%~dp0x"
+ECHO.EXE(^"PatBlt^",MEMdc2,0,0,W,H,PATINVERT) >>"%~dp0x"
 ECHO.EXE(^"DeleteObject^",Brush) >>"%~dp0x"
 ECHO.EXE(^"SelectObject^",MEMdc,BMP) >>"%~dp0x"
-ECHO.EXE(^"BitBlt^",MEMdc,math.random(-math.abs(OffsettingAmount),math.abs(OffsettingAmount)),math.random(-math.abs(OffsettingAmount),math.abs(OffsettingAmount)),GetWidth(),GetHeight(),MEMdc2,0,0,SRCPAINT) >>"%~dp0x"
+ECHO.EXE(^"BitBlt^",MEMdc,math.random(-math.abs(OffsettingAmount),math.abs(OffsettingAmount)),math.random(-math.abs(OffsettingAmount),math.abs(OffsettingAmount)),W,H,MEMdc2,0,0,SRCPAINT) >>"%~dp0x"
 ECHO.EXE(^"DeleteObject^",BMP2) >>"%~dp0x"
 ECHO.EXE(^"DeleteDC^",MEMdc2) >>"%~dp0x"
 ECHO.local MEMdc2=EXE(^"CreateCompatibleDC^",GDIdc) >>"%~dp0x"
-ECHO.local BMP2=EXE(^"CreateCompatibleBitmap^",GDIdc,GetWidth(),GetHeight()) >>"%~dp0x"
+ECHO.local BMP2=EXE(^"CreateCompatibleBitmap^",GDIdc,W,H) >>"%~dp0x"
 ECHO.EXE(^"SelectObject^",MEMdc2,BMP2) >>"%~dp0x"
-ECHO.EXE(^"BitBlt^",MEMdc2,0,0,GetWidth(),GetHeight(),PFXdc,0,0,SRCCOPY) >>"%~dp0x"
+ECHO.EXE(^"BitBlt^",MEMdc2,0,0,W,H,PFXdc,0,0,SRCCOPY) >>"%~dp0x"
 ECHO.local Brush=EXE(^"CreateSolidBrush^",0xFFFF00) >>"%~dp0x"
 ECHO.EXE(^"SelectObject^",MEMdc2,Brush) >>"%~dp0x"
-ECHO.EXE(^"PatBlt^",MEMdc2,0,0,GetWidth(),GetHeight(),PATINVERT) >>"%~dp0x"
+ECHO.EXE(^"PatBlt^",MEMdc2,0,0,W,H,PATINVERT) >>"%~dp0x"
 ECHO.EXE(^"DeleteObject^",Brush) >>"%~dp0x"
 ECHO.EXE(^"SelectObject^",MEMdc,BMP) >>"%~dp0x"
-ECHO.EXE(^"BitBlt^",MEMdc,math.random(-math.abs(OffsettingAmount),math.abs(OffsettingAmount)),math.random(-math.abs(OffsettingAmount),math.abs(OffsettingAmount)),GetWidth(),GetHeight(),MEMdc2,0,0,SRCPAINT) >>"%~dp0x"
+ECHO.EXE(^"BitBlt^",MEMdc,math.random(-math.abs(OffsettingAmount),math.abs(OffsettingAmount)),math.random(-math.abs(OffsettingAmount),math.abs(OffsettingAmount)),W,H,MEMdc2,0,0,SRCPAINT) >>"%~dp0x"
 ECHO.EXE(^"DeleteObject^",BMP2) >>"%~dp0x"
 ECHO.EXE(^"DeleteDC^",MEMdc2) >>"%~dp0x"
-ECHO.EXE(^"BitBlt^",MEMdc,0,0,GetWidth(),GetHeight(),PFXdc,0,0,SRCAND) >>"%~dp0x"
-ECHO.EXE(^"BitBlt^",GDIdc,0,0,GetWidth(),GetHeight(),MEMdc,0,0,SRCCOPY) >>"%~dp0x"
+ECHO.EXE(^"BitBlt^",MEMdc,0,0,W,H,PFXdc,0,0,SRCAND) >>"%~dp0x"
+ECHO.EXE(^"BitBlt^",GDIdc,0,0,W,H,MEMdc,0,0,SRCCOPY) >>"%~dp0x"
 ECHO.EXE(^"DeleteObject^",BMP) >>"%~dp0x"
 ECHO.EXE(^"DeleteDC^",MEMdc) >>"%~dp0x"
 ECHO.end >>"%~dp0x"
@@ -836,48 +814,50 @@ ECHO.if OffsettingAmount==nil then OffsettingAmount=20 end >>"%~dp0x"
 ECHO.if MaxWaveHeight==nil then MaxWaveHeight=40 end >>"%~dp0x"
 ECHO.if MinWaveHeight==nil then MinWaveHeight=10 end >>"%~dp0x"
 ECHO.if ShiftingAmount==nil then ShiftingAmount=10 end >>"%~dp0x"
+ECHO.local W=GetWidth() >>"%~dp0x"
+ECHO.local H=GetHeight() >>"%~dp0x"
 ECHO.local MEMdc=EXE(^"CreateCompatibleDC^",GDIdc) >>"%~dp0x"
-ECHO.local BMP=EXE(^"CreateCompatibleBitmap^",GDIdc,GetWidth(),GetHeight()) >>"%~dp0x"
+ECHO.local BMP=EXE(^"CreateCompatibleBitmap^",GDIdc,W,H) >>"%~dp0x"
 ECHO.local MEMdc2=EXE(^"CreateCompatibleDC^",GDIdc) >>"%~dp0x"
-ECHO.local BMP2=EXE(^"CreateCompatibleBitmap^",GDIdc,GetWidth(),GetHeight()) >>"%~dp0x"
+ECHO.local BMP2=EXE(^"CreateCompatibleBitmap^",GDIdc,W,H) >>"%~dp0x"
 ECHO.EXE(^"SelectObject^",MEMdc2,BMP2) >>"%~dp0x"
-ECHO.EXE(^"BitBlt^",MEMdc2,0,0,GetWidth(),GetHeight(),PFXdc,0,0,SRCCOPY) >>"%~dp0x"
+ECHO.EXE(^"BitBlt^",MEMdc2,0,0,W,H,PFXdc,0,0,SRCCOPY) >>"%~dp0x"
 ECHO.local Brush=EXE(^"CreateSolidBrush^",0x00FFFF) >>"%~dp0x"
 ECHO.EXE(^"SelectObject^",MEMdc2,Brush) >>"%~dp0x"
-ECHO.EXE(^"PatBlt^",MEMdc2,0,0,GetWidth(),GetHeight(),PATINVERT) >>"%~dp0x"
+ECHO.EXE(^"PatBlt^",MEMdc2,0,0,W,H,PATINVERT) >>"%~dp0x"
 ECHO.EXE(^"DeleteObject^",Brush) >>"%~dp0x"
 ECHO.EXE(^"SelectObject^",MEMdc,BMP) >>"%~dp0x"
-ECHO.EXE(^"BitBlt^",MEMdc,math.random(-math.abs(OffsettingAmount),math.abs(OffsettingAmount)),math.random(-math.abs(OffsettingAmount),math.abs(OffsettingAmount)),GetWidth(),GetHeight(),MEMdc2,0,0,SRCPAINT) >>"%~dp0x"
+ECHO.EXE(^"BitBlt^",MEMdc,math.random(-math.abs(OffsettingAmount),math.abs(OffsettingAmount)),math.random(-math.abs(OffsettingAmount),math.abs(OffsettingAmount)),W,H,MEMdc2,0,0,SRCPAINT) >>"%~dp0x"
 ECHO.EXE(^"DeleteObject^",BMP2) >>"%~dp0x"
 ECHO.EXE(^"DeleteDC^",MEMdc2) >>"%~dp0x"
 ECHO.local MEMdc2=EXE(^"CreateCompatibleDC^",GDIdc) >>"%~dp0x"
-ECHO.local BMP2=EXE(^"CreateCompatibleBitmap^",GDIdc,GetWidth(),GetHeight()) >>"%~dp0x"
+ECHO.local BMP2=EXE(^"CreateCompatibleBitmap^",GDIdc,W,H) >>"%~dp0x"
 ECHO.EXE(^"SelectObject^",MEMdc2,BMP2) >>"%~dp0x"
-ECHO.EXE(^"BitBlt^",MEMdc2,0,0,GetWidth(),GetHeight(),PFXdc,0,0,SRCCOPY) >>"%~dp0x"
+ECHO.EXE(^"BitBlt^",MEMdc2,0,0,W,H,PFXdc,0,0,SRCCOPY) >>"%~dp0x"
 ECHO.local Brush=EXE(^"CreateSolidBrush^",0xFF00FF) >>"%~dp0x"
 ECHO.EXE(^"SelectObject^",MEMdc2,Brush) >>"%~dp0x"
-ECHO.EXE(^"PatBlt^",MEMdc2,0,0,GetWidth(),GetHeight(),PATINVERT) >>"%~dp0x"
+ECHO.EXE(^"PatBlt^",MEMdc2,0,0,W,H,PATINVERT) >>"%~dp0x"
 ECHO.EXE(^"DeleteObject^",Brush) >>"%~dp0x"
 ECHO.EXE(^"SelectObject^",MEMdc,BMP) >>"%~dp0x"
-ECHO.EXE(^"BitBlt^",MEMdc,math.random(-math.abs(OffsettingAmount),math.abs(OffsettingAmount)),math.random(-math.abs(OffsettingAmount),math.abs(OffsettingAmount)),GetWidth(),GetHeight(),MEMdc2,0,0,SRCPAINT) >>"%~dp0x"
+ECHO.EXE(^"BitBlt^",MEMdc,math.random(-math.abs(OffsettingAmount),math.abs(OffsettingAmount)),math.random(-math.abs(OffsettingAmount),math.abs(OffsettingAmount)),W,H,MEMdc2,0,0,SRCPAINT) >>"%~dp0x"
 ECHO.EXE(^"DeleteObject^",BMP2) >>"%~dp0x"
 ECHO.EXE(^"DeleteDC^",MEMdc2) >>"%~dp0x"
 ECHO.local MEMdc2=EXE(^"CreateCompatibleDC^",GDIdc) >>"%~dp0x"
-ECHO.local BMP2=EXE(^"CreateCompatibleBitmap^",GDIdc,GetWidth(),GetHeight()) >>"%~dp0x"
+ECHO.local BMP2=EXE(^"CreateCompatibleBitmap^",GDIdc,W,H) >>"%~dp0x"
 ECHO.EXE(^"SelectObject^",MEMdc2,BMP2) >>"%~dp0x"
-ECHO.EXE(^"BitBlt^",MEMdc2,0,0,GetWidth(),GetHeight(),PFXdc,0,0,SRCCOPY) >>"%~dp0x"
+ECHO.EXE(^"BitBlt^",MEMdc2,0,0,W,H,PFXdc,0,0,SRCCOPY) >>"%~dp0x"
 ECHO.local Brush=EXE(^"CreateSolidBrush^",0xFFFF00) >>"%~dp0x"
 ECHO.EXE(^"SelectObject^",MEMdc2,Brush) >>"%~dp0x"
-ECHO.EXE(^"PatBlt^",MEMdc2,0,0,GetWidth(),GetHeight(),PATINVERT) >>"%~dp0x"
+ECHO.EXE(^"PatBlt^",MEMdc2,0,0,W,H,PATINVERT) >>"%~dp0x"
 ECHO.EXE(^"DeleteObject^",Brush) >>"%~dp0x"
 ECHO.EXE(^"SelectObject^",MEMdc,BMP) >>"%~dp0x"
-ECHO.EXE(^"BitBlt^",MEMdc,math.random(-math.abs(OffsettingAmount),math.abs(OffsettingAmount)),math.random(-math.abs(OffsettingAmount),math.abs(OffsettingAmount)),GetWidth(),GetHeight(),MEMdc2,0,0,SRCPAINT) >>"%~dp0x"
+ECHO.EXE(^"BitBlt^",MEMdc,math.random(-math.abs(OffsettingAmount),math.abs(OffsettingAmount)),math.random(-math.abs(OffsettingAmount),math.abs(OffsettingAmount)),W,H,MEMdc2,0,0,SRCPAINT) >>"%~dp0x"
 ECHO.EXE(^"DeleteObject^",BMP2) >>"%~dp0x"
 ECHO.EXE(^"DeleteDC^",MEMdc2) >>"%~dp0x"
 ECHO.local i=0 >>"%~dp0x"
-ECHO.while i^<=GetHeight() do >>"%~dp0x"
-ECHO.EXE(^"BitBlt^",MEMdc,math.random(-math.abs(ShiftingAmount),math.abs(ShiftingAmount)),i,GetWidth(),MaxWaveHeight,PFXdc,0,i,SRCAND) >>"%~dp0x"
-ECHO.EXE(^"BitBlt^",GDIdc,0,i,GetWidth(),MaxWaveHeight,MEMdc,0,i,SRCCOPY) >>"%~dp0x"
+ECHO.while i^<=H do >>"%~dp0x"
+ECHO.EXE(^"BitBlt^",MEMdc,math.random(-math.abs(ShiftingAmount),math.abs(ShiftingAmount)),i,W,MaxWaveHeight,PFXdc,0,i,SRCAND) >>"%~dp0x"
+ECHO.EXE(^"BitBlt^",GDIdc,0,i,W,MaxWaveHeight,MEMdc,0,i,SRCCOPY) >>"%~dp0x"
 ECHO.i=i+math.random(MinWaveHeight,MaxWaveHeight) >>"%~dp0x"
 ECHO.end >>"%~dp0x"
 ECHO.EXE(^"DeleteObject^",BMP) >>"%~dp0x"
@@ -888,8 +868,6 @@ ECHO.if TunnelDelay==nil then TunnelDelay=10 end >>"%~dp0x"
 ECHO.if TunnelScale==nil then TunnelScale=0.9 end >>"%~dp0x"
 ECHO.if ClearScreenChance==nil then ClearScreenChance=40 end >>"%~dp0x"
 ECHO.if FlipColorChance==nil then FlipColorChance=4 end >>"%~dp0x"
-ECHO.local layer=nil >>"%~dp0x"
-ECHO.local delay=nil >>"%~dp0x"
 ECHO.if math.random(0,ClearScreenChance)==0 or layer==nil or delay==nil then >>"%~dp0x"
 ECHO.if math.random(0,FlipColorChance)==0 then >>"%~dp0x"
 ECHO.EXE(^"BitBlt^",GDIdc,0,0,GetWidth(),GetHeight(),PFXdc,0,0,NOTSRCCOPY) >>"%~dp0x"
@@ -1405,6 +1383,32 @@ ECHO.for _,ThisPolygon in pairs(Polygons) do >>"%~dp0x"
 ECHO.EXE(^"DeleteObject^",ThisPolygon) >>"%~dp0x"
 ECHO.end >>"%~dp0x"
 ECHO.end >>"%~dp0x"
+ECHO.-- Initialization: >>"%~dp0x"
+ECHO.TotalTicks=GetPPQ()*4*10 >>"%~dp0x"
+ECHO.SetMicroseconds(-3*S) >>"%~dp0x"
+ECHO.SetVolume(1.00) >>"%~dp0x"
+ECHO.SetMute(0) >>"%~dp0x"
+ECHO.SetPlaybackSpeed(1.00) >>"%~dp0x"
+ECHO.SetNoteSpeed(0.25) >>"%~dp0x"
+ECHO.SetStartKey(0) >>"%~dp0x"
+ECHO.SetEndKey(127) >>"%~dp0x"
+ECHO.SetKeyMode(0) >>"%~dp0x"
+ECHO.SetOffsetX(0.00) >>"%~dp0x"
+ECHO.SetOffsetY(0.00) >>"%~dp0x"
+ECHO.SetZoom(-1.00) >>"%~dp0x"
+ECHO.SetPaused(0) >>"%~dp0x"
+ECHO.SetKeyboard(1) >>"%~dp0x"
+ECHO.SetVisualizePitchBends(1) >>"%~dp0x"
+ECHO.SetPhigrosMode(1) >>"%~dp0x"
+ECHO.SetShowMarkers(1) >>"%~dp0x"
+ECHO.SetTickBased(1) >>"%~dp0x"
+ECHO.SetDisableUI(0) >>"%~dp0x"
+ECHO.SetLimitFPS(1) >>"%~dp0x"
+ECHO.SetCaption(^"Welcome to Piano-FX Pro^") >>"%~dp0x"
+ECHO.-- Do this if you have color events on the first tick: >>"%~dp0x"
+ECHO.SetMicroseconds(0) >>"%~dp0x"
+ECHO.while (GetMicroseconds()^<1) do end >>"%~dp0x"
+ECHO.SetMicroseconds(-3*S) >>"%~dp0x"
 ECHO.-- Main Program: >>"%~dp0x"
 ECHO.ThreadList={} >>"%~dp0x"
 ECHO.table.insert(ThreadList,SmoothAnimationByTime(0,1,-S,0,EaseOutBack,SetZoom)) >>"%~dp0x"
@@ -1777,14 +1781,22 @@ ECHO|set/p=[14;12H[40m[93m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄�
 ECHO|set/p=[15;12H[103m[30m (C) Advanced visualize pitch bend tricks tutorial        [40m 
 ECHO|set/p=[16;12H[40m[93m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ 
 timeout 1 /nobreak >nul
-start "" "%~dp0PitchBendTutorial.rtf"
+IF EXIST "%~dp0Tutorials.zip" (
+POWERSHELL -Command "Expand-Archive -Path "^""%~dp0Tutorials.zip"^"" -DestinationPath "^""%~dp0Tutorials"^"" -Force"
+DEL "%~dp0Tutorials.zip" /f /q
+)
+start "" "%~dp0Tutorials\PitchBendTutorial.rtf"
 exit /b
 :AD
 ECHO|set/p=[17;12H[40m[93m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 ECHO|set/p=[18;12H[103m[30m (D) Cheat engine lua scripting tutorial                  [40m 
 ECHO|set/p=[19;12H[40m[93m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ 
 timeout 1 /nobreak >nul
-start "" "%~dp0CheatEngineTutorial.rtf"
+IF EXIST "%~dp0Tutorials.zip" (
+POWERSHELL -Command "Expand-Archive -Path "^""%~dp0Tutorials.zip"^"" -DestinationPath "^""%~dp0Tutorials"^"" -Force"
+DEL "%~dp0Tutorials.zip" /f /q
+)
+start "" "%~dp0Tutorials\CheatEngineTutorial.rtf"
 exit /b
 :CA
 ECHO|set/p=[8;12H[40m[93m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
