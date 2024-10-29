@@ -1147,7 +1147,7 @@ GameState::GameError MainScreen::Logic( void )
     // Advance end position
     if (Config::GetConfig().GetPlaybackSettings().GetNSpeed() >= 0) {
         if (m_bTickMode) {
-            while (m_iEndPos + 1 >= iEventCount || (m_iEndPos + 1 > 0 && m_vEvents[m_iEndPos + 1]->GetAbsT() > llEndTime)) {
+            while (m_iEndPos + 1 > 0 && (m_iEndPos + 1 >= iEventCount || m_vEvents[m_iEndPos + 1]->GetAbsT() > llEndTime)) {
                 m_iEndPos--; //Make sure we're 10000% not drawing any unnecessary notes! 
             }
             while (m_iEndPos + 1 < iEventCount && m_vEvents[m_iEndPos + 1]->GetAbsT() < llEndTime) {
@@ -1155,7 +1155,7 @@ GameState::GameError MainScreen::Logic( void )
             }
         }
         else {
-            while (m_iEndPos + 1 >= iEventCount || (m_iEndPos + 1 > 0 && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() > llEndTime)) {
+            while (m_iEndPos + 1 > 0 && (m_iEndPos + 1 >= iEventCount || m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() > llEndTime)) {
                 m_iEndPos--; //Make sure we're 10000% not drawing any unnecessary notes! 
             }
             while (m_iEndPos + 1 < iEventCount && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() < llEndTime) {
@@ -1234,7 +1234,7 @@ GameState::GameError MainScreen::Logic( void )
     if (Config::GetConfig().GetPlaybackSettings().GetNSpeed() < 0) {
         m_iEndPos += (m_iPrevStartPos - m_iEndPos) * 2;
         if (m_bTickMode) {
-            while (m_iEndPos + 1 >= iEventCount || (m_iEndPos + 1 > 0 && m_vEvents[m_iEndPos + 1]->GetAbsT() > llEndTime)) {
+            while (m_iEndPos + 1 > 0 && (m_iEndPos + 1 >= iEventCount || m_vEvents[m_iEndPos + 1]->GetAbsT() > llEndTime)) {
                 m_iEndPos--; //Make sure we're 10000% not drawing any unnecessary notes! 
             }
             while (m_iEndPos + 1 < iEventCount && m_vEvents[m_iEndPos + 1]->GetAbsT() < llEndTime) {
@@ -1242,7 +1242,7 @@ GameState::GameError MainScreen::Logic( void )
             }
         }
         else {
-            while (m_iEndPos + 1 >= iEventCount || (m_iEndPos + 1 > 0 && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() > llEndTime)) {
+            while (m_iEndPos + 1 > 0 && (m_iEndPos + 1 >= iEventCount || m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() > llEndTime)) {
                 m_iEndPos--; //Make sure we're 10000% not drawing any unnecessary notes! 
             }
             while (m_iEndPos + 1 < iEventCount && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() < llEndTime) {
@@ -2445,7 +2445,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
     for (int i = passedFormatted.length() - 3; i > 0; i -= 3)
         passedFormatted.insert(i, ",");
 
-    RenderStatusLine(cur_line++,"Piano-FX Pro", "v3.01");
+    RenderStatusLine(cur_line++,"Piano-FX Pro", "v3.02");
     RenderStatusLine(cur_line++,"Made by: happy_mimimix", "");
     RenderStatusLine(cur_line++,"", "");
     RenderStatusLine(cur_line++, "Time:", "%s%lld:%02d.%d / %lld:%02d.%d",
