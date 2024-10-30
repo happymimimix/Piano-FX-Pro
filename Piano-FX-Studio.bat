@@ -1,7 +1,7 @@
 Setlocal enabledelayedexpansion
 cd "%~dp0"
 CHCP 65001 >nul
-title Piano FX Studio v3.01
+title Piano FX Studio v3.02
 color 0f
 echo off
 for /l %%a in (3 1 25) do (
@@ -15,7 +15,7 @@ ECHO.[H[?25l[40m
 ECHO.                                                                                
 ECHO.       [97m╔════════════════════════════════════════════════════════════════╗       
 ECHO.       [97m║                   [93m┌────────────────────────┐                   [97m║       
-ECHO.       [97m║ [91m»»»»»»»»»»»»»»»»» [93m│ [95mPiano-FX Studio v3.01  [93m│ [91m««««««««««««««««« [97m║       
+ECHO.       [97m║ [91m»»»»»»»»»»»»»»»»» [93m│ [95mPiano-FX Studio v3.02  [93m│ [91m««««««««««««««««« [97m║       
 ECHO.       [97m║                   [93m│ [95mMade by: Happy_mimimix [93m│                   [97m║       
 ECHO.       [97m║                   [93m└────────────────────────┘                   [97m║       
 ECHO.       [97m║                                                                ║       
@@ -51,7 +51,7 @@ ECHO|set/p=[14;12H[40m[97m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 ECHO|set/p=[15;12H[107m[30m (C) Run Piano-FX GDI Overlay                             [100m [40m
 ECHO|set/p=[16;12H[40m[97m▀[100m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ [40m
 ECHO|set/p=[17;12H[40m[97m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-ECHO|set/p=[18;12H[107m[30m (D) Run Piano-FX Pro v3.01                               [100m [40m
+ECHO|set/p=[18;12H[107m[30m (D) Run Piano-FX Pro v3.02                               [100m [40m
 ECHO|set/p=[19;12H[40m[97m▀[100m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ [40m
 CHOICE /C 23abcd /N >nul
 if "%errorlevel%" equ "1" (goto Animate)
@@ -138,7 +138,7 @@ start "" "%~dp0Piano-FX-GDI-Overlay.exe"
 exit /b
 :SD
 ECHO|set/p=[17;12H[40m[93m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-ECHO|set/p=[18;12H[103m[30m (D) Run Piano FX Pro v3.01                               [40m 
+ECHO|set/p=[18;12H[103m[30m (D) Run Piano FX Pro v3.02                               [40m 
 ECHO|set/p=[19;12H[40m[93m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ 
 timeout 1 /nobreak >nul
 start "" "%~dp0Piano-FX-Pro.exe"
@@ -2482,18 +2482,22 @@ echo.Animation target:
 echo.1. Volume
 echo.2. PlaybackSpeed
 echo.3. NoteSpeed
-echo.4. Offset-X
-echo.5. Offset-Y
-echo.6. Zoom
+echo.4. StartKey
+echo.5. EndKey
+echo.6. Offset-X
+echo.7. Offset-Y
+echo.8. Zoom
 echo|set/p=^^^>
-choice /C 123456 /n
+choice /C 12345678 /n
 echo.
 if "%errorlevel%" equ "1" (set AnimationTarget=SetVolume)
 if "%errorlevel%" equ "2" (set AnimationTarget=SetPlaybackSpeed)
 if "%errorlevel%" equ "3" (set AnimationTarget=SetNoteSpeed)
-if "%errorlevel%" equ "4" (set AnimationTarget=SetOffsetX)
-if "%errorlevel%" equ "5" (set AnimationTarget=SetOffsetY)
-if "%errorlevel%" equ "6" (set AnimationTarget=SetZoom)
+if "%errorlevel%" equ "4" (set AnimationTarget=SetStartKey)
+if "%errorlevel%" equ "5" (set AnimationTarget=SetEndKey)
+if "%errorlevel%" equ "6" (set AnimationTarget=SetOffsetX)
+if "%errorlevel%" equ "7" (set AnimationTarget=SetOffsetY)
+if "%errorlevel%" equ "8" (set AnimationTarget=SetZoom)
 echo.Slicing: 
 echo.1. Sliced
 echo.2. Normal
@@ -2605,8 +2609,8 @@ echo.
 if "%errorlevel%" equ "1" (set AnimationTarget=SetVolume&set AnimationSource=GetVolume)
 if "%errorlevel%" equ "2" (set AnimationTarget=SetPlaybackSpeed&set AnimationSource=GetPlaybackSpeed)
 if "%errorlevel%" equ "3" (set AnimationTarget=SetNoteSpeed&set AnimationSource=GetNoteSpeed)
-if "%errorlevel%" equ "4" (set AnimationTarget=SetOffsetX&set AnimationSource=StartKey)
-if "%errorlevel%" equ "5" (set AnimationTarget=SetOffsetY&set AnimationSource=EndKey)
+if "%errorlevel%" equ "4" (set AnimationTarget=SetStartKey&set AnimationSource=GetStartKey)
+if "%errorlevel%" equ "5" (set AnimationTarget=SetEndKey&set AnimationSource=GetEndKey)
 if "%errorlevel%" equ "6" (set AnimationTarget=SetOffsetX&set AnimationSource=GetOffsetX)
 if "%errorlevel%" equ "7" (set AnimationTarget=SetOffsetY&set AnimationSource=GetOffsetY)
 if "%errorlevel%" equ "8" (set AnimationTarget=SetZoom&set AnimationSource=GetZoom)
@@ -2689,9 +2693,9 @@ if "%errorlevel%" equ "2" (set AnimationTarget=SetVolume)
 if "%errorlevel%" equ "3" (set AnimationTarget=SetMute)
 if "%errorlevel%" equ "4" (set AnimationTarget=SetPlaybackSpeed)
 if "%errorlevel%" equ "5" (set AnimationTarget=SetNoteSpeed)
-if "%errorlevel%" equ "6" (set AnimationTarget=StartKey)
-if "%errorlevel%" equ "7" (set AnimationTarget=EndKey)
-if "%errorlevel%" equ "8" (set AnimationTarget=KeyMode)
+if "%errorlevel%" equ "6" (set AnimationTarget=SetStartKey)
+if "%errorlevel%" equ "7" (set AnimationTarget=SetEndKey)
+if "%errorlevel%" equ "8" (set AnimationTarget=SetKeyMode)
 if "%errorlevel%" equ "9" (set AnimationTarget=SetOffsetX)
 if "%errorlevel%" equ "10" (set AnimationTarget=SetOffsetY)
 if "%errorlevel%" equ "11" (set AnimationTarget=SetZoom)
