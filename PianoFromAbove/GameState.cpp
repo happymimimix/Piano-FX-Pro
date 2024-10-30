@@ -393,7 +393,7 @@ GameState::GameError SplashScreen::Logic()
 
     // Advance end position
     int iEventCount = (int)m_vEvents.size();
-    while (m_iEndPos + 1 >= iEventCount || (m_iEndPos + 1 > 0 && m_vEvents[m_iEndPos + 1]->GetAbsT() > llEndTime))
+    while (m_iEndPos + 1 > 0 && (m_iEndPos + 1 >= iEventCount || m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() > llEndTime))
         m_iEndPos--;
     while (m_iEndPos + 1 < iEventCount && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() < llEndTime )
         m_iEndPos++;
@@ -1424,7 +1424,7 @@ void MainScreen::JumpTo(long long llStartTime, boolean loadingMode)
         if (m_bTickMode) {
             m_iEndPos = m_iStartPos + 1;
             auto iEventCount = (long long)m_vEvents.size();
-            while (m_iEndPos + 1 >= iEventCount || (m_iEndPos + 1 > 0 && m_vEvents[m_iEndPos + 1]->GetAbsT() > llEndTime))
+            while (m_iEndPos + 1 > 0 && (m_iEndPos + 1 >= iEventCount || m_vEvents[m_iEndPos + 1]->GetAbsT() > llEndTime))
                 m_iEndPos--;
             m_iEndPos += (m_iStartPos - m_iEndPos) * 2;
         }
@@ -1432,7 +1432,7 @@ void MainScreen::JumpTo(long long llStartTime, boolean loadingMode)
 
             m_iEndPos = m_iStartPos + 1;
             auto iEventCount = (long long)m_vEvents.size();
-            while (m_iEndPos + 1 >= iEventCount || (m_iEndPos + 1 > 0 && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() > llEndTime))
+            while (m_iEndPos + 1 > 0 && (m_iEndPos + 1 >= iEventCount || m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() > llEndTime))
                 m_iEndPos--;
             m_iEndPos += (m_iStartPos - m_iEndPos) * 2;
         }
@@ -1825,8 +1825,10 @@ void MainScreen::RenderGlobals()
         m_llRndStartTime = m_iStartTick;
     } else {
         long long llMicroSecsPP = static_cast< long long >( m_llTimeSpan / m_fNotesCY + 0.5f );
-        m_llRndStartTime = m_llStartTime - ( m_llStartTime < 0 ? llMicroSecsPP : 0 );
-        m_llRndStartTime = (m_llRndStartTime / llMicroSecsPP ) * llMicroSecsPP;
+        if (llMicroSecsPP != 0) {
+            m_llRndStartTime = m_llStartTime - (m_llStartTime < 0 ? llMicroSecsPP : 0);
+            m_llRndStartTime = (m_llRndStartTime / llMicroSecsPP) * llMicroSecsPP;
+        }
     }
 
     GenNoteXTable();
@@ -1936,7 +1938,7 @@ void MainScreen::RenderNotes()
     // Ensure that any rects rendered after this point render over the notes
     m_pRenderer->SplitRect();
 
-    for (auto i = iEndPos; i >= iStartPos; i--) {
+    for (auto i = iEndPos; i >= max(iStartPos,0); i--) {
         MIDIChannelEvent* pEvent = m_vEvents[i];
         if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn &&
             pEvent->GetParam2() > 0 && pEvent->HasSister()) {
