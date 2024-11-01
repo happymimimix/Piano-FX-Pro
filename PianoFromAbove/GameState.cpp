@@ -2334,12 +2334,27 @@ void MainScreen::RenderText()
     Config& config = Config::GetConfig();
     VizSettings viz = config.GetVizSettings();
 
-    int Lines = 10;
-    if (m_bDebug) Lines += 10;
-    if (viz.bPhigros) Lines += 4;
-    if (m_Timer.m_bManualTimer && !m_bDebug) Lines += 1;
-    if (viz.bDumpFrames && !m_bDebug) Lines -= 2;
-    if (viz.bDumpFrames && m_bDebug) Lines -= 1;
+    int Lines = 10; //Basic info
+    if (m_bDebug) {
+        Lines += 9; //Debug info
+    }
+    if (viz.bPhigros) {
+        Lines += 4; //Score and level
+    }
+    if (viz.bDumpFrames && m_bDebug) {
+        Lines += 1; //Playback speed
+    }
+    else {
+        if (m_bDebug) {
+            Lines += 1; //Playback speed
+        }
+        else if (m_Timer.m_bManualTimer) {
+            Lines += 1; //Playback speed
+        }
+    }
+    if (viz.bDumpFrames) {
+        Lines -= 1; //Don't show FPS when exporting videos
+    }
 
     // Screen info
     RECT rcStatus = { m_pRenderer->GetBufferWidth() - 260, 0, m_pRenderer->GetBufferWidth(), 16 * Lines + 10};
@@ -2461,7 +2476,9 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
         min, sec, cs,
         tmin, tsec, tcs);
     RenderStatusLine(cur_line++, "Tick:", "%d/%d", m_iStartTick, mInfo.iDivision);
-    if (m_bDebug) RenderStatusLine(cur_line++, "Microseconds:", llStartTimeFormatted.c_str());
+    if (m_bDebug) {
+        RenderStatusLine(cur_line++, "Microseconds:", llStartTimeFormatted.c_str());
+    }
     if (!viz.bDumpFrames) {
         RenderStatusLine(cur_line++, "FPS:", "%.2lf", m_dFPS);
     }
@@ -2484,14 +2501,23 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
             RenderStatusLine(cur_line++, "Volume:", "%.0lf%%", cPlayback.GetVolume() * 100);
         }
     }
-    if (m_Timer.m_bManualTimer && !m_bDebug && !viz.bDumpFrames) {
-        RenderStatusLine(cur_line++,"PlaybackSpeed:", "%.0lf%%", (m_dFPS / m_Timer.m_dFramerate) * 100);
+    if (viz.bDumpFrames && m_bDebug) {
+        RenderStatusLine(cur_line++, "PlaybackSpeed:", "%.0lf%%", cPlayback.GetSpeed() * 100);
     }
-    if ((!m_Timer.m_bManualTimer || viz.bDumpFrames) && m_bDebug) {
-        RenderStatusLine(cur_line++,"PlaybackSpeed:", "%.0lf%%", cPlayback.GetSpeed() * 100);
-    }
-    if (m_Timer.m_bManualTimer && !viz.bDumpFrames && m_bDebug) {
-        RenderStatusLine(cur_line++,"PlaybackSpeed:", "%.0lf%%", cPlayback.GetSpeed() * (m_dFPS / m_Timer.m_dFramerate) * 100);
+    else {
+        if (m_bDebug) {
+            if (m_Timer.m_bManualTimer) {
+                RenderStatusLine(cur_line++, "PlaybackSpeed:", "%.0lf%%", cPlayback.GetSpeed() * (m_dFPS / m_Timer.m_dFramerate) * 100);
+            }
+            else {
+                RenderStatusLine(cur_line++, "PlaybackSpeed:", "%.0lf%%", cPlayback.GetSpeed() * 100);
+            }
+        }
+        else {
+            if (m_Timer.m_bManualTimer) {
+                RenderStatusLine(cur_line++, "PlaybackSpeed:", "%.0lf%%", (m_dFPS / m_Timer.m_dFramerate) * 100);
+            }
+        }
     }
     if (m_bDebug) {
         RenderStatusLine(cur_line++,"NoteSpeed:", "%f", cPlayback.GetNSpeed());
@@ -2501,7 +2527,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
         RenderStatusLine(cur_line++,"WindowSize:", "%d*%d", width, height);
         RenderStatusLine(cur_line++,"KeyRange:", "%d~%d", m_bFlipKeyboard ? m_iEndNote : m_iStartNote, m_bFlipKeyboard ? m_iStartNote : m_iEndNote);
     }
-    if (viz.bPhigros) { //Calculate song level
+    if (viz.bPhigros) {
         RenderStatusLine(cur_line++, "Score:", "%07.0f", (passed == static_cast<long long>(mInfo.iNoteCount) ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(mInfo.iNoteCount) * 1000000)));
              if (mInfo.iNoteCount < 100000) {RenderStatusLine(cur_line++,"Level:", "EZ Lv.1");}
         else if (mInfo.iNoteCount < 200000) {RenderStatusLine(cur_line++,"Level:", "EZ Lv.2");}
