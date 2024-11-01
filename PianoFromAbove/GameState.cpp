@@ -1860,8 +1860,6 @@ void MainScreen::RenderLines()
     if (m_bBackgroundLoaded)
         return;
 
-    m_pRenderer->DrawRect(m_bFlipKeyboard ? m_pRenderer->GetBufferWidth() - m_fNotesX - m_fNotesCX : m_fNotesX, m_fNotesY, m_fNotesCX, m_fNotesCY, m_csBackground.iPrimaryRGB );
-
     // Vertical lines
     for ( int i = m_iStartNote + 1; i <= m_iEndNote; i++ )
         if ( !MIDI::IsSharp( i - 1 ) && !MIDI::IsSharp( i ) )
@@ -2036,7 +2034,7 @@ void MainScreen::RenderKeys()
     float fNearCY = fKeysCY - fSpacerCY - fRedCY - fTransitionCY - fTopCY;
 
     // Draw the background
-    m_pRenderer->DrawRect(m_bFlipKeyboard ? m_pRenderer->GetBufferWidth() - m_fNotesX - m_fNotesCX : m_fNotesX, fKeysY, m_fNotesCX, fKeysCY, m_csBackground.iPrimaryRGB);
+    m_pRenderer->DrawRect(m_bFlipKeyboard ? m_pRenderer->GetBufferWidth() - m_fNotesX - m_fNotesCX : m_fNotesX, fKeysY, m_fNotesCX, fKeysCY, m_csKBBackground.iPrimaryRGB);
     m_pRenderer->DrawRect(m_bFlipKeyboard ? m_pRenderer->GetBufferWidth() - m_fNotesX - m_fNotesCX : m_fNotesX, fKeysY, m_fNotesCX, fTransitionCY, m_csBackground.iPrimaryRGB, m_csBackground.iPrimaryRGB, m_csKBBackground.iVeryDarkRGB, m_csKBBackground.iVeryDarkRGB);
     m_pRenderer->DrawRect(m_bFlipKeyboard ? m_pRenderer->GetBufferWidth() - m_fNotesX - m_fNotesCX : m_fNotesX, fKeysY + fTransitionCY, m_fNotesCX, fRedCY, m_csKBRed.iDarkRGB, m_csKBRed.iDarkRGB, m_csKBRed.iPrimaryRGB, m_csKBRed.iPrimaryRGB);
     m_pRenderer->DrawRect(m_bFlipKeyboard ? m_pRenderer->GetBufferWidth() - m_fNotesX - m_fNotesCX : m_fNotesX, fKeysY + fTransitionCY + fRedCY, m_fNotesCX, fSpacerCY, m_csKBBackground.iDarkRGB, m_csKBBackground.iDarkRGB, m_csKBBackground.iDarkRGB, m_csKBBackground.iDarkRGB);
