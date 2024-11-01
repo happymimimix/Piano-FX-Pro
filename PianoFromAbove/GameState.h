@@ -66,6 +66,17 @@ protected:
     static const int QueueSize = 50;
 };
 
+struct ChannelSettings
+{
+    ChannelSettings() { bHidden = bMuted = false; SetColor( 0x00000000 ); }
+    void SetColor();
+    void SetColor( unsigned int iColor, double dDark = 0.5, double dVeryDark = 0.2 );
+
+    bool bHidden, bMuted;
+    unsigned int iPrimaryRGB, iDarkRGB, iVeryDarkRGB, iOrigBGR;
+};
+struct TrackSettings { ChannelSettings aChannels[16]; };
+
 class SplashScreen : public GameState
 {
 public:
@@ -80,7 +91,7 @@ private:
     void InitNotes( const vector< MIDIEvent* > &vEvents );
     void InitState();
     void ColorChannel( int iTrack, int iChannel, unsigned int iColor, bool bRandom = false );
-    void SetChannelSettings( const vector< unsigned > &vColor );
+    void SetChannelSettings( const vector< bool > &vMuted, const vector< bool > &vHidden, const vector< unsigned > &vColor );
 
     void UpdateState( int iPos );
 
@@ -102,12 +113,11 @@ private:
     bool m_bPaused;
     bool m_bMute;
 
-    // Devices
     MIDIOutDevice m_OutDevice;
 
     static const float SharpRatio;
     static const long long TimeSpan = 500000;
-    vector<TrackSettings> m_vTrackSettings;
+    vector< TrackSettings > m_vTrackSettings;
 
     // Computed in RenderGlobal
     int m_iStartNote, m_iEndNote; // Start and end notes of the songs

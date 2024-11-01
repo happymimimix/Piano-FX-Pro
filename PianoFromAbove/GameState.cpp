@@ -19,7 +19,6 @@
 #include "resource.h"
 #include "ConfigProcs.h"
 #include <d3d9types.h>
-#include "MIDI.h"
 #include "lzma.h"
 
 long long m_llStartTime;
@@ -111,7 +110,7 @@ GameState::GameError IntroScreen::Init()
 GameState::GameError IntroScreen::Logic()
 {
     // Start new ImGui frame
-    m_pRenderer->ImguiStartFrame();
+    m_pRenderer->ImGuiStartFrame();
 
     Sleep( 10 );
     return Success;
@@ -234,13 +233,13 @@ SplashScreen::SplashScreen( HWND hWnd, D3D12Renderer *pRenderer ) : GameState( h
     vector< MIDIEvent* > vEvents;
     vEvents.reserve( m_MIDI.GetInfo().iEventCount );
     m_MIDI.ConnectNotes(); // Order's important here
+    m_MIDI.PostProcess(m_vEvents);
 
     // Allocate
     m_vTrackSettings.resize( m_MIDI.GetInfo().iNumTracks );
     for (int i = 0; i < 128; i++)
         m_vState[i].reserve(128);
 
-	m_MIDI.PostProcess(m_vTrackSettings, m_vEvents);
     InitState();
 }
 
@@ -267,7 +266,8 @@ void SplashScreen::InitState()
     m_bPaused = cPlayback.GetPaused();
     m_bMute = cPlayback.GetMute();
 
-    SetChannelSettings( vector< unsigned >( cVisual.colors, cVisual.colors + sizeof( cVisual.colors ) / sizeof( cVisual.colors[0] ) ) );
+    SetChannelSettings( vector< bool >(), vector< bool >(),
+        vector< unsigned >( cVisual.colors, cVisual.colors + sizeof( cVisual.colors ) / sizeof( cVisual.colors[0] ) ) );
 
     if (cViz.bKDMAPI) {
         m_OutDevice.OpenKDMAPI();
@@ -293,7 +293,7 @@ void SplashScreen::ColorChannel( int iTrack, int iChannel, unsigned int iColor, 
         m_vTrackSettings[iTrack].aChannels[iChannel].SetColor( iColor );
 }
 
-void SplashScreen::SetChannelSettings(const vector< unsigned > &vColor )
+void SplashScreen::SetChannelSettings( const vector< bool > &, const vector< bool > &, const vector< unsigned > &vColor )
 {
     const MIDI::MIDIInfo &mInfo = m_MIDI.GetInfo();
     const vector< MIDITrack* > &vTracks = m_MIDI.GetTracks();
@@ -301,7 +301,7 @@ void SplashScreen::SetChannelSettings(const vector< unsigned > &vColor )
     static Config& config = Config::GetConfig();
     static const VizSettings& cViz = config.GetVizSettings();
 
-    size_t iPos = 0;
+    int iPos = 0;
     for ( int i = 0; i < (int)mInfo.iNumTracks; i++ )
     {
         const MIDITrack::MIDITrackInfo &mTrackInfo = vTracks[i]->GetInfo();
@@ -357,7 +357,7 @@ GameState::GameError SplashScreen::MsgProc( HWND, UINT msg, WPARAM wParam, LPARA
 GameState::GameError SplashScreen::Logic()
 {
     // Start new ImGui frame
-    m_pRenderer->ImguiStartFrame();
+    m_pRenderer->ImGuiStartFrame();
 
     static Config &config = Config::GetConfig();
     static PlaybackSettings &cPlayback = config.GetPlaybackSettings();
@@ -393,9 +393,7 @@ GameState::GameError SplashScreen::Logic()
 
     // Advance end position
     int iEventCount = (int)m_vEvents.size();
-    while (m_iEndPos + 1 > 0 && (m_iEndPos + 1 >= iEventCount || m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() > llEndTime))
-        m_iEndPos--;
-    while (m_iEndPos + 1 < iEventCount && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() < llEndTime )
+    while ( m_iEndPos + 1 < iEventCount && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() < llEndTime )
         m_iEndPos++;
         
     // Advance start position updating initial state as we pass stale events
@@ -410,6 +408,7 @@ GameState::GameError SplashScreen::Logic()
         UpdateState( m_iStartPos );
         m_iStartPos++;
     }
+
     return Success;
 }
 
@@ -573,16 +572,6 @@ void SplashScreen::RenderNotes()
     if ( m_iEndPos < 0 || m_iStartPos >= static_cast< int >( m_vEvents.size() ) )
         return;
 
-    for (int i = m_iStartPos; i <= m_iEndPos; i++) {
-        MIDIChannelEvent* pEvent = m_vEvents[i];
-        if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn &&
-            pEvent->GetParam2() > 0 && pEvent->HasSister())
-        {
-            if (!MIDI::IsSharp(pEvent->GetParam1())) {
-                RenderNote(pEvent);
-            }
-        }
-    }
     for (int i = 0; i < 128; i++) {
         if (!MIDI::IsSharp(i)) {
             for (vector< int >::iterator it = (m_vState[i]).begin(); it != (m_vState[i]).end(); it++) {
@@ -590,13 +579,12 @@ void SplashScreen::RenderNotes()
             }
         }
     }
-
     for (int i = m_iStartPos; i <= m_iEndPos; i++) {
         MIDIChannelEvent* pEvent = m_vEvents[i];
         if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn &&
             pEvent->GetParam2() > 0 && pEvent->HasSister() &&
-            MIDI::IsSharp(pEvent->GetParam1())) {
-            RenderNote(pEvent);
+            !MIDI::IsSharp(pEvent->GetParam1())) {
+                RenderNote(pEvent);
         }
     }
     for (int i = 0; i < 128; i++) {
@@ -604,6 +592,14 @@ void SplashScreen::RenderNotes()
             for (vector< int >::iterator it = (m_vState[i]).begin(); it != (m_vState[i]).end(); it++) {
                 RenderNote(m_vEvents[*it]);
             }
+        }
+    }
+    for (int i = m_iStartPos; i <= m_iEndPos; i++) {
+        MIDIChannelEvent* pEvent = m_vEvents[i];
+        if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn &&
+            pEvent->GetParam2() > 0 && pEvent->HasSister() &&
+            MIDI::IsSharp(pEvent->GetParam1())) {
+            RenderNote(pEvent);
         }
     }
 }
@@ -702,7 +698,7 @@ MainScreen::MainScreen( wstring sMIDIFile, State eGameMode, HWND hWnd, D3D12Rend
     for (auto note_state : m_vState)
         note_state.reserve(m_MIDI.GetInfo().iNumTracks * 16);
 
-    m_MIDI.PostProcess(m_vTrackSettings, m_vEvents, &m_vProgramChange, &m_vMetaEvents, &m_vNoteOns, &m_vTempo, &m_vSignature, &m_vMarkers, &m_vColors);
+    m_MIDI.PostProcess(m_vEvents, &m_vProgramChange, &m_vMetaEvents, &m_vNoteOns, &m_vTempo, &m_vSignature, &m_vMarkers, &m_vColors);
 
     // Initialize
     InitColors();
@@ -830,22 +826,22 @@ void ChannelSettings::SetColor()
 }
 
 // Flips around windows format (ABGR) -> direct x format (ARGB)
-void ChannelSettings::SetColor(unsigned int iColor, double dDark, double dVeryDark)
+void ChannelSettings::SetColor( unsigned int iColor, double dDark, double dVeryDark )
 {
-    int R = (iColor >> 0) & 0xFF, dR, vdR;
-    int G = (iColor >> 8) & 0xFF, dG, vdG;
-    int B = (iColor >> 16) & 0xFF, dB, vdB;
-    int A = (iColor >> 24) & 0xFF;
+    int R = ( iColor >> 0 ) & 0xFF, dR, vdR;
+    int G = ( iColor >> 8 ) & 0xFF, dG, vdG;
+    int B = ( iColor >> 16 ) & 0xFF, dB, vdB;
+    int A = ( iColor >> 24 ) & 0xFF;
 
     int H, S, V;
-    Util::RGBtoHSV(R, G, B, H, S, V);
-    Util::HSVtoRGB(H, S, min(100, static_cast<int>(V * dDark)), dR, dG, dB);
-    Util::HSVtoRGB(H, S, min(100, static_cast<int>(V * dVeryDark)), vdR, vdG, vdB);
+    Util::RGBtoHSV( R, G, B, H, S, V );
+    Util::HSVtoRGB( H, S, min( 100, static_cast< int >( V * dDark ) ), dR, dG, dB );
+    Util::HSVtoRGB( H, S, min( 100, static_cast< int >( V * dVeryDark ) ), vdR, vdG, vdB );
 
     this->iOrigBGR = iColor;
-    this->iPrimaryRGB = (A << 24) | (R << 16) | (G << 8) | (B << 0);
-    this->iDarkRGB = (A << 24) | (dR << 16) | (dG << 8) | (dB << 0);
-    this->iVeryDarkRGB = (A << 24) | (vdR << 16) | (vdG << 8) | (vdB << 0);
+    this->iPrimaryRGB = ( A << 24 ) | ( R << 16 ) | ( G << 8 ) | ( B << 0 );
+    this->iDarkRGB = ( A << 24 ) | ( dR << 16 ) | ( dG << 8 ) | ( dB << 0 );
+    this->iVeryDarkRGB =  ( A << 24 ) | ( vdR << 16 ) | ( vdG << 8 ) | ( vdB << 0 );
 }
 
 ChannelSettings* MainScreen::GetChannelSettings( int iTrack )
@@ -1041,7 +1037,7 @@ GameState::GameError MainScreen::MsgProc( HWND, UINT msg, WPARAM wParam, LPARAM 
 GameState::GameError MainScreen::Logic( void )
 {
     // Start new ImGui frame
-    m_pRenderer->ImguiStartFrame();
+    m_pRenderer->ImGuiStartFrame();
 
     static Config &config = Config::GetConfig();
     static PlaybackSettings &cPlayback = config.GetPlaybackSettings();
@@ -1125,7 +1121,7 @@ GameState::GameError MainScreen::Logic( void )
     m_iStartTick = GetCurrentTick( m_llStartTime );
     long long llEndTime = 0;
     if (m_bTickMode) {
-        if (Config::GetConfig().GetPlaybackSettings().GetNSpeed() < 0) {
+        if (dNSpeed < 0) {
             llEndTime = m_iStartTick - m_llTimeSpan;
         }
         else {
@@ -1133,7 +1129,7 @@ GameState::GameError MainScreen::Logic( void )
         }
     }
     else {
-        if (Config::GetConfig().GetPlaybackSettings().GetNSpeed() < 0) {
+        if (dNSpeed < 0) {
             llEndTime = m_llStartTime - m_llTimeSpan;
         }
         else {
@@ -1145,9 +1141,9 @@ GameState::GameError MainScreen::Logic( void )
     RenderGlobals();
 
     // Advance end position
-    if (Config::GetConfig().GetPlaybackSettings().GetNSpeed() >= 0) {
+    if (dNSpeed >= 0) {
         if (m_bTickMode) {
-            while (m_iEndPos + 1 > 0 && (m_iEndPos + 1 >= iEventCount || m_vEvents[m_iEndPos + 1]->GetAbsT() > llEndTime)) {
+            while (m_iEndPos > 0 && (m_iEndPos + 1 >= iEventCount || m_vEvents[m_iEndPos + 1]->GetAbsT() > llEndTime)) {
                 m_iEndPos--; //Make sure we're 10000% not drawing any unnecessary notes! 
             }
             while (m_iEndPos + 1 < iEventCount && m_vEvents[m_iEndPos + 1]->GetAbsT() < llEndTime) {
@@ -1155,7 +1151,7 @@ GameState::GameError MainScreen::Logic( void )
             }
         }
         else {
-            while (m_iEndPos + 1 > 0 && (m_iEndPos + 1 >= iEventCount || m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() > llEndTime)) {
+            while (m_iEndPos > 0 && (m_iEndPos + 1 >= iEventCount || m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() > llEndTime)) {
                 m_iEndPos--; //Make sure we're 10000% not drawing any unnecessary notes! 
             }
             while (m_iEndPos + 1 < iEventCount && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() < llEndTime) {
@@ -1173,7 +1169,7 @@ GameState::GameError MainScreen::Logic( void )
         long long events_processed = 0;
         for (auto& work : m_vThreadWork)
             work.clear();
-        while (m_iStartPos < iEventCount && m_vEvents[m_iStartPos]->GetAbsMicroSec() <= m_llStartTime)
+        while ( m_iStartPos < iEventCount && m_vEvents[m_iStartPos]->GetAbsMicroSec() <= m_llStartTime )
         {
             MIDIChannelEvent* pEvent = m_vEvents[m_iStartPos];
             MIDIChannelEvent* pChannelEvent = reinterpret_cast<MIDIChannelEvent*>(pEvent);
@@ -1231,10 +1227,11 @@ GameState::GameError MainScreen::Logic( void )
     }
 
     // Advance end position AFTER advancing start for negative note speed
-    if (Config::GetConfig().GetPlaybackSettings().GetNSpeed() < 0) {
+    if (dNSpeed < 0) {
         m_iEndPos += (m_iPrevStartPos - m_iEndPos) * 2;
+        m_iEndPos = max(m_iEndPos, 0);
         if (m_bTickMode) {
-            while (m_iEndPos + 1 > 0 && (m_iEndPos + 1 >= iEventCount || m_vEvents[m_iEndPos + 1]->GetAbsT() > llEndTime)) {
+            while (m_iEndPos > 0 && (m_iEndPos + 1 >= iEventCount || m_vEvents[m_iEndPos + 1]->GetAbsT() > llEndTime)) {
                 m_iEndPos--; //Make sure we're 10000% not drawing any unnecessary notes! 
             }
             while (m_iEndPos + 1 < iEventCount && m_vEvents[m_iEndPos + 1]->GetAbsT() < llEndTime) {
@@ -1242,7 +1239,7 @@ GameState::GameError MainScreen::Logic( void )
             }
         }
         else {
-            while (m_iEndPos + 1 > 0 && (m_iEndPos + 1 >= iEventCount || m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() > llEndTime)) {
+            while (m_iEndPos > 0 && (m_iEndPos + 1 >= iEventCount || m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() > llEndTime)) {
                 m_iEndPos--; //Make sure we're 10000% not drawing any unnecessary notes! 
             }
             while (m_iEndPos + 1 < iEventCount && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() < llEndTime) {
@@ -1374,7 +1371,6 @@ void MainScreen::JumpTo(long long llStartTime, boolean loadingMode)
     if (itMiddle != itEnd && itMiddle - m_vEvents.begin() < m_iStartPos)
         m_iStartPos = itMiddle - m_vEvents.begin();
 
-
     // Need to scan up to the next note on event
     for (; itMiddle != itEnd; itMiddle++) {
         if ((*itMiddle)->GetChannelEventType() == MIDIChannelEvent::NoteOn && (*itMiddle)->GetParam2() > 0)
@@ -1424,15 +1420,14 @@ void MainScreen::JumpTo(long long llStartTime, boolean loadingMode)
         if (m_bTickMode) {
             m_iEndPos = m_iStartPos + 1;
             auto iEventCount = (long long)m_vEvents.size();
-            while (m_iEndPos + 1 > 0 && (m_iEndPos + 1 >= iEventCount || m_vEvents[m_iEndPos + 1]->GetAbsT() > llEndTime))
+            while (m_iEndPos > 0 && (m_iEndPos + 1 >= iEventCount || m_vEvents[m_iEndPos + 1]->GetAbsT() > llEndTime))
                 m_iEndPos--;
             m_iEndPos += (m_iStartPos - m_iEndPos) * 2;
         }
         else {
-
             m_iEndPos = m_iStartPos + 1;
             auto iEventCount = (long long)m_vEvents.size();
-            while (m_iEndPos + 1 > 0 && (m_iEndPos + 1 >= iEventCount || m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() > llEndTime))
+            while (m_iEndPos > 0 && (m_iEndPos + 1 >= iEventCount || m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() > llEndTime))
                 m_iEndPos--;
             m_iEndPos += (m_iStartPos - m_iEndPos) * 2;
         }
@@ -1935,20 +1930,21 @@ void MainScreen::RenderNotes()
     long long iStartPos = Config::GetConfig().GetPlaybackSettings().GetNSpeed() < 0 ? m_iStartPos - (m_iEndPos - m_iStartPos) : m_iStartPos;
     long long iEndPos = Config::GetConfig().GetPlaybackSettings().GetNSpeed() < 0 ? m_iEndPos - (m_iEndPos - m_iStartPos) : m_iEndPos;
 
+    if (iStartPos < 0 || iEndPos >= m_vEvents.size()) return; // the note speed has been changed after processing these positions but before reaching here. 
+
     // Ensure that any rects rendered after this point render over the notes
     m_pRenderer->SplitRect();
 
-    for (auto i = iEndPos; i >= max(iStartPos,0); i--) {
+    for (int i = 0; i < 128; i++) {
+        for (vector< int >::iterator it = (m_vState[i]).begin(); it != (m_vState[i]).end(); it++) {
+            RenderNote(m_vEvents[*it]);
+        }
+    }
+    for (int i = iStartPos; i <= iEndPos; i++) {
         MIDIChannelEvent* pEvent = m_vEvents[i];
         if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn &&
             pEvent->GetParam2() > 0 && pEvent->HasSister()) {
             RenderNote(pEvent);
-        }
-    }
-
-    for (size_t i = 0; i < 128; i++) {
-        for (vector< int >::reverse_iterator it = (m_vState[i]).rbegin(); it != (m_vState[i]).rend(); it++) {
-            RenderNote(m_vEvents[*it]);
         }
     }
 }
@@ -2447,7 +2443,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
     for (int i = passedFormatted.length() - 3; i > 0; i -= 3)
         passedFormatted.insert(i, ",");
 
-    RenderStatusLine(cur_line++,"Piano-FX Pro", "v3.02");
+    RenderStatusLine(cur_line++,"Piano-FX Pro", "v3.04");
     RenderStatusLine(cur_line++,"Made by: happy_mimimix", "");
     RenderStatusLine(cur_line++,"", "");
     RenderStatusLine(cur_line++, "Time:", "%s%lld:%02d.%d / %lld:%02d.%d",

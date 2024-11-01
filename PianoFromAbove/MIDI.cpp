@@ -245,7 +245,7 @@ MIDI::MIDI ( const wstring &sFilename )
         // Go to the beginning of the file to prepare for parsing
         if (_fseeki64(stream, 0, SEEK_SET)) {
             MessageBoxA(NULL, "_fseeki64 encountered an error.", "Piano-FX Pro", MB_OK | MB_ICONERROR);
-            //return;
+            return;
         }
 
         // Parse the entire MIDI to memory
@@ -404,13 +404,19 @@ MIDI::~MIDI( void )
 
 #define EVENT_POOL_MAX 1000000
 MIDIChannelEvent* MIDI::AllocChannelEvent() {
-    if (event_pools.size() == 0 || event_pools.back().size() == EVENT_POOL_MAX) {
+    if (event_pools.size() == 0 || event_pools.back().count == EVENT_POOL_MAX) {
+        // Currently, MIDIChannelEvent is 32 bytes large.
+        // This is conveniently exactly half the size of an x86 cache line.
+        // Making sure the pool allocation is aligned to at least 32 bytes should ensure that all member accesses are in cache.
+        static_assert(sizeof(MIDIChannelEvent) == 32);
         event_pools.emplace_back();
-        event_pools.back().reserve(EVENT_POOL_MAX);
+        event_pools.back().events = (MIDIChannelEvent*)_aligned_malloc(EVENT_POOL_MAX * sizeof(MIDIChannelEvent), 32);
+        event_pools.back().count = 0;
     }
     auto& pool = event_pools.back();
-    pool.emplace_back();
-    return &pool.back();
+    auto ev = &pool.events[pool.count++];
+    new (ev) MIDIChannelEvent();
+    return ev;
 }
 
 
@@ -531,6 +537,8 @@ void MIDI::clear( void )
         delete *it;
     m_vTracks.clear();
     m_Info.clear();
+    for (auto& pool : event_pools)
+        _aligned_free(pool.events);
     event_pools.clear();
 }
 
@@ -644,7 +652,7 @@ void MIDI::MIDIInfo::AddTrackInfo( const MIDITrack &mTrack )
 
 // Sets absolute time variables. A lot of code for not much happening...
 // Has to be EXACT. Even a little drift and things start messing up a few minutes in (metronome, etc)
-void MIDI::PostProcess(vector<TrackSettings> vTrackSettings, vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vProgramChanges, vector<MIDIMetaEvent*>* vMetaEvents, eventvec_t* vNoteOns, eventvec_t* vTempo, eventvec_t* vSignature, eventvec_t* vMarkers, eventvec_t* vColors)
+void MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vProgramChanges, vector<MIDIMetaEvent*>* vMetaEvents, eventvec_t* vNoteOns, eventvec_t* vTempo, eventvec_t* vSignature, eventvec_t* vMarkers, eventvec_t* vColors)
 {
     // Iterator like class
     MIDIPos midiPos( *this );

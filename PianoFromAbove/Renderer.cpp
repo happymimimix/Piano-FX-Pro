@@ -98,12 +98,14 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
             return std::make_tuple(res, "D3D12CreateDevice");
     }
 
+#ifdef _DEBUG
     // Break on errors
     ComPtr<ID3D12InfoQueue> info_queue;
     if (SUCCEEDED(m_pDevice->QueryInterface(IID_PPV_ARGS(&info_queue)))) {
         info_queue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, TRUE);
         info_queue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, TRUE);
     }
+#endif
 
     // Create command queue
     D3D12_COMMAND_QUEUE_DESC queue_desc = {
@@ -370,7 +372,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     note_pipeline_desc.DepthStencilState = {
         .DepthEnable = TRUE,
         .DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL,
-        .DepthFunc = D3D12_COMPARISON_FUNC_LESS,
+        .DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL,
     };
     note_pipeline_desc.InputLayout = {
         .NumElements = 0,
