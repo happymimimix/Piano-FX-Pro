@@ -121,9 +121,11 @@ GameState::GameError IntroScreen::Render()
     if ( FAILED( m_pRenderer->ResetDeviceIfNeeded() ) ) return DirectXError;
 
     // Clear the backbuffer to a blue color
-    m_pRenderer->ClearAndBeginScene( D3DCOLOR_XRGB( 0, 0, 0 ) );
-    m_pRenderer->DrawRect( 0.0f, 0.0f, static_cast< float >( m_pRenderer->GetBufferWidth() ),
-                           static_cast< float >( m_pRenderer->GetBufferHeight() ), 0x00000000 );
+    unsigned int iColor = Config::GetConfig().GetVisualSettings().iBkgColor;
+    int R = (iColor >> 0) & 0xFF;
+    int G = (iColor >> 8) & 0xFF;
+    int B = (iColor >> 16) & 0xFF;
+    m_pRenderer->ClearAndBeginScene(D3DCOLOR_XRGB(R, G, B));
 
     // Clear out the ImGui draw list
     m_pRenderer->BeginText();
@@ -132,6 +134,27 @@ GameState::GameError IntroScreen::Render()
     // Present the backbuffer contents to the display
     m_pRenderer->EndScene();
     m_pRenderer->Present();
+
+    // Get the current frame
+    auto* frame = m_pRenderer->Screenshot();
+    //Don't let BitBlt capture a blank screen! 
+    HDC hdcGFX = GetDC(g_hWndGfx);
+    HDC hdcMem = CreateCompatibleDC(hdcGFX);
+    HBITMAP hBitmap = CreateCompatibleBitmap(hdcGFX, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight());
+    SelectObject(hdcMem, hBitmap);
+    BITMAPINFO bmpInfo = {};
+    bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bmpInfo.bmiHeader.biWidth = m_pRenderer->GetBufferWidth();
+    bmpInfo.bmiHeader.biHeight = -m_pRenderer->GetBufferHeight();
+    bmpInfo.bmiHeader.biPlanes = 1;
+    bmpInfo.bmiHeader.biBitCount = 32;
+    bmpInfo.bmiHeader.biCompression = BI_RGB;
+    SetDIBits(hdcMem, hBitmap, 0, m_pRenderer->GetBufferHeight(), frame, &bmpInfo, DIB_RGB_COLORS);
+    BitBlt(hdcGFX, 0, 0, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(), hdcMem, 0, 0, SRCCOPY);
+    DeleteObject(hBitmap);
+    DeleteDC(hdcMem);
+    ReleaseDC(g_hWndGfx, hdcGFX);
+
     return Success;
 }
 
@@ -507,7 +530,11 @@ GameState::GameError SplashScreen::Render()
     if ( FAILED( m_pRenderer->ResetDeviceIfNeeded() ) ) return DirectXError;
 
     // Clear the backbuffer to a blue color
-    m_pRenderer->ClearAndBeginScene(Config::GetConfig().GetVisualSettings().iBkgColor);
+    unsigned int iColor = Config::GetConfig().GetVisualSettings().iBkgColor;
+    int R = (iColor >> 0) & 0xFF;
+    int G = (iColor >> 8) & 0xFF;
+    int B = (iColor >> 16) & 0xFF;
+    m_pRenderer->ClearAndBeginScene(D3DCOLOR_XRGB(R, G, B));
     RenderNotes();
 
     // Present the backbuffer contents to the display
