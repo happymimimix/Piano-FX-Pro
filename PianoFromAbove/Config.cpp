@@ -226,7 +226,7 @@ void VizSettings::LoadDefaultValues() {
 }
 
 void VizSettings::LoadDefaultColors() {
-    this->iBarColor = 0x00FF0080;
+    this->iBarColor = 0x000D0A98;
 }
 
 void AudioSettings::LoadMIDIDevices()

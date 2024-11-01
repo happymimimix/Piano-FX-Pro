@@ -507,9 +507,7 @@ GameState::GameError SplashScreen::Render()
     if ( FAILED( m_pRenderer->ResetDeviceIfNeeded() ) ) return DirectXError;
 
     // Clear the backbuffer to a blue color
-    m_pRenderer->ClearAndBeginScene( D3DCOLOR_XRGB( 0, 0, 0 ) );
-    m_pRenderer->DrawRect( 0.0f, 0.0f, static_cast< float >( m_pRenderer->GetBufferWidth() ),
-                           static_cast< float >( m_pRenderer->GetBufferHeight() ), 0x00000000 );
+    m_pRenderer->ClearAndBeginScene(Config::GetConfig().GetVisualSettings().iBkgColor);
     RenderNotes();
 
     // Present the backbuffer contents to the display
@@ -711,13 +709,14 @@ MainScreen::MainScreen( wstring sMIDIFile, State eGameMode, HWND hWnd, D3D12Rend
 void MainScreen::InitColors()
 {
     static Config& config = Config::GetConfig();
+    static const VisualSettings& cVisual = config.GetVisualSettings();
     static const VizSettings& cViz = config.GetVizSettings();
 
-    m_csBackground.SetColor( 0x00464646, 0.7f, 1.3f );
-    m_csKBBackground.SetColor( 0x00999999, 0.4f, 0.0f );
+    m_csBackground.SetColor(cVisual.iBkgColor, 0.7f, 1.3f );
+    m_csKBBackground.SetColor(0x00999999, 0.4f, 0.0f);
     m_csKBRed.SetColor(cViz.iBarColor, 0.5f);
-    m_csKBWhite.SetColor( 0x00FFFFFF, 0.8f, 0.6f );
-    m_csKBSharp.SetColor( 0x00404040, 0.5f, 0.0f );
+    m_csKBWhite.SetColor(0x00FFFFFF, 0.8f, 0.6f);
+    m_csKBSharp.SetColor(0x00404040, 0.5f, 0.0f);
 }
 
 // Init state vars. Only those which validate the date.
@@ -822,26 +821,26 @@ void MainScreen::ColorChannel( int iTrack, int iChannel, unsigned int iColor, bo
 // Sets to a random color
 void ChannelSettings::SetColor()
 {
-    SetColor( Util::RandColor(), 0.6, 0.2 );
+    SetColor(Util::RandColor(), 0.6, 0.2);
 }
 
 // Flips around windows format (ABGR) -> direct x format (ARGB)
-void ChannelSettings::SetColor( unsigned int iColor, double dDark, double dVeryDark )
+void ChannelSettings::SetColor(unsigned int iColor, double dDark, double dVeryDark)
 {
-    int R = ( iColor >> 0 ) & 0xFF, dR, vdR;
-    int G = ( iColor >> 8 ) & 0xFF, dG, vdG;
-    int B = ( iColor >> 16 ) & 0xFF, dB, vdB;
-    int A = ( iColor >> 24 ) & 0xFF;
+    int R = (iColor >> 0) & 0xFF, dR, vdR;
+    int G = (iColor >> 8) & 0xFF, dG, vdG;
+    int B = (iColor >> 16) & 0xFF, dB, vdB;
+    int A = (iColor >> 24) & 0xFF;
 
     int H, S, V;
-    Util::RGBtoHSV( R, G, B, H, S, V );
-    Util::HSVtoRGB( H, S, min( 100, static_cast< int >( V * dDark ) ), dR, dG, dB );
-    Util::HSVtoRGB( H, S, min( 100, static_cast< int >( V * dVeryDark ) ), vdR, vdG, vdB );
+    Util::RGBtoHSV(R, G, B, H, S, V);
+    Util::HSVtoRGB(H, S, min(100, static_cast<int>(V * dDark)), dR, dG, dB);
+    Util::HSVtoRGB(H, S, min(100, static_cast<int>(V * dVeryDark)), vdR, vdG, vdB);
 
     this->iOrigBGR = iColor;
-    this->iPrimaryRGB = ( A << 24 ) | ( R << 16 ) | ( G << 8 ) | ( B << 0 );
-    this->iDarkRGB = ( A << 24 ) | ( dR << 16 ) | ( dG << 8 ) | ( dB << 0 );
-    this->iVeryDarkRGB =  ( A << 24 ) | ( vdR << 16 ) | ( vdG << 8 ) | ( vdB << 0 );
+    this->iPrimaryRGB = (A << 24) | (R << 16) | (G << 8) | (B << 0);
+    this->iDarkRGB = (A << 24) | (dR << 16) | (dG << 8) | (dB << 0);
+    this->iVeryDarkRGB = (A << 24) | (vdR << 16) | (vdG << 8) | (vdB << 0);
 }
 
 ChannelSettings* MainScreen::GetChannelSettings( int iTrack )
@@ -1735,7 +1734,7 @@ GameState::GameError MainScreen::Render()
         m_sCurBackground = cViz.sBackground;
     }
 
-    m_pRenderer->ClearAndBeginScene( 0x00000000 );
+    m_pRenderer->ClearAndBeginScene(m_csBackground.iPrimaryRGB);
     if (config.GetViewSettings().GetZoomX() != 0) {
         RenderLines();
         RenderNotes();
@@ -2010,24 +2009,10 @@ void MainScreen::RenderKeys()
     float fNearCY = fKeysCY - fSpacerCY - fRedCY - fTransitionCY - fTopCY;
 
     // Draw the background
-    if (m_bBackgroundLoaded) {
-        auto dark = 0x80000000;
-        auto very_dark = 0x00000000;
-        m_pRenderer->DrawRect(m_bFlipKeyboard ? m_pRenderer->GetBufferWidth() - m_fNotesX - m_fNotesCX : m_fNotesX, fKeysY + fTransitionCY, m_fNotesCX, fKeysCY, very_dark);
-        m_pRenderer->DrawRect(m_bFlipKeyboard ? m_pRenderer->GetBufferWidth() - m_fNotesX - m_fNotesCX : m_fNotesX, fKeysY, m_fNotesCX, fTransitionCY,
-            0xFF000000, 0xFF000000, very_dark, very_dark);
-        m_pRenderer->DrawRect(m_bFlipKeyboard ? m_pRenderer->GetBufferWidth() - m_fNotesX - m_fNotesCX : m_fNotesX, fKeysY + fTransitionCY, m_fNotesCX, fRedCY,
-            m_csKBRed.iDarkRGB, m_csKBRed.iDarkRGB, m_csKBRed.iPrimaryRGB, m_csKBRed.iPrimaryRGB);
-        m_pRenderer->DrawRect(m_bFlipKeyboard ? m_pRenderer->GetBufferWidth() - m_fNotesX - m_fNotesCX : m_fNotesX, fKeysY + fTransitionCY + fRedCY, m_fNotesCX, fSpacerCY, dark);
-    } else {
-        m_pRenderer->DrawRect(m_bFlipKeyboard ? m_pRenderer->GetBufferWidth() - m_fNotesX - m_fNotesCX : m_fNotesX, fKeysY, m_fNotesCX, fKeysCY, m_csKBBackground.iVeryDarkRGB);
-        m_pRenderer->DrawRect(m_bFlipKeyboard ? m_pRenderer->GetBufferWidth() - m_fNotesX - m_fNotesCX : m_fNotesX, fKeysY, m_fNotesCX, fTransitionCY,
-            m_csBackground.iPrimaryRGB, m_csBackground.iPrimaryRGB, m_csKBBackground.iVeryDarkRGB, m_csKBBackground.iVeryDarkRGB);
-        m_pRenderer->DrawRect(m_bFlipKeyboard ? m_pRenderer->GetBufferWidth() - m_fNotesX - m_fNotesCX : m_fNotesX, fKeysY + fTransitionCY, m_fNotesCX, fRedCY,
-            m_csKBRed.iDarkRGB, m_csKBRed.iDarkRGB, m_csKBRed.iPrimaryRGB, m_csKBRed.iPrimaryRGB);
-        m_pRenderer->DrawRect(m_bFlipKeyboard ? m_pRenderer->GetBufferWidth() - m_fNotesX - m_fNotesCX : m_fNotesX, fKeysY + fTransitionCY + fRedCY, m_fNotesCX, fSpacerCY,
-            m_csKBBackground.iDarkRGB, m_csKBBackground.iDarkRGB, m_csKBBackground.iDarkRGB, m_csKBBackground.iDarkRGB);
-    }
+    m_pRenderer->DrawRect(m_bFlipKeyboard ? m_pRenderer->GetBufferWidth() - m_fNotesX - m_fNotesCX : m_fNotesX, fKeysY, m_fNotesCX, fKeysCY, m_csBackground.iPrimaryRGB);
+    m_pRenderer->DrawRect(m_bFlipKeyboard ? m_pRenderer->GetBufferWidth() - m_fNotesX - m_fNotesCX : m_fNotesX, fKeysY, m_fNotesCX, fTransitionCY, m_csBackground.iPrimaryRGB, m_csBackground.iPrimaryRGB, m_csKBBackground.iVeryDarkRGB, m_csKBBackground.iVeryDarkRGB);
+    m_pRenderer->DrawRect(m_bFlipKeyboard ? m_pRenderer->GetBufferWidth() - m_fNotesX - m_fNotesCX : m_fNotesX, fKeysY + fTransitionCY, m_fNotesCX, fRedCY, m_csKBRed.iDarkRGB, m_csKBRed.iDarkRGB, m_csKBRed.iPrimaryRGB, m_csKBRed.iPrimaryRGB);
+    m_pRenderer->DrawRect(m_bFlipKeyboard ? m_pRenderer->GetBufferWidth() - m_fNotesX - m_fNotesCX : m_fNotesX, fKeysY + fTransitionCY + fRedCY, m_fNotesCX, fSpacerCY, m_csKBBackground.iDarkRGB, m_csKBBackground.iDarkRGB, m_csKBBackground.iDarkRGB, m_csKBBackground.iDarkRGB);
 
     // Keys info
     float fKeyGap = max( 1.0f, floor( m_fWhiteCX * 0.05f + 0.5f ) );
