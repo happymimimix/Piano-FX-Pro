@@ -218,11 +218,12 @@ void VizSettings::LoadDefaultValues() {
     this->sSplashMIDI = L"";
     this->bVisualizePitchBends = true;
     this->bDumpFrames = false;
-    this->iBarColor = 0x00FF0080;
     this->sBackground = L"";
     this->bColorLoop = true;
     this->bKDMAPI = false;
     this->bDisableUI = false;
+
+    VizSettings::LoadDefaultColors();
 }
 
 void VizSettings::LoadDefaultColors() {
