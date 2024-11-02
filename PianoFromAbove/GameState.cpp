@@ -1760,10 +1760,14 @@ GameState::GameError MainScreen::Render()
     }
 
     m_pRenderer->ClearAndBeginScene(m_csBackground.iPrimaryRGB);
-    if (config.GetViewSettings().GetZoomX() != 0) {
-        RenderLines();
-        RenderNotes();
-        if (m_bShowKB) RenderKeys();
+    if (config.GetViewSettings().GetZoomX() != 0.0f) {
+        if (config.GetViewSettings().GetZoomX() > 0.0f) {
+            RenderLines();
+            RenderNotes();
+        }
+        if (m_bShowKB) {
+            RenderKeys();
+        }
     }
     RenderText();
 
@@ -2185,6 +2189,11 @@ void MainScreen::RenderKeys()
         for (int i = m_iStartNote; i <= m_iEndNote; i++)
             if (!MIDI::IsSharp(i))
             {
+                int state = m_vState[i].size() == 0 ? -1 : m_vState[i].back();
+                MIDIChannelEvent* pEvent = (state >= 0 ? m_vEvents[state] : NULL);
+                if (pEvent && m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bHidden) {
+                    m_pNoteState[i] = -1;
+                }
                 if (m_pNoteState[i] == -1)
                 {
                     m_pRenderer->DrawRect(fCurX + fKeyGap1, fCurY, m_fWhiteCX - fKeyGap, fTopCY + fNearCY,
@@ -2220,6 +2229,11 @@ void MainScreen::RenderKeys()
                 fCurX += m_fWhiteCX;
             else
             {
+                int state = m_vState[i].size() == 0 ? -1 : m_vState[i].back();
+                MIDIChannelEvent* pEvent = (state >= 0 ? m_vEvents[state] : NULL);
+                if (pEvent && m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bHidden) {
+                    m_pNoteState[i] = -1;
+                }
                 float fNudgeX = 0.0;
                 MIDI::Note eNote = MIDI::NoteVal(i);
                 if (eNote == MIDI::CS || eNote == MIDI::FS) fNudgeX = -SharpRatio / 5.0f;
