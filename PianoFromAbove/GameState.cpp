@@ -1352,8 +1352,6 @@ void MainScreen::UpdateState(int key, const thread_work_t& work)
 
 void MainScreen::JumpTo(long long llStartTime, boolean loadingMode)
 {
-    static Config& config = Config::GetConfig();
-
     // Kill the music!
     if (!loadingMode) m_OutDevice.AllNotesOff();
 
