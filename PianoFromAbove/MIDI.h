@@ -73,9 +73,6 @@ public:
     enum Note { A, AS, B, C, CS, D, DS, E, F, FS, G, GS };
 
     static const int KEYS = 129; // One extra because 128th is a sharp
-    static const int C8 = 108;
-    static const int C4 = C8 - 4 * 12;
-    static const int A0 = C8 - 7 * 12 - 3;
     static const int Drums = 0x09;
     static const wstring Instruments[129];
     static const wstring &NoteName( int iNote );

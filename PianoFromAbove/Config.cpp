@@ -155,7 +155,7 @@ void VisualSettings::LoadDefaultValues()
 
 void VisualSettings::LoadDefaultColors()
 {
-    iBkgColor = 0x00303030;
+    iBkgColor = 0x007F7F00;
     int R, G, B = 0, S = 80, V = 100;
     int iColors = sizeof(this->colors) / sizeof(this->colors[0]);
     for (int i = 10, count = 0; count < iColors; i = (i + 7) % iColors, count++)
@@ -227,7 +227,7 @@ void VizSettings::LoadDefaultValues() {
 }
 
 void VizSettings::LoadDefaultColors() {
-    this->iBarColor = 0x000D0A98;
+    this->iBarColor = 0x000000FF;
 }
 
 void AudioSettings::LoadMIDIDevices()
