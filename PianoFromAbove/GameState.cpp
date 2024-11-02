@@ -1989,7 +1989,7 @@ void MainScreen::RenderNote(const MIDIChannelEvent* pNote)
                 .key = (uint8_t)iNote,
                 .channel = (uint8_t)iChannel,
                 .track = (uint16_t)iTrack,
-                .pos = static_cast<float>(Config::GetConfig().GetPlaybackSettings().GetNSpeed() < 0 ? m_llTimeSpan - (llNoteStart - m_llRndStartTime) + (llNoteEnd - llNoteStart) :llNoteStart - m_llRndStartTime),
+                .pos = static_cast<float>(Config::GetConfig().GetPlaybackSettings().GetNSpeed() < 0 ? - (llNoteStart - m_llRndStartTime) - (llNoteEnd - llNoteStart) : llNoteStart - m_llRndStartTime),
                 .length = static_cast<float>(llNoteEnd - llNoteStart),
             }
         );
