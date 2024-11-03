@@ -1208,6 +1208,7 @@ GameState::GameError MainScreen::Logic( void )
                     float NoteWidth = (m_pRenderer->GetBufferWidth() * m_fZoomX * m_fTempZoomX) / (m_iEndNote - m_iStartNote);
                     m_pBendsValue[pEvent->GetChannel()] = ((pEvent->GetParam2() << 7) | pEvent->GetParam1()) - (1 << 13);
                     float ShiftAmount = m_pBendsRange[pEvent->GetChannel()] == 0 ? 0 : m_pBendsValue[pEvent->GetChannel()] / ((1 << 13) / m_pBendsRange[pEvent->GetChannel()]);
+                    if (m_bFlipKeyboard) ShiftAmount *= -1;
                     m_pBends[pEvent->GetChannel()] = NoteWidth * ShiftAmount;
                 }
                 if (pChannelEvent->GetChannelEventType() == MIDIChannelEvent::Controller) {
@@ -1216,6 +1217,7 @@ GameState::GameError MainScreen::Logic( void )
                         m_pBendsRange[pEvent->GetChannel()] = pEvent->GetParam2();
                         float NoteWidth = (m_pRenderer->GetBufferWidth() * m_fZoomX * m_fTempZoomX) / (m_iEndNote - m_iStartNote);
                         float ShiftAmount = m_pBendsRange[pEvent->GetChannel()] == 0 ? 0 : m_pBendsValue[pEvent->GetChannel()] / ((1 << 13) / m_pBendsRange[pEvent->GetChannel()]);
+                        if (m_bFlipKeyboard) ShiftAmount *= -1;
                         m_pBends[pEvent->GetChannel()] = NoteWidth * ShiftAmount;
                     }
                 }
