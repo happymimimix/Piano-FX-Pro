@@ -597,10 +597,10 @@ size_t MIDI::ParseTracks( const unsigned char *pcData, size_t iMaxSize )
 
         iTotal += iCount;
     }
-    while ( iMaxSize - iTotal > 0 && iCount > 0 && m_Info.iFormatType != 2 );
+    while ( iMaxSize - iTotal > 0 && iCount > 0 && iTrack < 0xFFFF);
 
     // Some MIDIs lie about the amount of tracks
-    m_Info.iNumTracks = (int)m_vTracks.size();
+    m_Info.iNumTracks = min(m_vTracks.size(),0xFFFF);
 
     return iTotal;
 }
@@ -629,20 +629,17 @@ void MIDI::MIDIInfo::AddTrackInfo( const MIDITrack &mTrack )
     this->iTotalTicks = max( this->iTotalTicks, mti.iTotalTicks );
     this->iEventCount += mti.iEventCount;
     this->iNumChannels += mti.iNumChannels;
-    this->iVolumeSum += mti.iVolumeSum;
     if ( mti.iNoteCount )
     {
         if ( !this->iNoteCount )
         {
             this->iMinNote = mti.iMinNote;
             this->iMaxNote = mti.iMaxNote;
-            this->iMaxVolume = mti.iMaxVolume;
         }
         else
         {
             this->iMinNote = min( mti.iMinNote, this->iMinNote );
             this->iMaxNote = max( mti.iMaxNote, this->iMaxNote );
-            this->iMaxVolume = max( mti.iMaxVolume, this->iMaxVolume );
         }
     }
     this->iNoteCount += mti.iNoteCount;
@@ -940,17 +937,14 @@ void MIDITrack::MIDITrackInfo::AddEventInfo( const MIDIEvent &mEvent )
                         if ( !this->iNoteCount )
                         {
                             this->iMinNote = this->iMaxNote = iParam1;
-                            this->iMaxVolume = iParam2;
                         }
                         else
                         {
                             this->iMinNote = min( iParam1, this->iMinNote );
                             this->iMaxNote = max( iParam1, this->iMaxNote );
-                            this->iMaxVolume = max( iParam2, this->iMaxVolume );
                         }
                         //NoteCount
                         this->iNoteCount++;
-                        this->iVolumeSum += iParam2;
 
                         //Channel info
                         if ( !this->aNoteCount[ iChannel ] )
@@ -990,7 +984,7 @@ MIDIEvent::EventType MIDIEvent::DecodeEventType( int iEventCode )
     return MetaEvent;
 }
 
-int MIDIEvent::MakeNextEvent( MIDI& midi, const unsigned char *pcData, size_t iMaxSize, int iTrack, MIDIEvent **pOutEvent )
+uint32_t MIDIEvent::MakeNextEvent( MIDI& midi, const unsigned char *pcData, size_t iMaxSize, int iTrack, MIDIEvent **pOutEvent )
 {
     MIDIEvent *pPrevEvent = *pOutEvent;
 
@@ -1038,7 +1032,7 @@ int MIDIEvent::MakeNextEvent( MIDI& midi, const unsigned char *pcData, size_t iM
     return iTotal;
 }
 
-int MIDIChannelEvent::ParseEvent( const unsigned char *pcData, size_t iMaxSize )
+uint32_t MIDIChannelEvent::ParseEvent( const unsigned char *pcData, size_t iMaxSize )
 {
     // Split up the event code
     m_cChannel = m_iEventCode & 0xF;
@@ -1061,7 +1055,7 @@ int MIDIChannelEvent::ParseEvent( const unsigned char *pcData, size_t iMaxSize )
     }
 }
 
-int MIDIMetaEvent::ParseEvent( const unsigned char *pcData, size_t iMaxSize )
+uint32_t MIDIMetaEvent::ParseEvent( const unsigned char *pcData, size_t iMaxSize )
 {
     if ( iMaxSize < 1 ) return 0;
 
@@ -1082,7 +1076,7 @@ int MIDIMetaEvent::ParseEvent( const unsigned char *pcData, size_t iMaxSize )
 
 // NOTE: this is INCOMPLETE. Data is parsed but not fully interpreted:
 // divided messages don't know about each other
-int MIDISysExEvent::ParseEvent( const unsigned char *pcData, size_t iMaxSize )
+uint32_t MIDISysExEvent::ParseEvent( const unsigned char *pcData, size_t iMaxSize )
 {
     if ( iMaxSize < 1 ) return 0;
 
@@ -1153,7 +1147,7 @@ uint32_t MIDI::Parse24Bit( const unsigned char *pcData, size_t iMaxSize, uint32_
 }
 
 //Parse 16 bits of data. Big Endian.
-uint32_t MIDI::Parse16Bit( const unsigned char *pcData, size_t iMaxSize, uint32_t *piOut )
+uint16_t MIDI::Parse16Bit( const unsigned char *pcData, size_t iMaxSize, uint16_t *piOut )
 {
     if ( !pcData || !piOut || iMaxSize < 2 )
         return 0;

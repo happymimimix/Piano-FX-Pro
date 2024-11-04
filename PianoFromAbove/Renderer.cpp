@@ -1061,6 +1061,82 @@ HRESULT D3D12Renderer::EndScene(bool draw_bg) {
     return S_OK;
 }
 
+HRESULT D3D12Renderer::EndSplashScene() {
+    // Generate ImGui render data
+    ImGui::Render();
+    ImGui::GetDrawData()->AddDrawList(m_pDrawList);
+
+    // Flush the intermediate rect buffer
+    HRESULT res = S_OK;
+    if (!m_vRectsIntermediate.empty()) {
+        for (size_t i = 0; i < m_vRectsIntermediate.size(); i += RectsPerPass * 4) {
+            if (i == 0)
+                SetPipeline(Pipeline::Rect);
+
+            auto remaining = m_vRectsIntermediate.size() - i;
+            auto rect_count = min(remaining, RectsPerPass * 4);
+            D3D12_RANGE rect_range = {
+                .Begin = 0,
+                .End = rect_count * sizeof(RectVertex),
+            };
+            RectVertex* vertices = nullptr;
+            res = m_pVertexBuffers[m_uFrameIndex]->Map(0, &rect_range, (void**)&vertices);
+            if (FAILED(res))
+                return res;
+            memcpy(vertices, &m_vRectsIntermediate[i], rect_count * sizeof(RectVertex));
+            m_pVertexBuffers[m_uFrameIndex]->Unmap(0, &rect_range);
+
+            // Draw the first rect batch
+            m_pCommandList->DrawIndexedInstanced(rect_count / 4 * 6, 1, 0, 0, 0);
+
+            if (remaining - rect_count != 0) {
+                // Still more notes to go! Render the current batch and wait for the GPU to finish rendering it
+                // Close the command list
+                res = m_pCommandList->Close();
+                if (FAILED(res))
+                    return res;
+
+                // Execute the command list
+                ID3D12CommandList* command_lists[] = { m_pCommandList.Get() };
+                m_pCommandQueue->ExecuteCommandLists(1, command_lists);
+
+                // Wait for the GPU to finish rendering the frame
+                res = WaitForGPU();
+                if (FAILED(res))
+                    return res;
+
+                // Reset the command list
+                m_pCommandAllocator[m_uFrameIndex]->Reset();
+                m_pCommandList->Reset(m_pCommandAllocator[m_uFrameIndex].Get(), m_pRectPipelineState.Get());
+
+                // Set up the state again
+                SetPipeline(Pipeline::Rect);
+                SetupCommandList();
+            }
+        }
+    }
+
+    // Draw ImGui
+    ID3D12DescriptorHeap* heaps[] = { m_pImGuiSRVDescriptorHeap.Get() };
+    m_pCommandList->SetDescriptorHeaps(_countof(heaps), heaps);
+    ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), m_pCommandList.Get());
+
+    // Transition backbuffer state to present
+    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_pRenderTargets[m_uFrameIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+    m_pCommandList->ResourceBarrier(1, &barrier);
+
+    // Close the command list
+    res = m_pCommandList->Close();
+    if (FAILED(res))
+        return res;
+
+    // Execute the command list
+    ID3D12CommandList* command_lists[] = { m_pCommandList.Get() };
+    m_pCommandQueue->ExecuteCommandLists(1, command_lists);
+
+    return S_OK;
+}
+
 HRESULT D3D12Renderer::Present() {
     // Present the frame
     HRESULT res;

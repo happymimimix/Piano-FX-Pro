@@ -6,7 +6,6 @@ struct NoteData {
     float length;
 };
 
-#define MAX_TRACK_COLORS 1024
 struct TrackColor {
     uint colors[3]; // primary, dark, darker
 };
@@ -33,7 +32,7 @@ NotePSInput main(uint id : SV_VertexID) {
     uint packed = note_data[note_index].packed;
     uint note = packed & 0xFF;
     uint chan = (packed >> 8) & 0xFF;
-    uint track = ((packed >> 16) & 0xFFFF) % MAX_TRACK_COLORS;
+    uint track = (packed >> 16) & 0xFFFF;
     bool sharp = ((1 << (note % 12)) & 0x54A) != 0;
 
     float x = fixed[0].note_x[note] + fixed[0].bends[chan];

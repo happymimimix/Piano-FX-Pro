@@ -644,7 +644,7 @@ INT_PTR WINAPI TracksProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
             lvi.pszText = buf;
 
             int iPos = 0;
-            for ( uint32_t i = 0; i < mInfo.iNumTracks; i++ )
+            for ( uint16_t i = 0; i < mInfo.iNumTracks; i++ )
             {
                 const MIDITrack::MIDITrackInfo &mTrackInfo = vTracks[i]->GetInfo();
                 for ( int j = 0; j < 16; j++ )

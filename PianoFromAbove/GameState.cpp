@@ -23,17 +23,17 @@
 
 long long m_llStartTime;
 std::string llStartTimeFormatted;
-long long polyphony;
+uint32_t polyphony;
 std::string polyFormatted;
-long long nps;
+uint32_t nps;
 std::string npsFormatted;
-long long passed;
+uint32_t passed;
 std::string passedFormatted;
 uint8_t FrameCount = 0;
 int width = -1;
 int height = -1;
 int m_iStartTick;
-uint32_t resolution = -1;
+uint16_t resolution = -1;
 
 //A caption that can be set using cheat engine, it does not change by itself. 
 //When compiled, this placeholder will be wiped with IDA Pro. 
@@ -325,7 +325,7 @@ void SplashScreen::SetChannelSettings( const vector< bool > &, const vector< boo
     static const VizSettings& cViz = config.GetVizSettings();
 
     int iPos = 0;
-    for ( int i = 0; i < (int)mInfo.iNumTracks; i++ )
+    for (uint16_t i = 0; i < mInfo.iNumTracks; i++ )
     {
         const MIDITrack::MIDITrackInfo &mTrackInfo = vTracks[i]->GetInfo();
         for ( int j = 0; j < 16; j++ )
@@ -538,7 +538,7 @@ GameState::GameError SplashScreen::Render()
     RenderNotes();
 
     // Present the backbuffer contents to the display
-    m_pRenderer->EndScene();
+    m_pRenderer->EndSplashScene();
     m_pRenderer->Present();
 
     // Get the current frame
@@ -837,12 +837,12 @@ GameState::GameError MainScreen::Init()
     return Success;
 }
 
-void MainScreen::ColorChannel( int iTrack, int iChannel, unsigned int iColor, bool bRandom )
+void MainScreen::ColorChannel(int iTrack, int iChannel, unsigned int iColor, bool bRandom)
 {
-    if ( bRandom )
+    if (bRandom)
         m_vTrackSettings[iTrack].aChannels[iChannel].SetColor();
     else
-        m_vTrackSettings[iTrack].aChannels[iChannel].SetColor( iColor );
+        m_vTrackSettings[iTrack].aChannels[iChannel].SetColor(iColor);
 }
 
 // Sets to a random color
@@ -876,10 +876,10 @@ ChannelSettings* MainScreen::GetChannelSettings( int iTrack )
     const vector< MIDITrack* > &vTracks = m_MIDI.GetTracks();
 
     int iPos = 0;
-    for ( uint32_t i = 0; i < mInfo.iNumTracks; i++ )
+    for (uint16_t i = 0; i < mInfo.iNumTracks; i++ )
     {
         const MIDITrack::MIDITrackInfo &mTrackInfo = vTracks[i]->GetInfo();
-        for (uint32_t j = 0; j < 16; j++ )
+        for (uint16_t j = 0; j < 16; j++ )
             if ( mTrackInfo.aNoteCount[j] > 0 )
             {
                 if ( iPos == iTrack ) return &m_vTrackSettings[i].aChannels[j];
@@ -901,7 +901,6 @@ void MainScreen::SetChannelSettings( const vector< bool > &vMuted, const vector<
     static const VizSettings& cViz = config.GetVizSettings();
 
     size_t iPos = 0;
-    unsigned int last_col = bColor ? vColor[0] : 0;
     for (int i = 0; i < (int)vTracks.size(); i++) {
         const MIDITrack::MIDITrackInfo& mTrackInfo = vTracks[i]->GetInfo();
         for (int j = 0; j < 16; j++) {
@@ -909,16 +908,17 @@ void MainScreen::SetChannelSettings( const vector< bool > &vMuted, const vector<
                 MuteChannel(i, j, bMuted ? vMuted[min(iPos, vMuted.size() - 1)] : false);
                 HideChannel(i, j, bHidden ? vHidden[min(iPos, vHidden.size() - 1)] : false);
                 if (cViz.bColorLoop && bColor) {
-                    last_col = vColor[iPos % vColor.size()];
+                    ColorChannel(i, j, vColor[iPos % vColor.size()]);
                 } else {
-                    if (bColor && iPos < vColor.size())
-                        last_col = vColor[iPos];
-                    else
-                        last_col = Util::RandColor();
+                    if (bColor && iPos < vColor.size()) {
+                        ColorChannel(i, j, vColor[iPos]);
+                    }
+                    else {
+                        ColorChannel(i, j, 0, true);
+                    }
                 }
                 iPos++;
             }
-            ColorChannel(i, j, last_col);
         }
     }
 }
@@ -1320,7 +1320,7 @@ GameState::GameError MainScreen::Logic( void )
     // Update track colors
     // TODO: Only update track colors lazily
     auto* track_colors = m_pRenderer->GetTrackColors();
-    for (size_t i = 0; i < min(m_vTrackSettings.size(), MaxTrackColors); i++) {
+    for (size_t i = 0; i < m_vTrackSettings.size(); i++) {
         for (size_t j = 0; j < 16; j++) {
             auto& src = m_vTrackSettings[i].aChannels[j];
             auto& dst = track_colors[i * 16 + j];
@@ -2085,7 +2085,7 @@ void MainScreen::RenderKeys()
                 else
                 {
                     const MIDIChannelEvent* pEvent = (m_pNoteState[i] >= 0 ? m_vEvents[m_pNoteState[i]] : NULL);
-                    const int iTrack = pEvent->GetTrack() % MaxTrackColors;
+                    const int iTrack = pEvent->GetTrack();
                     const int iChannel = pEvent->GetChannel();
 
                     ChannelSettings& csKBWhite = m_vTrackSettings[iTrack].aChannels[iChannel];
@@ -2152,7 +2152,7 @@ void MainScreen::RenderKeys()
                 else
                 {
                     const MIDIChannelEvent* pEvent = (m_pNoteState[i] >= 0 ? m_vEvents[m_pNoteState[i]] : NULL);
-                    const int iTrack = pEvent->GetTrack() % MaxTrackColors;
+                    const int iTrack = pEvent->GetTrack();
                     const int iChannel = pEvent->GetChannel();
 
                     const float fNewNear = fNearCY * 0.25f;
@@ -2208,7 +2208,7 @@ void MainScreen::RenderKeys()
                 else
                 {
                     const MIDIChannelEvent* pEvent = (m_pNoteState[i] >= 0 ? m_vEvents[m_pNoteState[i]] : NULL);
-                    const int iTrack = pEvent->GetTrack() % MaxTrackColors;
+                    const int iTrack = pEvent->GetTrack();
                     const int iChannel = pEvent->GetChannel();
 
                     ChannelSettings& csKBWhite = m_vTrackSettings[iTrack].aChannels[iChannel];
@@ -2275,7 +2275,7 @@ void MainScreen::RenderKeys()
                 else
                 {
                     const MIDIChannelEvent* pEvent = (m_pNoteState[i] >= 0 ? m_vEvents[m_pNoteState[i]] : NULL);
-                    const int iTrack = pEvent->GetTrack() % MaxTrackColors;
+                    const int iTrack = pEvent->GetTrack();
                     const int iChannel = pEvent->GetChannel();
 
                     const float fNewNear = fNearCY * 0.25f;
@@ -2450,7 +2450,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
     for (int i = passedFormatted.length() - 3; i > 0; i -= 3)
         passedFormatted.insert(i, ",");
 
-    RenderStatusLine(cur_line++,"Piano-FX Pro", "v3.04");
+    RenderStatusLine(cur_line++,"Piano-FX Pro", "v3.05");
     RenderStatusLine(cur_line++,"Made by: happy_mimimix", "");
     RenderStatusLine(cur_line++,"", "");
     RenderStatusLine(cur_line++, "Time:", "%s%lld:%02d.%d / %lld:%02d.%d",

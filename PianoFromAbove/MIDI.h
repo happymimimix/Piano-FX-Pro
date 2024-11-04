@@ -84,7 +84,7 @@ public:
     static uint32_t ParseVarNum( const unsigned char *pcData, size_t iMaxSize, uint32_t *piOut );
     static uint32_t Parse32Bit( const unsigned char *pcData, size_t iMaxSize, uint32_t *piOut );
     static uint32_t Parse24Bit( const unsigned char *pcData, size_t iMaxSize, uint32_t *piOut );
-    static uint32_t Parse16Bit( const unsigned char *pcData, size_t iMaxSize, uint32_t *piOut );
+    static uint16_t Parse16Bit( const unsigned char *pcData, size_t iMaxSize, uint16_t *piOut );
     static uint32_t ParseNChars( const unsigned char *pcData, size_t iNChars, size_t iMaxSize, char *pcOut );
 
     MIDI( void ) {};
@@ -112,18 +112,17 @@ public:
     {
         MIDIInfo() { clear(); }
         void clear() { llTotalMicroSecs = llFirstNote = iFormatType = iNumTracks = iNumChannels = iDivision = iMinNote =
-                       iMaxNote = iNoteCount = iEventCount = iMaxVolume = iVolumeSum = iTotalTicks = iTotalBeats = 0;
+                       iMaxNote = iNoteCount = iEventCount = iTotalTicks = iTotalBeats = 0;
                        sFilename.clear(); }
         void AddTrackInfo( const MIDITrack &mTrack);
 
         wstring sFilename;
         string sMd5;
-        uint32_t iFormatType;
-        uint32_t iNumTracks, iNumChannels;
-        uint32_t iDivision;
+        uint16_t iFormatType;
+        uint16_t iNumTracks, iNumChannels;
+        uint16_t iDivision;
         int iMinNote, iMaxNote;
         size_t iNoteCount, iEventCount;
-        int iMaxVolume, iVolumeSum;
         int iTotalTicks, iTotalBeats;
         long long llTotalMicroSecs, llFirstNote;
     };
@@ -168,17 +167,16 @@ public:
     {
         MIDITrackInfo() { clear(); }
         void clear() { llTotalMicroSecs = iSequenceNumber = iMinNote = iMaxNote = iNoteCount = 
-                       iEventCount = iMaxVolume = iVolumeSum = iTotalTicks = iNumChannels = 0;
+                       iEventCount = iTotalTicks = iNumChannels = 0;
                        memset( aNoteCount, 0, sizeof( aNoteCount ) ),
                        memset( aProgram, 0, sizeof( aProgram ) ),
                        sSequenceName.clear(); }
         void AddEventInfo( const MIDIEvent &mTrack );
 
-        uint32_t iSequenceNumber;
+        uint16_t iSequenceNumber;
         string sSequenceName;
         int iMinNote, iMaxNote;
         size_t iNoteCount, iEventCount;
-        int iMaxVolume, iVolumeSum;
         int iTotalTicks;
         long long llTotalMicroSecs;
         size_t aNoteCount[16];
@@ -204,19 +202,19 @@ public:
     static EventType DecodeEventType( int iEventCode );
 
     //Parsing functions that load data into the instance
-    static int MakeNextEvent( MIDI& midi, const unsigned char *pcData, size_t iMaxSize, int iTrack, MIDIEvent **pOutEvent );
+    static uint32_t MakeNextEvent( MIDI& midi, const unsigned char *pcData, size_t iMaxSize, int iTrack, MIDIEvent **pOutEvent );
 
     //Accessors
     EventType GetEventType() const { return (EventType)m_eEventType; }
     unsigned char GetEventCode() const { return m_iEventCode; }
-    int GetTrack() const { return m_iTrack; }
+    uint16_t GetTrack() const { return m_iTrack; }
     int GetAbsT() const { return m_iAbsT; }
     long long GetAbsMicroSec() const { return m_llAbsMicroSec; }
     void SetAbsMicroSec(long long llAbsMicroSec) { m_llAbsMicroSec = llAbsMicroSec; };
 
     long long m_llAbsMicroSec;
     int m_iAbsT;
-    unsigned short m_iTrack;
+    uint16_t m_iTrack;
     char m_eEventType;
     unsigned char m_iEventCode;
 };
@@ -228,7 +226,7 @@ public:
     MIDIChannelEvent() : m_iSisterIdx(-1), m_iSimultaneous(0), m_bPassDone(false) { }
 
     enum ChannelEventType { NoteOff = 0x8, NoteOn, NoteAftertouch, Controller, ProgramChange, ChannelAftertouch, PitchBend };
-    int ParseEvent( const unsigned char *pcData, size_t iMaxSize );
+    uint32_t ParseEvent( const unsigned char *pcData, size_t iMaxSize );
 
     //Accessors
     ChannelEventType GetChannelEventType() const { return static_cast<ChannelEventType>(m_iEventCode >> 4); }
@@ -276,11 +274,11 @@ public:
     enum MetaEventType { SequenceNumber, TextEvent, Copyright, SequenceName, InstrumentName, Lyric, Marker,
                          CuePoint, GenericTextA = 0x0a, ChannelPrefix = 0x20, PortPrefix = 0x21, EndOfTrack = 0x2F, SetTempo = 0x51,
                          SMPTEOffset = 0x54, TimeSignature = 0x58, KeySignature = 0x59, Proprietary = 0x7F };
-    int ParseEvent( const unsigned char *pcData, size_t iMaxSize );
+    uint32_t ParseEvent( const unsigned char *pcData, size_t iMaxSize );
 
     //Accessors
     MetaEventType GetMetaEventType() const { return m_eMetaEventType; }
-    int GetDataLen() const { return m_iDataLen; }
+    uint32_t GetDataLen() const { return m_iDataLen; }
     unsigned char *GetData() const { return m_pcData; }
 
 private:
@@ -296,7 +294,7 @@ public:
     MIDISysExEvent() : m_pcData( 0 ) { }
     ~MIDISysExEvent() { if ( m_pcData ) delete[] m_pcData; }
 
-    int ParseEvent( const unsigned char *pcData, size_t iMaxSize );
+    uint32_t ParseEvent( const unsigned char *pcData, size_t iMaxSize );
 
 private:
     uint32_t m_iDataLen;
