@@ -2473,7 +2473,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
     else {
         RenderStatusLine(cur_line++,"Notes:", passedFormatted.c_str());
         RenderStatusLine(cur_line++,"NotesPerSecond:", npsFormatted.c_str());
-        RenderStatusLine(cur_line++,"Polyphoney:", polyFormatted.c_str());
+        RenderStatusLine(cur_line++,"Polyphony:", polyFormatted.c_str());
     }
     if (m_bDebug) {
         RenderStatusLine(cur_line++,"Rendered:", "%lld", m_pRenderer->GetRenderedNotesCount());
