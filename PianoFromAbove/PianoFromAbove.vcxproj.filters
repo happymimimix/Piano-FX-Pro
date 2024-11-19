@@ -46,6 +46,9 @@
     <Filter Include="Header Files\lzma">
       <UniqueIdentifier>{bf67d806-6ffe-44c8-8135-b5fd2410d46d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Studio">
+      <UniqueIdentifier>{86533545-6508-4b8a-8b4e-cb9b55466cf0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Config.h">
@@ -387,6 +390,9 @@
     </ClCompile>
     <ClCompile Include="imgui\imgui_freetype.cpp">
       <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Studio.cpp">
+      <Filter>Source Files\Studio</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
