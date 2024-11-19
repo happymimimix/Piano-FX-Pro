@@ -12,6 +12,26 @@
 #include <string>
 using namespace std;
 
+#define VersionString "3.06"
+#define LVersionString L"3.06"
+
+template <typename T>
+string GetAddress(const T& Variable) {
+    HMODULE ProcessBaseAddress = GetModuleHandle(NULL);
+    uintptr_t VariableAddress = reinterpret_cast<uintptr_t>(&Variable);
+    uintptr_t OffsetAddress = VariableAddress - reinterpret_cast<uintptr_t>(ProcessBaseAddress);
+    stringstream sout;
+    sout << uppercase << hex << OffsetAddress;
+    return sout.str();
+}
+
+string GetExePath(void) {
+    char szFilePath[MAX_PATH + 1] = {};
+    GetModuleFileNameA(NULL, szFilePath, MAX_PATH);
+    (strrchr(szFilePath, '\\'))[0] = 0;
+    return szFilePath;
+}
+
 //The timer
 class Timer
 {

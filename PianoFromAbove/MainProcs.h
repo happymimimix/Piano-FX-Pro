@@ -48,5 +48,5 @@ VOID SetPosition( INT iPosition );
 VOID SetPlayable( BOOL bPlayable );
 VOID SetPlayMode( INT ePlayMode );
 VOID SetPlayPauseStop( BOOL bPlay, BOOL bPause, BOOL bStop );
-BOOL PlayFile( const wstring &sFile, bool bCustomSettings = true);
+BOOL PlayFile( const wstring &sFile);
 VOID CheckActivity( BOOL bIsActive, POINT *ptNew = NULL, BOOL bToggleEnable = false );

@@ -25,8 +25,8 @@ using namespace std;
 class GameState
 {
 public:
-    enum GameError { Success = 0, BadPointer, OutOfMemory, DirectXError };
-    enum State { Intro = 0, Splash, Practice };
+    enum GameError : uint8_t { Success = 0, BadPointer, OutOfMemory, DirectXError };
+    enum State : uint8_t { Intro = 0, Splash, Practice };
 
     //Static methods
     static const wstring Errors[];
@@ -80,7 +80,7 @@ struct TrackSettings { ChannelSettings aChannels[16]; };
 class SplashScreen : public GameState
 {
 public:
-    SplashScreen( HWND hWnd, D3D12Renderer *pRenderer );
+    SplashScreen( HWND hWnd, D3D12Renderer *pRenderer, bool enableSplash = true);
 
     GameError MsgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
     GameError Init();
@@ -120,9 +120,9 @@ private:
     vector< TrackSettings > m_vTrackSettings;
 
     // Computed in RenderGlobal
-    int m_iStartNote, m_iEndNote; // Start and end notes of the songs
+    uint8_t m_iStartNote, m_iEndNote; // Start and end notes of the songs
     float m_fNotesX, m_fNotesY, m_fNotesCX, m_fNotesCY; // Notes position
-    int m_iAllWhiteKeys; // Number of white keys are on the screen
+    uint8_t m_iAllWhiteKeys; // Number of white keys are on the screen
     float m_fWhiteCX; // Width of the white keys
     long long m_llRndStartTime; // Rounded start time to make stuff drop at the same time
 

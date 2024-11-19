@@ -13,8 +13,8 @@
 #define IDD_TRACKSETTINGS               127
 #define IDD_PP4_CONTROLS                128
 #define IDI_PFAICON                     134
-#define IDB_SPLASH                      135
 #define IDD_ABOUT                       138
+#define ID_STUDIO                       139
 #define IDR_SPLASHMIDI                  149
 #define IDD_LOADING                     153
 #define IDD_SETRESOLUTION               158
@@ -58,14 +58,11 @@
 #define IDC_FIRSTKEY                    1062
 #define IDC_LASTKEY                     1063
 #define IDC_THROUGH                     1064
-#define IDC_COMBO1                      1072
 #define IDC_MARKERENC                   1072
-#define IDC_COMBO2                      1073
 #define IDC_SPLASHMIDI                  1079
 #define IDC_WIDTH                       1079
 #define IDC_BACKGROUND                  1080
 #define IDC_HEIGHT                      1080
-#define IDC_PICTURE                     1089
 #define IDC_NSPEED                      1095
 #define IDC_CHECK1                      1096
 #define IDC_LOADINGPROGRESS             1097
@@ -103,17 +100,13 @@
 #define ID_FILE_CLOSEFILE               40070
 #define ID_VIEW_KEYBOARD                40079
 #define ID_VIEW_FULLSCREEN              40080
-#define ID_VIEW_PLAYBACK                40081
 #define ID_VIEW_CONTROLS                40084
-#define ID_GRAPHICS_STOP                40086
 #define ID_VIEW_NOFULLSCREEN            40094
 #define ID_VIEW_ALWAYSONTOP             40096
 #define ID_VIEW_RESETDEVICE             40100
 #define IDC_INACTIVITYTIMER             40103
-#define ID__POSITIONCONTROL             40104
 #define IDC_POSNCTRL                    40105
 #define ID_VIEW_MOVEANDZOOM             40109
-#define ID_VIEW_CANCELMOVEANDZOOM       40114
 #define ID_VIEW_RESETMOVEANDZOOM        40115
 #define ID_CHANGESTATE                  40121
 #define ID_GAMEERROR                    40142
@@ -129,8 +122,8 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        104
-#define _APS_NEXT_COMMAND_VALUE         40001
+#define _APS_NEXT_COMMAND_VALUE         40002
 #define _APS_NEXT_CONTROL_VALUE         1000
-#define _APS_NEXT_SYMED_VALUE           101
+#define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

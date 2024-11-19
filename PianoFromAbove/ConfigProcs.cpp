@@ -24,7 +24,7 @@ VOID DoPreferences( HWND hWndOwner )
 {
     int pDialogs[] = { IDD_PP1_VISUAL, IDD_PP2_AUDIO, IDD_PP3_VIDEO, IDD_PP4_CONTROLS, IDD_PP5_VIZ };
     DLGPROC pProcs[] = { VisualProc, AudioProc, VideoProc, ControlsProc, VizProc };
-    LPCWSTR pTitles[] = { TEXT( "Visual" ), TEXT( "Audio" ), TEXT("Video"), TEXT( "Controls" ), TEXT("Other") };
+    LPCWSTR pTitles[] = { TEXT( "Video" ), TEXT( "Audio" ), TEXT( "Render" ), TEXT( "Control" ), TEXT( "Other" ) };
     PROPSHEETPAGE psp[sizeof(pDialogs) / sizeof(int)];
     PROPSHEETHEADER psh;
 

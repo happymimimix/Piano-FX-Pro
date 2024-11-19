@@ -119,10 +119,10 @@ LRESULT WINAPI WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                             cPlayback.SetPlayMode(GameState::Intro, true);
                             cPlayback.SetPlayable(false, true);
                             cPlayback.SetPosition(0);
-                            SetWindowText(g_hWnd, L"Piano-FX Pro | Made by: happy_mimimix | Ver 3.05 | Now playing: None");
+                            SetWindowText(g_hWnd, L"Piano-FX Pro v" LVersionString " | Made by: happy_mimimix | Now playing: None");
                             HandOffMsg(WM_COMMAND, ID_CHANGESTATE, (LPARAM)new IntroScreen(NULL, NULL));
                         }
-                        PlayFile(sFilename, iId == ID_FILE_PRACTICESONGCUSTOM);
+                        PlayFile(sFilename);
                     }
                     return 0;
                 }
@@ -132,7 +132,7 @@ LRESULT WINAPI WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                     cPlayback.SetPlayMode( GameState::Intro, true );
                     cPlayback.SetPlayable( false, true );
                     cPlayback.SetPosition( 0 );
-                    SetWindowText( g_hWnd, L"Piano-FX Pro | Made by: happy_mimimix | Ver 3.05 | Now playing: None");
+                    SetWindowText(g_hWnd, L"Piano-FX Pro v" LVersionString " | Made by: happy_mimimix | Now playing: None");
                     HandOffMsg( WM_COMMAND, ID_CHANGESTATE, ( LPARAM )new IntroScreen( NULL, NULL ) );
                     return 0;
                 }
@@ -214,6 +214,9 @@ LRESULT WINAPI WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                 case ID_GAMEERROR:
                     MessageBoxW( hWnd, GameState::Errors[lParam].c_str(), L"Error", MB_OK | MB_ICONEXCLAMATION );
                     return 0;
+                case ID_STUDIO:
+                    
+                    return 0;
             }
             break;
         }
@@ -279,7 +282,7 @@ LRESULT WINAPI WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
             std::vector<wchar_t> filename;
             filename.resize(DragQueryFile(drop, 0, NULL, 0) + 1);
             DragQueryFile(drop, 0, filename.data(), filename.size());
-            PlayFile(filename.data(), true);
+            PlayFile(filename.data());
             return 0;
     }
 
@@ -895,15 +898,10 @@ VOID MoveThumbPosition( int iPositionNew, int &iPosition, HWND hWnd, RECT *rcCha
 
 INT_PTR WINAPI AboutProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM )
 {
-    static HANDLE hSplash = NULL;
-
     switch( msg )
     {
 	    case WM_INITDIALOG:
         {
-            if ( !hSplash ) hSplash = LoadImage( g_hInstance, MAKEINTRESOURCE( IDB_SPLASH ), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR );
-            SendMessage( GetDlgItem( hWnd, IDC_PICTURE ), STM_SETIMAGE, IMAGE_BITMAP, ( LPARAM )hSplash );
-
             RECT rcPos, rcParent;
             HWND hWndParent = GetParent( hWnd );
             GetClientRect( hWnd, &rcPos );
@@ -1157,7 +1155,7 @@ INT_PTR LoadingProc(HWND hwnd, UINT msg, WPARAM, LPARAM) {
     return false;
 }
 
-BOOL PlayFile( const wstring &sFile, bool bCustomSettings )
+BOOL PlayFile(const wstring &sFile)
 {
     Config &config = Config::GetConfig();
     const VisualSettings &cVisual = config.GetVisualSettings();
@@ -1186,19 +1184,9 @@ BOOL PlayFile( const wstring &sFile, bool bCustomSettings )
     }
 
     // Set up track settings
-    if ( bCustomSettings )
-    {
-        if (!GetCustomSettings(pGameState)) {
-            delete pGameState;
-            return FALSE;
-        }
-    }
-    else
-    {
-        pGameState->SetChannelSettings(
-            vector< bool >(),
-            vector< bool >(),
-            vector< unsigned >( cVisual.colors, cVisual.colors + sizeof( cVisual.colors ) / sizeof( cVisual.colors[0] ) ) );
+    if (!GetCustomSettings(pGameState)) {
+        delete pGameState;
+        return FALSE;
     }
 
     // Success! Set up the GUI for playback
@@ -1209,10 +1197,10 @@ BOOL PlayFile( const wstring &sFile, bool bCustomSettings )
     cView.SetZoomMove( false, true );
     TCHAR sTitle[1<<10];
     if (cViz.bDumpFrames) {
-        _stprintf_s(sTitle, TEXT("Piano-FX Pro | Made by: happy_mimimix | Ver 3.05 | Now rendering: %ws"), sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
+        _stprintf_s(sTitle, L"Piano-FX Pro v" LVersionString L" | Made by : happy_mimimix | Now rendering : % ws", sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
     }
     else {
-        _stprintf_s(sTitle, TEXT("Piano-FX Pro | Made by: happy_mimimix | Ver 3.05 | Now playing: %ws"), sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
+        _stprintf_s(sTitle, L"Piano-FX Pro v" LVersionString L" | Made by: happy_mimimix | Now playing: %ws", sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
     }
     SetWindowText(g_hWnd, sTitle);
 

@@ -24,6 +24,8 @@
 #include "Renderer.h"
 #include "Misc.h"
 
+#include "Studio.cpp"
+
 INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, INT nCmdShow );
 DWORD WINAPI GameThread( LPVOID lpParameter );
 
@@ -43,6 +45,9 @@ TSQueue< MSG > g_MsgQueue; // Producer/consumer to hold events for our game thre
 //-----------------------------------------------------------------------------
 INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
 {
+    extern int __argc;
+    extern char** __argv;
+
     //Debug console
     AllocConsole();
     freopen("CONOUT$", "w", stdout);
@@ -53,7 +58,25 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
     pos.X = 4;
     pos.Y = 2;
     SetConsoleCursorPosition(hConsole, pos);
-    cout << "Welcome to Piano-FX Pro\n\n";
+    cout << "Welcome to Piano-FX Pro v";
+    cout << VersionString;
+    cout << "\n\n";
+
+    if (__argc == 3) {
+        string ARG1 = __argv[1];
+        string ARG2 = __argv[2];
+        if (ARG1 == "OPEN" && ARG2 == "PFXSTUDIO") {
+            goto PFXSTUDIO;
+        }
+        else {
+            goto PFX;
+        }
+    }
+    else {
+        goto PFX;
+    }
+
+PFX:
 
     g_hInstance = hInstance;
     srand( ( unsigned )time( NULL ) );
@@ -107,7 +130,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
     PlaybackSettings &cPlayback = config.GetPlaybackSettings();
 
     // Create the application window
-    g_hWnd = CreateWindowEx( 0, CLASSNAME, L"Piano-FX Pro | Made by: happy_mimimix | Ver 3.05 | Now playing: None", WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, cView.GetMainLeft(), cView.GetMainTop(),
+    g_hWnd = CreateWindowEx( 0, CLASSNAME, L"Piano-FX Pro v" LVersionString " | Made by: happy_mimimix | Now playing: None", WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, cView.GetMainLeft(), cView.GetMainTop(),
                              cView.GetMainWidth(), cView.GetMainHeight(), NULL, NULL, wc.hInstance, NULL );
     if ( !g_hWnd ) return 1;
 
@@ -128,19 +151,38 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
     HACCEL hAccel = LoadAccelerators( hInstance, MAKEINTRESOURCE( IDA_MAINMENU ) );
     if ( !hAccel ) return 1;
 
-    // Get the game going
-    HANDLE hThread = CreateThread( NULL, 0, GameThread, new SplashScreen( NULL, NULL ), 0, NULL );
-    if ( !hThread ) return 1;
+    HANDLE hThread;
 
-    // Set up GUI and show
-    SetPlayMode( GameState::Splash );
-    SetOnTop( cView.GetOnTop() );
-    ShowControls( cView.GetControls() );
-    ShowWindow( g_hWndGfx, SW_SHOW );
-    ShowWindow( g_hWnd, nCmdShow );
-    UpdateWindow( g_hWnd );
-    SetFocus( g_hWndGfx );
-    cPlayback.SetPaused( false, false );
+    if (__argc == 2) {
+        // Get the game going
+        hThread = CreateThread(NULL, 0, GameThread, new SplashScreen(NULL, NULL, false), 0, NULL);
+        if (!hThread) return 1;
+        SetPlayMode(GameState::Intro);
+        SetOnTop(cView.GetOnTop());
+        ShowControls(cView.GetControls());
+        ShowWindow(g_hWndGfx, SW_SHOW);
+        ShowWindow(g_hWnd, nCmdShow);
+        UpdateWindow(g_hWnd);
+        SetFocus(g_hWndGfx);
+        size_t llFilenameLength = mbstowcs(nullptr, __argv[1], 0);
+        wstring sFilename(llFilenameLength, L'\0');
+        mbstowcs(&sFilename[0], __argv[1], llFilenameLength);
+        PlayFile(sFilename);
+    }
+    else {
+        // Get the game going
+        hThread = CreateThread(NULL, 0, GameThread, new SplashScreen(NULL, NULL, true), 0, NULL);
+        if (!hThread) return 1;
+        // Set up GUI and show
+        SetPlayMode(GameState::Splash);
+        SetOnTop(cView.GetOnTop());
+        ShowControls(cView.GetControls());
+        ShowWindow(g_hWndGfx, SW_SHOW);
+        ShowWindow(g_hWnd, nCmdShow);
+        UpdateWindow(g_hWnd);
+        SetFocus(g_hWndGfx);
+        cPlayback.SetPaused(false, false);
+    }
 
     // Enter the message loop
     MSG msg = {};
@@ -164,6 +206,10 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
     // Clean up
     UnregisterClass( CLASSNAME, wc.hInstance );
     CoUninitialize();
+    return 0;
+
+PFXSTUDIO:
+
     return 0;
 }
 
@@ -192,7 +238,7 @@ DWORD WINAPI GameThread( LPVOID lpParameter )
 
     // Put the adapter in the window title
     wchar_t buf[1<<10] = {};
-    _snwprintf_s(buf, 1<<10, L"Piano-FX Pro | Made by: happy_mimimix | Ver 3.05 | Now playing: Splash MIDI");
+    _snwprintf_s(buf, 1<<10, L"Piano-FX Pro v" LVersionString L" | Made by: happy_mimimix | Now playing: Splash MIDI");
     SetWindowTextW(g_hWnd, buf);
 
     // Event, logic, render...

@@ -45,7 +45,7 @@ struct VisualSettings : public ISettings
     void LoadConfigValues( TiXmlElement *txRoot );
     bool SaveConfigValues( TiXmlElement *txRoot );
 
-    enum KeysShown { All, Song, Custom } eKeysShown;
+    enum KeysShown : uint8_t { All, Song, Custom } eKeysShown;
     int iFirstKey, iLastKey;
     bool bAlwaysShowControls;
     unsigned int colors[16], iBkgColor;
@@ -110,6 +110,11 @@ public:
     double GetSpeed() const { return m_dSpeed; }
     double GetNSpeed() const { return m_dNSpeed; }
     double GetVolume() const { return m_dVolume; }
+    string GetPausedAddress() const { return GetAddress(m_bPaused); }
+    string GetMuteAddress() const { return GetAddress(m_bMute); }
+    string GetSpeedAddress() const { return GetAddress(m_dSpeed); }
+    string GetNSpeedAddress() const { return GetAddress(m_dNSpeed); }
+    string GetVolumeAddress() const { return GetAddress(m_dVolume); }
 
 private:
     GameState::State m_ePlayMode;
@@ -149,8 +154,12 @@ public:
     float GetOffsetX() const { return m_fOffsetX; }
     float GetOffsetY() const { return m_fOffsetY; }
     float GetZoomX() const { return m_fZoomX; }
+    string GetOffsetXAddress() const { return GetAddress(m_fOffsetX); }
+    string GetOffsetYAddress() const { return GetAddress(m_fOffsetY); }
+    string GetZoomXAddress() const { return GetAddress(m_fZoomX); }
     bool GetControls() const { return m_bControls; }
     bool GetKeyboard() const { return m_bKeyboard; }
+    string GetKeyboardAddress() const { return GetAddress(m_bKeyboard); }
     bool GetOnTop() const { return m_bOnTop; }
     bool GetFullScreen() const { return m_bFullScreen; }
     bool GetZoomMove() const { return m_bZoomMove; }
@@ -169,7 +178,7 @@ struct VizSettings : public ISettings {
 
     bool bTickBased;
     bool bShowMarkers;
-    enum MarkerEncoding { CP1252, CP437, CP82, CP886, CP932, CP936, UTF8 } eMarkerEncoding;
+    enum MarkerEncoding : uint8_t { CP1252, CP437, CP82, CP886, CP932, CP936, UTF8 } eMarkerEncoding;
     bool bPhigros;
     std::wstring sSplashMIDI;
     bool bVisualizePitchBends;

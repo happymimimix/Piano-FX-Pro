@@ -22,13 +22,13 @@
 #include "lzma.h"
 
 long long m_llStartTime;
-std::string llStartTimeFormatted;
+string llStartTimeFormatted;
 uint32_t polyphony;
-std::string polyFormatted;
+string polyFormatted;
 uint32_t nps;
-std::string npsFormatted;
+string npsFormatted;
 uint32_t passed;
-std::string passedFormatted;
+string passedFormatted;
 uint8_t FrameCount = 0;
 int width = -1;
 int height = -1;
@@ -37,7 +37,7 @@ uint16_t resolution = -1;
 
 //A caption that can be set using cheat engine, it does not change by itself. 
 //When compiled, this placeholder will be wiped with IDA Pro. 
-static char CheatEngineCaption[1<<10] = "CHEAT ENGINE CAPTION PLACEHOLDER"; 
+static char CheatEngineCaption[1 << 10] = {};
 
 const wstring GameState::Errors[] =
 {
@@ -162,107 +162,109 @@ GameState::GameError IntroScreen::Render()
 // SplashScreen GameState object
 //-----------------------------------------------------------------------------
 
-SplashScreen::SplashScreen( HWND hWnd, D3D12Renderer *pRenderer ) : GameState( hWnd, pRenderer )
+SplashScreen::SplashScreen( HWND hWnd, D3D12Renderer *pRenderer, bool enableSplash ) : GameState( hWnd, pRenderer )
 {
-    HRSRC hResInfo = FindResource( NULL, MAKEINTRESOURCE( IDR_SPLASHMIDI ), TEXT( "MIDI" ) );
-    HGLOBAL hRes = LoadResource( NULL, hResInfo );
-    int iSize = SizeofResource( NULL, hResInfo );
-    unsigned char *pData = ( unsigned char * )LockResource( hRes );
+    if (enableSplash) {
+        HRSRC hResInfo = FindResource(NULL, MAKEINTRESOURCE(IDR_SPLASHMIDI), TEXT("MIDI"));
+        HGLOBAL hRes = LoadResource(NULL, hResInfo);
+        int iSize = SizeofResource(NULL, hResInfo);
+        unsigned char* pData = (unsigned char*)LockResource(hRes);
 
-    Config& config = Config::GetConfig();
-    VizSettings viz = config.GetVizSettings();
+        Config& config = Config::GetConfig();
+        VizSettings viz = config.GetVizSettings();
 
-    // Parse MIDI
-    if (!viz.sSplashMIDI.empty()) {
-        // this is REALLY BAD, but i can't figure out how to make it move ownership of the memory pool vector instead of copying
-        m_MIDI.~MIDI();
-        new (&m_MIDI) MIDI(viz.sSplashMIDI);
-        if (!m_MIDI.IsValid()) {
-            MessageBox(hWnd, L"The custom splash MIDI failed to load. Please choose a different MIDI.", L"", MB_ICONWARNING);
-            m_MIDI = MIDI();
-            goto SplashFailed;
-        }
-    } else {
-        SplashFailed:
-        constexpr uint8_t lzma_magic[] = { 0xFD, 0x37, 0x7A, 0x58, 0x5A, 0x00 };
-        while (iSize >= LZMA_STREAM_HEADER_SIZE * 2 && !memcmp(pData, lzma_magic, sizeof(lzma_magic))) {
-            unsigned char* compressed = pData;
-            uint64_t decompressed_size = 0;
-            lzma_stream strm = LZMA_STREAM_INIT;
-            lzma_stream_flags stream_flags;
-            lzma_index* index = nullptr;
-            auto pos = (int64_t)iSize;
-            lzma_ret ret;
-            do {
-                pos -= LZMA_STREAM_HEADER_SIZE;
-                uint64_t footer_pos;
-                while (true) {
-                    footer_pos = pos;
-
-                    int i = 2;
-                    if (*(uint32_t*)&compressed[footer_pos + 8] != 0)
-                        break;
-
-                    do {
-                        pos -= 4;
-                        --i;
-                    } while (i >= 0 && *(uint32_t*)&compressed[footer_pos + i * 4] == 0);
-                }
-                ret = lzma_stream_footer_decode(&stream_flags, &compressed[footer_pos]);
-                pos -= stream_flags.backward_size;
-                lzma_index_decoder(&strm, &index, UINT64_MAX);
-                strm.avail_in = stream_flags.backward_size;
-                strm.next_in = &compressed[pos];
-                pos += stream_flags.backward_size;
-                ret = lzma_code(&strm, LZMA_RUN);
-                pos -= stream_flags.backward_size + LZMA_STREAM_HEADER_SIZE;
-                pos -= lzma_index_total_size(index);
-                decompressed_size += lzma_index_uncompressed_size(index);
-            } while (pos > 0);
-            pData = new unsigned char[decompressed_size];
-            uint8_t* write_ptr = pData;
-            lzma_end(&strm);
-            strm = LZMA_STREAM_INIT;
-            lzma_stream_decoder(&strm, UINT64_MAX, LZMA_CONCATENATED);
-            strm.next_in = compressed;
-            strm.avail_in = iSize;
-            bool done = false;
-            lzma_action action = LZMA_RUN;
-            while (!done) {
-                if (strm.avail_in == 0)
-                    action = LZMA_FINISH;
-                lzma_ret ret = lzma_code(&strm, action);
-                if (strm.avail_out == 0) {
-                    auto remaining = min(decompressed_size - (write_ptr - pData), 1 << 20);
-                    strm.next_out = write_ptr;
-                    strm.avail_out = remaining;
-                    write_ptr += remaining;
-                }
-                switch (ret) {
-                case LZMA_STREAM_END:
-                    done = true;
-                    break;
-                case LZMA_OK:
-                    break;
-                }
+        // Parse MIDI
+        if (!viz.sSplashMIDI.empty()) {
+            // this is REALLY BAD, but i can't figure out how to make it move ownership of the memory pool vector instead of copying
+            m_MIDI.~MIDI();
+            new (&m_MIDI) MIDI(viz.sSplashMIDI);
+            if (!m_MIDI.IsValid()) {
+                MessageBox(hWnd, L"The custom splash MIDI failed to load. Please choose a different MIDI.", L"", MB_ICONWARNING);
+                m_MIDI = MIDI();
+                goto SplashFailed;
             }
-            iSize = decompressed_size;
         }
-        m_MIDI.ParseMIDI(pData, iSize);
-        free(pData);
-        pData = NULL;
-        delete[] pData;
+        else {
+        SplashFailed:
+            constexpr uint8_t lzma_magic[] = { 0xFD, 0x37, 0x7A, 0x58, 0x5A, 0x00 };
+            while (iSize >= LZMA_STREAM_HEADER_SIZE * 2 && !memcmp(pData, lzma_magic, sizeof(lzma_magic))) {
+                unsigned char* compressed = pData;
+                uint64_t decompressed_size = 0;
+                lzma_stream strm = LZMA_STREAM_INIT;
+                lzma_stream_flags stream_flags;
+                lzma_index* index = nullptr;
+                auto pos = (int64_t)iSize;
+                lzma_ret ret;
+                do {
+                    pos -= LZMA_STREAM_HEADER_SIZE;
+                    uint64_t footer_pos;
+                    while (true) {
+                        footer_pos = pos;
+
+                        int i = 2;
+                        if (*(uint32_t*)&compressed[footer_pos + 8] != 0)
+                            break;
+
+                        do {
+                            pos -= 4;
+                            --i;
+                        } while (i >= 0 && *(uint32_t*)&compressed[footer_pos + i * 4] == 0);
+                    }
+                    ret = lzma_stream_footer_decode(&stream_flags, &compressed[footer_pos]);
+                    pos -= stream_flags.backward_size;
+                    lzma_index_decoder(&strm, &index, UINT64_MAX);
+                    strm.avail_in = stream_flags.backward_size;
+                    strm.next_in = &compressed[pos];
+                    pos += stream_flags.backward_size;
+                    ret = lzma_code(&strm, LZMA_RUN);
+                    pos -= stream_flags.backward_size + LZMA_STREAM_HEADER_SIZE;
+                    pos -= lzma_index_total_size(index);
+                    decompressed_size += lzma_index_uncompressed_size(index);
+                } while (pos > 0);
+                pData = new unsigned char[decompressed_size];
+                uint8_t* write_ptr = pData;
+                lzma_end(&strm);
+                strm = LZMA_STREAM_INIT;
+                lzma_stream_decoder(&strm, UINT64_MAX, LZMA_CONCATENATED);
+                strm.next_in = compressed;
+                strm.avail_in = iSize;
+                bool done = false;
+                lzma_action action = LZMA_RUN;
+                while (!done) {
+                    if (strm.avail_in == 0)
+                        action = LZMA_FINISH;
+                    lzma_ret ret = lzma_code(&strm, action);
+                    if (strm.avail_out == 0) {
+                        auto remaining = min(decompressed_size - (write_ptr - pData), 1 << 20);
+                        strm.next_out = write_ptr;
+                        strm.avail_out = remaining;
+                        write_ptr += remaining;
+                    }
+                    switch (ret) {
+                    case LZMA_STREAM_END:
+                        done = true;
+                        break;
+                    case LZMA_OK:
+                        break;
+                    }
+                }
+                iSize = decompressed_size;
+            }
+            m_MIDI.ParseMIDI(pData, iSize);
+            free(pData);
+            pData = NULL;
+            delete[] pData;
+        }
+        vector< MIDIEvent* > vEvents;
+        vEvents.reserve(m_MIDI.GetInfo().iEventCount);
+        m_MIDI.ConnectNotes(); // Order's important here
+        m_MIDI.PostProcess(m_vEvents);
+
+        // Allocate
+        m_vTrackSettings.resize(m_MIDI.GetInfo().iNumTracks);
+        for (int i = 0; i < 128; i++)
+            m_vState[i].reserve(128);
     }
-    vector< MIDIEvent* > vEvents;
-    vEvents.reserve( m_MIDI.GetInfo().iEventCount );
-    m_MIDI.ConnectNotes(); // Order's important here
-    m_MIDI.PostProcess(m_vEvents);
-
-    // Allocate
-    m_vTrackSettings.resize( m_MIDI.GetInfo().iNumTracks );
-    for (int i = 0; i < 128; i++)
-        m_vState[i].reserve(128);
-
     InitState();
 }
 
@@ -702,13 +704,6 @@ float SplashScreen::GetNoteX(int iNote) {
 //-----------------------------------------------------------------------------
 // MainScreen GameState object
 //-----------------------------------------------------------------------------
-
-string GetExePath(void) {
-    char szFilePath[MAX_PATH + 1] = { 0 };
-    GetModuleFileNameA(NULL, szFilePath, MAX_PATH);
-    (strrchr(szFilePath, '\\'))[0] = 0;
-    return szFilePath;
-}
 
 MainScreen::MainScreen( wstring sMIDIFile, State eGameMode, HWND hWnd, D3D12Renderer *pRenderer ) :
     GameState( hWnd, pRenderer ), m_MIDI( sMIDIFile ), m_eGameMode( eGameMode )
@@ -2386,9 +2381,11 @@ void MainScreen::RenderStatusLine(int line, const char* left, const char* format
 void MainScreen::RenderStatus(LPRECT prcStatus)
 {
     Config& config = Config::GetConfig();
-    VizSettings viz = config.GetVizSettings();
-    static ViewSettings& cView = config.GetViewSettings();
+    const VisualSettings& cVisual = config.GetVisualSettings();
+    const ViewSettings& cView = config.GetViewSettings();
+    const VideoSettings& cVideo = config.GetVideoSettings();
     const PlaybackSettings& cPlayback = config.GetPlaybackSettings();
+    const VizSettings& cViz = config.GetVizSettings();
     const MIDI::MIDIInfo& mInfo = m_MIDI.GetInfo();
 
     resolution = mInfo.iDivision;
@@ -2408,7 +2405,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
     int cur_line = 0;
 
 
-    if (!viz.bDisableUI) {
+    if (!cViz.bDisableUI) {
         m_pRenderer->GetDrawList()->AddRectFilled(ImVec2(prcStatus->left, prcStatus->top), ImVec2(prcStatus->right, prcStatus->bottom), 0x80000000);
     }
     m_llPolyphony = 0;
@@ -2450,7 +2447,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
     for (int i = passedFormatted.length() - 3; i > 0; i -= 3)
         passedFormatted.insert(i, ",");
 
-    RenderStatusLine(cur_line++,"Piano-FX Pro", "v3.05");
+    RenderStatusLine(cur_line++,"Piano-FX Pro", VersionString);
     RenderStatusLine(cur_line++,"Made by: happy_mimimix", "");
     RenderStatusLine(cur_line++,"", "");
     RenderStatusLine(cur_line++, "Time:", "%s%lld:%02d.%d / %lld:%02d.%d",
@@ -2461,11 +2458,11 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
     if (m_bDebug) {
         RenderStatusLine(cur_line++, "Microseconds:", llStartTimeFormatted.c_str());
     }
-    if (!viz.bDumpFrames) {
+    if (!cViz.bDumpFrames) {
         RenderStatusLine(cur_line++, "FPS:", "%.2lf", m_dFPS);
     }
     RenderStatusLine(cur_line++, "Tempo:", "%.3lf bpm", tempo);
-    if (viz.bPhigros) {
+    if (cViz.bPhigros) {
         RenderStatusLine(cur_line++,"Combo:", passedFormatted.c_str());
         RenderStatusLine(cur_line++,"ClicksPerSecond:", npsFormatted.c_str());
         RenderStatusLine(cur_line++,"Simultaneity:", polyFormatted.c_str());
@@ -2483,7 +2480,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
             RenderStatusLine(cur_line++, "Volume:", "%.0lf%%", cPlayback.GetVolume() * 100);
         }
     }
-    if (viz.bDumpFrames) {
+    if (cViz.bDumpFrames) {
         if (m_bDebug) {
             RenderStatusLine(cur_line++, "PlaybackSpeed:", "%.0lf%%", cPlayback.GetSpeed() * 100);
         }
@@ -2511,7 +2508,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
         RenderStatusLine(cur_line++,"WindowSize:", "%d*%d", width, height);
         RenderStatusLine(cur_line++,"KeyRange:", "%d~%d", m_bFlipKeyboard ? m_iEndNote : m_iStartNote, m_bFlipKeyboard ? m_iStartNote : m_iEndNote);
     }
-    if (viz.bPhigros) {
+    if (cViz.bPhigros) {
         RenderStatusLine(cur_line++, "Score:", "%07.0f", (passed == static_cast<long long>(mInfo.iNoteCount) ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(mInfo.iNoteCount) * 1000000)));
              if (mInfo.iNoteCount < 100000) {RenderStatusLine(cur_line++,"Level:", "EZ Lv.1");}
         else if (mInfo.iNoteCount < 200000) {RenderStatusLine(cur_line++,"Level:", "EZ Lv.2");}
@@ -2548,7 +2545,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
             RenderStatusLine(cur_line++, "ERROR: Score overflow! ", "");
         }
     }
-    if (FrameCount % (1<<3) == 0) {
+    if (FrameCount % (1<<4) == 0) {
         HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
         COORD pos;
         CONSOLE_SCREEN_BUFFER_INFO csbi;
@@ -2569,133 +2566,133 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Microseconds: " << llStartTimeFormatted << " (Qword: Piano-FX-Pro.exe+000001) [Read / Write]";
+        cout << "    Microseconds: " << llStartTimeFormatted << " (Qword +" + GetAddress(m_llStartTime) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Ticks: " << m_iStartTick << " (Integer: Piano-FX-Pro.exe+000002) [Read Only]";
+        cout << "    Ticks: " << m_iStartTick << " (Integer +" + GetAddress(m_iStartTick) + ")[Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Resolution: " << resolution << " (Integer: Piano-FX-Pro.exe+000003) [Read Only]";
+        cout << "    Resolution: " << resolution << " (Integer +" + GetAddress(resolution) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Volume: " << cPlayback.GetVolume() << " (Double: Piano-FX-Pro.exe+000004) [Read / Write]";
+        cout << "    Volume: " << cPlayback.GetVolume() << " (Double +" + cPlayback.GetVolumeAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Mute: " << cPlayback.GetMute() << " (Byte: Piano-FX-Pro.exe+000005) [Read / Write]";
+        cout << "    Mute: " << cPlayback.GetMute() << " (Byte +" + cPlayback.GetMuteAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    PlaybackSpeed: " << cPlayback.GetSpeed() << " (Double: Piano-FX-Pro.exe+000006) [Read / Write]";
+        cout << "    PlaybackSpeed: " << cPlayback.GetSpeed() << " (Double +" + cPlayback.GetSpeedAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    NoteSpeed: " << cPlayback.GetNSpeed() << " (Double: Piano-FX-Pro.exe+000007) [Read / Write]";
+        cout << "    NoteSpeed: " << cPlayback.GetNSpeed() << " (Double +" + cPlayback.GetNSpeedAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Offset-X: " << cView.GetOffsetX() << " (Float: Piano-FX-Pro.exe+000008) [Read / Write]";
+        cout << "    Offset-X: " << cView.GetOffsetX() << " (Float +" + cView.GetOffsetXAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Offset-Y: " << cView.GetOffsetY() << " (Float: Piano-FX-Pro.exe+000009) [Read / Write]";
+        cout << "    Offset-Y: " << cView.GetOffsetY() << " (Float +" + cView.GetOffsetYAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Zoom: " << cView.GetZoomX() << " (Float: Piano-FX-Pro.exe+000010) [Read / Write]";
+        cout << "    Zoom: " << cView.GetZoomX() << " (Float +" + cView.GetZoomXAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    KeyRange: " << config.GetVisualSettings().iFirstKey << "~" << config.GetVisualSettings().iLastKey << " (Integer: Piano-FX-Pro.exe+000011 ~ Integer: Piano-FX-Pro.exe+000012) [Read / Write]";
+        cout << "    KeyRange: " << cVisual.iFirstKey << "~" << cVisual.iLastKey << " (Integer +" + GetAddress(cVisual.iFirstKey) + " ~ Integer +" + GetAddress(cVisual.iLastKey) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    KeyMode: " << config.GetVisualSettings().eKeysShown << " (Integer: Piano-FX-Pro.exe+000013) [Read / Write]";
+        cout << "    KeyMode: " << static_cast<short>(cVisual.eKeysShown) << " (Bytes +" + GetAddress(cVisual.eKeysShown) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    WindowSize: " << width << "*" << height << " (Integer: Piano-FX-Pro.exe+000014 * Integer: Piano-FX-Pro.exe+000015) [Read Only]";
+        cout << "    WindowSize: " << width << "*" << height << " (Integer +" + GetAddress(width) + " * Integer +" + GetAddress(height) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Paused: " << cPlayback.GetPaused() << " (Byte: Piano-FX-Pro.exe+000016) [Read / Write]";
+        cout << "    Paused: " << cPlayback.GetPaused() << " (Byte +" + cPlayback.GetPausedAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Keyboard: " << config.GetViewSettings().GetKeyboard() << " (Byte: Piano-FX-Pro.exe+000017) [Read / Write]";
+        cout << "    Keyboard: " << cView.GetKeyboard() << " (Byte +" + cView.GetKeyboardAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    VisualizePitchBends: " << config.GetVizSettings().bVisualizePitchBends << " (Byte: Piano-FX-Pro.exe+000018) [Read / Write]";
+        cout << "    VisualizePitchBends: " << cViz.bVisualizePitchBends << " (Byte +" + GetAddress(cViz.bVisualizePitchBends) + ")[Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    PhigrosMode: " << config.GetVizSettings().bPhigros << " (Byte: Piano-FX-Pro.exe+000019) [Read / Write]";
+        cout << "    PhigrosMode: " << cViz.bPhigros << " (Byte +" + GetAddress(cViz.bPhigros) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    ShowMarkers: " << config.GetVizSettings().bShowMarkers << " (Byte: Piano-FX-Pro.exe+000020) [Read / Write]";
+        cout << "    ShowMarkers: " << cViz.bShowMarkers << " (Byte +" + GetAddress(cViz.bShowMarkers) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    TickBased: " << config.GetVizSettings().bTickBased << " (Byte: Piano-FX-Pro.exe+000021) [Read / Write]";
+        cout << "    TickBased: " << cViz.bTickBased << " (Byte +" + GetAddress(cViz.bTickBased) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    DisableUI: " << config.GetVizSettings().bDisableUI << " (Byte: Piano-FX-Pro.exe+000022) [Read / Write]";
+        cout << "    DisableUI: " << cViz.bDisableUI << " (Byte +" + GetAddress(cViz.bDisableUI) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    LimitFPS: " << m_pRenderer->GetLimitFPS() << " (Byte: Piano-FX-Pro.exe+000023) [Read / Write]";
+        cout << "    LimitFPS: " << m_pRenderer->GetLimitFPS() << " (Byte +" + GetAddress(cVideo.bLimitFPS) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Caption: \"" << (strlen(CheatEngineCaption) < sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]) ? CheatEngineCaption : "MAXIMUM LENGTH EXCEEDED! ") << "\" (String[" << sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]) << "]: Piano-FX-Pro.exe+000024) [Read / Write]";
+        cout << "    Caption: \"" << (strlen(CheatEngineCaption) < sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]) ? CheatEngineCaption : "MAXIMUM LENGTH EXCEEDED! ") << "\" (String[" << sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]) << "] +" + GetAddress(CheatEngineCaption) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
