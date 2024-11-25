@@ -705,6 +705,13 @@ float SplashScreen::GetNoteX(int iNote) {
 // MainScreen GameState object
 //-----------------------------------------------------------------------------
 
+string GetExePath(void) {
+    char szFilePath[MAX_PATH + 1] = {};
+    GetModuleFileNameA(NULL, szFilePath, MAX_PATH);
+    (strrchr(szFilePath, '\\'))[0] = 0;
+    return szFilePath;
+}
+
 MainScreen::MainScreen( wstring sMIDIFile, State eGameMode, HWND hWnd, D3D12Renderer *pRenderer ) :
     GameState( hWnd, pRenderer ), m_MIDI( sMIDIFile ), m_eGameMode( eGameMode )
 {

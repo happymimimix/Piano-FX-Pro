@@ -74,24 +74,40 @@
       <AdditionalManifestDependencies>"type='Win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'";%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>del .\PianoFromAbove.vcxproj /f /q
+      <Command>del .\PianoFromAbove.vcxproj.user /f /q
+del ..\Release /f /s /q
+rmdir ..\Release /s /q
+msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=Release /p:Platform=x64
+msbuild ..\Colorizer\Colorizer.sln -t:Clean -p:Configuration=Release /p:Platform=x64
+msbuild ..\PFXGDI\PFXGDI.sln -t:Clean -p:Configuration=Release /p:Platform=x86
+del .\Colorizer.exe /f /q
+del .\Colorizer.exe.h /f /q
+del .\PFXGDI.exe /f /q
+del .\PFXGDI.exe.h /f /q
+msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
+msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
+xxd -i Colorizer.exe &gt; Colorizer.exe.h
+xxd -i PFXGDI.exe &gt; PFXGDI.exe.h</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>copy ..\Release\Piano-FX-Pro.exe ..\Piano-FX-Pro.exe /v /y
+msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=Release /p:Platform=x64
+del .\PianoFromAbove.vcxproj.user /f /q
 del ..\.vs /f /s /q
 rmdir ..\.vs /s /q
 del .\Release /f /s /q
 rmdir .\Release /s /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
-msbuild .\Colorizer\Colorizer.sln -t:Clean -p:Configuration=Release /p:Platform=x64
-msbuild .\PFXGDI\PFXGDI.sln -t:Clean -p:Configuration=Release /p:Platform=x64
-msbuild .\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
-msbuild .\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
-xxd -i Colorizer.exe &gt; Colorizer.exe.h
-xxd -i PFXGDI.exe &gt; PFXGDI.exe.h</Command>
-    </PreBuildEvent>
+mkdir ..\Release
+move /y ..\Piano-FX-Pro.exe ..\Release\Piano-FX-Pro.exe</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Colorizer.exe.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="ConfigProcs.h" />
+    <ClInclude Include="ConGui.h" />
     <ClInclude Include="d3dx12\d3dx12.h" />
     <ClInclude Include="d3dx12\d3dx12_barriers.h" />
     <ClInclude Include="d3dx12\d3dx12_check_feature_support.h" />
@@ -178,8 +194,10 @@ xxd -i PFXGDI.exe &gt; PFXGDI.exe.h</Command>
     <ClInclude Include="MainProcs.h" />
     <ClInclude Include="MIDI.h" />
     <ClInclude Include="Misc.h" />
+    <ClInclude Include="PFXGDI.exe.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Studio.h" />
     <ClInclude Include="tinyxml\tinystr.h" />
     <ClInclude Include="tinyxml\tinyxml.h" />
   </ItemGroup>

@@ -92,6 +92,10 @@ LRESULT WINAPI WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 
     switch( msg )
     {
+        case WM_WINDOWPOSCHANGING:
+            // Allow the window to be larger than the screen. 
+            return 0;
+
         case WM_COMMAND:
         {
             int iId = LOWORD( wParam );
@@ -196,13 +200,8 @@ LRESULT WINAPI WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                 case ID_VIEW_RESETMOVEANDZOOM:
                     HandOffMsg( msg, wParam, lParam );
                     return 0;
-                case ID_VIEW_SETWINDOWSIZE: {
+                case ID_VIEW_SETWINDOWSIZE:
                     DialogBox(NULL, MAKEINTRESOURCE(IDD_SETRESOLUTION), g_hWnd, SetResolutionProc);
-                    return 0;
-                }
-                case ID_VIEW_NOFULLSCREEN:
-                    if ( cView.GetZoomMove() ) HandOffMsg( msg, ID_VIEW_CANCELMOVEANDZOOM, lParam );
-                    else if ( cView.GetFullScreen() ) cView.SetFullScreen( false, true );
                     return 0;
                 case ID_OPTIONS_PREFERENCES:
                     CheckActivity( TRUE );
@@ -215,7 +214,15 @@ LRESULT WINAPI WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                     MessageBoxW( hWnd, GameState::Errors[lParam].c_str(), L"Error", MB_OK | MB_ICONEXCLAMATION );
                     return 0;
                 case ID_STUDIO:
-                    
+                    char ProgramPath[MAX_PATH + 1] = {};
+                    GetModuleFileNameA(NULL, ProgramPath, MAX_PATH);
+                    string Command = "start \"Piano-FX Studio v";
+                    Command += VersionString;
+                    Command += "\" \"";
+                    Command += ProgramPath;
+                    Command += "\" ";
+                    Command += "OPEN PFXSTUDIO";
+                    system(Command.c_str());
                     return 0;
             }
             break;
@@ -285,7 +292,6 @@ LRESULT WINAPI WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
             PlayFile(filename.data());
             return 0;
     }
-
     return DefWindowProc( hWnd, msg, wParam, lParam );
 }
 

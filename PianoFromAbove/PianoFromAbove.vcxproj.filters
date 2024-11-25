@@ -327,6 +327,18 @@
     <ClInclude Include="lzma\vli.h">
       <Filter>Header Files\lzma</Filter>
     </ClInclude>
+    <ClInclude Include="Colorizer.exe.h">
+      <Filter>Source Files\Studio</Filter>
+    </ClInclude>
+    <ClInclude Include="PFXGDI.exe.h">
+      <Filter>Source Files\Studio</Filter>
+    </ClInclude>
+    <ClInclude Include="Studio.h">
+      <Filter>Source Files\Studio</Filter>
+    </ClInclude>
+    <ClInclude Include="ConGui.h">
+      <Filter>Source Files\Studio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PianoFromAbove.rc">

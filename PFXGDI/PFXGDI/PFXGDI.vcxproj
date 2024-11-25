@@ -47,17 +47,20 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>
     </Link>
     <PreBuildEvent>
+      <Command>del .\PFXGDI.vcxproj.user /f /q</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
       <Command>del .\PFXGDI.vcxproj.user /f /q
 del ..\.vs /f /s /q
 rmdir ..\.vs /s /q
 del .\Release /f /s /q
 rmdir .\Release /s /q</Command>
-    </PreBuildEvent>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp" />

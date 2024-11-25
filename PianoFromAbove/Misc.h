@@ -25,13 +25,6 @@ string GetAddress(const T& Variable) {
     return sout.str();
 }
 
-string GetExePath(void) {
-    char szFilePath[MAX_PATH + 1] = {};
-    GetModuleFileNameA(NULL, szFilePath, MAX_PATH);
-    (strrchr(szFilePath, '\\'))[0] = 0;
-    return szFilePath;
-}
-
 //The timer
 class Timer
 {

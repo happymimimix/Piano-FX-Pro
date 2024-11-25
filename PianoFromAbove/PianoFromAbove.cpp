@@ -24,7 +24,7 @@
 #include "Renderer.h"
 #include "Misc.h"
 
-#include "Studio.cpp"
+#include "Studio.h"
 
 INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, INT nCmdShow );
 DWORD WINAPI GameThread( LPVOID lpParameter );
@@ -209,7 +209,7 @@ PFX:
     return 0;
 
 PFXSTUDIO:
-
+    StudioMain();
     return 0;
 }
 

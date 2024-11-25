@@ -101,7 +101,6 @@
 #define ID_VIEW_KEYBOARD                40079
 #define ID_VIEW_FULLSCREEN              40080
 #define ID_VIEW_CONTROLS                40084
-#define ID_VIEW_NOFULLSCREEN            40094
 #define ID_VIEW_ALWAYSONTOP             40096
 #define ID_VIEW_RESETDEVICE             40100
 #define IDC_INACTIVITYTIMER             40103
