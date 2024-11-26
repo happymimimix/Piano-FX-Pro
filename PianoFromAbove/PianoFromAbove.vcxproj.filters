@@ -336,9 +336,6 @@
     <ClInclude Include="Studio.h">
       <Filter>Source Files\Studio</Filter>
     </ClInclude>
-    <ClInclude Include="ConGui.h">
-      <Filter>Source Files\Studio</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PianoFromAbove.rc">
