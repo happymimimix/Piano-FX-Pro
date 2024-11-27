@@ -46,8 +46,14 @@
     <Filter Include="Header Files\lzma">
       <UniqueIdentifier>{bf67d806-6ffe-44c8-8135-b5fd2410d46d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Studio">
+    <Filter Include="Source Files\Piano-FX Studio">
       <UniqueIdentifier>{86533545-6508-4b8a-8b4e-cb9b55466cf0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Piano-FX Studio\Embedded Files">
+      <UniqueIdentifier>{bfb735c4-31ac-4c24-b72e-f60975558e20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Piano-FX Studio\Main">
+      <UniqueIdentifier>{31d55b7e-15be-4d96-aa29-a3cebd92e35c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -328,13 +334,13 @@
       <Filter>Header Files\lzma</Filter>
     </ClInclude>
     <ClInclude Include="Colorizer.exe.h">
-      <Filter>Source Files\Studio</Filter>
+      <Filter>Source Files\Piano-FX Studio\Embedded Files</Filter>
     </ClInclude>
     <ClInclude Include="PFXGDI.exe.h">
-      <Filter>Source Files\Studio</Filter>
+      <Filter>Source Files\Piano-FX Studio\Embedded Files</Filter>
     </ClInclude>
     <ClInclude Include="Studio.h">
-      <Filter>Source Files\Studio</Filter>
+      <Filter>Source Files\Piano-FX Studio\Main</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -401,7 +407,7 @@
       <Filter>Source Files\imgui</Filter>
     </ClCompile>
     <ClCompile Include="Studio.cpp">
-      <Filter>Source Files\Studio</Filter>
+      <Filter>Source Files\Piano-FX Studio\Main</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
