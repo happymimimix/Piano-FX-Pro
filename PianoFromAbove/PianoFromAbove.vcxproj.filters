@@ -55,6 +55,27 @@
     <Filter Include="Source Files\Piano-FX Studio\Main">
       <UniqueIdentifier>{31d55b7e-15be-4d96-aa29-a3cebd92e35c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Piano-FX Studio\Utilities">
+      <UniqueIdentifier>{d482b7fd-fb24-4c99-8139-01071fd84d12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Piano-FX Studio\TouchEventListeners">
+      <UniqueIdentifier>{93b175e2-78cb-40bb-ab46-1854104bc44c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Piano-FX Studio\TouchEventListeners\Tab4">
+      <UniqueIdentifier>{377d32de-fea0-4f21-b4a4-23f528127226}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Piano-FX Studio\TouchEventListeners\Tab3">
+      <UniqueIdentifier>{31f0fdeb-9904-45bb-a121-c215d5761813}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Piano-FX Studio\TouchEventListeners\Tab2">
+      <UniqueIdentifier>{f5a40076-e970-422f-ad90-be90443fe4b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Piano-FX Studio\TouchEventListeners\Tab1">
+      <UniqueIdentifier>{d309e3e2-4f8c-4db0-bbd0-2a72d7640cf7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Piano-FX Studio\TouchEventListeners\Tab1\SubViews">
+      <UniqueIdentifier>{6370c0cf-b749-45a1-a966-9f8b795d42e8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Config.h">
@@ -342,6 +363,42 @@
     <ClInclude Include="Studio.h">
       <Filter>Source Files\Piano-FX Studio\Main</Filter>
     </ClInclude>
+    <ClInclude Include="Background.h">
+      <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="PFXSTUDIO_Global_Imports.h">
+      <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="ConsoleSetupScript.h">
+      <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="CloseBtn.h">
+      <Filter>Source Files\Piano-FX Studio\TouchEventListeners</Filter>
+    </ClInclude>
+    <ClInclude Include="Tab1.h">
+      <Filter>Source Files\Piano-FX Studio\TouchEventListeners\Tab1</Filter>
+    </ClInclude>
+    <ClInclude Include="Tab2.h">
+      <Filter>Source Files\Piano-FX Studio\TouchEventListeners\Tab2</Filter>
+    </ClInclude>
+    <ClInclude Include="Tab1Btn3.h">
+      <Filter>Source Files\Piano-FX Studio\TouchEventListeners\Tab1\SubViews</Filter>
+    </ClInclude>
+    <ClInclude Include="TabSwitcher.h">
+      <Filter>Source Files\Piano-FX Studio\TouchEventListeners</Filter>
+    </ClInclude>
+    <ClInclude Include="Tab3.h">
+      <Filter>Source Files\Piano-FX Studio\TouchEventListeners\Tab3</Filter>
+    </ClInclude>
+    <ClInclude Include="Tab4.h">
+      <Filter>Source Files\Piano-FX Studio\TouchEventListeners\Tab4</Filter>
+    </ClInclude>
+    <ClInclude Include="EmbededFilesExtractor.h">
+      <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="TouchEventListener.h">
+      <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PianoFromAbove.rc">
@@ -408,6 +465,24 @@
     </ClCompile>
     <ClCompile Include="Studio.cpp">
       <Filter>Source Files\Piano-FX Studio\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="TabSwitcherMain.h">
+      <Filter>Source Files\Piano-FX Studio\TouchEventListeners</Filter>
+    </ClCompile>
+    <ClCompile Include="Tab4Main.h">
+      <Filter>Source Files\Piano-FX Studio\TouchEventListeners\Tab4</Filter>
+    </ClCompile>
+    <ClCompile Include="Tab3Main.h">
+      <Filter>Source Files\Piano-FX Studio\TouchEventListeners\Tab3</Filter>
+    </ClCompile>
+    <ClCompile Include="Tab2Main.h">
+      <Filter>Source Files\Piano-FX Studio\TouchEventListeners\Tab2</Filter>
+    </ClCompile>
+    <ClCompile Include="Tab1Main.h">
+      <Filter>Source Files\Piano-FX Studio\TouchEventListeners\Tab1</Filter>
+    </ClCompile>
+    <ClCompile Include="TouchEventListenerInit.h">
+      <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
