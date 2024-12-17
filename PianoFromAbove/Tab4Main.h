@@ -18,7 +18,11 @@ void Tab4::EnableAll() {
 }
 
 void Tab4::DisableAll() {
-    TouchEventManager::Delete(Tab4::Btn1);
+    if (Btn1 == nullptr) {
+        cout << "[1;1H[40m[91mERROR: Trying to disable a tab that isn't enabled. \n";
+        cout << "\nThe program will now stop. \n";
+    }
+    TouchEventManager::Delete(Btn1);
 }
 
 void Tab4::Draw() {

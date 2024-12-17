@@ -167,12 +167,16 @@ void TabSwitcher::DisableTab(uint8_t Tab) {
     {
     case 1:
         Tab1::DisableAll();
+        break;
     case 2:
         Tab2::DisableAll();
+        break;
     case 3:
         Tab3::DisableAll();
+        break;
     case 4:
         Tab4::DisableAll();
+        break;
     default:
         cout << "[1;1H[40m[91mERROR: Switching from an unknown tab: ";
         cout << (int)Tab;

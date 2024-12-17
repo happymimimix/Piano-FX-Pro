@@ -12,8 +12,8 @@ struct TouchEventListener {
     function<void()> OnLeave = []() {};
     function<void()> OnTouch = []() {};
 
-    bool IsTouching(COORD MousePos) {
-        if (X <= MousePos.X && MousePos.X <= (X + W) && Y <= MousePos.Y && MousePos.Y <= (Y + H)) {
+    bool IsTouching(POINT MousePos) {
+        if (X <= MousePos.x && MousePos.x <= (X + W) && Y <= MousePos.y && MousePos.y <= (Y + H)) {
             return true;
         }
         else {
@@ -49,46 +49,19 @@ struct TouchEventManager {
             }
         }
         else {
-            if (ListenerPointer->Prev == nullptr) {
-                // Trying to delete the first item
-                First = ListenerPointer->Next;
-                if (ListenerPointer->Next != nullptr) {
-                    ListenerPointer->Next->Prev = nullptr;
-                }
-            }
-            else if (ListenerPointer->Next == nullptr) {
-                // Trying to delete the last item
-                if (ListenerPointer->Prev == nullptr) {
-                    cout << "[1;1H[40m[91mERROR: The touch event listener chain list is broken. \n";
-                    cout << "\nThe program will now stop. \n";
-                    while (true) {
-                        // Make the program hang instead of closing! 
-                        // This way the user can clearly see the error message. 
-                    }
-                }
-                else {
-                    ListenerPointer->Prev->Next = nullptr;
-                }
+            if (ListenerPointer->Prev) {
+                ListenerPointer->Prev->Next = ListenerPointer->Next;
             }
             else {
-                // Trying to delete an item in the middle
-                if (ListenerPointer->Next == nullptr || ListenerPointer->Prev == nullptr) {
-                    cout << "[1;1H[40m[91mERROR: The touch event listener chain list is broken. \n";
-                    cout << "\nThe program will now stop. \n";
-                    while (true) {
-                        // Make the program hang instead of closing! 
-                        // This way the user can clearly see the error message. 
-                    }
-                }
-                else {
-                    ListenerPointer->Prev->Next = ListenerPointer->Next;
-                    ListenerPointer->Next->Prev = ListenerPointer->Prev;
-                }
+                First = ListenerPointer->Next;
+            }
+            if (ListenerPointer->Next) {
+                ListenerPointer->Next->Prev = ListenerPointer->Prev;
             }
             ListenerPointer = nullptr;
         }
     }
-    static void CheckTouches(COORD MousePos, bool MouseClicked) {
+    static void CheckTouches(POINT MousePos, bool MouseClicked) {
         TouchEventListener* CurrentListener = First;
         TouchEventListener* Touched = nullptr;
         while (CurrentListener != nullptr) {

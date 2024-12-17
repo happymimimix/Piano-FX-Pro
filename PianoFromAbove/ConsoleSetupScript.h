@@ -56,8 +56,8 @@ void Setup() {
     // Set console font
     CONSOLE_FONT_INFOEX cfi;
     cfi.cbSize = sizeof(CONSOLE_FONT_INFOEX);
-    cfi.dwFontSize.X = 10;
-    cfi.dwFontSize.Y = 18;
+    cfi.dwFontSize.X = ChW;
+    cfi.dwFontSize.Y = ChH;
     cfi.FontWeight = 400;
     wcscpy(cfi.FaceName, L"Terminal");
     if (!SetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), FALSE, &cfi)) {

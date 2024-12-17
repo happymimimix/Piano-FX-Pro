@@ -6,7 +6,6 @@ TouchEventListener* Tab1::Btn2 = nullptr;
 TouchEventListener* Tab1::Btn3 = nullptr;
 TouchEventListener* Tab1::Btn4 = nullptr;
 TouchEventListener* Tab1::Btn5 = nullptr;
-int delc = 0;
 
 void Tab1::EnableAll() {
     if (Btn1 != nullptr | Btn2 != nullptr | Btn3 != nullptr | Btn4 != nullptr | Btn5 != nullptr) {
@@ -73,7 +72,7 @@ void Tab1::EnableAll() {
             cout << "[9;4H[44m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀";
             cout << "[10;4H[44m[97m Install Black MIDI templates for FL Studio 12.3 [30m█";
             cout << "[11;4H[44m[30m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
-            Tab1::OpenSubView_Btn3();
+            Tab1::Btn3::Open();
         };
         Btn3->OnHover = []() {
             cout << "[9;4H[103m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀";
@@ -118,7 +117,7 @@ void Tab1::EnableAll() {
             cout << "[16;4H[44m[97m Improve audio quality with OmniMIDI [30m█";
             cout << "[17;4H[44m[30m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
             Sleep(500);
-            ShellExecuteA(0, "open", "http://www.cheatengine.org", 0, 0, SW_SHOWNORMAL);
+            ShellExecuteA(0, "open", "https://github.com/KeppySoftware/OmniMIDI/releases", 0, 0, SW_SHOWNORMAL);
             Btn5->OnLeave();
         };
         Btn5->OnHover = []() {
@@ -136,14 +135,15 @@ void Tab1::EnableAll() {
 }
 
 void Tab1::DisableAll() {
-    delc++;
-    cout << "[10;10H";
-    cout << delc;
-    TouchEventManager::Delete(Tab1::Btn1);
-    TouchEventManager::Delete(Tab1::Btn2);
-    TouchEventManager::Delete(Tab1::Btn3);
-    TouchEventManager::Delete(Tab1::Btn4);
-    TouchEventManager::Delete(Tab1::Btn5);
+    if (Btn1 == nullptr | Btn2 == nullptr | Btn3 == nullptr | Btn4 == nullptr | Btn5 == nullptr) {
+        cout << "[1;1H[40m[91mERROR: Trying to disable a tab that isn't enabled. \n";
+        cout << "\nThe program will now stop. \n";
+    }
+    TouchEventManager::Delete(Btn1);
+    TouchEventManager::Delete(Btn2);
+    TouchEventManager::Delete(Btn3);
+    TouchEventManager::Delete(Btn4);
+    TouchEventManager::Delete(Btn5);
 }
 
 void Tab1::Draw() {

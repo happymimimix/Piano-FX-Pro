@@ -6,3 +6,6 @@
 #include <vector>
 #include <functional>
 using namespace std;
+
+#define ChW 10
+#define ChH 18

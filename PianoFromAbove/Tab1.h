@@ -2,6 +2,7 @@
 #include <PFXSTUDIO_Global_Imports.h>
 #include <TouchEventListener.h>
 #include <TabSwitcher.h>
+#include <ConsoleTextbox.h>
 
 struct Tab1 {
     static TouchEventListener* Btn1;
@@ -13,5 +14,11 @@ struct Tab1 {
     static void EnableAll();
     static void DisableAll();
     static void Draw();
-    static void OpenSubView_Btn3();
+
+    struct Btn3 {
+        static TouchEventListener* Close;
+        static ConsoleTextbox Path;
+
+        static void Open();
+    };
 };

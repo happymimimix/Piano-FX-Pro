@@ -12,25 +12,26 @@ void StudioMain() {
     TabSwitcher::EnableAll();
 
     size_t LastCommandLength = 0;
-    cout << "[1;2H[40m[31m(0,0)";
+    cout << "[1;2H[40m[91m(0,0)";
     while (!CloseBtn::Terminated) {
-        INPUT_RECORD inrec;
-        DWORD nEvents;
-        if (ReadConsoleInputA(GetStdHandle(STD_INPUT_HANDLE), &inrec, 1, &nEvents)) {
-            if (inrec.EventType == MOUSE_EVENT) {
-                MOUSE_EVENT_RECORD mouseEvent = inrec.Event.MouseEvent;
-                // Print mouse debug information
-                string CommandText = "(" + to_string(mouseEvent.dwMousePosition.X) + ", " + to_string(mouseEvent.dwMousePosition.Y) + ")";
+        if (GetForegroundWindow() == GetConsoleWindow()) {
+            InvalidateRect(GetConsoleWindow(), NULL, TRUE);
+            POINT CursorPos;
+            if (GetCursorPos(&CursorPos)) {
+                ScreenToClient(GetConsoleWindow(), &CursorPos);
+                CursorPos.x /= ChW;
+                CursorPos.y /= ChH;
+                string CommandText = "(" + to_string(CursorPos.x) + ", " + to_string(CursorPos.y) + ")";
                 size_t ThisCommandLength = CommandText.length();
                 bool Clicked = false;
-                if (mouseEvent.dwButtonState & FROM_LEFT_1ST_BUTTON_PRESSED) {
+                if (GetAsyncKeyState(VK_LBUTTON) & 0x8000) {
                     // Button down - green text
-                    cout << "[1;2H[40m[32m";
+                    cout << "[1;2H[40m[92m";
                     Clicked = true;
                 }
                 else {
                     // Button up - red text
-                    cout << "[1;2H[40m[31m";
+                    cout << "[1;2H[40m[91m";
                 }
                 cout << CommandText;
                 while (ThisCommandLength < LastCommandLength) {
@@ -38,7 +39,12 @@ void StudioMain() {
                     ThisCommandLength++;
                 }
                 LastCommandLength = CommandText.length();
-                TouchEventManager::CheckTouches(mouseEvent.dwMousePosition, Clicked);
+                TouchEventManager::CheckTouches(CursorPos, Clicked);
+            }
+            MSG msg = {};
+            if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
+                TranslateMessage(&msg);
+                DispatchMessageW(&msg);
             }
         }
     }

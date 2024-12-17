@@ -399,6 +399,12 @@
     <ClInclude Include="TouchEventListener.h">
       <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
     </ClInclude>
+    <ClInclude Include="ConsoleTextbox.h">
+      <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="ConsoleFillingTool.h">
+      <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PianoFromAbove.rc">

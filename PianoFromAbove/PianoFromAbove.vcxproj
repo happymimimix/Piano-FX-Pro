@@ -174,6 +174,7 @@ move /y ..\Piano-FX-Pro.exe ..\Release\Piano-FX-Pro.exe</Command>
     <ClInclude Include="Colorizer.exe.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="ConfigProcs.h" />
+    <ClInclude Include="ConsoleFillingTool.h" />
     <ClInclude Include="ConsoleSetupScript.h" />
     <ClInclude Include="d3dx12\d3dx12.h" />
     <ClInclude Include="d3dx12\d3dx12_barriers.h" />
@@ -290,13 +291,11 @@ move /y ..\Piano-FX-Pro.exe ..\Release\Piano-FX-Pro.exe</Command>
     <ClCompile Include="TabSwitcherMain.h">
       <FileType>CppHeader</FileType>
     </ClCompile>
+    <ClInclude Include="ConsoleTextbox.h" />
     <ClInclude Include="tinyxml\tinystr.h" />
     <ClInclude Include="tinyxml\tinyxml.h" />
     <ClInclude Include="TouchEventListener.h" />
-    <ClCompile Include="TouchEventListenerInit.h">
-      <FileType>CppHeader</FileType>
-      <DeploymentContent>false</DeploymentContent>
-    </ClCompile>
+    <ClCompile Include="TouchEventListenerInit.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PianoFromAbove.rc" />
