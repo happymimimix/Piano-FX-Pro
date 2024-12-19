@@ -170,12 +170,16 @@ move /y ..\Piano-FX-Pro.exe ..\Release\Piano-FX-Pro.exe</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Background.h" />
+    <ClInclude Include="ButtonStateDeclarations.h" />
     <ClInclude Include="CloseBtn.h" />
     <ClInclude Include="Colorizer.exe.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="ConfigProcs.h" />
+    <ClInclude Include="ConsoleButton.h" />
+    <ClInclude Include="ConsoleDropdown.h" />
     <ClInclude Include="ConsoleFillingTool.h" />
     <ClInclude Include="ConsoleSetupScript.h" />
+    <ClInclude Include="ConsoleTransitionTool.h" />
     <ClInclude Include="d3dx12\d3dx12.h" />
     <ClInclude Include="d3dx12\d3dx12_barriers.h" />
     <ClInclude Include="d3dx12\d3dx12_check_feature_support.h" />
@@ -187,6 +191,7 @@ move /y ..\Piano-FX-Pro.exe ..\Release\Piano-FX-Pro.exe</Command>
     <ClInclude Include="d3dx12\d3dx12_root_signature.h" />
     <ClInclude Include="d3dx12\d3dx12_state_object.h" />
     <ClInclude Include="EmbededFilesExtractor.h" />
+    <ClInclude Include="flpTools.h" />
     <ClInclude Include="freetype\freetype.h" />
     <ClInclude Include="freetype\ftadvanc.h" />
     <ClInclude Include="freetype\ftbbox.h" />
@@ -268,13 +273,14 @@ move /y ..\Piano-FX-Pro.exe ..\Release\Piano-FX-Pro.exe</Command>
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Studio.h" />
-    <ClInclude Include="Tab1Btn3.h">
+    <ClCompile Include="Tab1Btn3.h">
       <FileType>CppHeader</FileType>
-    </ClInclude>
+    </ClCompile>
     <ClInclude Include="Tab1.h" />
     <ClCompile Include="Tab1Main.h">
       <FileType>CppHeader</FileType>
     </ClCompile>
+    <ClInclude Include="Tab1Graphics.h" />
     <ClInclude Include="Tab2.h" />
     <ClCompile Include="Tab2Main.h">
       <FileType>CppHeader</FileType>

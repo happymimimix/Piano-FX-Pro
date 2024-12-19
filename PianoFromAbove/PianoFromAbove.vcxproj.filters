@@ -76,6 +76,18 @@
     <Filter Include="Source Files\Piano-FX Studio\TouchEventListeners\Tab1\SubViews">
       <UniqueIdentifier>{6370c0cf-b749-45a1-a966-9f8b795d42e8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Piano-FX Studio\Graphics">
+      <UniqueIdentifier>{9115e826-5452-48b4-88a3-36f981cad17d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Piano-FX Studio\TouchEventListeners\Tab2\SubViews">
+      <UniqueIdentifier>{130a82ba-8795-4783-b2fd-9bcd2ffc8be8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Piano-FX Studio\TouchEventListeners\Tab3\SubViews">
+      <UniqueIdentifier>{28487e42-69de-4a38-ad6c-7152eaca4bd3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Piano-FX Studio\TouchEventListeners\Tab4\SubViews">
+      <UniqueIdentifier>{e2e3d992-d0ab-41eb-ac10-064799d7f2ac}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Config.h">
@@ -363,9 +375,6 @@
     <ClInclude Include="Studio.h">
       <Filter>Source Files\Piano-FX Studio\Main</Filter>
     </ClInclude>
-    <ClInclude Include="Background.h">
-      <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
-    </ClInclude>
     <ClInclude Include="PFXSTUDIO_Global_Imports.h">
       <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
     </ClInclude>
@@ -380,9 +389,6 @@
     </ClInclude>
     <ClInclude Include="Tab2.h">
       <Filter>Source Files\Piano-FX Studio\TouchEventListeners\Tab2</Filter>
-    </ClInclude>
-    <ClInclude Include="Tab1Btn3.h">
-      <Filter>Source Files\Piano-FX Studio\TouchEventListeners\Tab1\SubViews</Filter>
     </ClInclude>
     <ClInclude Include="TabSwitcher.h">
       <Filter>Source Files\Piano-FX Studio\TouchEventListeners</Filter>
@@ -403,6 +409,27 @@
       <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="ConsoleFillingTool.h">
+      <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="ConsoleDropdown.h">
+      <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="flpTools.h">
+      <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="ConsoleButton.h">
+      <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Background.h">
+      <Filter>Source Files\Piano-FX Studio\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Tab1Graphics.h">
+      <Filter>Source Files\Piano-FX Studio\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="ButtonStateDeclarations.h">
+      <Filter>Source Files\Piano-FX Studio\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="ConsoleTransitionTool.h">
       <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
     </ClInclude>
   </ItemGroup>
@@ -489,6 +516,9 @@
     </ClCompile>
     <ClCompile Include="TouchEventListenerInit.h">
       <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="Tab1Btn3.h">
+      <Filter>Source Files\Piano-FX Studio\TouchEventListeners\Tab1\SubViews</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

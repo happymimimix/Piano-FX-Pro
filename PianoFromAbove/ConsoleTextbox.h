@@ -2,13 +2,13 @@
 #include <PFXSTUDIO_Global_Imports.h>
 
 struct ConsoleTextbox {
-    HWND hTextbox = NULL;
+    HWND hDropdown = NULL;
 
     void Create(int x, int y, int w, int h) {
-        this->hTextbox = CreateWindowEx(
+        this->hDropdown = CreateWindowEx(
             WS_EX_CLIENTEDGE,
             L"EDIT",
-            L"",
+            NULL,
             WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL,
             x, y, w, h,
             GetConsoleWindow(),
@@ -19,9 +19,9 @@ struct ConsoleTextbox {
     }
 
     wstring GetText() {
-        if (this->hTextbox != NULL) {
-            wstring Content(GetWindowTextLengthW(this->hTextbox), L'\0');
-            GetWindowTextW(this->hTextbox, &Content[0], GetWindowTextLengthW(this->hTextbox) + 1);
+        if (this->hDropdown != NULL) {
+            wstring Content(GetWindowTextLengthW(this->hDropdown), L'\0');
+            GetWindowTextW(this->hDropdown, &Content[0], GetWindowTextLengthW(this->hDropdown) + 1);
             return Content;
         }
         else {
@@ -35,8 +35,8 @@ struct ConsoleTextbox {
     }
 
     void SetText(const wstring& Content) {
-        if (this->hTextbox != NULL) {
-            SendMessage(this->hTextbox, WM_SETTEXT, 0, (LPARAM)Content.c_str());
+        if (this->hDropdown != NULL) {
+            SendMessage(this->hDropdown, WM_SETTEXT, 0, (LPARAM)Content.c_str());
         }
         else {
             cout << "[1;1H[40m[91mERROR: Trying to set text to a text box that doesn't exist! \n";
@@ -49,9 +49,9 @@ struct ConsoleTextbox {
     }
 
     void Delete() {
-        if (this->hTextbox != NULL) {
-            DestroyWindow(this->hTextbox);
-            this->hTextbox = NULL;
+        if (this->hDropdown != NULL) {
+            DestroyWindow(this->hDropdown);
+            this->hDropdown = NULL;
         }
         else {
             cout << "[1;1H[40m[91mERROR: Trying to delete a text box that doesn't exist! \n";

@@ -7,6 +7,7 @@
 
 void StudioMain() {
     Setup();
+    ExtractEmbededFiles();
     CloseBtn::Create();
     TabSwitcher::EnableTab(1);
     TabSwitcher::EnableAll();
@@ -14,38 +15,36 @@ void StudioMain() {
     size_t LastCommandLength = 0;
     cout << "[1;2H[40m[91m(0,0)";
     while (!CloseBtn::Terminated) {
-        if (GetForegroundWindow() == GetConsoleWindow()) {
-            InvalidateRect(GetConsoleWindow(), NULL, TRUE);
-            POINT CursorPos;
-            if (GetCursorPos(&CursorPos)) {
-                ScreenToClient(GetConsoleWindow(), &CursorPos);
-                CursorPos.x /= ChW;
-                CursorPos.y /= ChH;
-                string CommandText = "(" + to_string(CursorPos.x) + ", " + to_string(CursorPos.y) + ")";
-                size_t ThisCommandLength = CommandText.length();
-                bool Clicked = false;
-                if (GetAsyncKeyState(VK_LBUTTON) & 0x8000) {
-                    // Button down - green text
-                    cout << "[1;2H[40m[92m";
-                    Clicked = true;
-                }
-                else {
-                    // Button up - red text
-                    cout << "[1;2H[40m[91m";
-                }
-                cout << CommandText;
-                while (ThisCommandLength < LastCommandLength) {
-                    cout << "[96m═";
-                    ThisCommandLength++;
-                }
-                LastCommandLength = CommandText.length();
-                TouchEventManager::CheckTouches(CursorPos, Clicked);
+        RedrawWindow(GetConsoleWindow(), NULL, NULL, RDW_ALLCHILDREN | RDW_INVALIDATE);
+        POINT CursorPos;
+        if (GetCursorPos(&CursorPos) && GetForegroundWindow() == GetConsoleWindow()) {
+            ScreenToClient(GetConsoleWindow(), &CursorPos);
+            CursorPos.x /= ChW;
+            CursorPos.y /= ChH;
+            string CommandText = "(" + to_string(CursorPos.x) + ", " + to_string(CursorPos.y) + ")";
+            size_t ThisCommandLength = CommandText.length();
+            bool Clicked = false;
+            if (GetAsyncKeyState(VK_LBUTTON) & 0x8000) {
+                // Button down - green text
+                cout << "[1;2H[40m[92m";
+                Clicked = true;
             }
-            MSG msg = {};
-            if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
-                TranslateMessage(&msg);
-                DispatchMessageW(&msg);
+            else {
+                // Button up - red text
+                cout << "[1;2H[40m[91m";
             }
+            cout << CommandText;
+            while (ThisCommandLength < LastCommandLength) {
+                cout << "[96m═";
+                ThisCommandLength++;
+            }
+            LastCommandLength = CommandText.length();
+            TouchEventManager::CheckTouches(CursorPos, Clicked);
+        }
+        MSG msg = {};
+        if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
+            TranslateMessage(&msg);
+            DispatchMessageW(&msg);
         }
     }
 }

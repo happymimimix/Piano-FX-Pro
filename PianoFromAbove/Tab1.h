@@ -3,6 +3,8 @@
 #include <TouchEventListener.h>
 #include <TabSwitcher.h>
 #include <ConsoleTextbox.h>
+#include <ConsoleDropdown.h>
+#include <Tab1Graphics.h>
 
 struct Tab1 {
     static TouchEventListener* Btn1;
@@ -18,6 +20,8 @@ struct Tab1 {
     struct Btn3 {
         static TouchEventListener* Close;
         static ConsoleTextbox Path;
+        static TouchEventListener* Browse;
+        static TouchEventListener* Install;
 
         static void Open();
     };

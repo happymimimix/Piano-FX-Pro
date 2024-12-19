@@ -1,50 +1,24 @@
 ﻿#include <Tab1.h>
-#include <ConsoleTextbox.h>
 #include <ConsoleFillingTool.h>
+#include <ConsoleTransitionTool.h>
+#include <flpTools.h>
 
 TouchEventListener* Tab1::Btn3::Close = nullptr;
 ConsoleTextbox Tab1::Btn3::Path;
+TouchEventListener* Tab1::Btn3::Browse = nullptr;
+TouchEventListener* Tab1::Btn3::Install = nullptr;
 
 void Tab1::Btn3::Open() {
-    Tab1::Btn3->OnLeave = []() {};
     TabSwitcher::DisableAll();
     Tab1::DisableAll();
     InvalidateRect(GetConsoleWindow(), NULL, TRUE);
     // Move the last two buttons downwards
-    HWND ConsoleWindow = GetConsoleWindow();
-    HDC ConsoleDC = GetDC(ConsoleWindow);
-    HDC MemDC = CreateCompatibleDC(ConsoleDC);
-    HBITMAP BMP = CreateCompatibleBitmap(ConsoleDC, 46 * ChW, 6 * ChH);
-    SelectObject(MemDC, BMP);
-    BitBlt(MemDC, 0, 0, 46 * ChW, 6 * ChH, ConsoleDC, 3 * ChW, 11 * ChH, SRCCOPY);\
-    FillConsole(3, 11, 46, 6, ' ', 0x0F);
-    uint16_t CP_Y = 11 * ChH;
-    while (CP_Y <= 19 * ChH) {
-        BitBlt(ConsoleDC, 3 * ChW, CP_Y, 46 * ChW, 6 * ChH, MemDC, 0, 0, SRCCOPY);
-        CP_Y += 1 << 2;
-        Sleep(1);
-    }
-    DeleteDC(MemDC);
-    DeleteObject(BMP);
-    // Draw the UI
-    cout << "[9;4H[44m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀";
-    cout << "[10;4H[44m[97m Install Black MIDI templates for FL Studio 12.3 [30m█";
-    cout << "[11;4H[44m[36m┌────────────────────────────────────────────────────────────[[91mx[36m]┐";
-    cout << "[12;4H[44m[36m│ [95mFl Studio installation directory:                             [36m│";
-    cout << "[13;4H[44m[36m│ [95m┌──────────────────────────────────────────────────┬────────┐ [36m│";
-    cout << "[14;4H[44m[36m│ [95m│                                                  │ [91mBrowse [95m│ [36m│";
-    cout << "[15;4H[44m[36m│ [95m└──────────────────────────────────────────────────┴────────┘ [36m│";
-    cout << "[16;4H[44m[36m│                                                   [91m┌─────────┐ [36m│";
-    cout << "[17;4H[44m[36m│                                                   [91m│ [92mInstall [91m│ [36m│";
-    cout << "[18;4H[44m[36m│                                                   [91m└─────────┘ [36m│";
-    cout << "[19;4H[44m[36m└───────────────────────────────────────────────────────────────┘";
+    DoTransition(3, 11, 46, 6, 3, 19, 0x00001000, true, 0x0F);
     // Don't let the last two buttons disappear on minimizing
-    cout << "[20;4H[107m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀";
-    cout << "[21;4H[107m[30m Download Cheat Engine from official website [90m█";
-    cout << "[22;4H[107m[30m▄[90m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
-    cout << "[23;4H[107m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀";
-    cout << "[24;4H[107m[30m Improve audio quality with OmniMIDI [90m█";
-    cout << "[25;4H[107m[30m▄[90m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
+    Tab1Graphics::Btn4(3, 19, Normal);
+    Tab1Graphics::Btn5(3, 22, Normal);
+    // Draw the UI
+    Tab1Graphics::Btn3Graphics::Main(3, 10);
     Close = TouchEventManager::Create();
     Close->X = 65;
     Close->Y = 10;
@@ -54,25 +28,12 @@ void Tab1::Btn3::Open() {
         Close->OnLeave = []() {};
         TouchEventManager::Delete(Close);
         Path.Delete();
+        TouchEventManager::Delete(Browse);
+        TouchEventManager::Delete(Install);
         FillConsole(3, 8, 65, 11, ' ', 0x0F);
-        cout << "[9;4H[107m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀";
-        cout << "[10;4H[107m[30m Install Black MIDI templates for FL Studio 12.3 [90m█";
-        cout << "[11;4H[107m[30m▄[90m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
-        // Move the last two buttons downwards
-        HWND ConsoleWindow = GetConsoleWindow();
-        HDC ConsoleDC = GetDC(ConsoleWindow);
-        HDC MemDC = CreateCompatibleDC(ConsoleDC);
-        HBITMAP BMP = CreateCompatibleBitmap(ConsoleDC, 46 * ChW, 7 * ChH);
-        SelectObject(MemDC, BMP);
-        BitBlt(MemDC, 0, 0, 46 * ChW, 7 * ChH, ConsoleDC, 3 * ChW, 19 * ChH, SRCCOPY);
-        uint16_t CP_Y = 19 * ChH;
-        while (CP_Y >= 11 * ChH) {
-            BitBlt(ConsoleDC, 3 * ChW, CP_Y, 46 * ChW, 7 * ChH, MemDC, 0, 0, SRCCOPY);
-            CP_Y -= 1 << 2;
-            Sleep(1);
-        }
-        DeleteDC(MemDC);
-        DeleteObject(BMP);
+        Tab1Graphics::Btn3(3, 8, Normal);
+        // Move the last two buttons back upwards
+        DoTransition(3, 19, 46, 7, 3, 11, 0x00001000, true, 0x0F);
         TabSwitcher::EnableAll();
         Tab1::EnableAll();
         FillConsole(3, 19, 46, 6, ' ', 0x0F);
@@ -85,4 +46,75 @@ void Tab1::Btn3::Open() {
     };
     Path.Create(6*ChW-ChW/2, 13*ChH-ChH/2, 51*ChW, 2*ChH);
     Path.SetText(L"C:\\Program Files (x86)\\Image-Line\\FL Studio 12");
+    Browse = TouchEventManager::Create();
+    Browse->X = 57;
+    Browse->Y = 13;
+    Browse->W = 7;
+    Browse->H = 0;
+    Browse->OnTouch = []() {
+        Tab1Graphics::Btn3Graphics::Browse(58, 13, Touched);
+        wchar_t DIR[MAX_PATH] = {};
+        BROWSEINFOW BI = {};
+        BI.lpszTitle = L"Select FL Studio Installation DIR: ";
+        BI.ulFlags = NULL;
+
+        LPITEMIDLIST pidl = SHBrowseForFolder(&BI);
+        if (pidl && SHGetPathFromIDList(pidl, DIR)) {
+            CoTaskMemFree(pidl);
+            Path.SetText(DIR);
+        }
+    };
+    Browse->OnHover = []() {
+        Tab1Graphics::Btn3Graphics::Browse(58, 13, Hovered);
+    };
+    Browse->OnLeave = []() {
+        Tab1Graphics::Btn3Graphics::Browse(58, 13, Normal);
+    };
+    Install = TouchEventManager::Create();
+    Install->X = 56;
+    Install->Y = 16;
+    Install->W = 8;
+    Install->H = 0;
+    Install->OnTouch = []() {
+        Tab1Graphics::Btn3Graphics::Install(57, 16, Touched);
+        wstring DIR = Path.GetText();
+        DIR += L"\\Data\\Projects\\Templates\\BlackMIDI";
+        CreateDirectory(DIR.c_str(), NULL);
+        uint16_t PPQ = 1 << 6;
+        while (PPQ <= 1 << 12) {
+            PPQ = PPQ << 1;
+            wstring SubDIR = DIR;
+            SubDIR += L"\\";
+            SubDIR += to_wstring(PPQ);
+            SubDIR += L"ppq";
+            CreateDirectory(SubDIR.c_str(), NULL);
+            SubDIR += L"\\";
+            SubDIR += to_wstring(PPQ);
+            SubDIR += L"ppq.nfo";
+            fstream NFO(SubDIR, ios::out);
+            NFO << "Description=New black midi project with a resolution of ";
+            NFO << to_string(PPQ);
+            NFO << "ppq. \n";
+            NFO << "MenuIconIndex=-96";
+            NFO.close();
+            SubDIR = DIR;
+            SubDIR += L"\\";
+            SubDIR += to_wstring(PPQ);
+            SubDIR += L"ppq";
+            SubDIR += L"\\";
+            SubDIR += to_wstring(PPQ);
+            SubDIR += L"ppq.flp";
+            CreateFLP(SubDIR, PPQ);
+        }
+        wstring NoticeText = L"";
+        NoticeText += L"Black MIDI templates have been installed to: \n";
+        NoticeText += DIR;
+        MessageBox(GetConsoleWindow(), NoticeText.c_str(), L"Success", MB_OK | MB_ICONEXCLAMATION);
+    };
+    Install->OnHover = []() {
+        Tab1Graphics::Btn3Graphics::Install(57, 16, Hovered);
+    };
+    Install->OnLeave = []() {
+        Tab1Graphics::Btn3Graphics::Install(57, 16, Normal);
+    };
 }
