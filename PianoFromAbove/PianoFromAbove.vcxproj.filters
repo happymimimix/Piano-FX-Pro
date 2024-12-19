@@ -432,6 +432,9 @@
     <ClInclude Include="ConsoleTransitionTool.h">
       <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
     </ClInclude>
+    <ClInclude Include="Tab2Graphics.h">
+      <Filter>Source Files\Piano-FX Studio\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PianoFromAbove.rc">

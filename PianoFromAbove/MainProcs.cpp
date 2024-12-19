@@ -123,7 +123,12 @@ LRESULT WINAPI WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                             cPlayback.SetPlayMode(GameState::Intro, true);
                             cPlayback.SetPlayable(false, true);
                             cPlayback.SetPosition(0);
+#ifdef SOFTWARE_RENDER_ONLY
+                            SetWindowText(g_hWnd, L"Piano-FX Pro v" LVersionString " | Made by: happy_mimimix | Now playing: None  (Enforced Software Rendering)");
+#else
                             SetWindowText(g_hWnd, L"Piano-FX Pro v" LVersionString " | Made by: happy_mimimix | Now playing: None");
+#endif // SOFTWARE_RENDER_ONLY
+
                             HandOffMsg(WM_COMMAND, ID_CHANGESTATE, (LPARAM)new IntroScreen(NULL, NULL));
                         }
                         PlayFile(sFilename);
@@ -136,7 +141,11 @@ LRESULT WINAPI WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                     cPlayback.SetPlayMode( GameState::Intro, true );
                     cPlayback.SetPlayable( false, true );
                     cPlayback.SetPosition( 0 );
+#ifdef SOFTWARE_RENDER_ONLY
+                    SetWindowText(g_hWnd, L"Piano-FX Pro v" LVersionString " | Made by: happy_mimimix | Now playing: None  (Enforced Software Rendering)");
+#else
                     SetWindowText(g_hWnd, L"Piano-FX Pro v" LVersionString " | Made by: happy_mimimix | Now playing: None");
+#endif
                     HandOffMsg( WM_COMMAND, ID_CHANGESTATE, ( LPARAM )new IntroScreen( NULL, NULL ) );
                     return 0;
                 }
@@ -1164,7 +1173,6 @@ INT_PTR LoadingProc(HWND hwnd, UINT msg, WPARAM, LPARAM) {
 BOOL PlayFile(const wstring &sFile)
 {
     Config &config = Config::GetConfig();
-    const VisualSettings &cVisual = config.GetVisualSettings();
     PlaybackSettings &cPlayback = config.GetPlaybackSettings();
     ViewSettings &cView = config.GetViewSettings();
     VizSettings& cViz = config.GetVizSettings();
@@ -1203,10 +1211,18 @@ BOOL PlayFile(const wstring &sFile)
     cView.SetZoomMove( false, true );
     TCHAR sTitle[1<<10];
     if (cViz.bDumpFrames) {
-        _stprintf_s(sTitle, L"Piano-FX Pro v" LVersionString L" | Made by : happy_mimimix | Now rendering : % ws", sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
+#ifdef SOFTWARE_RENDER_ONLY
+        _stprintf_s(sTitle, L"Piano-FX Pro v" LVersionString L" | Made by : happy_mimimix | Now rendering : %ws  (Enforced Software Rendering)", sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
+#else
+        _stprintf_s(sTitle, L"Piano-FX Pro v" LVersionString L" | Made by : happy_mimimix | Now rendering : %ws", sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
+#endif
     }
     else {
+#ifdef SOFTWARE_RENDER_ONLY
+        _stprintf_s(sTitle, L"Piano-FX Pro v" LVersionString L" | Made by: happy_mimimix | Now playing: %ws  (Enforced Software Rendering)", sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
+#else
         _stprintf_s(sTitle, L"Piano-FX Pro v" LVersionString L" | Made by: happy_mimimix | Now playing: %ws", sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
+#endif
     }
     SetWindowText(g_hWnd, sTitle);
 

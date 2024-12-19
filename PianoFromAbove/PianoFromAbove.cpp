@@ -130,8 +130,14 @@ PFX:
     PlaybackSettings &cPlayback = config.GetPlaybackSettings();
 
     // Create the application window
-    g_hWnd = CreateWindowEx( 0, CLASSNAME, L"Piano-FX Pro v" LVersionString " | Made by: happy_mimimix | Now playing: None", WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, cView.GetMainLeft(), cView.GetMainTop(),
-                             cView.GetMainWidth(), cView.GetMainHeight(), NULL, NULL, wc.hInstance, NULL );
+#ifdef SOFTWARE_RENDER_ONLY
+    g_hWnd = CreateWindowEx(0, CLASSNAME, L"Piano-FX Pro v" LVersionString " | Made by: happy_mimimix | Now playing: None  (Enforced Software Rendering)", WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, cView.GetMainLeft(), cView.GetMainTop(),
+        cView.GetMainWidth(), cView.GetMainHeight(), NULL, NULL, wc.hInstance, NULL );
+#else
+    g_hWnd = CreateWindowEx(0, CLASSNAME, L"Piano-FX Pro v" LVersionString " | Made by: happy_mimimix | Now playing: None", WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, cView.GetMainLeft(), cView.GetMainTop(),
+        cView.GetMainWidth(), cView.GetMainHeight(), NULL, NULL, wc.hInstance, NULL);
+#endif // SOFTWARE_RENDER_ONLY
+
     if ( !g_hWnd ) return 1;
 
     // Accept drag and drop
@@ -238,7 +244,11 @@ DWORD WINAPI GameThread( LPVOID lpParameter )
 
     // Put the adapter in the window title
     wchar_t buf[1<<10] = {};
-    _snwprintf_s(buf, 1<<10, L"Piano-FX Pro v" LVersionString L" | Made by: happy_mimimix | Now playing: Splash MIDI");
+#ifdef SOFTWARE_RENDER_ONLY
+    _snwprintf_s(buf, 1<<10, L"Piano-FX Pro v" LVersionString L" | Made by: happy_mimimix | Now playing: Splash MIDI  (Enforced Software Rendering)");
+#else
+    _snwprintf_s(buf, 1 << 10, L"Piano-FX Pro v" LVersionString L" | Made by: happy_mimimix | Now playing: Splash MIDI");
+#endif
     SetWindowTextW(g_hWnd, buf);
 
     // Event, logic, render...

@@ -8,9 +8,6 @@
 *
 *************************************************************************************************/
 #include "d3dx12/d3dx12.h"
-#ifdef _DEBUG
-#include <dxgidebug.h>
-#endif
 #include "RectPixelShader.h"
 #include "RectVertexShader.h"
 #include "NotePixelShader.h"
@@ -28,39 +25,16 @@ ComPtr<IWICImagingFactory> D3D12Renderer::s_pWICFactory;
 D3D12Renderer::D3D12Renderer() {}
 
 D3D12Renderer::~D3D12Renderer() {
-    // HACK: This hangs for some reason. Maybe it's because the hWnd gets destroyed before here?
-    //WaitForGPU();
-
     if (m_hFenceEvent)
         CloseHandle(m_hFenceEvent);
-
-#ifdef _DEBUG
-    ComPtr<IDXGIDebug1> dxgi_debug = nullptr;
-    if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&dxgi_debug))))
-        dxgi_debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
-#endif
 }
 
 std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) {
     HRESULT res;
-#ifdef _DEBUG
-    // Initialize D3D12 debug interface
-    ID3D12Debug1* d3d12_debug = nullptr;
-    res = D3D12GetDebugInterface(IID_PPV_ARGS(&d3d12_debug));
-    if (FAILED(res))
-        return std::make_tuple(res, "D3D12GetDebugInterface");
-    d3d12_debug->EnableDebugLayer();
-    d3d12_debug->SetEnableGPUBasedValidation(true);
-    d3d12_debug->SetEnableSynchronizedCommandQueueValidation(true);
-    d3d12_debug->Release();
-#endif
 
     // Create DXGI factory
-#ifdef _DEBUG
-    res = CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&m_pFactory));
-#else
     res = CreateDXGIFactory2(0, IID_PPV_ARGS(&m_pFactory));
-#endif
+
     if (FAILED(res))
         return std::make_tuple(res, "CreateDXGIFactory2");
 
@@ -68,8 +42,8 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     // TODO: Allow device selection for people with multiple GPUs
     m_hWnd = hWnd;
     m_bLimitFPS = bLimitFPS;
+#ifndef SOFTWARE_RENDER_ONLY
     IDXGIAdapter* adapter = nullptr;
-    //std::vector<ComPtr<IDXGIAdapter1>> adapters;
     for (UINT i = 0; m_pFactory->EnumAdapters(i, &adapter) != DXGI_ERROR_NOT_FOUND; i++) {
         res = adapter->QueryInterface(IID_PPV_ARGS(&m_pAdapter));
         if (FAILED(res))
@@ -89,6 +63,9 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
         break;
     }
     if (m_pDevice == nullptr) { //Oh we love software rendering! 
+#else
+    {
+#endif // !SOFTWARE_RENDER_ONLY
         ComPtr<IDXGIAdapter> warpAdapter;
         res = m_pFactory->EnumWarpAdapter(IID_PPV_ARGS(&warpAdapter));
         if (FAILED(res))
@@ -97,15 +74,6 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
         if (FAILED(res))
             return std::make_tuple(res, "D3D12CreateDevice");
     }
-
-#ifdef _DEBUG
-    // Break on errors
-    ComPtr<ID3D12InfoQueue> info_queue;
-    if (SUCCEEDED(m_pDevice->QueryInterface(IID_PPV_ARGS(&info_queue)))) {
-        info_queue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, TRUE);
-        info_queue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, TRUE);
-    }
-#endif
 
     // Create command queue
     D3D12_COMMAND_QUEUE_DESC queue_desc = {
