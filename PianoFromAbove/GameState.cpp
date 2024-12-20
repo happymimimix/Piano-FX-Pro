@@ -2005,28 +2005,56 @@ void MainScreen::RenderNote(const MIDIChannelEvent* pNote)
 void MainScreen::GenNoteXTable() {
     if (m_bFlipKeyboard) {
         for (int i = m_iStartNote; i <= m_iEndNote; i++) {
-            int iWhiteKeys = MIDI::WhiteCount(m_iStartNote, i);
-            float fStartX = (MIDI::IsSharp(m_iStartNote) - MIDI::IsSharp(i)) * SharpRatio / 2.0f;
-            if (MIDI::IsSharp(i))
-            {
-                MIDI::Note eNote = MIDI::NoteVal(i);
-                if (eNote == MIDI::CS || eNote == MIDI::FS) fStartX -= SharpRatio / 5.0f;
-                else if (eNote == MIDI::AS || eNote == MIDI::DS) fStartX += SharpRatio / 5.0f;
+            if (Config::GetConfig().GetVizSettings().bSameWidth) {
+                float fStartNote = m_iStartNote;
+                float fEndNote = m_iEndNote;
+                float KeyCount = i - (m_iStartNote - 1);
+                if (MIDI::IsSharp(m_iStartNote - 1)) {
+                    fStartNote -= 0.5f;
+                    KeyCount += 0.5f;
+                }
+                if (MIDI::IsSharp(m_iEndNote + 1)) {
+                    fEndNote += 0.5f;
+                }
+                notex_table[i] = m_fNotesX + (m_fNotesCX - ((m_fNotesCX / ((fEndNote - fStartNote)+1)) * KeyCount));
+            }else{
+                int iWhiteKeys = MIDI::WhiteCount(m_iStartNote, i);
+                float fStartX = (MIDI::IsSharp(m_iStartNote) - MIDI::IsSharp(i)) * SharpRatio / 2.0f;
+                if (MIDI::IsSharp(i))
+                {
+                    MIDI::Note eNote = MIDI::NoteVal(i);
+                    if (eNote == MIDI::CS || eNote == MIDI::FS) fStartX -= SharpRatio / 5.0f;
+                    else if (eNote == MIDI::AS || eNote == MIDI::DS) fStartX += SharpRatio / 5.0f;
+                }
+                notex_table[i] = m_fNotesX + (m_fNotesCX - (m_fWhiteCX * (iWhiteKeys + fStartX)) - (MIDI::IsSharp(i) ? m_fWhiteCX * SharpRatio : m_fWhiteCX));
             }
-            notex_table[i] = m_fNotesX + (m_fNotesCX - (m_fWhiteCX * (iWhiteKeys + fStartX)) - (MIDI::IsSharp(i) ? m_fWhiteCX * SharpRatio : m_fWhiteCX));
         }
     }
     else {
         for (int i = m_iStartNote; i <= m_iEndNote; i++) {
-            int iWhiteKeys = MIDI::WhiteCount(m_iStartNote, i);
-            float fStartX = (MIDI::IsSharp(m_iStartNote) - MIDI::IsSharp(i)) * SharpRatio / 2.0f;
-            if (MIDI::IsSharp(i))
-            {
-                MIDI::Note eNote = MIDI::NoteVal(i);
-                if (eNote == MIDI::CS || eNote == MIDI::FS) fStartX -= SharpRatio / 5.0f;
-                else if (eNote == MIDI::AS || eNote == MIDI::DS) fStartX += SharpRatio / 5.0f;
+            if (Config::GetConfig().GetVizSettings().bSameWidth) {
+                float fStartNote = m_iStartNote;
+                float fEndNote = m_iEndNote;
+                float KeyCount = i - m_iStartNote;
+                if (MIDI::IsSharp(m_iStartNote - 1)) {
+                    fStartNote -= 0.5f;
+                    KeyCount += 0.5f;
+                }
+                if (MIDI::IsSharp(m_iEndNote + 1)) {
+                    fEndNote += 0.5f;
+                }
+                notex_table[i] = m_fNotesX + (m_fNotesCX / ((fEndNote - fStartNote) + 1)) * KeyCount;
+            }else{
+                int iWhiteKeys = MIDI::WhiteCount(m_iStartNote, i);
+                float fStartX = (MIDI::IsSharp(m_iStartNote) - MIDI::IsSharp(i)) * SharpRatio / 2.0f;
+                if (MIDI::IsSharp(i))
+                {
+                    MIDI::Note eNote = MIDI::NoteVal(i);
+                    if (eNote == MIDI::CS || eNote == MIDI::FS) fStartX -= SharpRatio / 5.0f;
+                    else if (eNote == MIDI::AS || eNote == MIDI::DS) fStartX += SharpRatio / 5.0f;
+                }
+                notex_table[i] = m_fNotesX + m_fWhiteCX * (iWhiteKeys + fStartX);
             }
-            notex_table[i] = m_fNotesX + m_fWhiteCX * (iWhiteKeys + fStartX);
         }
     }
 }

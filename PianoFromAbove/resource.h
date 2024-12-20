@@ -82,6 +82,7 @@
 #define IDC_BACKGROUNDRESET             1110
 #define IDC_COLORLOOP                   1111
 #define IDC_DISABLEUI                   1113
+#define IDC_SAMEWIDTH                   1114
 #define ID_PLAY_PLAY                    40005
 #define ID_PLAY_SKIPFWD                 40006
 #define ID_PLAY_SKIPBACK                40007

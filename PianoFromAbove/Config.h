@@ -188,6 +188,7 @@ struct VizSettings : public ISettings {
     bool bColorLoop;
     bool bKDMAPI;
     bool bDisableUI;
+    bool bSameWidth;
 };
 
 class Config : public ISettings

@@ -184,6 +184,7 @@ INT_PTR WINAPI VisualProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                         cVisual.colors[i] = (int)GetWindowLongPtr( GetDlgItem( hWnd, IDC_COLOR1 + i ), GWLP_USERDATA );
                     cVisual.iBkgColor = (int)GetWindowLongPtr( GetDlgItem( hWnd, IDC_BKGCOLOR ), GWLP_USERDATA );
                     cViz.iBarColor = (int)GetWindowLongPtr(GetDlgItem(hWnd, IDC_BARCOLOR), GWLP_USERDATA);
+                    cViz.bSameWidth = IsDlgButtonChecked(hWnd, IDC_SAMEWIDTH);
 
                     // Report success and return
                     config.SetVisualSettings( cVisual );
@@ -217,6 +218,7 @@ VOID SetVisualProc( HWND hWnd, const VisualSettings &cVisual, const VizSettings&
         SetWindowLongPtr( GetDlgItem( hWnd, IDC_COLOR1 + i ), GWLP_USERDATA, cVisual.colors[i] );
     SetWindowLongPtr( GetDlgItem( hWnd, IDC_BKGCOLOR ), GWLP_USERDATA, cVisual.iBkgColor );
     SetWindowLongPtr( GetDlgItem( hWnd, IDC_BARCOLOR ), GWLP_USERDATA, cViz.iBarColor );
+    CheckDlgButton(hWnd, IDC_SAMEWIDTH, cViz.bSameWidth ? BST_CHECKED : BST_UNCHECKED);
 }
 
 INT_PTR WINAPI AudioProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )

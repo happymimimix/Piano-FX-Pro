@@ -462,6 +462,26 @@ move /y ..\Piano-FX-Pro-SoftwareRendered.exe ..\Release\Piano-FX-Pro-SoftwareRen
       <VariableName Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">g_pBackgroundVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_pBackgroundVertexShader</VariableName>
     </FxCompile>
+    <FxCompile Include="note_vs_samewidth.hlsl">
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">5.1</ShaderModel>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_pNoteVertexShaderSameWidth</VariableName>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ObjectFileOutput>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">g_pNoteVertexShaderSameWidth</VariableName>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">
+      </ObjectFileOutput>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.1</ShaderModel>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ObjectFileOutput>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">g_pNoteVertexShaderSameWidth</VariableName>
+    </FxCompile>
     <FxCompile Include="note_ps.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">Pixel</ShaderType>

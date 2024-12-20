@@ -222,6 +222,7 @@ void VizSettings::LoadDefaultValues() {
     this->bColorLoop = true;
     this->bKDMAPI = false;
     this->bDisableUI = false;
+    this->bSameWidth = true;
 
     VizSettings::LoadDefaultColors();
 }
@@ -382,6 +383,8 @@ void VizSettings::LoadConfigValues(TiXmlElement* txRoot) {
         bKDMAPI = (iAttrVal != 0);
     if (txViz->QueryIntAttribute("DisableUI", &iAttrVal) == TIXML_SUCCESS)
         bDisableUI = (iAttrVal != 0);
+    if (txViz->QueryIntAttribute("SameWidthNotes", &iAttrVal) == TIXML_SUCCESS)
+        bSameWidth = (iAttrVal != 0);
     std::string sTempStr;
     txViz->QueryStringAttribute("SplashMIDI", &sTempStr);
     sSplashMIDI = Util::StringToWstring(sTempStr);
@@ -506,6 +509,7 @@ bool VizSettings::SaveConfigValues(TiXmlElement* txRoot) {
     txViz->SetAttribute("ColorLoop", bColorLoop);
     txViz->SetAttribute("KDMAPI", bKDMAPI);
     txViz->SetAttribute("DisableUI", bDisableUI);
+    txViz->SetAttribute("SameWidthNotes", bSameWidth);
 
     TiXmlElement* txBarColor = new TiXmlElement("BarColor");
     txViz->LinkEndChild(txBarColor);

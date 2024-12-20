@@ -12,6 +12,7 @@
 #include "RectVertexShader.h"
 #include "NotePixelShader.h"
 #include "NoteVertexShader.h"
+#include "NoteVertexShaderSameWidth.h"
 #include "BackgroundPixelShader.h"
 #include "BackgroundVertexShader.h"
 #include "Globals.h"
@@ -326,6 +327,14 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     if (FAILED(res))
         return std::make_tuple(res, "CreateRootSignature (note)");
 
+    ComPtr<ID3DBlob> same_width_note_serialized;
+    res = D3D12SerializeRootSignature(&root_sig_desc, D3D_ROOT_SIGNATURE_VERSION_1, &same_width_note_serialized, nullptr);
+    if (FAILED(res))
+        return std::make_tuple(res, "D3D12SerializeRootSignature (same width note)");
+    res = m_pDevice->CreateRootSignature(0, same_width_note_serialized->GetBufferPointer(), same_width_note_serialized->GetBufferSize(), IID_PPV_ARGS(&m_pNoteSameWidthRootSignature));
+    if (FAILED(res))
+        return std::make_tuple(res, "CreateRootSignature (same width note)");
+
     // Create note pipeline
     auto note_pipeline_desc = rect_pipeline_desc;
     note_pipeline_desc.pRootSignature = m_pNoteRootSignature.Get();
@@ -348,6 +357,19 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     res = m_pDevice->CreateGraphicsPipelineState(&note_pipeline_desc, IID_PPV_ARGS(&m_pNotePipelineState));
     if (FAILED(res))
         return std::make_tuple(res, "CreateGraphicsPipelineState (note)");
+
+    auto same_width_note_pipeline_desc = note_pipeline_desc;
+    same_width_note_pipeline_desc.pRootSignature = m_pNoteSameWidthRootSignature.Get();
+    same_width_note_pipeline_desc.VS = {
+        .pShaderBytecode = g_pNoteVertexShaderSameWidth,
+        .BytecodeLength = sizeof(g_pNoteVertexShaderSameWidth),
+    };
+    same_width_note_pipeline_desc.DepthStencilState = {
+        .DepthEnable = FALSE
+    };
+    res = m_pDevice->CreateGraphicsPipelineState(&same_width_note_pipeline_desc, IID_PPV_ARGS(&m_pNoteSameWidthPipelineState));
+    if (FAILED(res))
+        return std::make_tuple(res, "CreateGraphicsPipelineState (same width note)");
 
     // Create background root signature
     D3D12_DESCRIPTOR_RANGE descriptor_ranges[] = {
@@ -955,8 +977,14 @@ HRESULT D3D12Renderer::EndScene(bool draw_bg) {
     // Flush the intermediate note buffer
     if (!m_vNotesIntermediate.empty()) {
         for (size_t i = 0; i < m_vNotesIntermediate.size(); i += RectsPerPass) {
-            if (i == 0)
-                SetPipeline(Pipeline::Note);
+            if (i == 0) {
+                if (Config::GetConfig().GetVizSettings().bSameWidth) {
+                    SetPipeline(Pipeline::SameWidthNote);
+                }
+                else {
+                    SetPipeline(Pipeline::Note);
+                }
+            }
 
             auto remaining = m_vNotesIntermediate.size() - i;
             auto note_count = min(remaining, RectsPerPass);
@@ -995,7 +1023,12 @@ HRESULT D3D12Renderer::EndScene(bool draw_bg) {
                 m_pCommandList->Reset(m_pCommandAllocator[m_uFrameIndex].Get(), m_pRectPipelineState.Get());
 
                 // Set up the state again
-                SetPipeline(Pipeline::Note);
+                if (Config::GetConfig().GetVizSettings().bSameWidth) {
+                    SetPipeline(Pipeline::SameWidthNote);
+                }
+                else {
+                    SetPipeline(Pipeline::Note);
+                }
                 SetupCommandList();
             }
         }
@@ -1243,6 +1276,16 @@ void D3D12Renderer::SetPipeline(Pipeline pipeline) {
     case Pipeline::Note:
         m_pCommandList->SetPipelineState(m_pNotePipelineState.Get());
         m_pCommandList->SetGraphicsRootSignature(m_pNoteRootSignature.Get());
+        m_pCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        m_pCommandList->IASetVertexBuffers(0, 0, nullptr);
+        m_pCommandList->IASetIndexBuffer(&m_IndexBufferView);
+        m_pCommandList->SetGraphicsRootShaderResourceView(1, m_pFixedBuffer->GetGPUVirtualAddress());
+        m_pCommandList->SetGraphicsRootShaderResourceView(2, m_pTrackColorBuffer->GetGPUVirtualAddress());
+        m_pCommandList->SetGraphicsRootShaderResourceView(3, m_pNoteBuffers[m_uFrameIndex]->GetGPUVirtualAddress());
+        break;
+    case Pipeline::SameWidthNote:
+        m_pCommandList->SetPipelineState(m_pNoteSameWidthPipelineState.Get());
+        m_pCommandList->SetGraphicsRootSignature(m_pNoteSameWidthRootSignature.Get());
         m_pCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         m_pCommandList->IASetVertexBuffers(0, 0, nullptr);
         m_pCommandList->IASetIndexBuffer(&m_IndexBufferView);
