@@ -1,4 +1,5 @@
 ﻿#include <Tab1.h>
+#include <Tab1Btn3.h>
 
 TouchEventListener* Tab1::Btn1 = nullptr;
 TouchEventListener* Tab1::Btn2 = nullptr;
@@ -7,7 +8,7 @@ TouchEventListener* Tab1::Btn4 = nullptr;
 TouchEventListener* Tab1::Btn5 = nullptr;
 
 void Tab1::EnableAll() {
-    if (Btn1 != nullptr | Btn2 != nullptr | Btn3 != nullptr | Btn4 != nullptr | Btn5 != nullptr) {
+    if (AnyGoodPtr(Btn1,Btn2,Btn3,Btn4,Btn5)) {
         cout << "[1;1H[40m[91mERROR: Trying to enable a TouchEventListener that is already enabled. \n";
         cout << "\nThe program will now stop. \n";
         while (true) {
@@ -58,7 +59,7 @@ void Tab1::EnableAll() {
         Btn3->OnTouch = []() {
             Tab1Graphics::Btn3(3, 8, Touched);
             Tab1::Btn3->OnLeave = []() {};
-            Tab1::Btn3::Open();
+            Tab1::SubViewBtn3::Open();
         };
         Btn3->OnHover = []() {
             Tab1Graphics::Btn3(3, 8, Hovered);
@@ -105,19 +106,25 @@ void Tab1::EnableAll() {
 }
 
 void Tab1::DisableAll() {
-    if (Btn1 == nullptr | Btn2 == nullptr | Btn3 == nullptr | Btn4 == nullptr | Btn5 == nullptr) {
+    if (AnyNullPtr(Btn1, Btn2, Btn3, Btn4, Btn5)) {
         cout << "[1;1H[40m[91mERROR: Trying to disable a tab that isn't enabled. \n";
         cout << "\nThe program will now stop. \n";
+        while (true) {
+            // Make the program hang instead of closing! 
+            // This way the user can clearly see the error message. 
+        }
     }
-    TouchEventManager::Delete(Btn1);
-    TouchEventManager::Delete(Btn2);
-    TouchEventManager::Delete(Btn3);
-    TouchEventManager::Delete(Btn4);
-    TouchEventManager::Delete(Btn5);
+    else {
+        TouchEventManager::Delete(Btn1);
+        TouchEventManager::Delete(Btn2);
+        TouchEventManager::Delete(Btn3);
+        TouchEventManager::Delete(Btn4);
+        TouchEventManager::Delete(Btn5);
+    }
 }
 
 void Tab1::Draw() {
-    if (Btn1 == nullptr | Btn2 == nullptr | Btn3 == nullptr | Btn4 == nullptr | Btn5 == nullptr) {
+    if (AnyNullPtr(Btn1, Btn2, Btn3, Btn4, Btn5)) {
         cout << "[1;1H[40m[91mERROR: Trying to render a button that doesn't exist. \n";
         cout << "\nThe program will now stop. \n";
         while (true) {

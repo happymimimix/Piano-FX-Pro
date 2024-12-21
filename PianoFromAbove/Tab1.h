@@ -1,9 +1,10 @@
 ﻿#pragma once
 #include <PFXSTUDIO_Global_Imports.h>
 #include <TouchEventListener.h>
-#include <TabSwitcher.h>
 #include <ConsoleTextbox.h>
 #include <ConsoleDropdown.h>
+#include <NullPtrChecker.h>
+#include <TabSwitcher.h>
 #include <Tab1Graphics.h>
 
 struct Tab1 {
@@ -17,7 +18,7 @@ struct Tab1 {
     static void DisableAll();
     static void Draw();
 
-    struct Btn3 {
+    struct SubViewBtn3 {
         static TouchEventListener* Close;
         static ConsoleTextbox Path;
         static TouchEventListener* Browse;

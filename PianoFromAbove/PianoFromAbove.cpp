@@ -25,6 +25,7 @@
 #include "Misc.h"
 
 #include "Studio.h"
+#include "Tutorials.h"
 
 INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, INT nCmdShow );
 DWORD WINAPI GameThread( LPVOID lpParameter );
@@ -65,18 +66,25 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
     if (__argc == 3) {
         string ARG1 = __argv[1];
         string ARG2 = __argv[2];
-        if (ARG1 == "OPEN" && ARG2 == "PFXSTUDIO") {
-            goto PFXSTUDIO;
-        }
-        else {
-            goto PFX;
+        if (ARG1 == "OPEN") {
+            if (ARG2 == "PFXSTUDIO") {
+                StudioMain();
+                return 0;
+            }
+            else if (ARG2 == "CheatEngineTutorial") {
+                DisplayTutorial(CheatEngineTutorial);
+                return 0;
+            }
+            else if (ARG2 == "VisualizePitchBendTutorial") {
+                DisplayTutorial(VisualizePitchBendTutorial);
+                return 0;
+            }
+            else if (ARG2 == "GDITutorial") {
+                DisplayTutorial(GDITutorial);
+                return 0;
+            }
         }
     }
-    else {
-        goto PFX;
-    }
-
-PFX:
 
     g_hInstance = hInstance;
     srand( ( unsigned )time( NULL ) );
@@ -212,10 +220,6 @@ PFX:
     // Clean up
     UnregisterClass( CLASSNAME, wc.hInstance );
     CoUninitialize();
-    return 0;
-
-PFXSTUDIO:
-    StudioMain();
     return 0;
 }
 

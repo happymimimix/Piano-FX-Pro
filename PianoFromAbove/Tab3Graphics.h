@@ -2,7 +2,7 @@
 #include <PFXSTUDIO_Global_Imports.h>
 #include <ButtonStateDeclarations.h>
 
-struct Tab2Graphics {
+struct Tab3Graphics {
 	static void Btn1(uint8_t x, uint8_t y, BtnState state) {
 		// 0-based -> 1-based
 		x++;

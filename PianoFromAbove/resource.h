@@ -4,6 +4,8 @@
 //
 #define IDM_MAINMENU                    101
 #define IDA_MAINMENU                    103
+#define IDB_BITMAP1                     104
+#define IDB_BITMAP2                     105
 #define IDR_CONTEXTMENU                 106
 #define IDD_PP1_VISUAL                  107
 #define IDD_PP2_AUDIO                   108
@@ -121,7 +123,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        104
+#define _APS_NEXT_RESOURCE_VALUE        106
 #define _APS_NEXT_COMMAND_VALUE         40002
 #define _APS_NEXT_CONTROL_VALUE         1000
 #define _APS_NEXT_SYMED_VALUE           102

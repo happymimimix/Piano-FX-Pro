@@ -88,6 +88,9 @@
     <Filter Include="Source Files\Piano-FX Studio\TouchEventListeners\Tab4\SubViews">
       <UniqueIdentifier>{e2e3d992-d0ab-41eb-ac10-064799d7f2ac}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Piano-FX Studio\Tutorials">
+      <UniqueIdentifier>{7facbf6c-e561-4c89-ba21-667e99dfa124}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Config.h">
@@ -435,6 +438,36 @@
     <ClInclude Include="Tab2Graphics.h">
       <Filter>Source Files\Piano-FX Studio\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Tab3Graphics.h">
+      <Filter>Source Files\Piano-FX Studio\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Tab4Graphics.h">
+      <Filter>Source Files\Piano-FX Studio\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="NullPtrChecker.h">
+      <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Tutorials.h">
+      <Filter>Source Files\Piano-FX Studio\Tutorials</Filter>
+    </ClInclude>
+    <ClInclude Include="TutorialFramework.h">
+      <Filter>Source Files\Piano-FX Studio\Tutorials</Filter>
+    </ClInclude>
+    <ClInclude Include="CheatEngineTutorial.h">
+      <Filter>Source Files\Piano-FX Studio\Tutorials</Filter>
+    </ClInclude>
+    <ClInclude Include="VisualizePitchBendTutorial.h">
+      <Filter>Source Files\Piano-FX Studio\Tutorials</Filter>
+    </ClInclude>
+    <ClInclude Include="GDITutorial.h">
+      <Filter>Source Files\Piano-FX Studio\Tutorials</Filter>
+    </ClInclude>
+    <ClInclude Include="Tab1Btn3.h">
+      <Filter>Source Files\Piano-FX Studio\TouchEventListeners\Tab1\SubViews</Filter>
+    </ClInclude>
+    <ClInclude Include="Tab2Btn4.h">
+      <Filter>Source Files\Piano-FX Studio\TouchEventListeners\Tab2\SubViews</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PianoFromAbove.rc">
@@ -520,8 +553,8 @@
     <ClCompile Include="TouchEventListenerInit.h">
       <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="Tab1Btn3.h">
-      <Filter>Source Files\Piano-FX Studio\TouchEventListeners\Tab1\SubViews</Filter>
+    <ClCompile Include="Tutorials.cpp">
+      <Filter>Source Files\Piano-FX Studio\Tutorials</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -558,5 +591,13 @@
     <FxCompile Include="note_vs_samewidth.hlsl">
       <Filter>Resource Files</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Images\IMG_0001.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\Tutorial\TestingImage.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

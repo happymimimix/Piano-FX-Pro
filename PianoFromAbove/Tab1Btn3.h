@@ -3,12 +3,12 @@
 #include <ConsoleTransitionTool.h>
 #include <flpTools.h>
 
-TouchEventListener* Tab1::Btn3::Close = nullptr;
-ConsoleTextbox Tab1::Btn3::Path;
-TouchEventListener* Tab1::Btn3::Browse = nullptr;
-TouchEventListener* Tab1::Btn3::Install = nullptr;
+TouchEventListener* Tab1::SubViewBtn3::Close = nullptr;
+ConsoleTextbox Tab1::SubViewBtn3::Path;
+TouchEventListener* Tab1::SubViewBtn3::Browse = nullptr;
+TouchEventListener* Tab1::SubViewBtn3::Install = nullptr;
 
-void Tab1::Btn3::Open() {
+void Tab1::SubViewBtn3::Open() {
     TabSwitcher::DisableAll();
     Tab1::DisableAll();
     InvalidateRect(GetConsoleWindow(), NULL, TRUE);

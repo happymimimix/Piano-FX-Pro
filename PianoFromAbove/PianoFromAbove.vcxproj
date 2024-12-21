@@ -91,7 +91,7 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -106,6 +106,7 @@
       <GuardSignedReturns>false</GuardSignedReturns>
       <OpenMPSupport>false</OpenMPSupport>
       <WarningLevel>Level4</WarningLevel>
+      <CallingConvention>FastCall</CallingConvention>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -154,7 +155,7 @@ move /y ..\Piano-FX-Pro.exe ..\Release\Piano-FX-Pro.exe</Command>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;SOFTWARE_RENDER_ONLY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -169,6 +170,7 @@ move /y ..\Piano-FX-Pro.exe ..\Release\Piano-FX-Pro.exe</Command>
       <GuardSignedReturns>false</GuardSignedReturns>
       <OpenMPSupport>false</OpenMPSupport>
       <WarningLevel>Level4</WarningLevel>
+      <CallingConvention>FastCall</CallingConvention>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -217,7 +219,7 @@ move /y ..\Piano-FX-Pro-SoftwareRendered.exe ..\Release\Piano-FX-Pro-SoftwareRen
       <PrecompiledHeader>
       </PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -227,11 +229,12 @@ move /y ..\Piano-FX-Pro-SoftwareRendered.exe ..\Release\Piano-FX-Pro-SoftwareRen
       <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
-      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <GuardSignedReturns>false</GuardSignedReturns>
       <OpenMPSupport>false</OpenMPSupport>
       <WarningLevel>Level4</WarningLevel>
+      <CallingConvention>FastCall</CallingConvention>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -255,8 +258,10 @@ move /y ..\Piano-FX-Pro-SoftwareRendered.exe ..\Release\Piano-FX-Pro-SoftwareRen
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Tutorials.cpp" />
     <ClInclude Include="Background.h" />
     <ClInclude Include="ButtonStateDeclarations.h" />
+    <ClInclude Include="CheatEngineTutorial.h" />
     <ClInclude Include="CloseBtn.h" />
     <ClInclude Include="Colorizer.exe.h" />
     <ClInclude Include="Config.h" />
@@ -326,6 +331,7 @@ move /y ..\Piano-FX-Pro-SoftwareRendered.exe ..\Release\Piano-FX-Pro-SoftwareRen
     <ClInclude Include="freetype\tttags.h" />
     <ClInclude Include="ft2build.h" />
     <ClInclude Include="GameState.h" />
+    <ClInclude Include="GDITutorial.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
@@ -354,14 +360,15 @@ move /y ..\Piano-FX-Pro-SoftwareRendered.exe ..\Release\Piano-FX-Pro-SoftwareRen
     <ClInclude Include="MainProcs.h" />
     <ClInclude Include="MIDI.h" />
     <ClInclude Include="Misc.h" />
+    <ClInclude Include="NullPtrChecker.h" />
     <ClInclude Include="PFXGDI.exe.h" />
     <ClInclude Include="PFXSTUDIO_Global_Imports.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Studio.h" />
-    <ClCompile Include="Tab1Btn3.h">
+    <ClInclude Include="Tab1Btn3.h">
       <FileType>CppHeader</FileType>
-    </ClCompile>
+    </ClInclude>
     <ClInclude Include="Tab1.h" />
     <ClCompile Include="Tab1Main.h">
       <FileType>CppHeader</FileType>
@@ -371,15 +378,18 @@ move /y ..\Piano-FX-Pro-SoftwareRendered.exe ..\Release\Piano-FX-Pro-SoftwareRen
     <ClCompile Include="Tab2Main.h">
       <FileType>CppHeader</FileType>
     </ClCompile>
+    <ClInclude Include="Tab2Btn4.h" />
     <ClInclude Include="Tab2Graphics.h" />
     <ClInclude Include="Tab3.h" />
     <ClCompile Include="Tab3Main.h">
       <FileType>CppHeader</FileType>
     </ClCompile>
+    <ClInclude Include="Tab3Graphics.h" />
     <ClInclude Include="Tab4.h" />
     <ClCompile Include="Tab4Main.h">
       <FileType>CppHeader</FileType>
     </ClCompile>
+    <ClInclude Include="Tab4Graphics.h" />
     <ClInclude Include="TabSwitcher.h" />
     <ClCompile Include="TabSwitcherMain.h">
       <FileType>CppHeader</FileType>
@@ -389,6 +399,9 @@ move /y ..\Piano-FX-Pro-SoftwareRendered.exe ..\Release\Piano-FX-Pro-SoftwareRen
     <ClInclude Include="tinyxml\tinyxml.h" />
     <ClInclude Include="TouchEventListener.h" />
     <ClCompile Include="TouchEventListenerInit.h" />
+    <ClInclude Include="TutorialFramework.h" />
+    <ClInclude Include="Tutorials.h" />
+    <ClInclude Include="VisualizePitchBendTutorial.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PianoFromAbove.rc" />
@@ -562,6 +575,10 @@ move /y ..\Piano-FX-Pro-SoftwareRendered.exe ..\Release\Piano-FX-Pro-SoftwareRen
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Images\IMG_0001.bmp" />
+    <Image Include="Images\Tutorial\TestingImage.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

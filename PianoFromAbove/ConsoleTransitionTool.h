@@ -25,4 +25,5 @@ void DoTransition(uint8_t ogX, uint8_t ogY, uint8_t W, uint8_t H, uint8_t destX,
     BitBlt(ConsoleDC,destX * ChW, destY * ChH, W * ChW, H * ChH, MemDC, 0, 0, SRCCOPY);
     DeleteDC(MemDC);
     DeleteObject(BMP);
+    ReleaseDC(GetConsoleWindow(), ConsoleDC);
 }

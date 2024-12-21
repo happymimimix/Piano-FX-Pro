@@ -6,7 +6,7 @@
 #include <CloseBtn.h>
 
 void StudioMain() {
-    Setup();
+    ConsoleInit();
     ExtractEmbededFiles();
     CloseBtn::Create();
     TabSwitcher::EnableTab(1);
@@ -15,7 +15,7 @@ void StudioMain() {
     size_t LastCommandLength = 0;
     cout << "[1;2H[40m[91m(0,0)";
     while (!CloseBtn::Terminated) {
-        RedrawWindow(GetConsoleWindow(), NULL, NULL, RDW_ALLCHILDREN | RDW_INVALIDATE);
+        InvalidateRect(GetConsoleWindow(), NULL, NULL);
         POINT CursorPos;
         if (GetCursorPos(&CursorPos) && GetForegroundWindow() == GetConsoleWindow()) {
             ScreenToClient(GetConsoleWindow(), &CursorPos);
@@ -41,6 +41,7 @@ void StudioMain() {
             LastCommandLength = CommandText.length();
             TouchEventManager::CheckTouches(CursorPos, Clicked);
         }
+        InvalidateRect(GetConsoleWindow(), NULL, NULL);
         MSG msg = {};
         if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
             TranslateMessage(&msg);
