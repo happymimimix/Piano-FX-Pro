@@ -52,6 +52,24 @@ del ".\Data\Patches\Speech" /f /s /q
 rmdir ".\Data\Patches\Speech" /s /q
 del ".\Data\Patches\User" /f /s /q
 rmdir ".\Data\Patches\User" /s /q
+copy ".\Data\System\AudioTrack.fst" ".\Data\AudioTrack.fst" /v /y
+copy ".\Data\System\AutoTrack.fst" ".\Data\AutoTrack.fst" /v /y
+copy ".\Data\System\Empty.flp" ".\Data\Empty.flp" /v /y
+copy ".\Data\System\MIDITrack.fst" ".\Data\MIDITrack.fst" /v /y
+copy ".\Data\System\*.wav" ".\Data\*.wav" /v /y
+del ".\Data\System" /f /s /q
+rmdir ".\Data\System" /s /q
+mkdir ".\Data\System"
+copy ".\Data\AudioTrack.fst" ".\Data\System\AudioTrack.fst" /v /y
+copy ".\Data\AutoTrack.fst" ".\Data\System\AutoTrack.fst" /v /y
+copy ".\Data\Empty.flp" ".\Data\System\Empty.flp" /v /y
+copy ".\Data\MIDITrack.fst" ".\Data\System\MIDITrack.fst" /v /y
+copy ".\Data\*.wav" ".\Data\System\*.wav" /v /y
+del ".\Data\AudioTrack.fst" /f /q
+del ".\Data\AutoTrack.fst" /f /q
+del ".\Data\Empty.flp" /f /q
+del ".\Data\MIDITrack.fst" /f /q
+del ".\Data\*.wav" /f /q
 del ".\Data\Projects" /f /s /q
 rmdir ".\Data\Projects" /s /q
 mkdir ".\Data\Projects\Templates"
@@ -162,7 +180,6 @@ del ".\Artwork\PlaylistBackground.png" /f /q
 del ".\Artwork\PlugList.bmp" /f /q
 del ".\Artwork\Skins\Silent startup" /f /s /q
 rmdir ".\Artwork\Skins\Silent startup" /s /q
-del ".\Artwork\Skins\Default\BigFruit.png" /f /q
 del ".\Artwork\Skins\Default\ClipHanger.png" /f /q
 del ".\Artwork\Skins\Default\config.txt" /f /q
 del ".\Artwork\Skins\Default\PickerChan.png" /f /q

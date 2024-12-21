@@ -22,8 +22,15 @@ rmdir "..\Downloader" /s /q
 echo.Removing unecessary templates and presets... 
 del ".\Data\Patches" /f /s /q
 rmdir ".\Data\Patches" /s /q
+copy ".\Data\System\AutoTrack.fst" ".\Data\AutoTrack.fst" /v /y
+copy ".\Data\System\MIDITrack.fst" ".\Data\MIDITrack.fst" /v /y
 del ".\Data\System" /f /s /q
 rmdir ".\Data\System" /s /q
+mkdir ".\Data\System"
+copy ".\Data\AutoTrack.fst" ".\Data\System\AutoTrack.fst" /v /y
+copy ".\Data\MIDITrack.fst" ".\Data\System\MIDITrack.fst" /v /y
+del ".\Data\AutoTrack.fst" /f /q
+del ".\Data\MIDITrack.fst" /f /q
 del ".\Data\Projects" /f /s /q
 rmdir ".\Data\Projects" /s /q
 mkdir ".\Data\Projects\Templates"
