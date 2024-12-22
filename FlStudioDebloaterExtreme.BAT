@@ -180,7 +180,6 @@ del "..\Shared\Artwork\Fonts\PT_Sans-Web-Regular.ttf" /f /q
 del "..\Shared\Artwork\Fonts\Revalia-Regular.ttf" /f /q
 del "..\Shared\Artwork\Fonts\RobotoCondensed-Light.ttf" /f /q
 del "..\Shared\Artwork\Fonts\RobotoCondensed-Regular.ttf" /f /q
-del "..\Shared\Artwork\Fonts\Share-Regular.ttf" /f /q
 del "..\Shared\Artwork\Fonts\Ubuntu-R.ttf" /f /q
 del "..\Shared\Artwork\Fonts\UbuntuCondensed-Regular.ttf" /f /q
 del "..\Shared\Artwork\Fonts\WebSymbols-Regular.otf" /f /q

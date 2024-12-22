@@ -176,6 +176,12 @@ rmdir "..\Shared\Artwork\Fonts\WebSymbols-Regular" /s /q
 echo.Removing unecessary fonts and skins... 
 del ".\Artwork\Fonts" /f /s /q
 rmdir ".\Artwork\Fonts" /s /q
+copy ".\Artwork\Wallpapers\Default.txt" ".\Artwork\Default.txt" /v /y
+del ".\Artwork\Wallpapers" /f /s /q
+rmdir ".\Artwork\Wallpapers" /s /q
+mkdir ".\Artwork\Wallpapers"
+copy ".\Artwork\Default.txt" ".\Artwork\Wallpapers\Default.txt" /v /y
+del ".\Artwork\Default.txt" /f /q
 del ".\Artwork\PlaylistBackground.png" /f /q
 del ".\Artwork\PlugList.bmp" /f /q
 del ".\Artwork\Skins\Silent startup" /f /s /q
@@ -184,6 +190,24 @@ del ".\Artwork\Skins\Default\ClipHanger.png" /f /q
 del ".\Artwork\Skins\Default\config.txt" /f /q
 del ".\Artwork\Skins\Default\PickerChan.png" /f /q
 del ".\Artwork\Skins\Default\StartSnd.wav" /f /q
+del "..\Shared\Artwork\Fonts\Cuprum.ttf" /f /q
+del "..\Shared\Artwork\Fonts\FrancoisOne.ttf" /f /q
+del "..\Shared\Artwork\Fonts\ILLogos.ttf" /f /q
+del "..\Shared\Artwork\Fonts\Italianno-Regular.ttf" /f /q
+del "..\Shared\Artwork\Fonts\JosefinSans-SemiBold.ttf" /f /q
+del "..\Shared\Artwork\Fonts\Khand-Light.ttf" /f /q
+del "..\Shared\Artwork\Fonts\OpenSans-CondBold.ttf" /f /q
+del "..\Shared\Artwork\Fonts\OpenSans-Light.ttf" /f /q
+del "..\Shared\Artwork\Fonts\OpenSans-Regular.ttf" /f /q
+del "..\Shared\Artwork\Fonts\Oswald-Light.ttf" /f /q
+del "..\Shared\Artwork\Fonts\PT_Sans-Narrow-Web-Regular.ttf" /f /q
+del "..\Shared\Artwork\Fonts\PT_Sans-Web-Regular.ttf" /f /q
+del "..\Shared\Artwork\Fonts\Revalia-Regular.ttf" /f /q
+del "..\Shared\Artwork\Fonts\RobotoCondensed-Light.ttf" /f /q
+del "..\Shared\Artwork\Fonts\RobotoCondensed-Regular.ttf" /f /q
+del "..\Shared\Artwork\Fonts\Ubuntu-R.ttf" /f /q
+del "..\Shared\Artwork\Fonts\UbuntuCondensed-Regular.ttf" /f /q
+del "..\Shared\Artwork\Fonts\WebSymbols-Regular.otf" /f /q
 echo.Removing unecessary data files... 
 del "%userprofile%\Documents\Image-Line" /f /s /q
 rmdir "%userprofile%\Documents\Image-Line" /s /q
