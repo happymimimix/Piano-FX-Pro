@@ -88,8 +88,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -107,6 +106,8 @@
       <OpenMPSupport>false</OpenMPSupport>
       <WarningLevel>Level4</WarningLevel>
       <CallingConvention>FastCall</CallingConvention>
+      <PrecompiledHeaderFile />
+      <PrecompiledHeaderOutputFile />
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -152,8 +153,7 @@ move /y ..\Piano-FX-Pro.exe ..\Release\Piano-FX-Pro.exe</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -171,6 +171,8 @@ move /y ..\Piano-FX-Pro.exe ..\Release\Piano-FX-Pro.exe</Command>
       <OpenMPSupport>false</OpenMPSupport>
       <WarningLevel>Level4</WarningLevel>
       <CallingConvention>FastCall</CallingConvention>
+      <PrecompiledHeaderFile />
+      <PrecompiledHeaderOutputFile />
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -216,8 +218,7 @@ move /y ..\Piano-FX-Pro-SoftwareRendered.exe ..\Release\Piano-FX-Pro-SoftwareRen
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>false</IntrinsicFunctions>
@@ -235,6 +236,8 @@ move /y ..\Piano-FX-Pro-SoftwareRendered.exe ..\Release\Piano-FX-Pro-SoftwareRen
       <OpenMPSupport>false</OpenMPSupport>
       <WarningLevel>Level4</WarningLevel>
       <CallingConvention>FastCall</CallingConvention>
+      <PrecompiledHeaderFile />
+      <PrecompiledHeaderOutputFile />
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -283,15 +286,12 @@ move /y ..\Piano-FX-Pro-SoftwareRendered.exe ..\Release\Piano-FX-Pro-SoftwareRen
     <ClInclude Include="d3dx12\d3dx12_root_signature.h" />
     <ClInclude Include="d3dx12\d3dx12_state_object.h" />
     <ClInclude Include="EmbededFilesExtractor.h" />
-    <ClInclude Include="FFMPEG.h" />
-    <ClInclude Include="FFMPEG1.h" />
-    <ClInclude Include="FFMPEG2.h" />
-    <ClInclude Include="FFMPEG3.h" />
-    <ClInclude Include="FFMPEG4.h" />
-    <ClInclude Include="FFMPEG5.h" />
-    <ClInclude Include="FFMPEG6.h" />
-    <ClInclude Include="FFMPEG7.h" />
-    <ClInclude Include="FFMPEG8.h" />
+    <ClInclude Include="ffmpeg1.h" />
+    <ClInclude Include="ffmpeg2.h" />
+    <ClInclude Include="ffmpeg3.h" />
+    <ClInclude Include="ffmpeg4.h" />
+    <ClInclude Include="ffmpeg5.h" />
+    <ClInclude Include="ffmpeg6.h" />
     <ClInclude Include="flpTools.h" />
     <ClInclude Include="freetype\freetype.h" />
     <ClInclude Include="freetype\ftadvanc.h" />

@@ -1,4 +1,4 @@
-﻿#include "common.hlsli"
+#include "common.hlsli"
 
 ConstantBuffer<RootSignatureData> consts : register(b0);
 

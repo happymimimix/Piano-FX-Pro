@@ -16,7 +16,12 @@
 #include <regex>
 #include <clocale>
 
-#include "FFMPEG.h"
+#include "ffmpeg1.h"
+#include "ffmpeg2.h"
+#include "ffmpeg3.h"
+#include "ffmpeg4.h"
+#include "ffmpeg5.h"
+#include "ffmpeg6.h"
 
 #include "MainProcs.h"
 #include "resource.h"
@@ -26,6 +31,7 @@
 #include "StateVars.h"
 #include "Renderer.h"
 #include "Misc.h"
+#include "lzma.h"
 
 #include "Studio.h"
 #include "Tutorials.h"
@@ -71,7 +77,6 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
     //Debug console
     AllocConsole();
     freopen("CONOUT$", "w", stdout);
-    SetConsoleTitle("Piano-FX Pro v" + RVersionString);
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     COORD pos;
     CONSOLE_SCREEN_BUFFER_INFO csbi;
@@ -83,11 +88,103 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
     cout << VersionString;
     cout << "\n\n";
 
-    string FFmpegPath = ProgramPath() + "\\FFMPEG.exe";
-    if (!filesystem::exists(FFmpegPath)) {
-        ofstream FFmpegFile(FFmpegPath, ios::binary);
-        FFmpegFile.write(reinterpret_cast<const char*>(GetAllFFmpegData()), FFMPEG_SIZE);
-        FFmpegFile.close();
+    unsigned char* pData = new unsigned char[ffmpeg_len];
+    unsigned int offset = 0;
+    memcpy(pData + offset, ffmpeg1, sizeof(ffmpeg1));
+    offset += sizeof(ffmpeg1);
+    memcpy(pData + offset, ffmpeg2, sizeof(ffmpeg2));
+    offset += sizeof(ffmpeg2);
+    memcpy(pData + offset, ffmpeg3, sizeof(ffmpeg3));
+    offset += sizeof(ffmpeg3);
+    memcpy(pData + offset, ffmpeg4, sizeof(ffmpeg4));
+    offset += sizeof(ffmpeg4);
+    memcpy(pData + offset, ffmpeg5, sizeof(ffmpeg5));
+    offset += sizeof(ffmpeg5);
+    memcpy(pData + offset, ffmpeg6, sizeof(ffmpeg6));
+    offset += sizeof(ffmpeg6);
+    if (offset == ffmpeg_len) {
+        constexpr uint8_t lzma_magic[] = { 0xFD, 0x37, 0x7A, 0x58, 0x5A, 0x00 };
+        while (ffmpeg_len >= LZMA_STREAM_HEADER_SIZE * 2 && !memcmp(pData, lzma_magic, sizeof(lzma_magic))) {
+            unsigned char* compressed = pData;
+            uint64_t decompressed_size = 0;
+            lzma_stream strm = LZMA_STREAM_INIT;
+            lzma_stream_flags stream_flags;
+            lzma_index* index = nullptr;
+            auto pos = (int64_t)ffmpeg_len;
+            lzma_ret ret;
+            do {
+                pos -= LZMA_STREAM_HEADER_SIZE;
+                uint64_t footer_pos;
+                while (true) {
+                    footer_pos = pos;
+
+                    int i = 2;
+                    if (*(uint32_t*)&compressed[footer_pos + 8] != 0)
+                        break;
+
+                    do {
+                        pos -= 4;
+                        --i;
+                    } while (i >= 0 && *(uint32_t*)&compressed[footer_pos + i * 4] == 0);
+                }
+                ret = lzma_stream_footer_decode(&stream_flags, &compressed[footer_pos]);
+                pos -= stream_flags.backward_size;
+                lzma_index_decoder(&strm, &index, UINT64_MAX);
+                strm.avail_in = stream_flags.backward_size;
+                strm.next_in = &compressed[pos];
+                pos += stream_flags.backward_size;
+                ret = lzma_code(&strm, LZMA_RUN);
+                pos -= stream_flags.backward_size + LZMA_STREAM_HEADER_SIZE;
+                pos -= lzma_index_total_size(index);
+                decompressed_size += lzma_index_uncompressed_size(index);
+            } while (pos > 0);
+            pData = new unsigned char[decompressed_size];
+            uint8_t* write_ptr = pData;
+            lzma_end(&strm);
+            strm = LZMA_STREAM_INIT;
+            lzma_stream_decoder(&strm, UINT64_MAX, LZMA_CONCATENATED);
+            strm.next_in = compressed;
+            strm.avail_in = ffmpeg_len;
+            bool done = false;
+            lzma_action action = LZMA_RUN;
+            while (!done) {
+                if (strm.avail_in == 0)
+                    action = LZMA_FINISH;
+                lzma_ret ret = lzma_code(&strm, action);
+                if (strm.avail_out == 0) {
+                    auto remaining = min(decompressed_size - (write_ptr - pData), 1 << 20);
+                    strm.next_out = write_ptr;
+                    strm.avail_out = remaining;
+                    write_ptr += remaining;
+                }
+                switch (ret) {
+                case LZMA_STREAM_END:
+                    done = true;
+                    break;
+                case LZMA_OK:
+                    break;
+                }
+            }
+            ffmpeg_len = decompressed_size;
+        }
+        string FFmpegPath = ProgramPath() + "\\FFMPEG.exe";
+        if (!filesystem::exists(FFmpegPath)) {
+            ofstream FFmpegFile(FFmpegPath, ios::binary);
+            FFmpegFile.write(reinterpret_cast<const char*>(pData), ffmpeg_len);
+            FFmpegFile.close();
+        }
+    }
+    else {
+        std::cout << "Embedded ffmpeg.exe data length incorrect! \n";
+        std::cout << "Expected: ";
+        std::cout << ffmpeg_len;
+        std::cout << "\n";
+        std::cout << "Actual: ";
+        std::cout << offset;
+        std::cout << "\n";
+        while (true) {
+
+        }
     }
 
     if (__argc == 3) {
@@ -95,7 +192,6 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
         string ARG2 = __argv[2];
         if (ARG1 == "OPEN") {
             if (ARG2 == "PFXSTUDIO") {
-                SetConsoleTitle("Piano-FX Studio v" + RVersionString);
                 Config& config = Config::GetConfig();
                 const VisualSettings& cVisual = config.GetVisualSettings();
                 const ViewSettings& cView = config.GetViewSettings();

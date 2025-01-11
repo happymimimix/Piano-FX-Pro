@@ -934,7 +934,9 @@ HRESULT D3D12Renderer::ClearAndBeginScene(DWORD color) {
     CD3DX12_CPU_DESCRIPTOR_HANDLE rtv(m_pRTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), m_uFrameIndex, m_uRTVDescriptorSize);
     CD3DX12_CPU_DESCRIPTOR_HANDLE dsv(m_pDSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
     float float_color[4] = { (float)((color >> 16) & 0xFF) / 255.0f, (float)((color >> 8) & 0xFF) / 255.0f, (float)(color & 0xFF) / 255.0f, 1.0f };
-    m_pCommandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+    if (!Config::GetConfig().GetVizSettings().bSameWidth) {
+        m_pCommandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+    }
     m_pCommandList->ClearRenderTargetView(rtv, float_color, 0, nullptr);
 
     return S_OK;
@@ -1021,14 +1023,6 @@ HRESULT D3D12Renderer::EndScene(bool draw_bg) {
                 // Reset the command list
                 m_pCommandAllocator[m_uFrameIndex]->Reset();
                 m_pCommandList->Reset(m_pCommandAllocator[m_uFrameIndex].Get(), m_pRectPipelineState.Get());
-
-                // Set up the state again
-                if (Config::GetConfig().GetVizSettings().bSameWidth) {
-                    SetPipeline(Pipeline::SameWidthNote);
-                }
-                else {
-                    SetPipeline(Pipeline::Note);
-                }
                 SetupCommandList();
             }
         }
@@ -1109,9 +1103,7 @@ HRESULT D3D12Renderer::EndSplashScene() {
                 // Reset the command list
                 m_pCommandAllocator[m_uFrameIndex]->Reset();
                 m_pCommandList->Reset(m_pCommandAllocator[m_uFrameIndex].Get(), m_pRectPipelineState.Get());
-
-                // Set up the state again
-                SetPipeline(Pipeline::Rect);
+                
                 SetupCommandList();
             }
         }
