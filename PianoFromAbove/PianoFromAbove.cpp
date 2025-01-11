@@ -173,6 +173,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
             FFmpegFile.write(reinterpret_cast<const char*>(pData), ffmpeg_len);
             FFmpegFile.close();
         }
+        delete[] pData;
     }
     else {
         std::cout << "Embedded ffmpeg.exe data length incorrect! \n";

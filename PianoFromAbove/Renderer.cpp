@@ -65,590 +65,590 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     }
     if (m_pDevice == nullptr) { //Oh we love software rendering! 
 #else
-    {
+        {
 #endif // !SOFTWARE_RENDER_ONLY
-        ComPtr<IDXGIAdapter> warpAdapter;
-        res = m_pFactory->EnumWarpAdapter(IID_PPV_ARGS(&warpAdapter));
+            ComPtr<IDXGIAdapter> warpAdapter;
+            res = m_pFactory->EnumWarpAdapter(IID_PPV_ARGS(&warpAdapter));
+            if (FAILED(res))
+                return std::make_tuple(res, "EnumWarpAdapter");
+            res = D3D12CreateDevice(warpAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&m_pDevice));
+            if (FAILED(res))
+                return std::make_tuple(res, "D3D12CreateDevice");
+        }
+
+        // Create command queue
+        D3D12_COMMAND_QUEUE_DESC queue_desc = {
+            .Type = D3D12_COMMAND_LIST_TYPE_DIRECT,
+            .Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL,
+            .Flags = D3D12_COMMAND_QUEUE_FLAG_NONE,
+            .NodeMask = 0,
+        };
+        res = m_pDevice->CreateCommandQueue(&queue_desc, IID_PPV_ARGS(&m_pCommandQueue));
         if (FAILED(res))
-            return std::make_tuple(res, "EnumWarpAdapter");
-        res = D3D12CreateDevice(warpAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&m_pDevice));
+            return std::make_tuple(res, "CreateCommandQueue");
+
+        // Create render target view descriptor heap
+        D3D12_DESCRIPTOR_HEAP_DESC rtv_heap_desc = {
+            .Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV,
+            .NumDescriptors = FrameCount,
+            .Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE,
+            .NodeMask = 0,
+        };
+        res = m_pDevice->CreateDescriptorHeap(&rtv_heap_desc, IID_PPV_ARGS(&m_pRTVDescriptorHeap));
         if (FAILED(res))
-            return std::make_tuple(res, "D3D12CreateDevice");
-    }
+            return std::make_tuple(res, "CreateDescriptorHeap (RTV)");
+        m_uRTVDescriptorSize = m_pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
-    // Create command queue
-    D3D12_COMMAND_QUEUE_DESC queue_desc = {
-        .Type = D3D12_COMMAND_LIST_TYPE_DIRECT,
-        .Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL,
-        .Flags = D3D12_COMMAND_QUEUE_FLAG_NONE,
-        .NodeMask = 0,
-    };
-    res = m_pDevice->CreateCommandQueue(&queue_desc, IID_PPV_ARGS(&m_pCommandQueue));
-    if (FAILED(res))
-        return std::make_tuple(res, "CreateCommandQueue");
+        // Create depth stencil view descriptor heap
+        D3D12_DESCRIPTOR_HEAP_DESC dsv_heap_desc = {
+            .Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV,
+            .NumDescriptors = 1,
+            .Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE,
+            .NodeMask = 0,
+        };
+        res = m_pDevice->CreateDescriptorHeap(&dsv_heap_desc, IID_PPV_ARGS(&m_pDSVDescriptorHeap));
+        if (FAILED(res))
+            return std::make_tuple(res, "CreateDescriptorHeap (DSV)");
+        m_uDSVDescriptorSize = m_pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
-    // Create render target view descriptor heap
-    D3D12_DESCRIPTOR_HEAP_DESC rtv_heap_desc = {
-        .Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV,
-        .NumDescriptors = FrameCount,
-        .Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE,
-        .NodeMask = 0,
-    };
-    res = m_pDevice->CreateDescriptorHeap(&rtv_heap_desc, IID_PPV_ARGS(&m_pRTVDescriptorHeap));
-    if (FAILED(res))
-        return std::make_tuple(res, "CreateDescriptorHeap (RTV)");
-    m_uRTVDescriptorSize = m_pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+        // Create shader resource view heap
+        D3D12_DESCRIPTOR_HEAP_DESC srv_heap_desc = {
+            .Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
+            .NumDescriptors = FrameCount + 3,
+            .Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,
+            .NodeMask = 0,
+        };
+        res = m_pDevice->CreateDescriptorHeap(&srv_heap_desc, IID_PPV_ARGS(&m_pSRVDescriptorHeap));
+        if (FAILED(res))
+            return std::make_tuple(res, "CreateDescriptorHeap (SRV)");
+        m_uSRVDescriptorSize = m_pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-    // Create depth stencil view descriptor heap
-    D3D12_DESCRIPTOR_HEAP_DESC dsv_heap_desc = {
-        .Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV,
-        .NumDescriptors = 1,
-        .Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE,
-        .NodeMask = 0,
-    };
-    res = m_pDevice->CreateDescriptorHeap(&dsv_heap_desc, IID_PPV_ARGS(&m_pDSVDescriptorHeap));
-    if (FAILED(res))
-        return std::make_tuple(res, "CreateDescriptorHeap (DSV)");
-    m_uDSVDescriptorSize = m_pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+        // Allocate note shader resource views
+        D3D12_CPU_DESCRIPTOR_HANDLE srv_handle = m_pSRVDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+        for (uint32_t i = 0; i < FrameCount; i++) {
+            D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc = {
+                .Format = DXGI_FORMAT_UNKNOWN,
+                .ViewDimension = D3D12_SRV_DIMENSION_BUFFER,
+                .Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
+                .Buffer = {
+                    .FirstElement = 0,
+                    .NumElements = RectsPerPass,
+                    .StructureByteStride = sizeof(NoteData),
+                    .Flags = D3D12_BUFFER_SRV_FLAG_NONE,
+                }
+            };
 
-    // Create shader resource view heap
-    D3D12_DESCRIPTOR_HEAP_DESC srv_heap_desc = {
-        .Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
-        .NumDescriptors = FrameCount + 3,
-        .Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,
-        .NodeMask = 0,
-    };
-    res = m_pDevice->CreateDescriptorHeap(&srv_heap_desc, IID_PPV_ARGS(&m_pSRVDescriptorHeap));
-    if (FAILED(res))
-        return std::make_tuple(res, "CreateDescriptorHeap (SRV)");
-    m_uSRVDescriptorSize = m_pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-    // Allocate note shader resource views
-    D3D12_CPU_DESCRIPTOR_HANDLE srv_handle = m_pSRVDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-    for (uint32_t i = 0; i < FrameCount; i++) {
+            m_pDevice->CreateShaderResourceView(m_pNoteBuffers[i].Get(), &srv_desc, srv_handle);
+            srv_handle.ptr += m_uSRVDescriptorSize;
+        }
         D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc = {
             .Format = DXGI_FORMAT_UNKNOWN,
             .ViewDimension = D3D12_SRV_DIMENSION_BUFFER,
             .Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
             .Buffer = {
                 .FirstElement = 0,
-                .NumElements = RectsPerPass,
-                .StructureByteStride = sizeof(NoteData),
+                .NumElements = 1,
+                .StructureByteStride = sizeof(FixedSizeConstants),
                 .Flags = D3D12_BUFFER_SRV_FLAG_NONE,
             }
         };
-
-        m_pDevice->CreateShaderResourceView(m_pNoteBuffers[i].Get(), &srv_desc, srv_handle);
+        m_pDevice->CreateShaderResourceView(m_pGenericUpload.Get(), &srv_desc, srv_handle);
+        srv_desc.Buffer.StructureByteStride = GenericUploadSize;
         srv_handle.ptr += m_uSRVDescriptorSize;
-    }
-    D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc = {
-        .Format = DXGI_FORMAT_UNKNOWN,
-        .ViewDimension = D3D12_SRV_DIMENSION_BUFFER,
-        .Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
-        .Buffer = {
-            .FirstElement = 0,
-            .NumElements = 1,
-            .StructureByteStride = sizeof(FixedSizeConstants),
-            .Flags = D3D12_BUFFER_SRV_FLAG_NONE,
-        }
-    };
-    m_pDevice->CreateShaderResourceView(m_pGenericUpload.Get(), &srv_desc, srv_handle);
-    srv_desc.Buffer.StructureByteStride = GenericUploadSize;
-    srv_handle.ptr += m_uSRVDescriptorSize;
-    m_pDevice->CreateShaderResourceView(m_pFixedBuffer.Get(), &srv_desc, srv_handle);
-    srv_desc.Buffer.StructureByteStride = MaxTrackColors * 16 * sizeof(TrackColor);
-    srv_handle.ptr += m_uSRVDescriptorSize;
-    m_pDevice->CreateShaderResourceView(m_pTrackColorBuffer.Get(), &srv_desc, srv_handle);
+        m_pDevice->CreateShaderResourceView(m_pFixedBuffer.Get(), &srv_desc, srv_handle);
+        srv_desc.Buffer.StructureByteStride = MaxTrackColors * 16 * sizeof(TrackColor);
+        srv_handle.ptr += m_uSRVDescriptorSize;
+        m_pDevice->CreateShaderResourceView(m_pTrackColorBuffer.Get(), &srv_desc, srv_handle);
 
-    // Create ImGui shader resource view heap
-    D3D12_DESCRIPTOR_HEAP_DESC imgui_srv_heap_desc = {
-        .Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
-        .NumDescriptors = 1,
-        .Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,
-        .NodeMask = 0,
-    };
-    res = m_pDevice->CreateDescriptorHeap(&imgui_srv_heap_desc, IID_PPV_ARGS(&m_pImGuiSRVDescriptorHeap));
-    if (FAILED(res))
-        return std::make_tuple(res, "CreateDescriptorHeap (ImGui SRV)");
-
-    // Create texture shader resource view heap
-    D3D12_DESCRIPTOR_HEAP_DESC texture_srv_heap_desc = {
-        .Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
-        .NumDescriptors = 1,
-        .Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,
-        .NodeMask = 0,
-    };
-    res = m_pDevice->CreateDescriptorHeap(&texture_srv_heap_desc, IID_PPV_ARGS(&m_pTextureSRVDescriptorHeap));
-    if (FAILED(res))
-        return std::make_tuple(res, "CreateDescriptorHeap (Texture SRV)");
-    m_uTextureSRVDescriptorSize = m_pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-    // Create command allocators
-    for (uint32_t i = 0; i < FrameCount; i++) {
-        res = m_pDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_pCommandAllocator[i]));
+        // Create ImGui shader resource view heap
+        D3D12_DESCRIPTOR_HEAP_DESC imgui_srv_heap_desc = {
+            .Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
+            .NumDescriptors = 1,
+            .Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,
+            .NodeMask = 0,
+        };
+        res = m_pDevice->CreateDescriptorHeap(&imgui_srv_heap_desc, IID_PPV_ARGS(&m_pImGuiSRVDescriptorHeap));
         if (FAILED(res))
-            return std::make_tuple(res, "CreateCommandAllocator (direct)");
-    }
+            return std::make_tuple(res, "CreateDescriptorHeap (ImGui SRV)");
 
-    // Create root signature
-    ComPtr<ID3DBlob> rect_serialized;
-    D3D12_ROOT_PARAMETER root_sig_params[] = {
-        {
-            .ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS,
-            .Constants = {
+        // Create texture shader resource view heap
+        D3D12_DESCRIPTOR_HEAP_DESC texture_srv_heap_desc = {
+            .Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
+            .NumDescriptors = 1,
+            .Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,
+            .NodeMask = 0,
+        };
+        res = m_pDevice->CreateDescriptorHeap(&texture_srv_heap_desc, IID_PPV_ARGS(&m_pTextureSRVDescriptorHeap));
+        if (FAILED(res))
+            return std::make_tuple(res, "CreateDescriptorHeap (Texture SRV)");
+        m_uTextureSRVDescriptorSize = m_pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+        // Create command allocators
+        for (uint32_t i = 0; i < FrameCount; i++) {
+            res = m_pDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_pCommandAllocator[i]));
+            if (FAILED(res))
+                return std::make_tuple(res, "CreateCommandAllocator (direct)");
+        }
+
+        // Create root signature
+        ComPtr<ID3DBlob> rect_serialized;
+        D3D12_ROOT_PARAMETER root_sig_params[] = {
+            {
+                .ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS,
+                .Constants = {
+                    .ShaderRegister = 0,
+                    .RegisterSpace = 0,
+                    .Num32BitValues = sizeof(RootConstants) / 4,
+                },
+                .ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL
+            },
+            // The rect shader doesn't actually use any of this, but I have to put it here because of Intel's shit iGPU drivers
+            {
+                .ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV,
+                .Descriptor = {
+                    .ShaderRegister = 1,
+                    .RegisterSpace = 0,
+                },
+                .ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX
+            },
+            {
+                .ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV,
+                .Descriptor = {
+                    .ShaderRegister = 2,
+                    .RegisterSpace = 0,
+                },
+                .ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX
+            },
+            {
+                .ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV,
+                .Descriptor = {
+                    .ShaderRegister = 3,
+                    .RegisterSpace = 0,
+                },
+                .ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX
+            },
+        };
+        D3D12_ROOT_SIGNATURE_DESC root_sig_desc = {
+            .NumParameters = _countof(root_sig_params),
+            .pParameters = root_sig_params,
+            .Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
+                     D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
+                     D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
+                     D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS,
+        };
+        res = D3D12SerializeRootSignature(&root_sig_desc, D3D_ROOT_SIGNATURE_VERSION_1, &rect_serialized, nullptr);
+        if (FAILED(res))
+            return std::make_tuple(res, "D3D12SerializeRootSignature (rectangle)");
+        res = m_pDevice->CreateRootSignature(0, rect_serialized->GetBufferPointer(), rect_serialized->GetBufferSize(), IID_PPV_ARGS(&m_pRectRootSignature));
+        if (FAILED(res))
+            return std::make_tuple(res, "CreateRootSignature (rectangle)");
+
+        // Create rect pipeline
+        D3D12_INPUT_ELEMENT_DESC rect_vertex_input[] = {
+            {
+                .SemanticName = "POSITION",
+                .SemanticIndex = 0,
+                .Format = DXGI_FORMAT_R32G32_FLOAT,
+                .InputSlot = 0,
+                .AlignedByteOffset = 0,
+                .InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
+                .InstanceDataStepRate = 0,
+            },
+            {
+                .SemanticName = "COLOR",
+                .SemanticIndex = 0,
+                .Format = DXGI_FORMAT_B8G8R8A8_UNORM,
+                .InputSlot = 0,
+                .AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT,
+                .InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
+                .InstanceDataStepRate = 0,
+            },
+        };
+        D3D12_GRAPHICS_PIPELINE_STATE_DESC rect_pipeline_desc = {
+            .pRootSignature = m_pRectRootSignature.Get(),
+            .VS = {
+                .pShaderBytecode = g_pRectVertexShader,
+                .BytecodeLength = sizeof(g_pRectVertexShader),
+            },
+            .PS = {
+                .pShaderBytecode = g_pRectPixelShader,
+                .BytecodeLength = sizeof(g_pRectPixelShader),
+            },
+            .BlendState = {
+                .AlphaToCoverageEnable = FALSE,
+                .IndependentBlendEnable = FALSE,
+                .RenderTarget = {
+                    {
+                        // PFA is weird and inverts blending operations (0 is opaque, 255 is transparent)
+                        .BlendEnable = TRUE,
+                        .LogicOpEnable = FALSE,
+                        .SrcBlend = D3D12_BLEND_INV_SRC_ALPHA,
+                        .DestBlend = D3D12_BLEND_SRC_ALPHA,
+                        .BlendOp = D3D12_BLEND_OP_ADD,
+                        .SrcBlendAlpha = D3D12_BLEND_INV_SRC_ALPHA,
+                        .DestBlendAlpha = D3D12_BLEND_SRC_ALPHA,
+                        .BlendOpAlpha = D3D12_BLEND_OP_ADD,
+                        .LogicOp = D3D12_LOGIC_OP_NOOP,
+                        .RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL,
+                    }
+                }
+            },
+            .SampleMask = UINT_MAX,
+            .RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT),
+            .DepthStencilState = {
+                .DepthEnable = FALSE,
+                .StencilEnable = FALSE,
+            },
+            .InputLayout = {
+                .pInputElementDescs = rect_vertex_input,
+                .NumElements = _countof(rect_vertex_input),
+            },
+            .IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED,
+            .PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
+            .NumRenderTargets = 1,
+            .RTVFormats = {
+                DXGI_FORMAT_B8G8R8A8_UNORM,
+            },
+            .DSVFormat = DXGI_FORMAT_D32_FLOAT,
+            .SampleDesc = {
+                .Count = 1
+            },
+        };
+        res = m_pDevice->CreateGraphicsPipelineState(&rect_pipeline_desc, IID_PPV_ARGS(&m_pRectPipelineState));
+        if (FAILED(res))
+            return std::make_tuple(res, "CreateGraphicsPipelineState (rect)");
+
+        // Create note root signature
+        ComPtr<ID3DBlob> note_serialized;
+        res = D3D12SerializeRootSignature(&root_sig_desc, D3D_ROOT_SIGNATURE_VERSION_1, &note_serialized, nullptr);
+        if (FAILED(res))
+            return std::make_tuple(res, "D3D12SerializeRootSignature (note)");
+        res = m_pDevice->CreateRootSignature(0, note_serialized->GetBufferPointer(), note_serialized->GetBufferSize(), IID_PPV_ARGS(&m_pNoteRootSignature));
+        if (FAILED(res))
+            return std::make_tuple(res, "CreateRootSignature (note)");
+
+        ComPtr<ID3DBlob> same_width_note_serialized;
+        res = D3D12SerializeRootSignature(&root_sig_desc, D3D_ROOT_SIGNATURE_VERSION_1, &same_width_note_serialized, nullptr);
+        if (FAILED(res))
+            return std::make_tuple(res, "D3D12SerializeRootSignature (same width note)");
+        res = m_pDevice->CreateRootSignature(0, same_width_note_serialized->GetBufferPointer(), same_width_note_serialized->GetBufferSize(), IID_PPV_ARGS(&m_pNoteSameWidthRootSignature));
+        if (FAILED(res))
+            return std::make_tuple(res, "CreateRootSignature (same width note)");
+
+        // Create note pipeline
+        auto note_pipeline_desc = rect_pipeline_desc;
+        note_pipeline_desc.pRootSignature = m_pNoteRootSignature.Get();
+        note_pipeline_desc.VS = {
+            .pShaderBytecode = g_pNoteVertexShader,
+            .BytecodeLength = sizeof(g_pNoteVertexShader),
+        };
+        note_pipeline_desc.PS = {
+            .pShaderBytecode = g_pNotePixelShader,
+            .BytecodeLength = sizeof(g_pNotePixelShader),
+        };
+        note_pipeline_desc.DepthStencilState = {
+            .DepthEnable = TRUE,
+            .DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL,
+            .DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL,
+        };
+        note_pipeline_desc.InputLayout = {
+            .NumElements = 0,
+        };
+        res = m_pDevice->CreateGraphicsPipelineState(&note_pipeline_desc, IID_PPV_ARGS(&m_pNotePipelineState));
+        if (FAILED(res))
+            return std::make_tuple(res, "CreateGraphicsPipelineState (note)");
+
+        auto same_width_note_pipeline_desc = note_pipeline_desc;
+        same_width_note_pipeline_desc.pRootSignature = m_pNoteSameWidthRootSignature.Get();
+        same_width_note_pipeline_desc.VS = {
+            .pShaderBytecode = g_pNoteVertexShaderSameWidth,
+            .BytecodeLength = sizeof(g_pNoteVertexShaderSameWidth),
+        };
+        same_width_note_pipeline_desc.DepthStencilState = {
+            .DepthEnable = FALSE
+        };
+        res = m_pDevice->CreateGraphicsPipelineState(&same_width_note_pipeline_desc, IID_PPV_ARGS(&m_pNoteSameWidthPipelineState));
+        if (FAILED(res))
+            return std::make_tuple(res, "CreateGraphicsPipelineState (same width note)");
+
+        // Create background root signature
+        D3D12_DESCRIPTOR_RANGE descriptor_ranges[] = {
+            {
+                .RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
+                .NumDescriptors = 1,
+                .BaseShaderRegister = 0,
+                .RegisterSpace = 0,
+                .OffsetInDescriptorsFromTableStart = 0,
+            }
+        };
+        ComPtr<ID3DBlob> background_serialized;
+        D3D12_ROOT_PARAMETER background_root_sig_params[] = {
+            {
+                .ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE,
+                .DescriptorTable = {
+                    .NumDescriptorRanges = 1,
+                    .pDescriptorRanges = descriptor_ranges,
+                },
+                .ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL,
+            },
+        };
+        D3D12_STATIC_SAMPLER_DESC background_root_sig_samplers[] = {
+            {
+                .Filter = D3D12_FILTER_MIN_MAG_MIP_POINT,
+                .AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+                .AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+                .AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+                .MipLODBias = 0,
+                .MaxAnisotropy = 0,
+                .ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER,
+                .BorderColor = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK,
+                .MinLOD = 0,
+                .MaxLOD = D3D12_FLOAT32_MAX,
                 .ShaderRegister = 0,
                 .RegisterSpace = 0,
-                .Num32BitValues = sizeof(RootConstants) / 4,
-            },
-            .ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL
-        },
-        // The rect shader doesn't actually use any of this, but I have to put it here because of Intel's shit iGPU drivers
-        {
-            .ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV,
-            .Descriptor = {
-                .ShaderRegister = 1,
-                .RegisterSpace = 0,
-            },
-            .ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX
-        },
-        {
-            .ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV,
-            .Descriptor = {
-                .ShaderRegister = 2,
-                .RegisterSpace = 0,
-            },
-            .ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX
-        },
-        {
-            .ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV,
-            .Descriptor = {
-                .ShaderRegister = 3,
-                .RegisterSpace = 0,
-            },
-            .ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX
-        },
-    };
-    D3D12_ROOT_SIGNATURE_DESC root_sig_desc = {
-        .NumParameters = _countof(root_sig_params),
-        .pParameters = root_sig_params,
-        .Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
-                 D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
-                 D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
-                 D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS,
-    };
-    res = D3D12SerializeRootSignature(&root_sig_desc, D3D_ROOT_SIGNATURE_VERSION_1, &rect_serialized, nullptr);
-    if (FAILED(res))
-        return std::make_tuple(res, "D3D12SerializeRootSignature (rectangle)");
-    res = m_pDevice->CreateRootSignature(0, rect_serialized->GetBufferPointer(), rect_serialized->GetBufferSize(), IID_PPV_ARGS(&m_pRectRootSignature));
-    if (FAILED(res))
-        return std::make_tuple(res, "CreateRootSignature (rectangle)");
-
-    // Create rect pipeline
-    D3D12_INPUT_ELEMENT_DESC rect_vertex_input[] = {
-        {
-            .SemanticName = "POSITION",
-            .SemanticIndex = 0,
-            .Format = DXGI_FORMAT_R32G32_FLOAT,
-            .InputSlot = 0,
-            .AlignedByteOffset = 0,
-            .InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
-            .InstanceDataStepRate = 0,
-        },
-        {
-            .SemanticName = "COLOR",
-            .SemanticIndex = 0,
-            .Format = DXGI_FORMAT_B8G8R8A8_UNORM,
-            .InputSlot = 0,
-            .AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT,
-            .InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
-            .InstanceDataStepRate = 0,
-        },
-    };
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC rect_pipeline_desc = {
-        .pRootSignature = m_pRectRootSignature.Get(),
-        .VS = {
-            .pShaderBytecode = g_pRectVertexShader,
-            .BytecodeLength = sizeof(g_pRectVertexShader),
-        },
-        .PS = {
-            .pShaderBytecode = g_pRectPixelShader,
-            .BytecodeLength = sizeof(g_pRectPixelShader),
-        },
-        .BlendState = {
-            .AlphaToCoverageEnable = FALSE,
-            .IndependentBlendEnable = FALSE,
-            .RenderTarget = {
-                {
-                    // PFA is weird and inverts blending operations (0 is opaque, 255 is transparent)
-                    .BlendEnable = TRUE,
-                    .LogicOpEnable = FALSE,
-                    .SrcBlend = D3D12_BLEND_INV_SRC_ALPHA,
-                    .DestBlend = D3D12_BLEND_SRC_ALPHA,
-                    .BlendOp = D3D12_BLEND_OP_ADD,
-                    .SrcBlendAlpha = D3D12_BLEND_INV_SRC_ALPHA,
-                    .DestBlendAlpha = D3D12_BLEND_SRC_ALPHA,
-                    .BlendOpAlpha = D3D12_BLEND_OP_ADD,
-                    .LogicOp = D3D12_LOGIC_OP_NOOP,
-                    .RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL,
-                }
+                .ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL,
             }
-        },
-        .SampleMask = UINT_MAX,
-        .RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT),
-        .DepthStencilState = {
-            .DepthEnable = FALSE,
-            .StencilEnable = FALSE,
-        },
-        .InputLayout = {
-            .pInputElementDescs = rect_vertex_input,
-            .NumElements = _countof(rect_vertex_input),
-        },
-        .IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED,
-        .PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
-        .NumRenderTargets = 1,
-        .RTVFormats = {
-            DXGI_FORMAT_B8G8R8A8_UNORM,
-        },
-        .DSVFormat = DXGI_FORMAT_D32_FLOAT,
-        .SampleDesc = {
-            .Count = 1
-        },
-    };
-    res = m_pDevice->CreateGraphicsPipelineState(&rect_pipeline_desc, IID_PPV_ARGS(&m_pRectPipelineState));
-    if (FAILED(res))
-        return std::make_tuple(res, "CreateGraphicsPipelineState (rect)");
-    
-    // Create note root signature
-    ComPtr<ID3DBlob> note_serialized;
-    res = D3D12SerializeRootSignature(&root_sig_desc, D3D_ROOT_SIGNATURE_VERSION_1, &note_serialized, nullptr);
-    if (FAILED(res))
-        return std::make_tuple(res, "D3D12SerializeRootSignature (note)");
-    res = m_pDevice->CreateRootSignature(0, note_serialized->GetBufferPointer(), note_serialized->GetBufferSize(), IID_PPV_ARGS(&m_pNoteRootSignature));
-    if (FAILED(res))
-        return std::make_tuple(res, "CreateRootSignature (note)");
+        };
+        D3D12_ROOT_SIGNATURE_DESC background_root_sig_desc = {
+            .NumParameters = _countof(background_root_sig_params),
+            .pParameters = background_root_sig_params,
+            .NumStaticSamplers = _countof(background_root_sig_samplers),
+            .pStaticSamplers = background_root_sig_samplers,
+            .Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
+                     D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
+                     D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
+                     D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS,
+        };
+        res = D3D12SerializeRootSignature(&background_root_sig_desc, D3D_ROOT_SIGNATURE_VERSION_1, &background_serialized, nullptr);
+        if (FAILED(res))
+            return std::make_tuple(res, "D3D12SerializeRootSignature (background)");
+        res = m_pDevice->CreateRootSignature(0, background_serialized->GetBufferPointer(), background_serialized->GetBufferSize(), IID_PPV_ARGS(&m_pBackgroundRootSignature));
+        if (FAILED(res))
+            return std::make_tuple(res, "CreateRootSignature (background)");
 
-    ComPtr<ID3DBlob> same_width_note_serialized;
-    res = D3D12SerializeRootSignature(&root_sig_desc, D3D_ROOT_SIGNATURE_VERSION_1, &same_width_note_serialized, nullptr);
-    if (FAILED(res))
-        return std::make_tuple(res, "D3D12SerializeRootSignature (same width note)");
-    res = m_pDevice->CreateRootSignature(0, same_width_note_serialized->GetBufferPointer(), same_width_note_serialized->GetBufferSize(), IID_PPV_ARGS(&m_pNoteSameWidthRootSignature));
-    if (FAILED(res))
-        return std::make_tuple(res, "CreateRootSignature (same width note)");
+        // Create background pipeline
+        auto background_pipeline_desc = rect_pipeline_desc;
+        background_pipeline_desc.pRootSignature = m_pBackgroundRootSignature.Get();
+        background_pipeline_desc.VS = {
+            .pShaderBytecode = g_pBackgroundVertexShader,
+            .BytecodeLength = sizeof(g_pBackgroundVertexShader),
+        };
+        background_pipeline_desc.PS = {
+            .pShaderBytecode = g_pBackgroundPixelShader,
+            .BytecodeLength = sizeof(g_pBackgroundPixelShader),
+        };
+        background_pipeline_desc.InputLayout = {
+            .NumElements = 0,
+        };
+        res = m_pDevice->CreateGraphicsPipelineState(&background_pipeline_desc, IID_PPV_ARGS(&m_pBackgroundPipelineState));
+        if (FAILED(res))
+            return std::make_tuple(res, "CreateGraphicsPipelineState (background)");
 
-    // Create note pipeline
-    auto note_pipeline_desc = rect_pipeline_desc;
-    note_pipeline_desc.pRootSignature = m_pNoteRootSignature.Get();
-    note_pipeline_desc.VS = {
-        .pShaderBytecode = g_pNoteVertexShader,
-        .BytecodeLength = sizeof(g_pNoteVertexShader),
-    };
-    note_pipeline_desc.PS = {
-        .pShaderBytecode = g_pNotePixelShader,
-        .BytecodeLength = sizeof(g_pNotePixelShader),
-    };
-    note_pipeline_desc.DepthStencilState = {
-        .DepthEnable = TRUE,
-        .DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL,
-        .DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL,
-    };
-    note_pipeline_desc.InputLayout = {
-        .NumElements = 0,
-    };
-    res = m_pDevice->CreateGraphicsPipelineState(&note_pipeline_desc, IID_PPV_ARGS(&m_pNotePipelineState));
-    if (FAILED(res))
-        return std::make_tuple(res, "CreateGraphicsPipelineState (note)");
+        // Create command list
+        //res = m_pDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(&m_pCommandList));
+        res = m_pDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_pCommandAllocator[m_uFrameIndex].Get(), nullptr, IID_PPV_ARGS(&m_pCommandList));
+        if (FAILED(res))
+            return std::make_tuple(res, "CreateCommandList");
+        res = m_pCommandList->Close();
+        if (FAILED(res))
+            return std::make_tuple(res, "Closing command list");
 
-    auto same_width_note_pipeline_desc = note_pipeline_desc;
-    same_width_note_pipeline_desc.pRootSignature = m_pNoteSameWidthRootSignature.Get();
-    same_width_note_pipeline_desc.VS = {
-        .pShaderBytecode = g_pNoteVertexShaderSameWidth,
-        .BytecodeLength = sizeof(g_pNoteVertexShaderSameWidth),
-    };
-    same_width_note_pipeline_desc.DepthStencilState = {
-        .DepthEnable = FALSE
-    };
-    res = m_pDevice->CreateGraphicsPipelineState(&same_width_note_pipeline_desc, IID_PPV_ARGS(&m_pNoteSameWidthPipelineState));
-    if (FAILED(res))
-        return std::make_tuple(res, "CreateGraphicsPipelineState (same width note)");
+        // Create synchronization fence
+        res = m_pDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_pFence));
+        if (FAILED(res))
+            return std::make_tuple(res, "CreateFence");
+        m_pFenceValues[m_uFrameIndex]++;
 
-    // Create background root signature
-    D3D12_DESCRIPTOR_RANGE descriptor_ranges[] = {
-        {
-            .RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
-            .NumDescriptors = 1,
-            .BaseShaderRegister = 0,
-            .RegisterSpace = 0,
-            .OffsetInDescriptorsFromTableStart = 0,
-        }
-    };
-    ComPtr<ID3DBlob> background_serialized;
-    D3D12_ROOT_PARAMETER background_root_sig_params[] = {
-        {
-            .ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE,
-            .DescriptorTable = {
-                .NumDescriptorRanges = 1,
-                .pDescriptorRanges = descriptor_ranges,
-            },
-            .ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL,
-        },
-    };
-    D3D12_STATIC_SAMPLER_DESC background_root_sig_samplers[] = {
-        {
-            .Filter = D3D12_FILTER_MIN_MAG_MIP_POINT,
-            .AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP,
-            .AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP,
-            .AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP,
-            .MipLODBias = 0,
-            .MaxAnisotropy = 0,
-            .ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER,
-            .BorderColor = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK,
-            .MinLOD = 0,
-            .MaxLOD = D3D12_FLOAT32_MAX,
-            .ShaderRegister = 0,
-            .RegisterSpace = 0,
-            .ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL,
-        }
-    };
-    D3D12_ROOT_SIGNATURE_DESC background_root_sig_desc = {
-        .NumParameters = _countof(background_root_sig_params),
-        .pParameters = background_root_sig_params,
-        .NumStaticSamplers = _countof(background_root_sig_samplers),
-        .pStaticSamplers = background_root_sig_samplers,
-        .Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
-                 D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
-                 D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
-                 D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS,
-    };
-    res = D3D12SerializeRootSignature(&background_root_sig_desc, D3D_ROOT_SIGNATURE_VERSION_1, &background_serialized, nullptr);
-    if (FAILED(res))
-        return std::make_tuple(res, "D3D12SerializeRootSignature (background)");
-    res = m_pDevice->CreateRootSignature(0, background_serialized->GetBufferPointer(), background_serialized->GetBufferSize(), IID_PPV_ARGS(&m_pBackgroundRootSignature));
-    if (FAILED(res))
-        return std::make_tuple(res, "CreateRootSignature (background)");
+        // Create synchronization fence event
+        m_hFenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 
-    // Create background pipeline
-    auto background_pipeline_desc = rect_pipeline_desc;
-    background_pipeline_desc.pRootSignature = m_pBackgroundRootSignature.Get();
-    background_pipeline_desc.VS = {
-        .pShaderBytecode = g_pBackgroundVertexShader,
-        .BytecodeLength = sizeof(g_pBackgroundVertexShader),
-    };
-    background_pipeline_desc.PS = {
-        .pShaderBytecode = g_pBackgroundPixelShader,
-        .BytecodeLength = sizeof(g_pBackgroundPixelShader),
-    };
-    background_pipeline_desc.InputLayout = {
-        .NumElements = 0,
-    };
-    res = m_pDevice->CreateGraphicsPipelineState(&background_pipeline_desc, IID_PPV_ARGS(&m_pBackgroundPipelineState));
-    if (FAILED(res))
-        return std::make_tuple(res, "CreateGraphicsPipelineState (background)");
-
-    // Create command list
-    //res = m_pDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(&m_pCommandList));
-    res = m_pDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_pCommandAllocator[m_uFrameIndex].Get(), nullptr, IID_PPV_ARGS(&m_pCommandList));
-    if (FAILED(res))
-        return std::make_tuple(res, "CreateCommandList");
-    res = m_pCommandList->Close();
-    if (FAILED(res))
-        return std::make_tuple(res, "Closing command list");
-
-    // Create synchronization fence
-    res = m_pDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_pFence));
-    if (FAILED(res))
-        return std::make_tuple(res, "CreateFence");
-    m_pFenceValues[m_uFrameIndex]++;
-
-    // Create synchronization fence event
-    m_hFenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-
-    // Create generic upload buffer
-    auto generic_upload_desc = CD3DX12_RESOURCE_DESC::Buffer(GenericUploadSize);
-    auto upload_heap = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-    auto default_heap = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-    res = m_pDevice->CreateCommittedResource(
-        &upload_heap,
-        D3D12_HEAP_FLAG_NONE,
-        &generic_upload_desc,
-        D3D12_RESOURCE_STATE_GENERIC_READ,
-        nullptr,
-        IID_PPV_ARGS(&m_pGenericUpload)
-    );
-    if (FAILED(res))
-        return std::make_tuple(res, "CreateCommittedResource (generic upload buffer)");
-
-    // Create fixed size constants buffer
-    auto fixed_desc = CD3DX12_RESOURCE_DESC::Buffer(sizeof(FixedSizeConstants));
-    res = m_pDevice->CreateCommittedResource(
-        &default_heap,
-        D3D12_HEAP_FLAG_NONE,
-        &fixed_desc,
-        D3D12_RESOURCE_STATE_COMMON,
-        nullptr,
-        IID_PPV_ARGS(&m_pFixedBuffer)
-    );
-    if (FAILED(res))
-        return std::make_tuple(res, "CreateCommittedResource (fixed buffer)");
-
-    // Create track color buffer
-    auto track_color_desc = CD3DX12_RESOURCE_DESC::Buffer(MaxTrackColors * 16 * sizeof(TrackColor));
-    res = m_pDevice->CreateCommittedResource(
-        &default_heap,
-        D3D12_HEAP_FLAG_NONE,
-        &track_color_desc,
-        D3D12_RESOURCE_STATE_COMMON,
-        nullptr,
-        IID_PPV_ARGS(&m_pTrackColorBuffer)
-    );
-    if (FAILED(res))
-        return std::make_tuple(res, "CreateCommittedResource (track color buffer)");
-
-    // Create dynamic rect vertex buffers
-    // Each in-flight frame has its own vertex buffer
-    auto vertex_buffer_desc = CD3DX12_RESOURCE_DESC::Buffer(RectsPerPass * 6 * sizeof(RectVertex));
-    for (uint32_t i = 0; i < FrameCount; i++) {
+        // Create generic upload buffer
+        auto generic_upload_desc = CD3DX12_RESOURCE_DESC::Buffer(GenericUploadSize);
+        auto upload_heap = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+        auto default_heap = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
         res = m_pDevice->CreateCommittedResource(
             &upload_heap,
             D3D12_HEAP_FLAG_NONE,
-            &vertex_buffer_desc,
+            &generic_upload_desc,
             D3D12_RESOURCE_STATE_GENERIC_READ,
             nullptr,
-            IID_PPV_ARGS(&m_pVertexBuffers[i])
+            IID_PPV_ARGS(&m_pGenericUpload)
         );
         if (FAILED(res))
-            return std::make_tuple(res, "CreateCommittedResource (vertex buffer)");
-        m_pVertexBuffers[i]->SetName(L"Vertex buffer");
-        m_VertexBufferViews[i].BufferLocation = m_pVertexBuffers[i]->GetGPUVirtualAddress();
-        m_VertexBufferViews[i].SizeInBytes = vertex_buffer_desc.Width;
-        m_VertexBufferViews[i].StrideInBytes = sizeof(RectVertex);
-    }
+            return std::make_tuple(res, "CreateCommittedResource (generic upload buffer)");
 
-    // Create dynamic note buffers
-    auto note_buffer_desc = CD3DX12_RESOURCE_DESC::Buffer(RectsPerPass * sizeof(NoteData));
-    for (uint32_t i = 0; i < FrameCount; i++) {
+        // Create fixed size constants buffer
+        auto fixed_desc = CD3DX12_RESOURCE_DESC::Buffer(sizeof(FixedSizeConstants));
+        res = m_pDevice->CreateCommittedResource(
+            &default_heap,
+            D3D12_HEAP_FLAG_NONE,
+            &fixed_desc,
+            D3D12_RESOURCE_STATE_COMMON,
+            nullptr,
+            IID_PPV_ARGS(&m_pFixedBuffer)
+        );
+        if (FAILED(res))
+            return std::make_tuple(res, "CreateCommittedResource (fixed buffer)");
+
+        // Create track color buffer
+        auto track_color_desc = CD3DX12_RESOURCE_DESC::Buffer(MaxTrackColors * 16 * sizeof(TrackColor));
+        res = m_pDevice->CreateCommittedResource(
+            &default_heap,
+            D3D12_HEAP_FLAG_NONE,
+            &track_color_desc,
+            D3D12_RESOURCE_STATE_COMMON,
+            nullptr,
+            IID_PPV_ARGS(&m_pTrackColorBuffer)
+        );
+        if (FAILED(res))
+            return std::make_tuple(res, "CreateCommittedResource (track color buffer)");
+
+        // Create dynamic rect vertex buffers
+        // Each in-flight frame has its own vertex buffer
+        auto vertex_buffer_desc = CD3DX12_RESOURCE_DESC::Buffer(RectsPerPass * 6 * sizeof(RectVertex));
+        for (uint32_t i = 0; i < FrameCount; i++) {
+            res = m_pDevice->CreateCommittedResource(
+                &upload_heap,
+                D3D12_HEAP_FLAG_NONE,
+                &vertex_buffer_desc,
+                D3D12_RESOURCE_STATE_GENERIC_READ,
+                nullptr,
+                IID_PPV_ARGS(&m_pVertexBuffers[i])
+            );
+            if (FAILED(res))
+                return std::make_tuple(res, "CreateCommittedResource (vertex buffer)");
+            m_pVertexBuffers[i]->SetName(L"Vertex buffer");
+            m_VertexBufferViews[i].BufferLocation = m_pVertexBuffers[i]->GetGPUVirtualAddress();
+            m_VertexBufferViews[i].SizeInBytes = vertex_buffer_desc.Width;
+            m_VertexBufferViews[i].StrideInBytes = sizeof(RectVertex);
+        }
+
+        // Create dynamic note buffers
+        auto note_buffer_desc = CD3DX12_RESOURCE_DESC::Buffer(RectsPerPass * sizeof(NoteData));
+        for (uint32_t i = 0; i < FrameCount; i++) {
+            res = m_pDevice->CreateCommittedResource(
+                &upload_heap,
+                D3D12_HEAP_FLAG_NONE,
+                &note_buffer_desc,
+                D3D12_RESOURCE_STATE_GENERIC_READ,
+                nullptr,
+                IID_PPV_ARGS(&m_pNoteBuffers[i])
+            );
+            if (FAILED(res))
+                return std::make_tuple(res, "CreateCommittedResource (note buffer)");
+            m_pNoteBuffers[i]->SetName(L"Note buffer");
+        }
+
+        // Create index buffer
+        auto index_buffer_desc = CD3DX12_RESOURCE_DESC::Buffer(IndexBufferCount * sizeof(uint32_t));
+        res = m_pDevice->CreateCommittedResource(
+            &default_heap,
+            D3D12_HEAP_FLAG_NONE,
+            &index_buffer_desc,
+            D3D12_RESOURCE_STATE_COMMON,
+            nullptr,
+            IID_PPV_ARGS(&m_pIndexBuffer)
+        );
+        if (FAILED(res))
+            return std::make_tuple(res, "CreateCommittedResource (index buffer)");
+        m_pIndexBuffer->SetName(L"Index buffer");
+        m_IndexBufferView.BufferLocation = m_pIndexBuffer->GetGPUVirtualAddress();
+        m_IndexBufferView.Format = DXGI_FORMAT_R32_UINT;
+        m_IndexBufferView.SizeInBytes = index_buffer_desc.Width;
+
+        // Create index upload buffer
+        ComPtr<ID3D12Resource> index_buffer_upload = nullptr;
         res = m_pDevice->CreateCommittedResource(
             &upload_heap,
             D3D12_HEAP_FLAG_NONE,
-            &note_buffer_desc,
+            &index_buffer_desc,
             D3D12_RESOURCE_STATE_GENERIC_READ,
             nullptr,
-            IID_PPV_ARGS(&m_pNoteBuffers[i])
+            IID_PPV_ARGS(&index_buffer_upload)
         );
         if (FAILED(res))
-            return std::make_tuple(res, "CreateCommittedResource (note buffer)");
-        m_pNoteBuffers[i]->SetName(L"Note buffer");
+            return std::make_tuple(res, "CreateCommittedResource (index upload buffer)");
+        index_buffer_upload->SetName(L"Index upload buffer");
+
+        // Generate index buffer data
+        std::vector<uint32_t> index_buffer_vec;
+        index_buffer_vec.resize(IndexBufferCount);
+        for (uint32_t i = 0; i < IndexBufferCount / 6; i++) {
+            index_buffer_vec[i * 6] = i * 4;
+            index_buffer_vec[i * 6 + 1] = i * 4 + 1;
+            index_buffer_vec[i * 6 + 2] = i * 4 + 2;
+            index_buffer_vec[i * 6 + 3] = i * 4;
+            index_buffer_vec[i * 6 + 4] = i * 4 + 2;
+            index_buffer_vec[i * 6 + 5] = i * 4 + 3;
+        }
+
+        // Reset the command list
+        m_pCommandAllocator[m_uFrameIndex]->Reset();
+        m_pCommandList->Reset(m_pCommandAllocator[m_uFrameIndex].Get(), nullptr);
+
+        // Upload index buffer to GPU
+        D3D12_SUBRESOURCE_DATA index_buffer_data = {
+            .pData = index_buffer_vec.data(),
+            .RowPitch = (LONG_PTR)(index_buffer_vec.size() * sizeof(uint32_t)),
+            .SlicePitch = (LONG_PTR)(index_buffer_vec.size() * sizeof(uint32_t)),
+        };
+        UpdateSubresources<1>(m_pCommandList.Get(), m_pIndexBuffer.Get(), index_buffer_upload.Get(), 0, 0, 1, &index_buffer_data);
+
+        // Finalize index buffer
+        auto index_buffer_barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_pIndexBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_INDEX_BUFFER);
+        m_pCommandList->ResourceBarrier(1, &index_buffer_barrier);
+
+        // Close the command list
+        res = m_pCommandList->Close();
+        if (FAILED(res))
+            return std::make_tuple(res, "Closing command list for initial buffer upload");
+
+        // Execute the command list
+        ID3D12CommandList* command_lists[] = { m_pCommandList.Get() };
+        m_pCommandQueue->ExecuteCommandLists(1, command_lists);
+
+        // Wait for everything to finish
+        if (FAILED(WaitForGPU()))
+            return std::make_tuple(res, "WaitForGPU");
+
+        // Make the swap chain
+        auto res2 = CreateWindowDependentObjects(hWnd);
+        if (FAILED(std::get<0>(res2)))
+            return res2;
+
+        // Initialize ImGui
+        auto imgui_heap = m_pImGuiSRVDescriptorHeap.Get();
+        ImGui::CreateContext();
+
+        // Set up font and disable imgui.ini
+        ImGuiIO& io = ImGui::GetIO();
+        ImFontConfig font_config = {};
+        io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1 << 5, &font_config, io.Fonts->GetGlyphRangesDefault());
+        font_config.MergeMode = true;
+        io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1 << 5, &font_config, io.Fonts->GetGlyphRangesJapanese());
+        io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1 << 5, &font_config, io.Fonts->GetGlyphRangesKorean());
+        io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1 << 5, &font_config, io.Fonts->GetGlyphRangesChineseFull());
+        io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1 << 5, &font_config, io.Fonts->GetGlyphRangesVietnamese());
+        io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1 << 5, &font_config, io.Fonts->GetGlyphRangesThai());
+        io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1 << 5, &font_config, io.Fonts->GetGlyphRangesGreek());
+        io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1 << 5, &font_config, io.Fonts->GetGlyphRangesCyrillic());
+        io.Fonts->Build();
+        io.IniFilename = nullptr;
+
+        // Theme tweaks
+        auto& style = ImGui::GetStyle();
+        style.WindowMinSize = ImVec2(1, 1);
+        style.WindowBorderSize = 0.0f;
+        style.WindowPadding = ImVec2(6, 6);
+        style.Colors[ImGuiCol_WindowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.50f);
+
+        ImGui_ImplWin32_Init(hWnd);
+        ImGui_ImplDX12_Init(m_pDevice.Get(), FrameCount, DXGI_FORMAT_B8G8R8A8_UNORM, imgui_heap, imgui_heap->GetCPUDescriptorHandleForHeapStart(), imgui_heap->GetGPUDescriptorHandleForHeapStart());
+
+        m_pDrawList = new ImDrawList(ImGui::GetDrawListSharedData());
+
+        return std::make_tuple(S_OK, "");
     }
-
-    // Create index buffer
-    auto index_buffer_desc = CD3DX12_RESOURCE_DESC::Buffer(IndexBufferCount * sizeof(uint32_t));
-    res = m_pDevice->CreateCommittedResource(
-        &default_heap,
-        D3D12_HEAP_FLAG_NONE,
-        &index_buffer_desc,
-        D3D12_RESOURCE_STATE_COMMON,
-        nullptr,
-        IID_PPV_ARGS(&m_pIndexBuffer)
-    );
-    if (FAILED(res))
-        return std::make_tuple(res, "CreateCommittedResource (index buffer)");
-    m_pIndexBuffer->SetName(L"Index buffer");
-    m_IndexBufferView.BufferLocation = m_pIndexBuffer->GetGPUVirtualAddress();
-    m_IndexBufferView.Format = DXGI_FORMAT_R32_UINT;
-    m_IndexBufferView.SizeInBytes = index_buffer_desc.Width;
-
-    // Create index upload buffer
-    ComPtr<ID3D12Resource> index_buffer_upload = nullptr;
-    res = m_pDevice->CreateCommittedResource(
-        &upload_heap,
-        D3D12_HEAP_FLAG_NONE,
-        &index_buffer_desc,
-        D3D12_RESOURCE_STATE_GENERIC_READ,
-        nullptr,
-        IID_PPV_ARGS(&index_buffer_upload)
-    );
-    if (FAILED(res))
-        return std::make_tuple(res, "CreateCommittedResource (index upload buffer)");
-    index_buffer_upload->SetName(L"Index upload buffer");
-
-    // Generate index buffer data
-    std::vector<uint32_t> index_buffer_vec;
-    index_buffer_vec.resize(IndexBufferCount);
-    for (uint32_t i = 0; i < IndexBufferCount / 6; i++) {
-        index_buffer_vec[i * 6] = i * 4;
-        index_buffer_vec[i * 6 + 1] = i * 4 + 1;
-        index_buffer_vec[i * 6 + 2] = i * 4 + 2;
-        index_buffer_vec[i * 6 + 3] = i * 4;
-        index_buffer_vec[i * 6 + 4] = i * 4 + 2;
-        index_buffer_vec[i * 6 + 5] = i * 4 + 3;
-    }
-
-    // Reset the command list
-    m_pCommandAllocator[m_uFrameIndex]->Reset();
-    m_pCommandList->Reset(m_pCommandAllocator[m_uFrameIndex].Get(), nullptr);
-
-    // Upload index buffer to GPU
-    D3D12_SUBRESOURCE_DATA index_buffer_data = {
-        .pData = index_buffer_vec.data(),
-        .RowPitch = (LONG_PTR)(index_buffer_vec.size() * sizeof(uint32_t)),
-        .SlicePitch = (LONG_PTR)(index_buffer_vec.size() * sizeof(uint32_t)),
-    };
-    UpdateSubresources<1>(m_pCommandList.Get(), m_pIndexBuffer.Get(), index_buffer_upload.Get(), 0, 0, 1, &index_buffer_data);
-
-    // Finalize index buffer
-    auto index_buffer_barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_pIndexBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_INDEX_BUFFER);
-    m_pCommandList->ResourceBarrier(1, &index_buffer_barrier);
-
-    // Close the command list
-    res = m_pCommandList->Close();
-    if (FAILED(res))
-        return std::make_tuple(res, "Closing command list for initial buffer upload");
-
-    // Execute the command list
-    ID3D12CommandList* command_lists[] = { m_pCommandList.Get()};
-    m_pCommandQueue->ExecuteCommandLists(1, command_lists);
-
-    // Wait for everything to finish
-    if (FAILED(WaitForGPU()))
-        return std::make_tuple(res, "WaitForGPU");
-
-    // Make the swap chain
-    auto res2 = CreateWindowDependentObjects(hWnd);
-    if (FAILED(std::get<0>(res2)))
-        return res2;
-
-    // Initialize ImGui
-    auto imgui_heap = m_pImGuiSRVDescriptorHeap.Get();
-    ImGui::CreateContext();
-
-    // Set up font and disable imgui.ini
-    ImGuiIO& io = ImGui::GetIO();
-    ImFontConfig font_config = {};
-    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1<<5, &font_config, io.Fonts->GetGlyphRangesDefault());
-    font_config.MergeMode = true;
-    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1<<5, &font_config, io.Fonts->GetGlyphRangesJapanese());
-    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1<<5, &font_config, io.Fonts->GetGlyphRangesKorean());
-    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1<<5, &font_config, io.Fonts->GetGlyphRangesChineseFull());
-    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1<<5, &font_config, io.Fonts->GetGlyphRangesVietnamese());
-    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1<<5, &font_config, io.Fonts->GetGlyphRangesThai());
-    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1<<5, &font_config, io.Fonts->GetGlyphRangesGreek());
-    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1<<5, &font_config, io.Fonts->GetGlyphRangesCyrillic());
-    io.Fonts->Build();
-    io.IniFilename = nullptr;
-
-    // Theme tweaks
-    auto& style = ImGui::GetStyle();
-    style.WindowMinSize = ImVec2(1, 1);
-    style.WindowBorderSize = 0.0f;
-    style.WindowPadding = ImVec2(6, 6);
-    style.Colors[ImGuiCol_WindowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.50f);
-
-    ImGui_ImplWin32_Init(hWnd);
-    ImGui_ImplDX12_Init(m_pDevice.Get(), FrameCount, DXGI_FORMAT_B8G8R8A8_UNORM, imgui_heap, imgui_heap->GetCPUDescriptorHandleForHeapStart(), imgui_heap->GetGPUDescriptorHandleForHeapStart());
-
-    m_pDrawList = new ImDrawList(ImGui::GetDrawListSharedData());
-
-    return std::make_tuple(S_OK, "");
-}
 
 std::tuple<HRESULT, const char*> D3D12Renderer::CreateWindowDependentObjects(HWND hWnd) {
     HRESULT res;
@@ -666,7 +666,8 @@ std::tuple<HRESULT, const char*> D3D12Renderer::CreateWindowDependentObjects(HWN
         res = m_pSwapChain->ResizeBuffers(FrameCount, 0, 0, DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING);
         if (FAILED(res))
             return std::make_tuple(res, "ResizeBuffers");
-    } else {
+    }
+    else {
         // Create swap chain
         IDXGISwapChain1* temp_swapchain = nullptr;
         DXGI_SWAP_CHAIN_DESC1 swap_chain_desc = {
@@ -852,10 +853,10 @@ std::tuple<HRESULT, const char*> D3D12Renderer::CreateWindowDependentObjects(HWN
     float T = 0;
     float B = m_iBufferHeight;
     float mvp[4][4] = {
-        { 2.0f/(R-L),   0.0f,           0.0f,       0.0f },
-        { 0.0f,         2.0f/(T-B),     0.0f,       0.0f },
+        { 2.0f / (R - L),   0.0f,           0.0f,       0.0f },
+        { 0.0f,         2.0f / (T - B),     0.0f,       0.0f },
         { 0.0f,         0.0f,           0.5f,       0.0f },
-        { (R+L)/(L-R),  (T+B)/(B-T),    0.5f,       1.0f },
+        { (R + L) / (L - R),  (T + B) / (B - T),    0.5f,       1.0f },
     };
     memcpy(m_RootConstants.proj, mvp, sizeof(mvp));
 
@@ -1023,6 +1024,14 @@ HRESULT D3D12Renderer::EndScene(bool draw_bg) {
                 // Reset the command list
                 m_pCommandAllocator[m_uFrameIndex]->Reset();
                 m_pCommandList->Reset(m_pCommandAllocator[m_uFrameIndex].Get(), m_pRectPipelineState.Get());
+
+                // Set up the state again
+                if (Config::GetConfig().GetVizSettings().bSameWidth) {
+                    SetPipeline(Pipeline::SameWidthNote);
+                }
+                else {
+                    SetPipeline(Pipeline::Note);
+                }
                 SetupCommandList();
             }
         }
@@ -1103,7 +1112,9 @@ HRESULT D3D12Renderer::EndSplashScene() {
                 // Reset the command list
                 m_pCommandAllocator[m_uFrameIndex]->Reset();
                 m_pCommandList->Reset(m_pCommandAllocator[m_uFrameIndex].Get(), m_pRectPipelineState.Get());
-                
+
+                // Set up the state again
+                SetPipeline(Pipeline::Rect);
                 SetupCommandList();
             }
         }
@@ -1201,7 +1212,7 @@ HRESULT D3D12Renderer::DrawRect(float x, float y, float cx, float cy, DWORD c1, 
         {x + cx, y,      c2},
         {x + cx, y + cy, c3},
         {x,      y + cy, c4},
-    });
+        });
     return S_OK;
 }
 
@@ -1215,7 +1226,7 @@ HRESULT D3D12Renderer::DrawSkew(float x1, float y1, float x2, float y2, float x3
         {x2, y2, c2},
         {x3, y3, c3},
         {x4, y4, c4},
-    });
+        });
     return S_OK;
 }
 
@@ -1454,7 +1465,7 @@ bool D3D12Renderer::UploadBackgroundBitmap() {
     UpdateSubresources(m_pCommandList.Get(), m_pTextureBuffer.Get(), m_pTextureUpload.Get(), 0, 0, 1, &texture_data);
     barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_pTextureBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
     m_pCommandList->ResourceBarrier(1, &barrier);
-    
+
     // Execute the command list
     m_pCommandList->Close();
     ID3D12CommandList* command_lists[] = { m_pCommandList.Get() };
