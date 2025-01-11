@@ -1,4 +1,4 @@
-/*************************************************************************************************
+﻿/*************************************************************************************************
 *
 * File: GameState.cpp
 *
@@ -20,24 +20,7 @@
 #include "ConfigProcs.h"
 #include <d3d9types.h>
 #include "lzma.h"
-
-long long m_llStartTime;
-string llStartTimeFormatted;
-uint32_t polyphony;
-string polyFormatted;
-uint32_t nps;
-string npsFormatted;
-uint32_t passed;
-string passedFormatted;
-uint8_t FrameCount = 0;
-int width = -1;
-int height = -1;
-int m_iStartTick;
-uint16_t resolution = -1;
-
-//A caption that can be set using cheat engine, it does not change by itself. 
-//When compiled, this placeholder will be wiped with IDA Pro. 
-static char CheatEngineCaption[1 << 10] = {};
+#include "StateVars.h"
 
 const wstring GameState::Errors[] =
 {
@@ -2482,7 +2465,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
     for (int i = passedFormatted.length() - 3; i > 0; i -= 3)
         passedFormatted.insert(i, ",");
 
-    RenderStatusLine(cur_line++,"Piano-FX Pro", VersionString);
+    RenderStatusLine(cur_line++,"Piano-FX Pro", ("v" + RVersionString).c_str());
     RenderStatusLine(cur_line++,"Made by: happy_mimimix", "");
     RenderStatusLine(cur_line++,"", "");
     RenderStatusLine(cur_line++, "Time:", "%s%lld:%02d.%d / %lld:%02d.%d",
@@ -2656,6 +2639,12 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
         cout << "    Zoom: " << cView.GetZoomX() << " (Float +" + cView.GetZoomXAddress() + ") [Read / Write]";
+        pos.X = 0;
+        pos.Y = line; line++;
+        SetConsoleCursorPosition(hConsole, pos);
+        cout << string(csbi.dwSize.X, ' ');
+        SetConsoleCursorPosition(hConsole, pos);
+        cout << "    SameWidthNotes: " << cViz.bSameWidth << " (Byte +" + GetAddress(cViz.bSameWidth) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);

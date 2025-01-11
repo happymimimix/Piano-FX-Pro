@@ -262,6 +262,7 @@ move /y ..\Piano-FX-Pro-SoftwareRendered.exe ..\Release\Piano-FX-Pro-SoftwareRen
     <ClInclude Include="Background.h" />
     <ClInclude Include="ButtonStateDeclarations.h" />
     <ClInclude Include="CheatEngineTutorial.h" />
+    <ClInclude Include="ClipboardTool.h" />
     <ClInclude Include="CloseBtn.h" />
     <ClInclude Include="Colorizer.exe.h" />
     <ClInclude Include="Config.h" />
@@ -282,6 +283,15 @@ move /y ..\Piano-FX-Pro-SoftwareRendered.exe ..\Release\Piano-FX-Pro-SoftwareRen
     <ClInclude Include="d3dx12\d3dx12_root_signature.h" />
     <ClInclude Include="d3dx12\d3dx12_state_object.h" />
     <ClInclude Include="EmbededFilesExtractor.h" />
+    <ClInclude Include="FFMPEG.h" />
+    <ClInclude Include="FFMPEG1.h" />
+    <ClInclude Include="FFMPEG2.h" />
+    <ClInclude Include="FFMPEG3.h" />
+    <ClInclude Include="FFMPEG4.h" />
+    <ClInclude Include="FFMPEG5.h" />
+    <ClInclude Include="FFMPEG6.h" />
+    <ClInclude Include="FFMPEG7.h" />
+    <ClInclude Include="FFMPEG8.h" />
     <ClInclude Include="flpTools.h" />
     <ClInclude Include="freetype\freetype.h" />
     <ClInclude Include="freetype\ftadvanc.h" />
@@ -342,6 +352,7 @@ move /y ..\Piano-FX-Pro-SoftwareRendered.exe ..\Release\Piano-FX-Pro-SoftwareRen
     <ClInclude Include="imgui\imstb_rectpack.h" />
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
+    <ClInclude Include="LuaCode.h" />
     <ClInclude Include="lzma.h" />
     <ClInclude Include="lzma\base.h" />
     <ClInclude Include="lzma\bcj.h" />
@@ -365,6 +376,7 @@ move /y ..\Piano-FX-Pro-SoftwareRendered.exe ..\Release\Piano-FX-Pro-SoftwareRen
     <ClInclude Include="PFXSTUDIO_Global_Imports.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="StateVars.h" />
     <ClInclude Include="Studio.h" />
     <ClInclude Include="Tab1Btn3.h">
       <FileType>CppHeader</FileType>
@@ -575,10 +587,6 @@ move /y ..\Piano-FX-Pro-SoftwareRendered.exe ..\Release\Piano-FX-Pro-SoftwareRen
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
     </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="Images\IMG_0001.bmp" />
-    <Image Include="Images\Tutorial\TestingImage.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

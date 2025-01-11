@@ -1,4 +1,4 @@
-/*************************************************************************************************
+﻿/*************************************************************************************************
 *
 * File: Misc.h
 *
@@ -14,6 +14,8 @@ using namespace std;
 
 #define VersionString "3.06"
 #define LVersionString L"3.06"
+static string RVersionString = VersionString;
+static wstring RLVersionString = LVersionString;
 
 template <typename T>
 string GetAddress(const T& Variable) {

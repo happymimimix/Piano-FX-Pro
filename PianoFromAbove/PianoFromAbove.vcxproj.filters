@@ -468,6 +468,42 @@
     <ClInclude Include="Tab2Btn4.h">
       <Filter>Source Files\Piano-FX Studio\TouchEventListeners\Tab2\SubViews</Filter>
     </ClInclude>
+    <ClInclude Include="ClipboardTool.h">
+      <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaCode.h">
+      <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="StateVars.h">
+      <Filter>Header Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="FFMPEG.h">
+      <Filter>Source Files\Piano-FX Studio\Embedded Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FFMPEG1.h">
+      <Filter>Source Files\Piano-FX Studio\Embedded Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FFMPEG2.h">
+      <Filter>Source Files\Piano-FX Studio\Embedded Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FFMPEG3.h">
+      <Filter>Source Files\Piano-FX Studio\Embedded Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FFMPEG4.h">
+      <Filter>Source Files\Piano-FX Studio\Embedded Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FFMPEG5.h">
+      <Filter>Source Files\Piano-FX Studio\Embedded Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FFMPEG6.h">
+      <Filter>Source Files\Piano-FX Studio\Embedded Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FFMPEG7.h">
+      <Filter>Source Files\Piano-FX Studio\Embedded Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FFMPEG8.h">
+      <Filter>Source Files\Piano-FX Studio\Embedded Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PianoFromAbove.rc">
@@ -591,13 +627,5 @@
     <FxCompile Include="note_vs_samewidth.hlsl">
       <Filter>Resource Files</Filter>
     </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="Images\IMG_0001.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Images\Tutorial\TestingImage.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
   </ItemGroup>
 </Project>

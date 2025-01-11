@@ -2,7 +2,7 @@
 #include <PFXSTUDIO_Global_Imports.h>
 #include <ConsoleFillingTool.h>
 
-uint32_t ProgressCalc(uint32_t Begin, uint32_t End, uint32_t Progress, uint32_t ProgressMAX) {
+uint32_t inline ProgressCalc(uint32_t Begin, uint32_t End, uint32_t Progress, uint32_t ProgressMAX) {
     float fBegin = static_cast<float>(Begin);
     float fEnd = static_cast<float>(End);
     float fProgress = static_cast<float>(Progress) / static_cast<float>(ProgressMAX);
@@ -10,7 +10,7 @@ uint32_t ProgressCalc(uint32_t Begin, uint32_t End, uint32_t Progress, uint32_t 
     return static_cast<uint32_t>(round(Result));
 }
 
-void DoTransition(uint8_t ogX, uint8_t ogY, uint8_t W, uint8_t H, uint8_t destX, uint8_t destY, uint32_t Speed, bool EraseOriginal, WORD EraseColors) {
+void inline DoTransition(uint8_t ogX, uint8_t ogY, uint8_t W, uint8_t H, uint8_t destX, uint8_t destY, uint32_t Speed, bool EraseOriginal, WORD EraseColors) {
     HDC ConsoleDC = GetDC(GetConsoleWindow());
     HDC MemDC = CreateCompatibleDC(ConsoleDC);
     HBITMAP BMP = CreateCompatibleBitmap(ConsoleDC, W * ChW, H * ChH);

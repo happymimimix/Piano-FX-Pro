@@ -1,1 +1,1 @@
-void StudioMain();
+﻿void StudioMain();

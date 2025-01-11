@@ -1,4 +1,4 @@
-/**
+﻿/**
  * \file        lzma/bcj.h
  * \brief       Branch/Call/Jump conversion filters
  * \note        Never include this file directly. Use <lzma.h> instead.
@@ -75,20 +75,20 @@
  *              LZMA_SYNC_FLUSH predictably.
  */
 typedef struct {
-	/**
-	 * \brief       Start offset for conversions
-	 *
-	 * This setting is useful only when the same filter is used
-	 * _separately_ for multiple sections of the same executable file,
-	 * and the sections contain cross-section branch/call/jump
-	 * instructions. In that case it is beneficial to set the start
-	 * offset of the non-first sections so that the relative addresses
-	 * of the cross-section branch/call/jump instructions will use the
-	 * same absolute addresses as in the first section.
-	 *
-	 * When the pointer to options is NULL, the default value (zero)
-	 * is used.
-	 */
-	uint32_t start_offset;
+    /**
+     * \brief       Start offset for conversions
+     *
+     * This setting is useful only when the same filter is used
+     * _separately_ for multiple sections of the same executable file,
+     * and the sections contain cross-section branch/call/jump
+     * instructions. In that case it is beneficial to set the start
+     * offset of the non-first sections so that the relative addresses
+     * of the cross-section branch/call/jump instructions will use the
+     * same absolute addresses as in the first section.
+     *
+     * When the pointer to options is NULL, the default value (zero)
+     * is used.
+     */
+    uint32_t start_offset;
 
 } lzma_options_bcj;

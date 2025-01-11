@@ -1,4 +1,4 @@
-/*************************************************************************************************
+﻿/*************************************************************************************************
 *
 * File: MainProcs.cpp
 *
@@ -915,7 +915,7 @@ INT_PTR WINAPI AboutProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM )
 {
     switch( msg )
     {
-	    case WM_INITDIALOG:
+        case WM_INITDIALOG:
         {
             RECT rcPos, rcParent;
             HWND hWndParent = GetParent( hWnd );
@@ -933,20 +933,20 @@ INT_PTR WINAPI AboutProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM )
             SetBkMode( hDC, TRANSPARENT );
             return ( INT_PTR )GetStockObject( WHITE_BRUSH );
         }
-	    case WM_COMMAND:
+        case WM_COMMAND:
         {
             int iId = LOWORD( wParam );
             switch ( iId )
             {
                 case IDOK: case IDCANCEL:
-    			    EndDialog( hWnd, IDOK );
+                    EndDialog( hWnd, IDOK );
                     return TRUE;
             }
-		    break;
+            break;
         }
-	}
+    }
 
-	return FALSE;
+    return FALSE;
 }
 
 // Helpers involved with user interaction and the GUI

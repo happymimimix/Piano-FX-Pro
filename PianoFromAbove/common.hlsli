@@ -1,4 +1,4 @@
-struct RootSignatureData {
+﻿struct RootSignatureData {
     float4x4 proj;
     float deflate;
     float notes_y;

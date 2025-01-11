@@ -1,7 +1,7 @@
 #pragma once
 #include <PFXSTUDIO_Global_Imports.h>
 
-void FillConsole(SHORT X, SHORT Y, SHORT W, SHORT H, char CH, WORD Color) {
+void inline FillConsole(SHORT X, SHORT Y, SHORT W, SHORT H, char CH, WORD Color) {
     COORD Pos = { X, Y };
     DWORD Erased;
     DWORD Wiped;

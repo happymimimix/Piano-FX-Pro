@@ -1,4 +1,4 @@
-// dear imgui: FreeType font builder (used as a replacement for the stb_truetype builder)
+﻿// dear imgui: FreeType font builder (used as a replacement for the stb_truetype builder)
 // (code)
 
 // Get the latest version at https://github.com/ocornut/imgui/tree/master/misc/freetype
@@ -227,11 +227,11 @@ namespace
         if (glyph_index == 0)
             return NULL;
 
-		// If this crash for you: FreeType 2.11.0 has a crash bug on some bitmap/colored fonts.
-		// - https://gitlab.freedesktop.org/freetype/freetype/-/issues/1076
-		// - https://github.com/ocornut/imgui/issues/4567
-		// - https://github.com/ocornut/imgui/issues/4566
-		// You can use FreeType 2.10, or the patched version of 2.11.0 in VcPkg, or probably any upcoming FreeType version.
+        // If this crash for you: FreeType 2.11.0 has a crash bug on some bitmap/colored fonts.
+        // - https://gitlab.freedesktop.org/freetype/freetype/-/issues/1076
+        // - https://github.com/ocornut/imgui/issues/4567
+        // - https://github.com/ocornut/imgui/issues/4566
+        // You can use FreeType 2.10, or the patched version of 2.11.0 in VcPkg, or probably any upcoming FreeType version.
         FT_Error error = FT_Load_Glyph(Face, glyph_index, LoadFlags);
         if (error)
             return NULL;

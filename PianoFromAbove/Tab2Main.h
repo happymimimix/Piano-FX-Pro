@@ -1,6 +1,7 @@
-#include <Tab2.h>
+﻿#include <Tab2.h>
 #include <Tab2Btn4.h>
-#include <GameState.h>
+#include <ClipboardTool.h>
+#include <LuaCode.h>
 
 TouchEventListener* Tab2::Btn1 = nullptr;
 TouchEventListener* Tab2::Btn2 = nullptr;
@@ -27,8 +28,7 @@ void Tab2::EnableAll() {
             Sleep(500);
             char ProgramPath[MAX_PATH + 1] = {};
             GetModuleFileNameA(NULL, ProgramPath, MAX_PATH);
-            string Command = "start \"Visualize pitch bend tutorial";
-            Command += "\" \"";
+            string Command = "start \"Visualize pitch bend tutorial\" \"";
             Command += ProgramPath;
             Command += "\" ";
             Command += "OPEN VisualizePitchBendTutorial";
@@ -51,8 +51,7 @@ void Tab2::EnableAll() {
             Sleep(500);
             char ProgramPath[MAX_PATH + 1] = {};
             GetModuleFileNameA(NULL, ProgramPath, MAX_PATH);
-            string Command = "start \"Cheat engine Lua scripting tutorial";
-            Command += "\" \"";
+            string Command = "start \"Cheat engine Lua scripting tutorial\" \"";
             Command += ProgramPath;
             Command += "\" ";
             Command += "OPEN CheatEngineTutorial";
@@ -73,6 +72,8 @@ void Tab2::EnableAll() {
         Btn3->OnTouch = []() {
             Tab2Graphics::Btn3(3, 8, Touched);
             Sleep(500);
+            Copy(LuaCode);
+            MessageBoxA(GetConsoleWindow(), "Cheat Engine lua code template has been copied to clipboard. \nOpen Cheat Engine and paste them into Table -> Show Cheat Table Lua Script. ", "Success", NULL);
             Btn3->OnLeave();
         };
         Btn3->OnHover = []() {
@@ -88,8 +89,8 @@ void Tab2::EnableAll() {
         Btn4->H = 2;
         Btn4->OnTouch = []() {
             Tab2Graphics::Btn4(3, 11, Touched);
-            Sleep(500);
-            Btn4->OnLeave();
+            Tab2::Btn4->OnLeave = []() {};
+            Tab2::SubViewBtn4::Open();
         };
         Btn4->OnHover = []() {
             Tab2Graphics::Btn4(3, 11, Hovered);

@@ -1,4 +1,4 @@
-#include "common.hlsli"
+﻿#include "common.hlsli"
 
 BackgroundPSInput main(uint id : SV_VertexID) {
     BackgroundPSInput result;

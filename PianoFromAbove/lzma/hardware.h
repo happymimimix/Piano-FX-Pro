@@ -1,4 +1,4 @@
-/**
+﻿/**
  * \file        lzma/hardware.h
  * \brief       Hardware information
  * \note        Never include this file directly. Use <lzma.h> instead.

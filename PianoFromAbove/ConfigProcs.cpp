@@ -1,4 +1,4 @@
-/*************************************************************************************************
+﻿/*************************************************************************************************
 *
 * File: ConfigProcs.cpp
 *
@@ -583,9 +583,9 @@ INT_PTR WINAPI TracksProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
     static vector< bool > vMuted, vHidden; // Would rather be part of control, but no subitem lparam available
     static vector< unsigned > vColors;
 
-	switch ( msg )
-	{
-	    case WM_INITDIALOG:
+    switch ( msg )
+    {
+        case WM_INITDIALOG:
         {
             HWND hWndTracks = GetDlgItem( hWnd, IDC_TRACKS );
             TCHAR buf[MAX_PATH];
@@ -834,7 +834,7 @@ INT_PTR WINAPI TracksProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
             }
             break;
         }
-	    case WM_COMMAND:
+        case WM_COMMAND:
         {
             int iId = LOWORD( wParam );
             switch ( iId )
@@ -848,17 +848,17 @@ INT_PTR WINAPI TracksProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                     Config::GetConfig().m_bPianoOverride = IsDlgButtonChecked(hWnd, IDC_CHECK2);
                 }
                 case IDCANCEL:
-			        EndDialog( hWnd, iId );
-			        return TRUE;
+                    EndDialog( hWnd, iId );
+                    return TRUE;
             }
-		    break;
+            break;
         }
         case WM_CLOSE:
         {
             EndDialog(hWnd, IDCANCEL);
             return TRUE;
         }
-	}
+    }
 
-	return FALSE;
+    return FALSE;
 }

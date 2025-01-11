@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <PFXSTUDIO_Global_Imports.h>
 #include <TouchEventListener.h>
 #include <ConsoleTextbox.h>

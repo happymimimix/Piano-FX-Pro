@@ -1,4 +1,4 @@
-#include <PFXSTUDIO_Global_Imports.h>
+﻿#include <PFXSTUDIO_Global_Imports.h>
 #include <TouchEventListener.h>
 
 struct CloseBtn {
