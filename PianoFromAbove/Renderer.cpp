@@ -1074,8 +1074,9 @@ HRESULT D3D12Renderer::EndSplashScene() {
     HRESULT res = S_OK;
     if (!m_vRectsIntermediate.empty()) {
         for (size_t i = 0; i < m_vRectsIntermediate.size(); i += RectsPerPass * 4) {
-            if (i == 0)
+            if (i == 0) {
                 SetPipeline(Pipeline::Rect);
+            }
 
             auto remaining = m_vRectsIntermediate.size() - i;
             auto rect_count = min(remaining, RectsPerPass * 4);
