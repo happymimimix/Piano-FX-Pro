@@ -191,6 +191,9 @@ INT_PTR WINAPI VisualProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                     if ( cView.GetFullScreen() && bAlwaysShowControls != cVisual.bAlwaysShowControls )
                         cView.SetControls( cView.GetControls(), true );
                     SetWindowLongPtr( hWnd, DWLP_MSGRESULT, PSNRET_NOERROR );
+
+                    // Save settings
+                    config.SaveConfigValues();
                     return TRUE;
                 }
             }
@@ -274,6 +277,9 @@ INT_PTR WINAPI AudioProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                         HandOffMsg( WM_DEVICECHANGE, 0, 0 );
 
                     SetWindowLongPtr( hWnd, DWLP_MSGRESULT, PSNRET_NOERROR );
+
+                    // Save settings
+                    config.SaveConfigValues();
                     return TRUE;
                 }
             }
@@ -328,6 +334,9 @@ INT_PTR WINAPI VideoProc( HWND hWnd, UINT msg, WPARAM, LPARAM lParam )
 
                     config.SetVideoSettings( cVideo );
                     SetWindowLongPtr( hWnd, DWLP_MSGRESULT, PSNRET_NOERROR );
+
+                    // Save settings
+                    config.SaveConfigValues();
                     return TRUE;
                 }
             }
@@ -438,6 +447,9 @@ INT_PTR WINAPI ControlsProc( HWND hWnd, UINT msg, WPARAM, LPARAM lParam )
                     // Report success and return
                     config.SetControlsSettings( cControls );
                     SetWindowLongPtr( hWnd, DWLP_MSGRESULT, PSNRET_NOERROR );
+
+                    // Save settings
+                    config.SaveConfigValues();
                     return TRUE;
                 }
             }
@@ -540,6 +552,9 @@ INT_PTR WINAPI VizProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             viz.bDisableUI = IsDlgButtonChecked(hWnd, IDC_DISABLEUI);
             config.SetVizSettings(viz);
             SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_NOERROR);
+
+            // Save settings
+            config.SaveConfigValues();
             return TRUE;
         }
         }
