@@ -264,7 +264,7 @@ void VisualSettings::LoadConfigValues( TiXmlElement *txRoot )
     // Attributes
     int iAttrVal;
     if ( txVisual->QueryIntAttribute( "KeysShown", &iAttrVal ) == TIXML_SUCCESS )
-        this->eKeysShown = static_cast< KeysShown >( iAttrVal );
+        this->eKeysShown = static_cast<KeysShown>(max(KeysShown::All, min(iAttrVal, KeysShown::Custom)));
     if ( txVisual->QueryIntAttribute( "AlwaysShowControls", &iAttrVal ) == TIXML_SUCCESS )
         this->bAlwaysShowControls = ( iAttrVal != 0 );
     txVisual->QueryIntAttribute("FirstKey", &iFirstKey);
@@ -391,8 +391,9 @@ void VizSettings::LoadConfigValues(TiXmlElement* txRoot) {
     sTempStr = "";
     txViz->QueryStringAttribute("Background", &sTempStr);
     sBackground = Util::StringToWstring(sTempStr);
-    txViz->QueryIntAttribute("MarkerEncoding", (int*)&eMarkerEncoding);
-    eMarkerEncoding = max(MarkerEncoding::CP1252, min(eMarkerEncoding, MarkerEncoding::UTF8));
+    int tmpMarkerEncoding;
+    txViz->QueryIntAttribute("MarkerEncoding", &tmpMarkerEncoding);
+    eMarkerEncoding = static_cast<MarkerEncoding>(max(MarkerEncoding::CP1252, min(tmpMarkerEncoding, MarkerEncoding::UTF8)));
 
     int r, g, b, a = 0;
     TiXmlElement* txBarColor = txViz->FirstChildElement("BarColor");

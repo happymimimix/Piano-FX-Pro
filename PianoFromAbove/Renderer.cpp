@@ -1188,16 +1188,6 @@ HRESULT D3D12Renderer::BeginText() {
     return S_OK;
 }
 
-HRESULT D3D12Renderer::DrawTextW(const WCHAR*, FontSize, LPRECT, DWORD, DWORD, INT) {
-    // TODO
-    return S_OK;
-}
-
-HRESULT D3D12Renderer::DrawTextA(const CHAR*, FontSize, LPRECT, DWORD, DWORD, INT) {
-    // TODO
-    return S_OK;
-}
-
 HRESULT D3D12Renderer::EndText() {
     // TODO
     return S_OK;
