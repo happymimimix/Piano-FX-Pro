@@ -40,8 +40,8 @@
 #include "Tutorials.h"
 #include "LuaCode.h"
 
-INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, INT nCmdShow );
-DWORD WINAPI GameThread( LPVOID lpParameter );
+INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, INT nCmdShow);
+DWORD WINAPI GameThread(LPVOID lpParameter);
 
 //-----------------------------------------------------------------------------
 // Global variables
@@ -72,7 +72,7 @@ string ProgramPath() {
 // Name: wWinMain()
 // Desc: The application's entry point
 //-----------------------------------------------------------------------------
-INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
+INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
 {
     extern int __argc;
     extern char** __argv;
@@ -221,7 +221,6 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
                 Code += "MEM2=createMemoryStream()\n";
                 Code += "MEM3=createMemoryStream()\n";
                 Code += "MEM4=createMemoryStream()\n";
-                Code += "ShaderThread=nil\n";
                 Code += "function GetMicroseconds()\n";
                 Code += "return readQword(Microseconds)\n";
                 Code += "end\n";
@@ -697,72 +696,42 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
                 Code += "function RunShaderByTime(StartTime,EndTime,ShaderFunction,...)\n";
                 Code += "local EffectParameters={...}\n";
                 Code += "if hGDI==0 then return end\n";
-                Code += "if ShaderThread~=nil then\n";
-                Code += "ShaderThread.waitfor()\n";
-                Code += "ShaderThread.terminate()\n";
-                Code += "end\n";
-                Code += "ShaderThread=createThread(function()\n";
+                Code += "createThread(function()\n";
                 Code += "while GetMicroseconds()<StartTime and GetTicks()<TotalTicks do end\n";
                 Code += "while GetMicroseconds()<=EndTime and GetTicks()<TotalTicks do\n";
                 Code += "ShaderFunction((GetMicroseconds()-StartTime)/(EndTime-StartTime),table.unpack(EffectParameters))\n";
                 Code += "UpdateShaderFPSDisplay()\n";
                 Code += "end\n";
-                Code += "end)\n";
-                Code += "ShaderThread.freeOnTerminate(false)\n";
-                Code += "ShaderThread.resume()\n";
+                Code += "end).resume()\n";
                 Code += "end\n";
                 Code += "function RunShaderByTick(StartTime,EndTime,ShaderFunction,...)\n";
                 Code += "local EffectParameters={...}\n";
                 Code += "if hGDI==0 then return end\n";
-                Code += "if ShaderThread~=nil then\n";
-                Code += "ShaderThread.waitfor()\n";
-                Code += "ShaderThread.terminate()\n";
-                Code += "end\n";
-                Code += "ShaderThread=createThread(function()\n";
+                Code += "createThread(function()\n";
                 Code += "while GetTicks()<StartTime and GetTicks()<TotalTicks do end\n";
                 Code += "while GetTicks()<=EndTime and GetTicks()<TotalTicks do\n";
                 Code += "ShaderFunction((GetTicks()-StartTime)/(EndTime-StartTime),table.unpack(EffectParameters))\n";
                 Code += "UpdateShaderFPSDisplay()\n";
                 Code += "end\n";
-                Code += "end)\n";
-                Code += "ShaderThread.freeOnTerminate(false)\n";
-                Code += "ShaderThread.resume()\n";
+                Code += "end).resume()\n";
                 Code += "end\n";
                 Code += "function RunShaderByTimeAndWait(StartTime,EndTime,ShaderFunction,...)\n";
                 Code += "local EffectParameters={...}\n";
                 Code += "if hGDI==0 then return end\n";
-                Code += "if ShaderThread~=nil then\n";
-                Code += "ShaderThread.waitfor()\n";
-                Code += "ShaderThread.terminate()\n";
-                Code += "end\n";
-                Code += "ShaderThread=createThread(function()\n";
                 Code += "while GetMicroseconds()<StartTime and GetTicks()<TotalTicks do end\n";
                 Code += "while GetMicroseconds()<=EndTime and GetTicks()<TotalTicks do\n";
                 Code += "ShaderFunction((GetMicroseconds()-StartTime)/(EndTime-StartTime),table.unpack(EffectParameters))\n";
                 Code += "UpdateShaderFPSDisplay()\n";
                 Code += "end\n";
-                Code += "end)\n";
-                Code += "ShaderThread.freeOnTerminate(false)\n";
-                Code += "ShaderThread.resume()\n";
-                Code += "ShaderThread.waitfor()\n";
                 Code += "end\n";
                 Code += "function RunShaderByTickAndWait(StartTime,EndTime,ShaderFunction,...)\n";
                 Code += "local EffectParameters={...}\n";
                 Code += "if hGDI==0 then return end\n";
-                Code += "if ShaderThread~=nil then\n";
-                Code += "ShaderThread.waitfor()\n";
-                Code += "ShaderThread.terminate()\n";
-                Code += "end\n";
-                Code += "ShaderThread=createThread(function()\n";
                 Code += "while GetTicks()<StartTime and GetTicks()<TotalTicks do end\n";
                 Code += "while GetTicks()<=EndTime and GetTicks()<TotalTicks do\n";
                 Code += "ShaderFunction((GetTicks()-StartTime)/(EndTime-StartTime),table.unpack(EffectParameters))\n";
                 Code += "UpdateShaderFPSDisplay()\n";
                 Code += "end\n";
-                Code += "end)\n";
-                Code += "ShaderThread.freeOnTerminate(false)\n";
-                Code += "ShaderThread.resume()\n";
-                Code += "ShaderThread.waitfor()\n";
                 Code += "end\n";
                 Code += "-- Builtin GDI Shaders:\n";
                 Code += "function PlainShader(t)\n";
@@ -2515,34 +2484,34 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
 #endif
 
     g_hInstance = hInstance;
-    srand( ( unsigned )time( NULL ) );
+    srand((unsigned)time(NULL));
 
     // Ensure that the common control DLL is loaded. 
     INITCOMMONCONTROLSEX icex;
-    icex.dwSize = sizeof( INITCOMMONCONTROLSEX );
-    icex.dwICC  = ICC_WIN95_CLASSES | ICC_COOL_CLASSES | ICC_STANDARD_CLASSES;
-    InitCommonControlsEx(&icex); 
+    icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
+    icex.dwICC = ICC_WIN95_CLASSES | ICC_COOL_CLASSES | ICC_STANDARD_CLASSES;
+    InitCommonControlsEx(&icex);
 
     // Initialize COM. For the SH* functions
-    HRESULT hr = CoInitialize( NULL );
-    if ( FAILED( hr ) ) return 1;
+    HRESULT hr = CoInitialize(NULL);
+    if (FAILED(hr)) return 1;
 
     // Register the window class
     WNDCLASSEX wc;
-    wc.cbSize = sizeof( WNDCLASSEX );
+    wc.cbSize = sizeof(WNDCLASSEX);
     wc.style = 0;
     wc.lpfnWndProc = WndProc;
     wc.cbClsExtra = 0L;
     wc.cbWndExtra = 0L;
     wc.hInstance = hInstance;
-    wc.hIcon = LoadIcon( hInstance, MAKEINTRESOURCE( IDI_PFAICON ) );
-    wc.hCursor = LoadCursor( NULL, IDC_ARROW );
+    wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_PFAICON));
+    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
     // Window is only a container... never seen, thus null brush
     wc.hbrBackground = NULL; //( HBRUSH )GetStockObject( NULL_BRUSH );
-    wc.lpszMenuName = MAKEINTRESOURCE( IDM_MAINMENU );
+    wc.lpszMenuName = MAKEINTRESOURCE(IDM_MAINMENU);
     wc.lpszClassName = CLASSNAME;
     wc.hIconSm = NULL;
-    if ( !RegisterClassEx( &wc ) )
+    if (!RegisterClassEx(&wc))
         return 1;
 
     // Register the graphics window class
@@ -2550,31 +2519,31 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
     wc.lpfnWndProc = GfxProc;
     wc.lpszMenuName = NULL;
     wc.lpszClassName = GFXCLASSNAME;
-    if ( !RegisterClassEx( &wc ) )
+    if (!RegisterClassEx(&wc))
         return 1;
 
     // Register the position control window class
     wc.style = 0;
     wc.lpfnWndProc = PosnProc;
     wc.lpszClassName = POSNCLASSNAME;
-    if ( !RegisterClassEx( &wc ) )
+    if (!RegisterClassEx(&wc))
         return 1;
 
     // In addition to getting settings, triggers loading of saved config
-    Config &config = Config::GetConfig();
-    ViewSettings &cView = config.GetViewSettings();
-    PlaybackSettings &cPlayback = config.GetPlaybackSettings();
+    Config& config = Config::GetConfig();
+    ViewSettings& cView = config.GetViewSettings();
+    PlaybackSettings& cPlayback = config.GetPlaybackSettings();
 
     // Create the application window
 #ifdef SOFTWARE_RENDER_ONLY
     g_hWnd = CreateWindowEx(0, CLASSNAME, L"Piano-FX Pro v" LVersionString " | Made by: happy_mimimix | Now playing: None  (Enforced Software Rendering)", WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, cView.GetMainLeft(), cView.GetMainTop(),
-        cView.GetMainWidth(), cView.GetMainHeight(), NULL, NULL, wc.hInstance, NULL );
+        cView.GetMainWidth(), cView.GetMainHeight(), NULL, NULL, wc.hInstance, NULL);
 #else
     g_hWnd = CreateWindowEx(0, CLASSNAME, L"Piano-FX Pro v" LVersionString " | Made by: happy_mimimix | Now playing: None", WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, cView.GetMainLeft(), cView.GetMainTop(),
         cView.GetMainWidth(), cView.GetMainHeight(), NULL, NULL, wc.hInstance, NULL);
 #endif // SOFTWARE_RENDER_ONLY
 
-    if ( !g_hWnd ) return 1;
+    if (!g_hWnd) return 1;
 
     // Accept drag and drop
     DragAcceptFiles(g_hWnd, true);
@@ -2582,16 +2551,16 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
     // Creation order (z-order) matters big time for full screen
 
     // Create the controls rebar
-    g_hWndBar = CreateRebar( g_hWnd );
-    if ( !g_hWndBar ) return 1;
+    g_hWndBar = CreateRebar(g_hWnd);
+    if (!g_hWndBar) return 1;
 
     // Create the graphics window
-    g_hWndGfx = CreateWindowEx( 0, GFXCLASSNAME, NULL, WS_CHILD | WS_TABSTOP | WS_CLIPSIBLINGS,
-                                0, 0, 0, 0, g_hWnd, NULL, wc.hInstance, NULL );
-    if ( !g_hWndGfx ) return 1;
+    g_hWndGfx = CreateWindowEx(0, GFXCLASSNAME, NULL, WS_CHILD | WS_TABSTOP | WS_CLIPSIBLINGS,
+        0, 0, 0, 0, g_hWnd, NULL, wc.hInstance, NULL);
+    if (!g_hWndGfx) return 1;
 
-    HACCEL hAccel = LoadAccelerators( hInstance, MAKEINTRESOURCE( IDA_MAINMENU ) );
-    if ( !hAccel ) return 1;
+    HACCEL hAccel = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDA_MAINMENU));
+    if (!hAccel) return 1;
 
     HANDLE hThread;
 
@@ -2631,56 +2600,56 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
 
     // Enter the message loop
     MSG msg = {};
-    while( GetMessage( &msg, NULL, 0, 0 ) )
+    while (GetMessage(&msg, NULL, 0, 0))
     {
-        if( !TranslateAccelerator( g_hWnd, hAccel, &msg ) &&
-            !IsDialogMessage( g_hWnd, &msg ) )
+        if (!TranslateAccelerator(g_hWnd, hAccel, &msg) &&
+            !IsDialogMessage(g_hWnd, &msg))
         {
-            TranslateMessage( &msg );
-            DispatchMessage( &msg );
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
         }
     }
 
     // Signal the game thread to exit and wait for it
-    g_MsgQueue.ForcePush( msg );
-    WaitForSingleObject( hThread, INFINITE );
+    g_MsgQueue.ForcePush(msg);
+    WaitForSingleObject(hThread, INFINITE);
 
     // Save settings
     config.SaveConfigValues();
 
     // Clean up
-    UnregisterClass( CLASSNAME, wc.hInstance );
+    UnregisterClass(CLASSNAME, wc.hInstance);
     CoUninitialize();
     return 0;
 }
 
-DWORD WINAPI GameThread( LPVOID lpParameter )
+DWORD WINAPI GameThread(LPVOID lpParameter)
 {
-    if ( !g_hWndGfx ) return 0;
+    if (!g_hWndGfx) return 0;
 
     // Initialize Direct3D
-    D3D12Renderer *pRenderer = new D3D12Renderer();
+    D3D12Renderer* pRenderer = new D3D12Renderer();
     auto init_res = pRenderer->Init(g_hWndGfx, Config::GetConfig().GetVideoSettings().bLimitFPS);
-    if( FAILED(std::get<0>(init_res)) )
+    if (FAILED(std::get<0>(init_res)))
     {
-        wchar_t msg[1<<10] = {};
+        wchar_t msg[1 << 10] = {};
         _snwprintf_s(msg, 1024, L"Fatal error initializing D3D12.\n%S failed with code 0x%x.", std::get<1>(init_res), std::get<0>(init_res));
-        MessageBox( g_hWnd, msg, TEXT( "Error" ), MB_OK | MB_ICONEXCLAMATION );
-        PostMessage( g_hWnd, WM_QUIT, 1, 0 );
+        MessageBox(g_hWnd, msg, TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
+        PostMessage(g_hWnd, WM_QUIT, 1, 0);
         return 1;
     }
 
     // Create the game object
-    GameState *pGameState = reinterpret_cast< GameState* >( lpParameter );
-    pGameState->SetHWnd( g_hWndGfx );
-    pGameState->SetRenderer( pRenderer );
+    GameState* pGameState = reinterpret_cast<GameState*>(lpParameter);
+    pGameState->SetHWnd(g_hWndGfx);
+    pGameState->SetRenderer(pRenderer);
     pGameState->Init();
     GameState::GameError ge;
 
     // Put the adapter in the window title
-    wchar_t buf[1<<10] = {};
+    wchar_t buf[1 << 10] = {};
 #ifdef SOFTWARE_RENDER_ONLY
-    _snwprintf_s(buf, 1<<10, L"Piano-FX Pro v" LVersionString L" | Made by: happy_mimimix | Now playing: Splash MIDI  (Enforced Software Rendering)");
+    _snwprintf_s(buf, 1 << 10, L"Piano-FX Pro v" LVersionString L" | Made by: happy_mimimix | Now playing: Splash MIDI  (Enforced Software Rendering)");
 #else
     _snwprintf_s(buf, 1 << 10, L"Piano-FX Pro v" LVersionString L" | Made by: happy_mimimix | Now playing: Splash MIDI");
 #endif
@@ -2688,13 +2657,13 @@ DWORD WINAPI GameThread( LPVOID lpParameter )
 
     // Event, logic, render...
     MSG msg = {};
-    while( msg.message != WM_QUIT )
+    while (msg.message != WM_QUIT)
     {
-        while ( g_MsgQueue.Pop( msg ) )
-            pGameState->MsgProc( msg.hwnd, msg.message, msg.wParam, msg.lParam );
+        while (g_MsgQueue.Pop(msg))
+            pGameState->MsgProc(msg.hwnd, msg.message, msg.wParam, msg.lParam);
 
-        if ( ( ge = GameState::ChangeState( pGameState->NextState(), &pGameState ) ) != GameState::Success )
-            PostMessage( g_hWnd, WM_COMMAND, ID_GAMEERROR, ge );
+        if ((ge = GameState::ChangeState(pGameState->NextState(), &pGameState)) != GameState::Success)
+            PostMessage(g_hWnd, WM_COMMAND, ID_GAMEERROR, ge);
         pGameState->Logic();
         pGameState->Render();
     }
