@@ -5,12 +5,18 @@ struct ConsoleDropdown {
     HWND hDropdown = NULL;
 
     void Create(int x, int y, int w, int h) {
+        MSG msg = {};
+        if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
+            TranslateMessage(&msg);
+            DispatchMessageW(&msg);
+        }
+
         this->hDropdown = CreateWindowEx(
             WS_EX_CLIENTEDGE,
             L"COMBOBOX",
             NULL,
             WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWNLIST | WS_VSCROLL,
-            x, y, w, h,
+            x * ChW - ChW / 2, y * ChH - ChH / 4, w * ChW, h * ChH,
             GetConsoleWindow(),
             NULL,
             NULL,
@@ -102,7 +108,35 @@ struct ConsoleDropdown {
             this->hDropdown = NULL;
         }
         else {
-            cout << "[1;1H[40m[91mERROR: Trying to delete a text box that doesn't exist! \n";
+            cout << "[1;1H[40m[91mERROR: Trying to delete a dropdown menu that doesn't exist! \n";
+            cout << "\nThe program will now stop. \n";
+            while (true) {
+                // Make the program hang instead of closing! 
+                // This way the user can clearly see the error message. 
+            }
+        }
+    }
+
+    void Hide() {
+        if (this->hDropdown != NULL) {
+            ShowWindow(this->hDropdown, SW_HIDE);
+        }
+        else {
+            cout << "[1;1H[40m[91mERROR: Trying to hide a dropdown menu that doesn't exist! \n";
+            cout << "\nThe program will now stop. \n";
+            while (true) {
+                // Make the program hang instead of closing! 
+                // This way the user can clearly see the error message. 
+            }
+        }
+    }
+
+    void Show() {
+        if (this->hDropdown != NULL) {
+            ShowWindow(this->hDropdown, SW_SHOW);
+        }
+        else {
+            cout << "[1;1H[40m[91mERROR: Trying to show a dropdown menu that doesn't exist! \n";
             cout << "\nThe program will now stop. \n";
             while (true) {
                 // Make the program hang instead of closing! 

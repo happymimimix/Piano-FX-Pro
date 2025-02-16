@@ -16,12 +16,15 @@
 #include <regex>
 #include <clocale>
 
+#ifdef INCLUDE_FFMPEG
+// Do not include these files in Debug configuration as these files are too large and would cause significant lag in intellisense! 
 #include "ffmpeg1.h"
 #include "ffmpeg2.h"
 #include "ffmpeg3.h"
 #include "ffmpeg4.h"
 #include "ffmpeg5.h"
 #include "ffmpeg6.h"
+#endif
 
 #include "MainProcs.h"
 #include "resource.h"
@@ -86,107 +89,12 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
     SetConsoleCursorPosition(hConsole, pos);
     cout << "Welcome to Piano-FX Pro v";
     cout << VersionString;
+    cout << "\n\n\n";
+    for (uint8_t i = 0; i < (1 << 6); i++) {
+        cout << "=";
+    }
     cout << "\n\n";
-
-    unsigned char* pData = new unsigned char[ffmpeg_len];
-    unsigned int offset = 0;
-    memcpy(pData + offset, ffmpeg1, sizeof(ffmpeg1));
-    offset += sizeof(ffmpeg1);
-    memcpy(pData + offset, ffmpeg2, sizeof(ffmpeg2));
-    offset += sizeof(ffmpeg2);
-    memcpy(pData + offset, ffmpeg3, sizeof(ffmpeg3));
-    offset += sizeof(ffmpeg3);
-    memcpy(pData + offset, ffmpeg4, sizeof(ffmpeg4));
-    offset += sizeof(ffmpeg4);
-    memcpy(pData + offset, ffmpeg5, sizeof(ffmpeg5));
-    offset += sizeof(ffmpeg5);
-    memcpy(pData + offset, ffmpeg6, sizeof(ffmpeg6));
-    offset += sizeof(ffmpeg6);
-    if (offset == ffmpeg_len) {
-        constexpr uint8_t lzma_magic[] = { 0xFD, 0x37, 0x7A, 0x58, 0x5A, 0x00 };
-        while (ffmpeg_len >= LZMA_STREAM_HEADER_SIZE * 2 && !memcmp(pData, lzma_magic, sizeof(lzma_magic))) {
-            unsigned char* compressed = pData;
-            uint64_t decompressed_size = 0;
-            lzma_stream strm = LZMA_STREAM_INIT;
-            lzma_stream_flags stream_flags;
-            lzma_index* index = nullptr;
-            auto pos = (int64_t)ffmpeg_len;
-            lzma_ret ret;
-            do {
-                pos -= LZMA_STREAM_HEADER_SIZE;
-                uint64_t footer_pos;
-                while (true) {
-                    footer_pos = pos;
-
-                    int i = 2;
-                    if (*(uint32_t*)&compressed[footer_pos + 8] != 0)
-                        break;
-
-                    do {
-                        pos -= 4;
-                        --i;
-                    } while (i >= 0 && *(uint32_t*)&compressed[footer_pos + i * 4] == 0);
-                }
-                ret = lzma_stream_footer_decode(&stream_flags, &compressed[footer_pos]);
-                pos -= stream_flags.backward_size;
-                lzma_index_decoder(&strm, &index, UINT64_MAX);
-                strm.avail_in = stream_flags.backward_size;
-                strm.next_in = &compressed[pos];
-                pos += stream_flags.backward_size;
-                ret = lzma_code(&strm, LZMA_RUN);
-                pos -= stream_flags.backward_size + LZMA_STREAM_HEADER_SIZE;
-                pos -= lzma_index_total_size(index);
-                decompressed_size += lzma_index_uncompressed_size(index);
-            } while (pos > 0);
-            pData = new unsigned char[decompressed_size];
-            uint8_t* write_ptr = pData;
-            lzma_end(&strm);
-            strm = LZMA_STREAM_INIT;
-            lzma_stream_decoder(&strm, UINT64_MAX, LZMA_CONCATENATED);
-            strm.next_in = compressed;
-            strm.avail_in = ffmpeg_len;
-            bool done = false;
-            lzma_action action = LZMA_RUN;
-            while (!done) {
-                if (strm.avail_in == 0)
-                    action = LZMA_FINISH;
-                lzma_ret ret = lzma_code(&strm, action);
-                if (strm.avail_out == 0) {
-                    auto remaining = min(decompressed_size - (write_ptr - pData), 1 << 20);
-                    strm.next_out = write_ptr;
-                    strm.avail_out = remaining;
-                    write_ptr += remaining;
-                }
-                switch (ret) {
-                case LZMA_STREAM_END:
-                    done = true;
-                    break;
-                case LZMA_OK:
-                    break;
-                }
-            }
-            ffmpeg_len = decompressed_size;
-        }
-        string FFmpegPath = ProgramPath() + "\\FFMPEG.exe";
-        if (!filesystem::exists(FFmpegPath)) {
-            ofstream FFmpegFile(FFmpegPath, ios::binary);
-            FFmpegFile.write(reinterpret_cast<const char*>(pData), ffmpeg_len);
-            FFmpegFile.close();
-        }
-        delete[] pData;
-    }
-    else {
-        std::cout << "Embedded ffmpeg.exe data length incorrect! \n";
-        std::cout << "Expected: ";
-        std::cout << ffmpeg_len;
-        std::cout << "\n";
-        std::cout << "Actual: ";
-        std::cout << offset;
-        std::cout << "\n";
-        while (true) {
-
-        }
-    }
+    cout << "Preparing...\n";
 
     if (__argc == 3) {
         string ARG1 = __argv[1];
@@ -543,13 +451,13 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
                 Code += "return x<0.5 and 16*x*x*x*x*x or 1-math.pow(-2*x+2,5)/2\n";
                 Code += "end\n";
                 Code += "function EaseInExpo(x)\n";
-                Code += "return x == 0 and 0 or math.pow(2,10*x-10)\n";
+                Code += "return x==0 and 0 or math.pow(2,10*x-10)\n";
                 Code += "end\n";
                 Code += "function EaseOutExpo(x)\n";
-                Code += "return x == 1 and 1 or 1-math.pow(2,-10*x)\n";
+                Code += "return x==1 and 1 or 1-math.pow(2,-10*x)\n";
                 Code += "end\n";
                 Code += "function EaseInOutExpo(x)\n";
-                Code += "return x == 0 and 0 or x == 1 and 1 or x<0.5 and math.pow(2,20*x-10)/2 or (2-math.pow(2,-20*x+10))/2\n";
+                Code += "return x==0 and 0 or x==1 and 1 or x<0.5 and math.pow(2,20*x-10)/2 or (2-math.pow(2,-20*x+10))/2\n";
                 Code += "end\n";
                 Code += "function EaseInCirc(x)\n";
                 Code += "return 1-math.sqrt(1-math.pow(x,2))\n";
@@ -577,15 +485,15 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
                 Code += "end\n";
                 Code += "function EaseInElastic(x)\n";
                 Code += "local c4=(2*math.pi)/3\n";
-                Code += "return x == 0 and 0 or x == 1 and 1 or -math.pow(2,10*x-10)*math.sin((x*10-10.75)*c4)\n";
+                Code += "return x==0 and 0 or x==1 and 1 or -math.pow(2,10*x-10)*math.sin((x*10-10.75)*c4)\n";
                 Code += "end\n";
                 Code += "function EaseOutElastic(x)\n";
                 Code += "local c4=(2*math.pi)/3\n";
-                Code += "return x == 0 and 0 or x == 1 and 1 or math.pow(2,-10*x)*math.sin((x*10-0.75)*c4)+1\n";
+                Code += "return x==0 and 0 or x==1 and 1 or math.pow(2,-10*x)*math.sin((x*10-0.75)*c4)+1\n";
                 Code += "end\n";
                 Code += "function EaseInOutElastic(x)\n";
                 Code += "local c5=(2*math.pi)/4.5\n";
-                Code += "return x == 0 and 0 or x == 1 and 1 or x<0.5 and -(math.pow(2,20*x-10)*math.sin((20*x-11.125)*c5))/2 or (math.pow(2,-20*x+10)*math.sin((20*x-11.125)*c5))/2+1\n";
+                Code += "return x==0 and 0 or x==1 and 1 or x<0.5 and -(math.pow(2,20*x-10)*math.sin((20*x-11.125)*c5))/2 or (math.pow(2,-20*x+10)*math.sin((20*x-11.125)*c5))/2+1\n";
                 Code += "end\n";
                 Code += "function EaseInBounce(x)\n";
                 Code += "return 1-EaseOutBounce(1-x)\n";
@@ -611,7 +519,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
                 Code += "while (GetMicroseconds()<StartTime and GetTicks()<TotalTicks) do\n";
                 Code += "coroutine.yield()\n";
                 Code += "end\n";
-                Code += "while (GetMicroseconds() <= EndTime and GetTicks()<TotalTicks) do\n";
+                Code += "while (GetMicroseconds()<=EndTime and GetTicks()<TotalTicks) do\n";
                 Code += "SetValueFunction(StartValue+EasingFunction((GetMicroseconds()-StartTime)/(EndTime-StartTime))*(EndValue-StartValue))\n";
                 Code += "coroutine.yield()\n";
                 Code += "end\n";
@@ -624,7 +532,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
                 Code += "coroutine.yield()\n";
                 Code += "end\n";
                 Code += "local StartValue=GetValueFunction()\n";
-                Code += "while (GetMicroseconds() <= EndTime and GetTicks()<TotalTicks) do\n";
+                Code += "while (GetMicroseconds()<=EndTime and GetTicks()<TotalTicks) do\n";
                 Code += "SetValueFunction(StartValue+EasingFunction((GetMicroseconds()-StartTime)/(EndTime-StartTime))*(TargetValue-StartValue))\n";
                 Code += "coroutine.yield()\n";
                 Code += "end\n";
@@ -637,7 +545,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
                 Code += "coroutine.yield()\n";
                 Code += "end\n";
                 Code += "local SliceIndex=1\n";
-                Code += "while (GetMicroseconds() <= EndTime and GetTicks()<TotalTicks) do\n";
+                Code += "while (GetMicroseconds()<=EndTime and GetTicks()<TotalTicks) do\n";
                 Code += "SetValueFunction(StartValue+EasingFunction((GetMicroseconds()-StartTime)/(EndTime-StartTime))*(EndValue-StartValue))\n";
                 Code += "while (GetMicroseconds()<StartTime+Spacing*SliceIndex and GetTicks()<TotalTicks) do\n";
                 Code += "coroutine.yield()\n";
@@ -654,7 +562,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
                 Code += "end\n";
                 Code += "local StartValue=GetValueFunction()\n";
                 Code += "local SliceIndex=1\n";
-                Code += "while (GetMicroseconds() <= EndTime and GetTicks()<TotalTicks) do\n";
+                Code += "while (GetMicroseconds()<=EndTime and GetTicks()<TotalTicks) do\n";
                 Code += "SetValueFunction(StartValue+EasingFunction((GetMicroseconds()-StartTime)/(EndTime-StartTime))*(TargetValue-StartValue))\n";
                 Code += "while (GetMicroseconds()<StartTime+Spacing*SliceIndex and GetTicks()<TotalTicks) do\n";
                 Code += "coroutine.yield()\n";
@@ -677,7 +585,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
                 Code += "while (GetTicks()<StartTime and GetTicks()<TotalTicks) do\n";
                 Code += "coroutine.yield()\n";
                 Code += "end\n";
-                Code += "while (GetTicks() <= EndTime and GetTicks()<TotalTicks) do\n";
+                Code += "while (GetTicks()<=EndTime and GetTicks()<TotalTicks) do\n";
                 Code += "SetValueFunction(StartValue+EasingFunction((GetTicks()-StartTime)/(EndTime-StartTime))*(EndValue-StartValue))\n";
                 Code += "coroutine.yield()\n";
                 Code += "end\n";
@@ -690,7 +598,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
                 Code += "coroutine.yield()\n";
                 Code += "end\n";
                 Code += "local StartValue=GetValueFunction()\n";
-                Code += "while (GetTicks() <= EndTime and GetTicks()<TotalTicks) do\n";
+                Code += "while (GetTicks()<=EndTime and GetTicks()<TotalTicks) do\n";
                 Code += "SetValueFunction(StartValue+EasingFunction((GetTicks()-StartTime)/(EndTime-StartTime))*(TargetValue-StartValue))\n";
                 Code += "coroutine.yield()\n";
                 Code += "end\n";
@@ -703,7 +611,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
                 Code += "coroutine.yield()\n";
                 Code += "end\n";
                 Code += "local SliceIndex=1\n";
-                Code += "while (GetTicks() <= EndTime and GetTicks()<TotalTicks) do\n";
+                Code += "while (GetTicks()<=EndTime and GetTicks()<TotalTicks) do\n";
                 Code += "SetValueFunction(StartValue+EasingFunction((GetTicks()-StartTime)/(EndTime-StartTime))*(EndValue-StartValue))\n";
                 Code += "while (GetTicks()<StartTime+Spacing*SliceIndex and GetTicks()<TotalTicks) do\n";
                 Code += "coroutine.yield()\n";
@@ -720,7 +628,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
                 Code += "end\n";
                 Code += "local StartValue=GetValueFunction()\n";
                 Code += "local SliceIndex=1\n";
-                Code += "while (GetTicks() <= EndTime and GetTicks()<TotalTicks) do\n";
+                Code += "while (GetTicks()<=EndTime and GetTicks()<TotalTicks) do\n";
                 Code += "SetValueFunction(StartValue+EasingFunction((GetTicks()-StartTime)/(EndTime-StartTime))*(TargetValue-StartValue))\n";
                 Code += "while (GetTicks()<StartTime+Spacing*SliceIndex and GetTicks()<TotalTicks) do\n";
                 Code += "coroutine.yield()\n";
@@ -749,7 +657,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
                 Code += "while Working do\n";
                 Code += "Working=false\n";
                 Code += "for _,ThisThread in pairs(Threads) do\n";
-                Code += "if coroutine.status(ThisThread) ~= \"dead\" then\n";
+                Code += "if coroutine.status(ThisThread)~=\"dead\" then\n";
                 Code += "coroutine.resume(ThisThread)\n";
                 Code += "Working=true\n";
                 Code += "end\n";
@@ -1109,8 +1017,8 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
                 Code += "local OffsetBY=math.random(-math.abs(OffsettingAmount),math.abs(OffsettingAmount))\n";
                 Code += "while i<=H do\n";
                 Code += "EXE(\"BitBlt\",MEMdc_Main,math.random(-math.abs(ShiftingAmount),math.abs(ShiftingAmount)),i,W,MaxWaveHeight,MEMdc_R,OffsetRX,i+OffsetRY,SRCPAINT)\n";
-                Code += "EXE(\"BitBlt\",MEMdc_Main,math.random(-math.abs(ShiftingAmount),math.abs(ShiftingAmount)),i,W,MaxWaveHeight,MEMdc_G,OffsetRX,i+OffsetRY,SRCPAINT)\n";
-                Code += "EXE(\"BitBlt\",MEMdc_Main,math.random(-math.abs(ShiftingAmount),math.abs(ShiftingAmount)),i,W,MaxWaveHeight,MEMdc_B,OffsetRX,i+OffsetRY,SRCPAINT)\n";
+                Code += "EXE(\"BitBlt\",MEMdc_Main,math.random(-math.abs(ShiftingAmount),math.abs(ShiftingAmount)),i,W,MaxWaveHeight,MEMdc_G,OffsetGX,i+OffsetGY,SRCPAINT)\n";
+                Code += "EXE(\"BitBlt\",MEMdc_Main,math.random(-math.abs(ShiftingAmount),math.abs(ShiftingAmount)),i,W,MaxWaveHeight,MEMdc_B,OffsetBX,i+OffsetBY,SRCPAINT)\n";
                 Code += "EXE(\"BitBlt\",GDIdc,0,i,W,MaxWaveHeight,MEMdc_Main,0,i,SRCCOPY)\n";
                 Code += "i=i+math.random(MinWaveHeight,MaxWaveHeight)\n";
                 Code += "end\n";
@@ -2238,11 +2146,11 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
                 Code += "GlobalOffset=0\n";
                 Code += "end\n";
                 Code += "local CurrentOffset=GlobalOffset\n";
-                Code += "while CurrentOffset > 0 do\n";
+                Code += "while CurrentOffset>0 do\n";
                 Code += "CurrentOffset=CurrentOffset-Size\n";
                 Code += "end\n";
                 Code += "local Polygons={}\n";
-                Code += "while CurrentOffset <= W+Size do\n";
+                Code += "while CurrentOffset<=W+Size do\n";
                 Code += "local X1,Y1=CurrentOffset,Size\n";
                 Code += "local X2,Y2=RotatePoint(X1,Y1,2*math.pi/3,CurrentOffset,0)\n";
                 Code += "local X3,Y3=RotatePoint(X2,Y2,2*math.pi/3,CurrentOffset,0)\n";
@@ -2504,6 +2412,108 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
         }
     }
 
+#ifdef INCLUDE_FFMPEG
+    unsigned char* pData = new unsigned char[ffmpeg_len];
+    unsigned int offset = 0;
+    memcpy(pData + offset, ffmpeg1, sizeof(ffmpeg1));
+    offset += sizeof(ffmpeg1);
+    memcpy(pData + offset, ffmpeg2, sizeof(ffmpeg2));
+    offset += sizeof(ffmpeg2);
+    memcpy(pData + offset, ffmpeg3, sizeof(ffmpeg3));
+    offset += sizeof(ffmpeg3);
+    memcpy(pData + offset, ffmpeg4, sizeof(ffmpeg4));
+    offset += sizeof(ffmpeg4);
+    memcpy(pData + offset, ffmpeg5, sizeof(ffmpeg5));
+    offset += sizeof(ffmpeg5);
+    memcpy(pData + offset, ffmpeg6, sizeof(ffmpeg6));
+    offset += sizeof(ffmpeg6);
+    if (offset == ffmpeg_len) {
+        constexpr uint8_t lzma_magic[] = { 0xFD, 0x37, 0x7A, 0x58, 0x5A, 0x00 };
+        while (ffmpeg_len >= LZMA_STREAM_HEADER_SIZE * 2 && !memcmp(pData, lzma_magic, sizeof(lzma_magic))) {
+            unsigned char* compressed = pData;
+            uint64_t decompressed_size = 0;
+            lzma_stream strm = LZMA_STREAM_INIT;
+            lzma_stream_flags stream_flags;
+            lzma_index* index = nullptr;
+            auto pos = (int64_t)ffmpeg_len;
+            lzma_ret ret;
+            do {
+                pos -= LZMA_STREAM_HEADER_SIZE;
+                uint64_t footer_pos;
+                while (true) {
+                    footer_pos = pos;
+
+                    int i = 2;
+                    if (*(uint32_t*)&compressed[footer_pos + 8] != 0)
+                        break;
+
+                    do {
+                        pos -= 4;
+                        --i;
+                    } while (i >= 0 && *(uint32_t*)&compressed[footer_pos + i * 4] == 0);
+                }
+                ret = lzma_stream_footer_decode(&stream_flags, &compressed[footer_pos]);
+                pos -= stream_flags.backward_size;
+                lzma_index_decoder(&strm, &index, UINT64_MAX);
+                strm.avail_in = stream_flags.backward_size;
+                strm.next_in = &compressed[pos];
+                pos += stream_flags.backward_size;
+                ret = lzma_code(&strm, LZMA_RUN);
+                pos -= stream_flags.backward_size + LZMA_STREAM_HEADER_SIZE;
+                pos -= lzma_index_total_size(index);
+                decompressed_size += lzma_index_uncompressed_size(index);
+            } while (pos > 0);
+            pData = new unsigned char[decompressed_size];
+            uint8_t* write_ptr = pData;
+            lzma_end(&strm);
+            strm = LZMA_STREAM_INIT;
+            lzma_stream_decoder(&strm, UINT64_MAX, LZMA_CONCATENATED);
+            strm.next_in = compressed;
+            strm.avail_in = ffmpeg_len;
+            bool done = false;
+            lzma_action action = LZMA_RUN;
+            while (!done) {
+                if (strm.avail_in == 0)
+                    action = LZMA_FINISH;
+                lzma_ret ret = lzma_code(&strm, action);
+                if (strm.avail_out == 0) {
+                    auto remaining = min(decompressed_size - (write_ptr - pData), 1 << 20);
+                    strm.next_out = write_ptr;
+                    strm.avail_out = remaining;
+                    write_ptr += remaining;
+                }
+                switch (ret) {
+                case LZMA_STREAM_END:
+                    done = true;
+                    break;
+                case LZMA_OK:
+                    break;
+                }
+            }
+            ffmpeg_len = decompressed_size;
+        }
+        string FFmpegPath = ProgramPath() + "\\FFMPEG.exe";
+        if (!filesystem::exists(FFmpegPath)) {
+            ofstream FFmpegFile(FFmpegPath, ios::binary);
+            FFmpegFile.write(reinterpret_cast<const char*>(pData), ffmpeg_len);
+            FFmpegFile.close();
+        }
+        delete[] pData;
+    }
+    else {
+        std::cout << "Embedded ffmpeg.exe data length incorrect! \n";
+        std::cout << "Expected: ";
+        std::cout << ffmpeg_len;
+        std::cout << "\n";
+        std::cout << "Actual: ";
+        std::cout << offset;
+        std::cout << "\n";
+        while (true) {
+
+        }
+    }
+#endif
+
     g_hInstance = hInstance;
     srand( ( unsigned )time( NULL ) );
 
@@ -2589,6 +2599,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
         // Get the game going
         hThread = CreateThread(NULL, 0, GameThread, new SplashScreen(NULL, NULL, false), 0, NULL);
         if (!hThread) return 1;
+        // Set up GUI and show
         SetPlayMode(GameState::Intro);
         SetOnTop(cView.GetOnTop());
         ShowControls(cView.GetControls());
@@ -2602,6 +2613,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
         PlayFile(sFilename);
     }
     else {
+        cout << "Loading splash midi...\n";
         // Get the game going
         hThread = CreateThread(NULL, 0, GameThread, new SplashScreen(NULL, NULL, true), 0, NULL);
         if (!hThread) return 1;
@@ -2615,6 +2627,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow )
         SetFocus(g_hWndGfx);
         cPlayback.SetPaused(false, false);
     }
+    cout << "Let's go! \n";
 
     // Enter the message loop
     MSG msg = {};

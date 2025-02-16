@@ -44,7 +44,7 @@ void Tab1::SubViewBtn3::Open() {
     Close->OnLeave = []() {
         cout << "[11;66H[44m[91mx";
     };
-    Path.Create(6*ChW-ChW/2, 13*ChH-ChH/2, 51*ChW, 2*ChH);
+    Path.Create(6, 13, 51, 2);
     Path.SetText(L"C:\\Program Files (x86)\\Image-Line\\FL Studio 12");
     Browse = TouchEventManager::Create();
     Browse->X = 57;

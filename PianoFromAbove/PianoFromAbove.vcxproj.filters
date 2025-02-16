@@ -420,9 +420,6 @@
     <ClInclude Include="flpTools.h">
       <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="ConsoleButton.h">
-      <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
-    </ClInclude>
     <ClInclude Include="Background.h">
       <Filter>Source Files\Piano-FX Studio\Graphics</Filter>
     </ClInclude>

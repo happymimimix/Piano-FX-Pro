@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <fstream>
 #include <Windows.h>
@@ -11,3 +12,5 @@ using namespace std;
 
 #define ChW 10
 #define ChH 18
+
+function<void()> inline LoopingTask = []() {};
