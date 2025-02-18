@@ -4,24 +4,33 @@
 struct ConsoleTextbox {
     HWND hTextbox = NULL;
 
-    void Create(int x, int y, int w, int h) {
-        MSG msg = {};
-        if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
-            TranslateMessage(&msg);
-            DispatchMessageW(&msg);
+    void Create(uint8_t x, uint8_t y, uint8_t w, uint8_t h) {
+        if (this->hTextbox != NULL) {
+            cout << "[1;1H[40m[91mERROR: Trying to create a text box that already exist! \n";
+            cout << "\nThe program will now stop. \n";
+            while (true) {
+                // Make the program hang instead of closing! 
+                // This way the user can clearly see the error message. 
+            }
         }
-
-        this->hTextbox = CreateWindowEx(
-            WS_EX_CLIENTEDGE,
-            L"EDIT",
-            NULL,
-            WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL,
-            x * ChW - ChW / 2, y * ChH - ChH / 2, w * ChW, h * ChH,
-            GetConsoleWindow(),
-            NULL,
-            NULL,
-            NULL
-        );
+        else {
+            MSG msg = {};
+            if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
+                TranslateMessage(&msg);
+                DispatchMessageW(&msg);
+            }
+            this->hTextbox = CreateWindowEx(
+                WS_EX_CLIENTEDGE,
+                L"EDIT",
+                NULL,
+                WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL,
+                static_cast<int>(x) * ChW - ChW / 2, static_cast<int>(y) * ChH - ChH / 2, static_cast<int>(w) * ChW, static_cast<int>(h) * ChH,
+                GetConsoleWindow(),
+                NULL,
+                NULL,
+                NULL
+            );
+        }
     }
 
     wstring GetText() {

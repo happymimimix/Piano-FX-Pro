@@ -40,12 +40,12 @@ void StudioMain() {
             LastCommandLength = CommandText.length();
             TouchEventManager::CheckTouches(CursorPos, Clicked);
         }
+        RedrawWindow(GetConsoleWindow(), NULL, NULL, RDW_INVALIDATE | RDW_ALLCHILDREN | RDW_UPDATENOW);
         LoopingTask(); //Pseudo multithreading
         MSG msg = {};
         if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
             TranslateMessage(&msg);
             DispatchMessageW(&msg);
         }
-        RedrawWindow(GetConsoleWindow(), NULL, NULL, RDW_INVALIDATE | RDW_ALLCHILDREN | RDW_UPDATENOW);
     }
 }

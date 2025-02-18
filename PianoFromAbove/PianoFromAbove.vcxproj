@@ -278,6 +278,7 @@ move /y ..\Piano-FX-Pro-SoftwareRendered.exe ..\Release\Piano-FX-Pro-SoftwareRen
     <ClInclude Include="ConfigProcs.h" />
     <ClInclude Include="ConsoleDropdown.h" />
     <ClInclude Include="ConsoleFillingTool.h" />
+    <ClInclude Include="ConsoleNumberSpinner.h" />
     <ClInclude Include="ConsoleSetupScript.h" />
     <ClInclude Include="ConsoleTransitionTool.h" />
     <ClInclude Include="d3dx12\d3dx12.h" />

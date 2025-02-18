@@ -4,24 +4,33 @@
 struct ConsoleDropdown {
     HWND hDropdown = NULL;
 
-    void Create(int x, int y, int w, int h) {
-        MSG msg = {};
-        if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
-            TranslateMessage(&msg);
-            DispatchMessageW(&msg);
+    void Create(uint8_t x, uint8_t y, uint8_t w, uint8_t h) {
+        if (this->hDropdown != NULL) {
+            cout << "[1;1H[40m[91mERROR: Trying to create a dropdown menu that already exist! \n";
+            cout << "\nThe program will now stop. \n";
+            while (true) {
+                // Make the program hang instead of closing! 
+                // This way the user can clearly see the error message. 
+            }
         }
-
-        this->hDropdown = CreateWindowEx(
-            WS_EX_CLIENTEDGE,
-            L"COMBOBOX",
-            NULL,
-            WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWNLIST | WS_VSCROLL,
-            x * ChW - ChW / 2, y * ChH - ChH / 4, w * ChW, h * ChH,
-            GetConsoleWindow(),
-            NULL,
-            NULL,
-            NULL
-        );
+        else {
+            MSG msg = {};
+            if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
+                TranslateMessage(&msg);
+                DispatchMessageW(&msg);
+            }
+            this->hDropdown = CreateWindowEx(
+                WS_EX_CLIENTEDGE,
+                L"COMBOBOX",
+                NULL,
+                WS_CHILD | WS_VISIBLE | WS_BORDER | CBS_DROPDOWNLIST | WS_VSCROLL,
+                static_cast<int>(x) * ChW - ChW / 2, static_cast<int>(y) * ChH - ChH / 4, static_cast<int>(w) * ChW, static_cast<int>(h) * ChH - ChH / 2,
+                GetConsoleWindow(),
+                NULL,
+                NULL,
+                NULL
+            );
+        }
     }
 
     void AddItem(const wchar_t* item) {

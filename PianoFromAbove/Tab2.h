@@ -3,6 +3,7 @@
 #include <TouchEventListener.h>
 #include <ConsoleTextbox.h>
 #include <ConsoleDropdown.h>
+#include <ConsoleNumberSpinner.h>
 #include <NullPtrChecker.h>
 #include <TabSwitcher.h>
 #include <Tab2Graphics.h>
@@ -23,15 +24,15 @@ struct Tab2 {
         static TouchEventListener* Close;
         static ConsoleDropdown AnimationType1;
         static ConsoleDropdown AnimationType2;
+        static ConsoleDropdown AnimationTarget1;
+        static ConsoleDropdown AnimationTarget2;
         static ConsoleDropdown TimingUnit;
         static ConsoleTextbox StartTime;
         static ConsoleTextbox EndTime;
         static ConsoleTextbox StartValue;
         static ConsoleTextbox EndValue;
-        static ConsoleDropdown AnimationTarget1;
-        static ConsoleDropdown AnimationTarget2;
         static ConsoleTextbox SliceInterval;
-        static TouchEventListener* Add;
+        static TouchEventListener* UseThreads;
         static TouchEventListener* Generate;
 
         static void Open();

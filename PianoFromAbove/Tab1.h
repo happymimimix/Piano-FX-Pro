@@ -3,6 +3,7 @@
 #include <TouchEventListener.h>
 #include <ConsoleTextbox.h>
 #include <ConsoleDropdown.h>
+#include <ConsoleNumberSpinner.h>
 #include <NullPtrChecker.h>
 #include <TabSwitcher.h>
 #include <Tab1Graphics.h>

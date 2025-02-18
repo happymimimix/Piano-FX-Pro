@@ -492,6 +492,9 @@
     <ClInclude Include="ffmpeg6.h">
       <Filter>Source Files\Piano-FX Studio\Embedded Files</Filter>
     </ClInclude>
+    <ClInclude Include="ConsoleNumberSpinner.h">
+      <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PianoFromAbove.rc">
