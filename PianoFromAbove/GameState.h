@@ -21,6 +21,21 @@ using namespace std;
 #include "MIDI.h"
 #include "Misc.h"
 
+inline long long m_llStartTime;
+inline string llStartTimeFormatted;
+inline uint32_t polyphony;
+inline string polyFormatted;
+inline uint32_t nps;
+inline string npsFormatted;
+inline uint32_t passed;
+inline string passedFormatted;
+inline uint8_t FrameCount = 0;
+inline int width = -1;
+inline int height = -1;
+inline int m_iStartTick;
+inline uint16_t resolution = -1;
+inline char CheatEngineCaption[1 << 10] = {};
+
 //Abstract base class
 class GameState
 {
@@ -106,7 +121,6 @@ private:
     vector< MIDIChannelEvent* > m_vEvents; // The channel events of the song
     int m_iStartPos;
     int m_iEndPos;
-    long long m_llStartTime;
     vector<int> m_vState[128];  // The notes that are on at time m_llStartTime.
     Timer m_Timer; // Frame timers
     double m_dVolume;

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <iostream>
 #include <fstream>
 #include <Windows.h>
@@ -15,7 +15,7 @@ using namespace std;
 
 function<void()> inline LoopingTask = []() {};
 
-void ProcessMessage() {
+void inline 💬() {
     MSG msg = {};
     if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
         TranslateMessage(&msg);

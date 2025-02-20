@@ -20,7 +20,6 @@
 #include "ConfigProcs.h"
 #include <d3d9types.h>
 #include "lzma.h"
-#include "StateVars.h"
 
 const wstring GameState::Errors[] =
 {

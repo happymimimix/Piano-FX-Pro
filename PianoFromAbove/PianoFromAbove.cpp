@@ -31,7 +31,6 @@
 
 #include "Config.h"
 #include "GameState.h"
-#include "StateVars.h"
 #include "Renderer.h"
 #include "Misc.h"
 #include "lzma.h"

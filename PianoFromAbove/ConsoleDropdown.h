@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <PFXSTUDIO_Global_Imports.h>
 
 struct ConsoleDropdown {
@@ -25,17 +25,14 @@ struct ConsoleDropdown {
                 NULL,
                 NULL
             );
+            💬();
         }
     }
 
     void AddItem(const wchar_t* item) {
         if (this->hDropdown != NULL) {
             SendMessageW(this->hDropdown, CB_ADDSTRING, 0, (LPARAM)item);
-            MSG msg = {};
-            if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
-                TranslateMessage(&msg);
-                DispatchMessageW(&msg);
-            }
+            💬();
         }
         else {
             cout << "[1;1H[40m[91mERROR: Trying to add items to a dropdown menu that doesn't exist! \n";
@@ -49,12 +46,9 @@ struct ConsoleDropdown {
 
     int GetSelection() {
         if (this->hDropdown != NULL) {
-            return SendMessageW(this->hDropdown, CB_GETCURSEL, 0, 0);
-            MSG msg = {};
-            if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
-                TranslateMessage(&msg);
-                DispatchMessageW(&msg);
-            }
+            int Choice = SendMessageW(this->hDropdown, CB_GETCURSEL, 0, 0);
+            💬();
+            return Choice;
         }
         else {
             cout << "[1;1H[40m[91mERROR: Trying to grab selection from a dropdown menu that doesn't exist! \n";
@@ -69,19 +63,10 @@ struct ConsoleDropdown {
     wstring GetSelectionText() {
         if (this->hDropdown != NULL) {
             int IDX = SendMessageW(this->hDropdown, CB_GETCURSEL, 0, 0);
-            if (IDX != CB_ERR) {
-                wstring Content(SendMessageW(this->hDropdown, CB_GETLBTEXTLEN, IDX, 0), L'\0');
-                SendMessageW(this->hDropdown, CB_GETLBTEXT, IDX, (LPARAM)&Content[0]);
-                MSG msg = {};
-                if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
-                    TranslateMessage(&msg);
-                    DispatchMessageW(&msg);
-                }
-                return Content;
-            }
-            else {
-                return NULL;
-            }
+            wstring Content(SendMessageW(this->hDropdown, CB_GETLBTEXTLEN, IDX, 0), L'\0');
+            SendMessageW(this->hDropdown, CB_GETLBTEXT, IDX, (LPARAM)&Content[0]);
+            💬();
+            return Content;
         }
         else {
             cout << "[1;1H[40m[91mERROR: Trying to grab selection from a dropdown menu that doesn't exist! \n";
@@ -97,11 +82,7 @@ struct ConsoleDropdown {
         if (this->hDropdown != NULL) {
             if (IDX >= 0 && IDX < SendMessageW(this->hDropdown, CB_GETCOUNT, 0, 0)) {
                 SendMessageW(this->hDropdown, CB_SETCURSEL, IDX, 0);
-                MSG msg = {};
-                if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
-                    TranslateMessage(&msg);
-                    DispatchMessageW(&msg);
-                }
+                💬();
             }
             else {
                 cout << "[1;1H[40m[91mERROR: Cannot set selection index ";
@@ -130,11 +111,7 @@ struct ConsoleDropdown {
         if (this->hDropdown != NULL) {
             DestroyWindow(this->hDropdown);
             this->hDropdown = NULL;
-            MSG msg = {};
-            if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
-                TranslateMessage(&msg);
-                DispatchMessageW(&msg);
-            }
+            💬();
         }
         else {
             cout << "[1;1H[40m[91mERROR: Trying to delete a dropdown menu that doesn't exist! \n";
@@ -149,11 +126,7 @@ struct ConsoleDropdown {
     void Hide() {
         if (this->hDropdown != NULL) {
             ShowWindow(this->hDropdown, SW_HIDE);
-            MSG msg = {};
-            if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
-                TranslateMessage(&msg);
-                DispatchMessageW(&msg);
-            }
+            💬();
         }
         else {
             cout << "[1;1H[40m[91mERROR: Trying to hide a dropdown menu that doesn't exist! \n";
@@ -168,14 +141,40 @@ struct ConsoleDropdown {
     void Show() {
         if (this->hDropdown != NULL) {
             ShowWindow(this->hDropdown, SW_SHOW);
-            MSG msg = {};
-            if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
-                TranslateMessage(&msg);
-                DispatchMessageW(&msg);
-            }
+            💬();
         }
         else {
             cout << "[1;1H[40m[91mERROR: Trying to show a dropdown menu that doesn't exist! \n";
+            cout << "\nThe program will now stop. \n";
+            while (true) {
+                // Make the program hang instead of closing! 
+                // This way the user can clearly see the error message. 
+            }
+        }
+    }
+
+    void Disable() {
+        if (this->hDropdown != NULL) {
+            EnableWindow(this->hDropdown, false);
+            💬();
+        }
+        else {
+            cout << "[1;1H[40m[91mERROR: Trying to disable a dropdown menu that doesn't exist! \n";
+            cout << "\nThe program will now stop. \n";
+            while (true) {
+                // Make the program hang instead of closing! 
+                // This way the user can clearly see the error message. 
+            }
+        }
+    }
+
+    void Enable() {
+        if (this->hDropdown != NULL) {
+            EnableWindow(this->hDropdown, true);
+            💬();
+        }
+        else {
+            cout << "[1;1H[40m[91mERROR: Trying to enable a dropdown menu that doesn't exist! \n";
             cout << "\nThe program will now stop. \n";
             while (true) {
                 // Make the program hang instead of closing! 

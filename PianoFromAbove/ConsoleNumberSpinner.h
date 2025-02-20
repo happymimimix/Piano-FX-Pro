@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <PFXSTUDIO_Global_Imports.h>
 
 struct ConsoleNumberSpinner {
@@ -15,11 +15,6 @@ struct ConsoleNumberSpinner {
             }
         }
         else {
-            MSG msg = {};
-            if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
-                TranslateMessage(&msg);
-                DispatchMessageW(&msg);
-            }
             this->hEdit = CreateWindowEx(
                 WS_EX_CLIENTEDGE,
                 L"EDIT",
@@ -43,16 +38,30 @@ struct ConsoleNumberSpinner {
                 NULL
             );
             SendMessage(this->hSpin, UDM_SETBUDDY, (WPARAM)hEdit, 0);
+            💬();
         }
     }
 
     void SetLimits(int MinLimit, int MaxLimit) {
-        SendMessage(this->hSpin, UDM_SETRANGE32, (WPARAM)MinLimit, (LPARAM)MaxLimit);
+        if (this->hEdit != NULL && this->hSpin != NULL) {
+            SendMessage(this->hSpin, UDM_SETRANGE32, (WPARAM)MinLimit, (LPARAM)MaxLimit);
+        }
+        else {
+        cout << "[1;1H[40m[91mERROR: Trying to set limit to a spinner that doesn't exist! \n";
+        cout << "\nThe program will now stop. \n";
+        while (true) {
+            // Make the program hang instead of closing! 
+            // This way the user can clearly see the error message. 
+        }
+        }
+        💬();
     }
 
     int GetValue() {
         if (this->hEdit != NULL && this->hSpin != NULL) {
-            return (int)SendMessage(this->hSpin, UDM_GETPOS32, 0, 0);
+            int Content = SendMessage(this->hSpin, UDM_GETPOS32, 0, 0);
+            💬();
+            return Content;
         }
         else {
             cout << "[1;1H[40m[91mERROR: Trying to grab number from a spinner that doesn't exist! \n";
@@ -67,6 +76,7 @@ struct ConsoleNumberSpinner {
     void SetValue(int Content) {
         if (this->hEdit != NULL && this->hSpin != NULL) {
             SendMessage(this->hSpin, UDM_SETPOS32, 0, Content);
+            💬();
         }
         else {
             cout << "[1;1H[40m[91mERROR: Trying to set number to a spinner that doesn't exist! \n";
@@ -84,6 +94,7 @@ struct ConsoleNumberSpinner {
             DestroyWindow(this->hSpin);
             this->hEdit = NULL;
             this->hSpin = NULL;
+            💬();
         }
         else {
             cout << "[1;1H[40m[91mERROR: Trying to delete a number spinner that doesn't exist! \n";
@@ -99,6 +110,7 @@ struct ConsoleNumberSpinner {
         if (this->hEdit != NULL && this->hSpin != NULL) {
             ShowWindow(this->hEdit, SW_HIDE);
             ShowWindow(this->hSpin, SW_HIDE);
+            💬();
         }
         else {
             cout << "[1;1H[40m[91mERROR: Trying to hide a number spinner that doesn't exist! \n";
@@ -114,9 +126,42 @@ struct ConsoleNumberSpinner {
         if (this->hEdit != NULL && this->hSpin != NULL) {
             ShowWindow(this->hEdit, SW_SHOW);
             ShowWindow(this->hSpin, SW_SHOW);
+            💬();
         }
         else {
             cout << "[1;1H[40m[91mERROR: Trying to show a number spinner that doesn't exist! \n";
+            cout << "\nThe program will now stop. \n";
+            while (true) {
+                // Make the program hang instead of closing! 
+                // This way the user can clearly see the error message. 
+            }
+        }
+    }
+
+    void Disable() {
+        if (this->hEdit != NULL && this->hSpin != NULL) {
+            EnableWindow(this->hEdit, false);
+            EnableWindow(this->hSpin, false);
+            💬();
+        }
+        else {
+            cout << "[1;1H[40m[91mERROR: Trying to disable a number spinner that doesn't exist! \n";
+            cout << "\nThe program will now stop. \n";
+            while (true) {
+                // Make the program hang instead of closing! 
+                // This way the user can clearly see the error message. 
+            }
+        }
+    }
+
+    void Enable() {
+        if (this->hEdit != NULL && this->hSpin != NULL) {
+            EnableWindow(this->hEdit, true);
+            EnableWindow(this->hSpin, true);
+            💬();
+        }
+        else {
+            cout << "[1;1H[40m[91mERROR: Trying to enable a number spinner that doesn't exist! \n";
             cout << "\nThe program will now stop. \n";
             while (true) {
                 // Make the program hang instead of closing! 

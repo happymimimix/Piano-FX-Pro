@@ -17,6 +17,7 @@ ConsoleTextbox Tab2::SubViewBtn4::EndValue = {};
 ConsoleTextbox Tab2::SubViewBtn4::SliceInterval = {};
 TouchEventListener* Tab2::SubViewBtn4::UseThreads = nullptr;
 TouchEventListener* Tab2::SubViewBtn4::Generate = nullptr;
+bool Tab2::SubViewBtn4::Thread = true;
 
 void Tab2::SubViewBtn4::Open() {
     TabSwitcher::DisableAll();
@@ -24,7 +25,6 @@ void Tab2::SubViewBtn4::Open() {
     InvalidateRect(GetConsoleWindow(), NULL, TRUE);
     // Draw the UI
     Tab2Graphics::Btn4Graphics::Main(3, 13);
-    cout << "";
     Close = TouchEventManager::Create();
     Close->X = 75;
     Close->Y = 13;
@@ -49,6 +49,7 @@ void Tab2::SubViewBtn4::Open() {
         Tab2Graphics::Btn4(3, 11, Normal);
         TabSwitcher::EnableAll();
         Tab2::EnableAll();
+        LoopingTask = []() {};
     };
     Close->OnHover = []() {
         cout << "[14;76H[44m[93mx";
@@ -90,7 +91,6 @@ void Tab2::SubViewBtn4::Open() {
     AnimationTarget1.AddItem(L"LimitFPS");
     AnimationTarget1.AddItem(L"Caption");
     AnimationTarget1.SetSelection(0);
-    AnimationTarget1.Hide();
     AnimationTarget2.Create(24, 18, 21, 2);
     AnimationTarget2.AddItem(L"Volume");
     AnimationTarget2.AddItem(L"PlaybackSpeed");
@@ -115,4 +115,60 @@ void Tab2::SubViewBtn4::Open() {
     StartValue.SetText(L"0");
     EndValue.Create(51, 24, 19, 2);
     EndValue.SetText(L"0");
+    SliceInterval.Create(22, 27, 19, 2);
+    SliceInterval.SetText(L"100");
+    UseThreads = TouchEventManager::Create();
+    UseThreads->X = 49;
+    UseThreads->Y = 27;
+    UseThreads->W = 0;
+    UseThreads->H = 0;
+    UseThreads->OnTouch = []() {
+        Thread = !Thread;
+        UseThreads->OnLeave();
+        while (GetAsyncKeyState(VK_LBUTTON) & 0x8000) {
+
+        }
+    };
+    UseThreads->OnHover = []() {
+        Tab2Graphics::Btn4Graphics::UseThreads(49, 27, Hovered);
+    };
+    UseThreads->OnLeave = []() {
+        if (Thread) {
+            Tab2Graphics::Btn4Graphics::UseThreads(49, 27, Touched);
+        }
+        else {
+            Tab2Graphics::Btn4Graphics::UseThreads(49, 27, Normal);
+        }
+    };
+    Generate = TouchEventManager::Create();
+    Generate->X = 49;
+    Generate->Y = 27;
+    Generate->W = 0;
+    Generate->H = 0;
+    LoopingTask = []() {
+        if (AnimationType1.GetSelection() == 0) {
+            AnimationTarget1.Show();
+            AnimationTarget2.Hide();
+            EndTime.Disable();
+            EndValue.Disable();
+        }
+        else {
+            AnimationTarget1.Hide();
+            AnimationTarget2.Show();
+            EndTime.Enable();
+            EndValue.Enable();
+        }
+        if (AnimationType1.GetSelection() == 2) {
+            StartValue.Disable();
+        }
+        else {
+            StartValue.Enable();
+        }
+        if (AnimationType2.GetSelection() == 0) {
+            SliceInterval.Disable();
+        }
+        else {
+            SliceInterval.Enable();
+        }
+    };
 }

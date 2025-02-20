@@ -471,9 +471,6 @@
     <ClInclude Include="LuaCode.h">
       <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="StateVars.h">
-      <Filter>Header Files\Game</Filter>
-    </ClInclude>
     <ClInclude Include="ffmpeg1.h">
       <Filter>Source Files\Piano-FX Studio\Embedded Files</Filter>
     </ClInclude>

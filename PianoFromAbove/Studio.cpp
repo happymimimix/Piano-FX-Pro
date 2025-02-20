@@ -15,7 +15,8 @@ void StudioMain() {
     size_t LastCommandLength = 0;
     cout << "[1;2H[40m[91m(0,0)";
     while (!CloseBtn::Terminated) {
-        POINT CursorPos;
+        RedrawWindow(GetConsoleWindow(), NULL, NULL, RDW_INVALIDATE | RDW_ALLCHILDREN | RDW_UPDATENOW);
+        POINT CursorPos = {};
         if (GetCursorPos(&CursorPos) && GetForegroundWindow() == GetConsoleWindow()) {
             ScreenToClient(GetConsoleWindow(), &CursorPos);
             CursorPos.x /= ChW;
@@ -40,12 +41,7 @@ void StudioMain() {
             LastCommandLength = CommandText.length();
             TouchEventManager::CheckTouches(CursorPos, Clicked);
         }
-        RedrawWindow(GetConsoleWindow(), NULL, NULL, RDW_INVALIDATE | RDW_ALLCHILDREN | RDW_UPDATENOW);
         LoopingTask(); //Pseudo multithreading
-        MSG msg = {};
-        if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
-            TranslateMessage(&msg);
-            DispatchMessageW(&msg);
-        }
+        💬();
     }
 }

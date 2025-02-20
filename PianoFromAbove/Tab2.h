@@ -34,6 +34,7 @@ struct Tab2 {
         static ConsoleTextbox SliceInterval;
         static TouchEventListener* UseThreads;
         static TouchEventListener* Generate;
+        static bool Thread;
 
         static void Open();
     };

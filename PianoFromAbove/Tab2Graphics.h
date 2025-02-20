@@ -154,60 +154,6 @@ struct Tab2Graphics {
             cout << "[" << (short)y << ';' << (short)x << "H[44m[36m│[95m                 └──────────────────┘                       [91m└──────────┘[95m [36m│"; y++;
             cout << "[" << (short)y << ';' << (short)x << "H[44m[36m└─────────────────────────────────────────────────────────────────────────┘";
         }
-        static void SlicedMode(uint8_t x, uint8_t y, BtnState state) {
-            // 0-based -> 1-based
-            x++;
-            y++;
-            switch (state) {
-            case Normal:
-                cout << "[" << (short)y << ';' << (short)x << "H[44m[95m                                    "; y++;
-                cout << "[" << (short)y << ';' << (short)x << "H[44m[95m                                    "; y++;
-                cout << "[" << (short)y << ';' << (short)x << "H[44m[95m                                    ";
-                break;
-            case Touched:
-                cout << "[" << (short)y << ';' << (short)x << "H[44m[95m                ┌──────────────────┐"; y++;
-                cout << "[" << (short)y << ';' << (short)x << "H[44m[95mSlice interval: │                  │"; y++;
-                cout << "[" << (short)y << ';' << (short)x << "H[44m[95m                └──────────────────┘";
-                break;
-            default:
-                cout << "[1;1H[40m[91mERROR: Unknown button state ";
-                cout << (int)state;
-                cout << ", should only be 1(normal) or 3(touched). \n";
-                cout << "\nThe program will now stop. \n";
-                while (true) {
-                    // Make the program hang instead of closing! 
-                    // This way the user can clearly see the error message. 
-                }
-                break;
-            }
-        }
-        static void TargetMode(uint8_t x, uint8_t y, BtnState state) {
-            // 0-based -> 1-based
-            x++;
-            y++;
-            switch (state) {
-            case Normal:
-                cout << "[" << (short)y << ';' << (short)x << "H[44m[95m             ┌──────────────────┐            ┌──────────────────┐"; y++;
-                cout << "[" << (short)y << ';' << (short)x << "H[44m[95mStart value: │                  │ End value: │                  │"; y++;
-                cout << "[" << (short)y << ';' << (short)x << "H[44m[95m             └──────────────────┘            └──────────────────┘";
-                break;
-            case Touched:
-                cout << "[" << (short)y << ';' << (short)x << "H[44m[95m              ┌──────────────────┐                               "; y++;
-                cout << "[" << (short)y << ';' << (short)x << "H[44m[95mTarget value: │                  │                               "; y++;
-                cout << "[" << (short)y << ';' << (short)x << "H[44m[95m              └──────────────────┘                               ";
-                break;
-            default:
-                cout << "[1;1H[40m[91mERROR: Unknown button state ";
-                cout << (int)state;
-                cout << ", should only be 1(normal) or 3(touched). \n";
-                cout << "\nThe program will now stop. \n";
-                while (true) {
-                    // Make the program hang instead of closing! 
-                    // This way the user can clearly see the error message. 
-                }
-                break;
-            }
-        }
         static void UseThreads(uint8_t x, uint8_t y, BtnState state) {
             // 0-based -> 1-based
             x++;
@@ -217,10 +163,10 @@ struct Tab2Graphics {
                 cout << "[" << (short)y << ';' << (short)x << "H[44m[91m ";
                 break;
             case Hovered:
-                cout << "[" << (short)y << ';' << (short)x << "H[44m[93m*";
+                cout << "[" << (short)y << ';' << (short)x << "H[44m[32m*";
                 break;
             case Touched:
-                cout << "[" << (short)y << ';' << (short)x << "H[44m[32m*";
+                cout << "[" << (short)y << ';' << (short)x << "H[44m[91m*";
                 break;
             default:
                 cout << "[1;1H[40m[91mERROR: Unknown button state ";

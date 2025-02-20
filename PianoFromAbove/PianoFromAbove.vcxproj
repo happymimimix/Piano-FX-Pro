@@ -382,7 +382,6 @@ move /y ..\Piano-FX-Pro-SoftwareRendered.exe ..\Release\Piano-FX-Pro-SoftwareRen
     <ClInclude Include="PFXSTUDIO_Global_Imports.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="StateVars.h" />
     <ClInclude Include="Studio.h" />
     <ClInclude Include="Tab1Btn3.h">
       <FileType>CppHeader</FileType>
