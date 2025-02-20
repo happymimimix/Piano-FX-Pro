@@ -14,3 +14,11 @@ using namespace std;
 #define ChH 18
 
 function<void()> inline LoopingTask = []() {};
+
+void ProcessMessage() {
+    MSG msg = {};
+    if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
+        TranslateMessage(&msg);
+        DispatchMessageW(&msg);
+    }
+}

@@ -107,4 +107,12 @@ void Tab2::SubViewBtn4::Open() {
     TimingUnit.AddItem(L"Microseconds");
     TimingUnit.AddItem(L"Ticks");
     TimingUnit.SetSelection(0);
+    StartTime.Create(18, 21, 19, 2);
+    StartTime.SetText(L"0");
+    EndTime.Create(49, 21, 19, 2);
+    EndTime.SetText(L"0");
+    StartValue.Create(19, 24, 19, 2);
+    StartValue.SetText(L"0");
+    EndValue.Create(51, 24, 19, 2);
+    EndValue.SetText(L"0");
 }
