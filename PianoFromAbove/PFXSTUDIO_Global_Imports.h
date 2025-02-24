@@ -22,3 +22,11 @@ void inline 💬() {
         DispatchMessageW(&msg);
     }
 }
+
+void inline 🖥() {
+    HWND hComponents = NULL;
+    while ((hComponents = FindWindowEx(GetConsoleWindow(), hComponents, NULL, NULL)) != NULL)
+    {
+        InvalidateRect(hComponents, NULL, true);
+    }
+}

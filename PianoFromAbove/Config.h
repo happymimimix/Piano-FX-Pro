@@ -99,7 +99,7 @@ public:
     void SetStopped( bool bUpdateGUI = false ) { if ( bUpdateGUI ) ::SetPlayPauseStop( false, false, true ); m_bPaused = true; }
     void SetSpeed( double dSpeed, bool bUpdateGUI = false ) { if ( bUpdateGUI ) ::SetSpeed( dSpeed ); m_dSpeed = dSpeed; }
     void SetNSpeed( double dNSpeed, bool bUpdateGUI = false ) { dNSpeed = max(min(dNSpeed, 10.0), 0.005); if ( bUpdateGUI ) ::SetNSpeed( dNSpeed ); m_dNSpeed = dNSpeed; }
-    void SetVolume( double dVolume, bool bUpdateGUI = false ) { if ( bUpdateGUI ) ::SetVolume( dVolume ); m_dVolume = dVolume; }
+    void SetVolume( double dVolume, bool bUpdateGUI = false ) { if ( bUpdateGUI ) ::SetVolume( dVolume ); m_dVolume = max(min(dVolume, 2.0), 0.0); }
     void SetMute( bool bMute, bool bUpdateGUI = false ) { if ( bUpdateGUI ) ::SetMute( bMute ); m_bMute = bMute; }
 
     // Get accessors. Simple.
@@ -109,7 +109,7 @@ public:
     bool GetMute() const { return m_bMute; }
     double GetSpeed() const { return m_dSpeed; }
     double GetNSpeed() const { return m_dNSpeed; }
-    double GetVolume() const { return m_dVolume; }
+    double GetVolume() const { return max(min(m_dVolume, 2.0), 0.0); }
     string GetPausedAddress() const { return GetAddress(m_bPaused); }
     string GetMuteAddress() const { return GetAddress(m_bMute); }
     string GetSpeedAddress() const { return GetAddress(m_dSpeed); }

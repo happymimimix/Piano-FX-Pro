@@ -126,7 +126,7 @@ void Tab2::SubViewBtn4::Open() {
         Thread = !Thread;
         UseThreads->OnLeave();
         while (GetAsyncKeyState(VK_LBUTTON) & 0x8000) {
-
+            
         }
     };
     UseThreads->OnHover = []() {
@@ -141,10 +141,42 @@ void Tab2::SubViewBtn4::Open() {
         }
     };
     Generate = TouchEventManager::Create();
-    Generate->X = 49;
+    Generate->X = 65;
     Generate->Y = 27;
-    Generate->W = 0;
+    Generate->W = 9;
     Generate->H = 0;
+    Generate->OnTouch = []() {
+        Tab2Graphics::Btn4Graphics::Generate(66, 27, Touched);
+        wstring Code = L"";
+        if (AnimationType2.GetSelectionText() == L"Sliced") {
+            Code += L"Sliced";
+        }
+        Code += AnimationType1.GetSelectionText();
+        Code += L"AnimationBy";
+        if (TimingUnit.GetSelectionText() == L"Ticks") {
+            Code += L"Tick";
+        }
+        else {
+            Code += L"Time";
+        }
+        if (Thread == false) {
+            Code += L"AndWait";
+        }
+        Code += L"(";
+        if (AnimationType1.GetSelectionText() == L"Target") {
+            Code += L"Get";
+            Code += AnimationTarget1.GetSelectionText();
+        }
+        else {
+            Code += StartValue.GetText();
+        }
+    };
+    Generate->OnHover = []() {
+        Tab2Graphics::Btn4Graphics::Generate(66, 27, Hovered);
+    };
+    Generate->OnLeave = []() {
+        Tab2Graphics::Btn4Graphics::Generate(66, 27, Normal);
+    };
     LoopingTask = []() {
         if (AnimationType1.GetSelection() == 0) {
             AnimationTarget1.Show();

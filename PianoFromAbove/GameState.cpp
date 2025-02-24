@@ -411,7 +411,7 @@ GameState::GameError SplashScreen::Logic()
         if ( pEvent->GetChannelEventType() != MIDIChannelEvent::NoteOn )
             m_OutDevice.PlayEvent( pEvent->GetEventCode(), pEvent->GetParam1(), pEvent->GetParam2() );
         else if (!m_bMute && !m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bMuted )
-            m_OutDevice.PlayEvent( pEvent->GetEventCode(), pEvent->GetParam1(), static_cast<unsigned char>(min(static_cast<double>(pEvent->GetParam2())*cPlayback.GetVolume(),127)));
+            m_OutDevice.PlayEvent( pEvent->GetEventCode(), pEvent->GetParam1(), static_cast<unsigned char>(cPlayback.GetVolume() > 1.0 ? static_cast<double>(INT8_MAX) - (static_cast<double>(INT8_MAX) - static_cast<double>(pEvent->GetParam2())) * (2.0 - cPlayback.GetVolume()) : static_cast<double>(pEvent->GetParam2())*cPlayback.GetVolume()));
         UpdateState( m_iStartPos );
         m_iStartPos++;
     }
@@ -1208,7 +1208,7 @@ GameState::GameError MainScreen::Logic( void )
                 if (!m_bMute) m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), pEvent->GetParam2());
             }
             else if (!m_bMute && (!m_bAnyChannelMuted || !m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bMuted)) {
-                m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), static_cast<unsigned char>(min(static_cast<double>(pEvent->GetParam2()) * cPlayback.GetVolume(), 127)));
+                m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), static_cast<unsigned char>(cPlayback.GetVolume() > 1.0 ? static_cast<double>(INT8_MAX) - (static_cast<double>(INT8_MAX) - static_cast<double>(pEvent->GetParam2())) * (2.0 - cPlayback.GetVolume()) : static_cast<double>(pEvent->GetParam2()) * cPlayback.GetVolume()));
                 notes_played++;
             }
             if ((pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn || pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOff)
