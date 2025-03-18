@@ -2322,6 +2322,10 @@ void MainScreen::RenderKeys()
     }
 }
 
+#ifndef StatisticsWidth
+#define StatisticsWidth 260
+#endif
+
 void MainScreen::RenderText()
 {
     Config& config = Config::GetConfig();
@@ -2352,7 +2356,7 @@ void MainScreen::RenderText()
     }
 
     // Screen info
-    RECT rcStatus = { m_pRenderer->GetBufferWidth() - 260, 0, m_pRenderer->GetBufferWidth(), 16 * Lines + 10};
+    RECT rcStatus = { m_pRenderer->GetBufferWidth() - StatisticsWidth, 0, m_pRenderer->GetBufferWidth(), 16 * Lines + 10};
 
     int iMsgCY = 200;
     RECT rcMsg = { 0, static_cast<int>(m_pRenderer->GetBufferHeight() * (1.0f - KBPercent) - iMsgCY) / 2 };
@@ -2386,7 +2390,7 @@ void MainScreen::RenderStatusLine(int line, const char* left, const char* format
     vsnprintf_s(buf, sizeof(buf), format, varargs);
 
     auto draw_list = m_pRenderer->GetDrawList();
-    ImVec2 left_pos = ImVec2(m_pRenderer->GetBufferWidth() - 255, 3 + line * 16);
+    ImVec2 left_pos = ImVec2(m_pRenderer->GetBufferWidth() - (StatisticsWidth-5), 3 + line * 16);
     ImVec2 right_pos = ImVec2(m_pRenderer->GetBufferWidth() - ImGui::CalcTextSize(buf, NULL, false, -1.0f, 1<<4).x - 6, 3 + line * 16);
     draw_list->AddText(NULL, 1<<4, ImVec2(left_pos.x + 2, left_pos.y + 1), 0xFF404040, left);
     draw_list->AddText(NULL, 1<<4, ImVec2(left_pos.x, left_pos.y), 0xFFFFFFFF, left);

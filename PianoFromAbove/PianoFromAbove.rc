@@ -3,9 +3,9 @@
 #pragma code_page(65001)
 
 #include "resource.h"
-#include "Language.h"
-#include "Widths.h"
 #include "matrices.h"
+#include "Widths.h"
+#include "Language.h"
 #include "afxres.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -567,7 +567,7 @@ BEGIN
                     1
 
     DEFPUSHBUTTON   AboutText2,IDOK,
-                    AboutWindowW + mqMargin + mdBoxSpacing,
+                    AboutWindowW + mMargin - AboutText2W + mdBoxSpacing,
                     AboutWindowH + mdContentHeight + mMargin,
                     AboutText2W + dBoxSpacing,
                     dContentHeight
