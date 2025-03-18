@@ -1,131 +1,133 @@
-﻿//{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
+﻿// Microsoft Visual C++ generated include file.
 // Used by PianoFromAbove.rc
 //
 #define IDM_MAINMENU                    101
-#define IDA_MAINMENU                    103
-#define IDB_BITMAP1                     104
-#define IDB_BITMAP2                     105
-#define IDR_CONTEXTMENU                 106
-#define IDD_PP1_VISUAL                  107
-#define IDD_PP2_AUDIO                   108
-#define IDD_PP3_VIDEO                   109
-#define IDD_PP5_VIZ                     110
-#define IDB_MEDIAICONSSMALL             125
-#define IDD_TRACKSETTINGS               127
-#define IDD_PP4_CONTROLS                128
-#define IDI_PFAICON                     134
-#define IDD_ABOUT                       138
-#define ID_STUDIO                       139
-#define IDR_SPLASHMIDI                  149
-#define IDD_LOADING                     153
-#define IDD_SETRESOLUTION               158
-#define IDC_TRACKS                      1001
-#define IDC_COLOR1                      1002
-#define IDC_COLOR2                      1003
-#define IDC_COLOR3                      1004
-#define IDC_COLOR4                      1005
-#define IDC_COLOR5                      1006
-#define IDC_COLOR6                      1007
-#define IDC_COLOR7                      1008
-#define IDC_COLOR8                      1009
-#define IDC_COLOR9                      1010
-#define IDC_COLOR10                     1011
-#define IDC_COLOR11                     1012
-#define IDC_COLOR12                     1013
-#define IDC_COLOR13                     1014
-#define IDC_COLOR14                     1015
-#define IDC_COLOR15                     1016
-#define IDC_COLOR16                     1017
-#define IDC_BKGCOLOR                    1018
-#define IDC_BARCOLOR                    1019
-#define IDC_SHOWALLKEYS                 1020
-#define IDC_SHOWSONGKEYS                1021
-#define IDC_SHOWCUSTOMKEYS              1022
-#define IDC_LRARROWS                    1023
-#define IDC_LRARROWSSPIN                1024
-#define IDC_UDARROWS                    1025
-#define IDC_UDARROWSSPIN                1026
-#define IDC_MIDIOUT                     1029
-#define IDC_DISPLAYFPS                  1034
-#define IDC_LIMITFPS                    1035
-#define IDC_RESTOREDEFAULTS             1048
-#define IDC_VOLUME                      1053
-#define IDC_SPEED                       1054
-#define IDC_FILE                        1057
-#define IDC_FOLDER                      1058
-#define IDC_NOTES                       1059
-#define IDC_LENGTH                      1060
-#define IDC_SHOWCONTROLS                1061
-#define IDC_FIRSTKEY                    1062
-#define IDC_LASTKEY                     1063
-#define IDC_THROUGH                     1064
-#define IDC_MARKERENC                   1072
-#define IDC_SPLASHMIDI                  1079
-#define IDC_WIDTH                       1079
-#define IDC_BACKGROUND                  1080
-#define IDC_HEIGHT                      1080
-#define IDC_NSPEED                      1095
-#define IDC_CHECK1                      1096
-#define IDC_LOADINGPROGRESS             1097
-#define IDC_CHECK2                      1097
-#define IDC_LOADINGDESC                 1098
-#define IDC_LOADINGNUM                  1099
-#define IDC_STATS                       1102
-#define IDC_MARKERS                     1103
-#define IDC_SPLASHBROWSE                1104
-#define IDC_SPLASHRESET                 1105
-#define IDC_MEMUSAGE                    1106
-#define IDC_PITCHBENDS                  1106
-#define IDC_TICKBASED                   1107
-#define IDC_FFMPEG                      1108
-#define IDC_BACKGROUNDBROWSE            1109
-#define IDC_KDMAPI                      1109
-#define IDC_BACKGROUNDRESET             1110
-#define IDC_COLORLOOP                   1111
-#define IDC_DISABLEUI                   1113
-#define IDC_SAMEWIDTH                   1114
-#define ID_PLAY_PLAY                    40005
-#define ID_PLAY_SKIPFWD                 40006
-#define ID_PLAY_SKIPBACK                40007
-#define ID_PLAY_INCREASERATE            40008
-#define ID_PLAY_DECREASERATE            40009
-#define ID_PLAY_RESETRATE               40010
-#define ID_OPTIONS_PREFERENCES          40023
-#define ID_PLAY_VOLUMEDOWN              40040
-#define ID_PLAY_VOLUMEUP                40043
-#define ID_PLAY_MUTE                    40044
-#define ID_PLAY_PLAYPAUSE               40045
-#define ID_PLAY_PAUSE                   40056
-#define ID_PLAY_STOP                    40057
-#define IDC_TOPREBAR                    40060
-#define IDC_TOPTOOLBAR                  40061
-#define ID_FILE_CLOSEFILE               40070
-#define ID_VIEW_KEYBOARD                40079
-#define ID_VIEW_FULLSCREEN              40080
-#define ID_VIEW_CONTROLS                40084
-#define ID_VIEW_ALWAYSONTOP             40096
-#define ID_VIEW_RESETDEVICE             40100
-#define IDC_INACTIVITYTIMER             40103
-#define IDC_POSNCTRL                    40105
-#define ID_VIEW_MOVEANDZOOM             40109
-#define ID_VIEW_RESETMOVEANDZOOM        40115
-#define ID_CHANGESTATE                  40121
-#define ID_GAMEERROR                    40142
-#define ID_HELP_ABOUT                   40152
-#define ID_FILE_PRACTICESONGCUSTOM      40158
-#define ID_PLAY_NRESET                  40162
-#define ID_PLAY_NSLOWER                 40164
-#define ID_PLAY_NFASTER                 40166
-#define ID_VIEW_SETWINDOWSIZE           40173
+#define IDA_MAINMENU                    102
+#define IDI_PFAICON                     103
+#define IDB_MEDIAICONSSMALL             104
+#define IDR_SPLASHMIDI                  105
+#define ID_CHANGESTATE                  106
+#define ID_GAMEERROR                    107
 
-// Next default values for new objects
-// 
-#ifdef APSTUDIO_INVOKED
-#ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        106
-#define _APS_NEXT_COMMAND_VALUE         40002
-#define _APS_NEXT_CONTROL_VALUE         1000
-#define _APS_NEXT_SYMED_VALUE           102
-#endif
+#define IDD_PP1_VISUAL                  201
+#define IDD_PP2_AUDIO                   202
+#define IDD_PP3_VIDEO                   203
+#define IDD_PP4_CONTROLS                204
+#define IDD_PP5_VIZ                     205
+#define IDD_TRACKSETTINGS               206
+#define IDD_ABOUT                       207
+#define IDD_LOADING                     208
+#define IDD_SETRESOLUTION               209
+
+#define IDC_SHOWALLKEYS                 301
+#define IDC_SHOWSONGKEYS                302
+#define IDC_SHOWCUSTOMKEYS              303
+#define IDC_FIRSTKEY                    304
+#define IDC_THROUGH						305
+#define IDC_LASTKEY                     306
+#define IDC_SHOWCONTROLS                307
+#define IDC_SAMEWIDTH                   308
+#define IDC_COLOR1                      309
+#define IDC_COLOR2                      310
+#define IDC_COLOR3                      311
+#define IDC_COLOR4                      312
+#define IDC_COLOR5                      313
+#define IDC_COLOR6                      314
+#define IDC_COLOR7                      315
+#define IDC_COLOR8                      316
+#define IDC_COLOR9                      317
+#define IDC_COLOR10                     318
+#define IDC_COLOR11                     319
+#define IDC_COLOR12                     320
+#define IDC_COLOR13                     321
+#define IDC_COLOR14                     322
+#define IDC_COLOR15                     323
+#define IDC_COLOR16                     324
+#define IDC_BKGCOLOR                    325
+#define IDC_BARCOLOR                    326
+#define IDC_RESTOREDEFAULTS             327
+
+#define IDC_MIDIOUT                     401
+#define IDC_KDMAPI                      402
+
+#define IDC_DISPLAYFPS                  501
+#define IDC_LIMITFPS                    502
+
+#define IDC_LRARROWS                    601
+#define IDC_LRARROWSSPIN                602
+#define IDC_UDARROWS                    603
+#define IDC_UDARROWSSPIN                604
+
+#define IDC_TICKBASED                   701
+#define IDC_PITCHBENDS                  702
+#define IDC_STATS                       703
+#define IDC_MARKERS                     704
+#define IDC_MARKERENC                   705
+#define IDC_SPLASHMIDI                  706
+#define IDC_SPLASHBROWSE                707
+#define IDC_SPLASHRESET                 708
+#define IDC_BACKGROUND                  709
+#define IDC_BACKGROUNDBROWSE            710
+#define IDC_BACKGROUNDRESET             711
+#define IDC_COLORLOOP                   712
+#define IDC_FFMPEG                      713
+#define IDC_DISABLEUI                   714
+
+#define IDC_FILE                        801
+#define IDC_FOLDER                      802
+#define IDC_NOTES                       803
+#define IDC_LENGTH                      804
+#define IDC_TRACKS                      805
+#define IDC_NOLAG                       806
+#define IDC_PIANO                       807
+
+#define IDC_LOADINGPROGRESS             901
+#define IDC_LOADINGDESC                 902
+#define IDC_LOADINGNUM                  903
+#define IDC_MEMUSAGE                    904
+
+#define IDC_WIDTH                       1001
+#define IDC_HEIGHT                      1002
+
+#define ID_FILE_PRACTICE				1101
+#define ID_FILE_CLOSEFILE               1102
+#define ID_PLAY_PLAYPAUSE               1103
+#define ID_PLAY_PLAY                    1104
+#define ID_PLAY_PAUSE                   1105
+#define ID_PLAY_STOP                    1106
+#define ID_PLAY_SKIPFWD                 1107
+#define ID_PLAY_SKIPBACK                1108
+#define ID_PLAY_INCREASERATE            1109
+#define ID_PLAY_DECREASERATE            1110
+#define ID_PLAY_RESETRATE               1111
+#define ID_PLAY_NFASTER                 1112
+#define ID_PLAY_NSLOWER                 1113
+#define ID_PLAY_NRESET                  1114
+#define ID_PLAY_VOLUMEUP                1115
+#define ID_PLAY_VOLUMEDOWN              1116
+#define ID_PLAY_MUTE                    1117
+#define ID_VIEW_CONTROLS                1118
+#define ID_VIEW_KEYBOARD                1119
+#define ID_VIEW_ALWAYSONTOP             1120
+#define ID_VIEW_FULLSCREEN              1121
+#define ID_VIEW_SETWINDOWSIZE           1122
+#define ID_VIEW_MOVEANDZOOM             1123
+#define ID_VIEW_RESETMOVEANDZOOM        1124
+#define ID_VIEW_RESETDEVICE             1125
+#define ID_OPTIONS_PREFERENCES          1126
+#define ID_HELP_ABOUT                   1127
+#define ID_STUDIO                       1128
+
+#define IDC_VOLUME                      1201
+#define IDC_SPEED                       1202
+#define IDC_NSPEED                      1203
+#define IDC_TOPREBAR                    1204
+#define IDC_POSNCTRL                    1205
+#define IDC_TOPTOOLBAR                  1206
+
+#define IDB_BITMAP1                     1301
+#define IDB_BITMAP2                     1302
+
+#ifdef DBG
+#include "DebugLanguageOverride.h"
 #endif

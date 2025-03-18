@@ -114,9 +114,6 @@
     <ClInclude Include="MainProcs.h">
       <Filter>Header Files\Window</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files\Window</Filter>
-    </ClInclude>
     <ClInclude Include="Renderer.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
@@ -492,6 +489,21 @@
     <ClInclude Include="ConsoleNumberSpinner.h">
       <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
     </ClInclude>
+    <ClInclude Include="matrices.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Widths.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Language.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugLanguageOverride.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PianoFromAbove.rc">
@@ -579,6 +591,9 @@
     </ClCompile>
     <ClCompile Include="Tutorials.cpp">
       <Filter>Source Files\Piano-FX Studio\Tutorials</Filter>
+    </ClCompile>
+    <ClCompile Include="TextWidthCalculator.cpp">
+      <Filter>Resource Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

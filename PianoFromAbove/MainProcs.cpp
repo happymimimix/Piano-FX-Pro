@@ -19,6 +19,7 @@
 #include "ConfigProcs.h"
 #include "Globals.h"
 #include "resource.h"
+#include "Language.h"
 
 #include "GameState.h"
 #include "Config.h"
@@ -95,7 +96,6 @@ LRESULT WINAPI WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
         case WM_WINDOWPOSCHANGING:
             // Allow the window to be larger than the screen. 
             return 0;
-
         case WM_COMMAND:
         {
             int iId = LOWORD( wParam );
@@ -105,7 +105,7 @@ LRESULT WINAPI WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                 {
                     return 0;
                 }
-                case ID_FILE_PRACTICESONGCUSTOM:
+                case ID_FILE_PRACTICE:
                 {
                     CheckActivity( TRUE );
                     // Get the file(s) to add
@@ -123,12 +123,7 @@ LRESULT WINAPI WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                             cPlayback.SetPlayMode(GameState::Intro, true);
                             cPlayback.SetPlayable(false, true);
                             cPlayback.SetPosition(0);
-#ifdef SOFTWARE_RENDER_ONLY
-                            SetWindowText(g_hWnd, L"Piano-FX Pro v" LVersionString " | Made by: happy_mimimix | Now playing: None  (Enforced Software Rendering)");
-#else
-                            SetWindowText(g_hWnd, L"Piano-FX Pro v" LVersionString " | Made by: happy_mimimix | Now playing: None");
-#endif // SOFTWARE_RENDER_ONLY
-
+                            SetWindowText(g_hWnd, MainWindowTitle1 L" v" LVersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7);
                             HandOffMsg(WM_COMMAND, ID_CHANGESTATE, (LPARAM)new IntroScreen(NULL, NULL));
                         }
                         PlayFile(sFilename);
@@ -137,15 +132,11 @@ LRESULT WINAPI WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                 }
                 case ID_FILE_CLOSEFILE:
                 {
-                    if ( !cPlayback.GetPlayMode() ) break;
-                    cPlayback.SetPlayMode( GameState::Intro, true );
-                    cPlayback.SetPlayable( false, true );
-                    cPlayback.SetPosition( 0 );
-#ifdef SOFTWARE_RENDER_ONLY
-                    SetWindowText(g_hWnd, L"Piano-FX Pro v" LVersionString " | Made by: happy_mimimix | Now playing: None  (Enforced Software Rendering)");
-#else
-                    SetWindowText(g_hWnd, L"Piano-FX Pro v" LVersionString " | Made by: happy_mimimix | Now playing: None");
-#endif
+                    if (!cPlayback.GetPlayMode()) break;
+                    cPlayback.SetPlayMode(GameState::Intro, true);
+                    cPlayback.SetPlayable(false, true);
+                    cPlayback.SetPosition(0);
+                    SetWindowText(g_hWnd, MainWindowTitle1 L" v" LVersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7);
                     HandOffMsg( WM_COMMAND, ID_CHANGESTATE, ( LPARAM )new IntroScreen( NULL, NULL ) );
                     return 0;
                 }
@@ -350,7 +341,6 @@ LRESULT WINAPI GfxProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
     static int iBarHeight;
 
     static bool bTrack = false, bTrackL = false, bTrackR = false;
-    static HMENU hMenu;
 
     if ( ( msg >= WM_MOUSEFIRST && msg <= WM_MOUSELAST ) || ( msg >= WM_KEYFIRST && msg <= WM_KEYLAST ) ||
          msg == WM_CAPTURECHANGED || msg == WM_MOUSELEAVE )
@@ -359,9 +349,7 @@ LRESULT WINAPI GfxProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
     switch (msg)
     {
         case WM_CREATE:
-            hMenu = LoadMenu( g_hInstance, MAKEINTRESOURCE( IDR_CONTEXTMENU ) );
             ShowKeyboard( cView.GetKeyboard() );
-            SetTimer( hWnd, IDC_INACTIVITYTIMER, 2500, NULL );
             return 0;
         case WM_LBUTTONDOWN: case WM_RBUTTONDOWN:
             SetFocus( hWnd );
@@ -400,17 +388,6 @@ LRESULT WINAPI GfxProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                     ptContext.y = rcGfx.top;
                 }
             }
-            
-            HMENU hMenuPopup = GetSubMenu( hMenu, 1 );
-            HMENU hMenuMain = GetMainMenu();
-            CopyMenuState( GetSubMenu( hMenuMain, 0 ), hMenuPopup );
-            CopyMenuState( GetSubMenu( hMenuMain, 1 ), hMenuPopup );
-            CopyMenuState( GetSubMenu( hMenuMain, 2 ), hMenuPopup );
-
-            // Finally display the menu
-            CheckActivity( TRUE, NULL, TRUE );
-            TrackPopupMenuEx( hMenuPopup, TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RIGHTBUTTON, ptContext.x, ptContext.y, g_hWnd, NULL );
-            CheckActivity( TRUE, NULL, TRUE );
             return 0;
         }
         // Send me everything except the tab character
@@ -465,14 +442,8 @@ LRESULT WINAPI GfxProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
         case WM_MOUSELEAVE:
             bTrack = false;
             break;
-        case WM_TIMER:
-            if ( wParam == IDC_INACTIVITYTIMER )
-                CheckActivity( FALSE );
-            return 0;
         case WM_DESTROY:
             g_bGfxDestroyed = true;
-            DestroyMenu( hMenu );
-            KillTimer( hWnd, IDC_INACTIVITYTIMER );
             return 0;
     }
 
@@ -569,31 +540,38 @@ LRESULT WINAPI BarProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 HWND CreateRebar( HWND hWndOwner )
 {
     // Create the Rebar. Just houses the toolbar.
-    HWND hWndRebar = CreateWindowEx( WS_EX_CONTROLPARENT, REBARCLASSNAME, NULL, 
-        WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CCS_NODIVIDER | RBS_VARHEIGHT,
-        0, 0, 0, 0, hWndOwner, ( HMENU )IDC_TOPREBAR, g_hInstance, NULL );
+    HWND hWndRebar = CreateWindowEx( WS_EX_CONTROLPARENT, REBARCLASSNAME, NULL, WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CCS_NODIVIDER | RBS_VARHEIGHT, 0, 0, 0, 0, hWndOwner, ( HMENU )IDC_TOPREBAR, g_hInstance, NULL );
     if( !hWndRebar ) return NULL;
 
     // Create the system font
-    const INT ITEM_POINT_SIZE = 10;
     HDC hDC = GetDC( hWndOwner );
-    INT nFontHeight = MulDiv( ITEM_POINT_SIZE, GetDeviceCaps( hDC, LOGPIXELSY ), 72 );
-    HFONT hFont = CreateFont( nFontHeight, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
-                              CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, TEXT( "MS Shell Dlg 2" ) );
+    HFONT hFont = CreateFont(
+        12, //FontHeight
+        0, //FontWidth
+        0, //Escapement
+        0, //Orientation
+        0, //FontWeight
+        0, //Italic
+        0, //Underline
+        0, //StrikeOut
+        1, //CharSet
+        0, //OutPrecision
+        0, //ClipPrecision
+        0, //Quality
+        0, //PitchAndFamily
+        L"Tahoma" //FaceName
+    );
     ReleaseDC(hWndOwner, hDC);
 
     // Create and load the button icons
-    HIMAGELIST hIml = ImageList_LoadImage( g_hInstance, MAKEINTRESOURCE( IDB_MEDIAICONSSMALL ),
-                                           16, 20, RGB( 255, 255, 0), IMAGE_BITMAP, LR_CREATEDIBSECTION );
+    HIMAGELIST hIml = ImageList_LoadImage( g_hInstance, MAKEINTRESOURCE( IDB_MEDIAICONSSMALL ), 16, 20, RGB( 255, 255, 0), IMAGE_BITMAP, LR_CREATEDIBSECTION );
 
     // Create the toolbar. Houses custom controls too. Don't want multiple rebar brands because you lose too much control
-    HWND hWndToolbar = CreateWindowEx( WS_EX_CONTROLPARENT, TOOLBARCLASSNAME, NULL, 
-                                       WS_CHILD | WS_TABSTOP | CCS_NODIVIDER | CCS_NOPARENTALIGN | CCS_NORESIZE | TBSTYLE_FLAT | TBSTYLE_TOOLTIPS,
-                                       0, 0, 0, 0, hWndRebar, ( HMENU )IDC_TOPTOOLBAR, g_hInstance, NULL);
+    HWND hWndToolbar = CreateWindowEx( WS_EX_CONTROLPARENT, TOOLBARCLASSNAME, NULL, WS_CHILD | WS_TABSTOP | CCS_NODIVIDER | CCS_NOPARENTALIGN | CCS_NORESIZE | TBSTYLE_FLAT | TBSTYLE_LIST | TBSTYLE_TOOLTIPS, 0, 0, 0, 0, hWndRebar, ( HMENU )IDC_TOPTOOLBAR, g_hInstance, NULL);
     if (hWndToolbar == NULL)
         return NULL;
 
-    TBBUTTON tbButtons[8] = 
+    TBBUTTON tbButtons[11] = 
     {
         { MAKELONG(0, 0), ID_PLAY_PLAY, 0, BTNS_BUTTON, {0}, 0, ( INT_PTR )TEXT( "Play" ) },
         { MAKELONG(1, 0), ID_PLAY_PAUSE, 0, BTNS_BUTTON, {0}, 0, ( INT_PTR )TEXT( "Pause" ) },
@@ -602,7 +580,10 @@ HWND CreateRebar( HWND hWndOwner )
         { MAKELONG(3, 0), ID_PLAY_SKIPBACK, 0, BTNS_BUTTON, {0}, 0, ( INT_PTR )TEXT( "Skip Back" ) },
         { MAKELONG(4, 0), ID_PLAY_SKIPFWD, 0, BTNS_BUTTON, {0}, 0, ( INT_PTR )TEXT( "Skip Fwd" ) },
         { 0, 0, TBSTATE_ENABLED, BTNS_SEP, {0}, 0, NULL },
-        { MAKELONG(5, 0), ID_PLAY_MUTE, TBSTATE_ENABLED, BTNS_BUTTON, {0}, 0, ( INT_PTR )TEXT( "Mute" ) }
+        { MAKELONG(5, 0), ID_PLAY_MUTE, TBSTATE_ENABLED, BTNS_BUTTON, {0}, 0, ( INT_PTR )TEXT( "Mute" ) },
+        { I_IMAGENONE, 0, 0, BTNS_BUTTON | BTNS_NOPREFIX, {0}, 0, NULL },
+        { 0, 0, TBSTATE_ENABLED, BTNS_SEP, {0}, 0, NULL },
+        { I_IMAGENONE, 11, TBSTATE_ENABLED, BTNS_BUTTON | BTNS_SHOWTEXT, {0}, 0, (INT_PTR)TEXT("tytyty") }
     };
 
     // First add the toolbar buttons
@@ -611,11 +592,16 @@ HWND CreateRebar( HWND hWndOwner )
     SendMessage( hWndToolbar, TB_SETMAXTEXTROWS, 0, 0 );
     SendMessage( hWndToolbar, TB_BUTTONSTRUCTSIZE, sizeof( TBBUTTON ), 0 );
     SendMessage( hWndToolbar, TB_ADDBUTTONS, sizeof( tbButtons ) / sizeof( TBBUTTON ), ( LPARAM )&tbButtons );
-    SendMessage( hWndToolbar, TB_SETBUTTONSIZE, 0, MAKELONG( 32, 29 ) );
+    //SendMessage( hWndToolbar, TB_SETBUTTONSIZE, 0, MAKELONG( 32, 32 ) );
+    TBBUTTONINFO tbi = { sizeof(TBBUTTONINFO) };
+    tbi.dwMask = TBIF_SIZE;
+    tbi.cx = 200;  // 200px width
+    SendMessage(hWndToolbar, TB_SETBUTTONINFO, 8, (LPARAM)&tbi);
+    SendMessage(hWndToolbar, TB_AUTOSIZE, 0, 0);
 
+#define WS_VISIBLE       0x00000000L
     // Now add the other controls
-    HWND hWndVolume = CreateWindowEx( 0, TRACKBAR_CLASS, NULL, WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS,
-                                      209, 2, 75, 26, hWndToolbar, ( HMENU )IDC_VOLUME, g_hInstance, NULL );
+    HWND hWndVolume = CreateWindowEx( 0, TRACKBAR_CLASS, NULL, WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS, 4*32, 2, 75, 26, hWndToolbar, ( HMENU )IDC_VOLUME, g_hInstance, NULL );
     SendMessage( hWndVolume, TBM_SETRANGE, FALSE, MAKELONG( 0, 100 ) );
     SendMessage( hWndVolume, TBM_SETLINESIZE, 0, 5 ); 
 
@@ -636,10 +622,10 @@ HWND CreateRebar( HWND hWndOwner )
     HWND hWndNSpeed = CreateWindowEx( 0, TRACKBAR_CLASS, NULL, WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_BOTH | TBS_NOTICKS,
                                       485, 2, 100, 26, hWndToolbar, ( HMENU )IDC_NSPEED, g_hInstance, NULL );
     SendMessage( hWndNSpeed, TBM_SETRANGE, FALSE, MAKELONG( 5, 195 ) );
-    SendMessage( hWndNSpeed, TBM_SETLINESIZE, 0, 10 ); 
+    SendMessage( hWndNSpeed, TBM_SETLINESIZE, 0, 10 );
+#define WS_VISIBLE          0x10000000L
 
-    HWND hWndPosn = CreateWindowEx( 0, POSNCLASSNAME, NULL, WS_CHILD | WS_VISIBLE | WS_DISABLED,
-                                    0, 0, 0, 0, hWndRebar, ( HMENU )IDC_POSNCTRL, g_hInstance, NULL );
+    HWND hWndPosn = CreateWindowEx( 0, POSNCLASSNAME, NULL, WS_CHILD | WS_VISIBLE | WS_DISABLED, 0, 0, 0, 0, hWndRebar, ( HMENU )IDC_POSNCTRL, g_hInstance, NULL );
 
     // Set the font to the dialog font
     SendMessage( hWndVolume, WM_SETFONT, ( WPARAM )hFont, FALSE );
@@ -1211,18 +1197,10 @@ BOOL PlayFile(const wstring &sFile)
     cView.SetZoomMove( false, true );
     TCHAR sTitle[1<<10];
     if (cViz.bDumpFrames) {
-#ifdef SOFTWARE_RENDER_ONLY
-        _stprintf_s(sTitle, L"Piano-FX Pro v" LVersionString L" | Made by : happy_mimimix | Now rendering : %ws  (Enforced Software Rendering)", sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
-#else
-        _stprintf_s(sTitle, L"Piano-FX Pro v" LVersionString L" | Made by : happy_mimimix | Now rendering : %ws", sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
-#endif
+        _stprintf_s(sTitle, MainWindowTitle1 L" v" LVersionString L" | " MainWindowTitle2 L" | " MainWindowTitle4 L"%ws" MainWindowTitle7, sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
     }
     else {
-#ifdef SOFTWARE_RENDER_ONLY
-        _stprintf_s(sTitle, L"Piano-FX Pro v" LVersionString L" | Made by: happy_mimimix | Now playing: %ws  (Enforced Software Rendering)", sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
-#else
-        _stprintf_s(sTitle, L"Piano-FX Pro v" LVersionString L" | Made by: happy_mimimix | Now playing: %ws", sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
-#endif
+        _stprintf_s(sTitle, MainWindowTitle1 L" v" LVersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 L"%ws" MainWindowTitle7, sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
     }
     SetWindowText(g_hWnd, sTitle);
 

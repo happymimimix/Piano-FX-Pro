@@ -1,208 +1,584 @@
 // Microsoft Visual C++ generated resource script.
 //
+#pragma code_page(65001)
+
 #include "resource.h"
-
-#define APSTUDIO_READONLY_SYMBOLS
-/////////////////////////////////////////////////////////////////////////////
-//
-// Generated from the TEXTINCLUDE 2 resource.
-//
+#include "Language.h"
+#include "Widths.h"
+#include "matrices.h"
 #include "afxres.h"
-
-/////////////////////////////////////////////////////////////////////////////
-#undef APSTUDIO_READONLY_SYMBOLS
-
-/////////////////////////////////////////////////////////////////////////////
-// English (United States) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-
-#ifdef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// TEXTINCLUDE
-//
-
-1 TEXTINCLUDE 
-BEGIN
-    "resource.h\0"
-END
-
-2 TEXTINCLUDE 
-BEGIN
-    "#include ""afxres.h""\r\n"
-    "\0"
-END
-
-3 TEXTINCLUDE 
-BEGIN
-    "\r\n"
-    "\0"
-END
-
-#endif    // APSTUDIO_INVOKED
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
 //
 
-IDD_PP1_VISUAL DIALOGEX 0, 0, 300, 150
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CAPTION
-CAPTION "Property Page"
-FONT 8, "Segoe UI", 400, 0, 0x0
+IDD_PP1_VISUAL DIALOGEX 0,0,PropertyWindowW,PropertyWindowH
+STYLE DialogStyle
+CAPTION PropertyWindowTitle
+FONT FontSize,FontName
 BEGIN
-    GROUPBOX        "Keys to display",IDC_STATIC,4,4,292,52
-    CONTROL         "Show all 128 keys",IDC_SHOWALLKEYS,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,12,16,72,10
-    CONTROL         "Show song keys",IDC_SHOWSONGKEYS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,12,28,68,10
-    CONTROL         "Show keys:",IDC_SHOWCUSTOMKEYS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,12,40,52,10
-    COMBOBOX        IDC_FIRSTKEY,63,38,32,8,CBS_DROPDOWNLIST | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "through",IDC_THROUGH,98,40,30,8,WS_DISABLED
-    COMBOBOX        IDC_LASTKEY,130,38,32,8,CBS_DROPDOWNLIST | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Don't hide controls toolbar in full screen mode",IDC_SHOWCONTROLS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,60,180,10
-    LTEXT           "Bar color:",IDC_STATIC,100,124,32,8
-    CONTROL         "",IDC_COLOR1,"Button",BS_OWNERDRAW,8,100,16,16,WS_EX_CLIENTEDGE
-    CONTROL         "",IDC_COLOR2,"Button",BS_OWNERDRAW,26,100,16,16,WS_EX_CLIENTEDGE
-    CONTROL         "",IDC_COLOR3,"Button",BS_OWNERDRAW,44,100,16,16,WS_EX_CLIENTEDGE
-    CONTROL         "",IDC_COLOR4,"Button",BS_OWNERDRAW,62,100,16,16,WS_EX_CLIENTEDGE
-    CONTROL         "",IDC_COLOR5,"Button",BS_OWNERDRAW,80,100,16,16,WS_EX_CLIENTEDGE
-    CONTROL         "",IDC_COLOR6,"Button",BS_OWNERDRAW,98,100,16,16,WS_EX_CLIENTEDGE
-    CONTROL         "",IDC_COLOR7,"Button",BS_OWNERDRAW,116,100,16,16,WS_EX_CLIENTEDGE
-    CONTROL         "",IDC_COLOR8,"Button",BS_OWNERDRAW,134,100,16,16,WS_EX_CLIENTEDGE
-    CONTROL         "",IDC_COLOR9,"Button",BS_OWNERDRAW,152,100,16,16,WS_EX_CLIENTEDGE
-    CONTROL         "",IDC_COLOR10,"Button",BS_OWNERDRAW,170,100,16,16,WS_EX_CLIENTEDGE
-    CONTROL         "",IDC_COLOR11,"Button",BS_OWNERDRAW,188,100,16,16,WS_EX_CLIENTEDGE
-    CONTROL         "",IDC_COLOR12,"Button",BS_OWNERDRAW,206,100,16,16,WS_EX_CLIENTEDGE
-    CONTROL         "",IDC_COLOR13,"Button",BS_OWNERDRAW,224,100,16,16,WS_EX_CLIENTEDGE
-    CONTROL         "",IDC_COLOR14,"Button",BS_OWNERDRAW,242,100,16,16,WS_EX_CLIENTEDGE
-    CONTROL         "",IDC_COLOR15,"Button",BS_OWNERDRAW,260,100,16,16,WS_EX_CLIENTEDGE
-    CONTROL         "",IDC_COLOR16,"Button",BS_OWNERDRAW,278,100,16,16,WS_EX_CLIENTEDGE
-    LTEXT           "Background color:",IDC_STATIC,8,124,64,8
-    CONTROL         "",IDC_BKGCOLOR,"Button",BS_OWNERDRAW,76,120,16,16,WS_EX_CLIENTEDGE
-    PUSHBUTTON      "Restore Defaults Colors",IDC_RESTOREDEFAULTS,180,120,86,16
-    LTEXT           "Track colors:",IDC_STATIC,8,88,42,8
-    CONTROL         "",IDC_BARCOLOR,"Button",BS_OWNERDRAW,136,120,16,16,WS_EX_CLIENTEDGE
-    CONTROL         "Same width notes",IDC_SAMEWIDTH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,72,74,10
+
+    GROUPBOX        Property1Text1,-1,
+                    Margin,
+                    Margin,
+                    PropertyWindowW + mdMargin,
+                    qContentHeight + tMargin
+
+    CONTROL         Property1Text2,IDC_SHOWALLKEYS,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,
+                    tMargin,
+                    ContentHeight + dMargin,
+                    Property1Text2W + BoxSpacing,
+                    ContentHeight
+
+    CONTROL         Property1Text3,IDC_SHOWSONGKEYS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,
+                    tMargin,
+                    dContentHeight + dMargin,
+                    Property1Text3W + BoxSpacing,
+                    ContentHeight
+
+    CONTROL         Property1Text4,IDC_SHOWCUSTOMKEYS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,
+                    tMargin,
+                    tContentHeight + dMargin,
+                    Property1Text4W + BoxSpacing,
+                    ContentHeight
+
+    COMBOBOX        IDC_FIRSTKEY,
+                    tMargin + Property1Text4W + BoxSpacing,
+                    tContentHeight + dMargin + mhMargin,
+                    KeySelectW,
+                    ContentHeight + Margin,
+                    CBS_DROPDOWNLIST | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
+
+    LTEXT           Property1Text5,IDC_THROUGH,
+                    qMargin + Property1Text4W + BoxSpacing + KeySelectW,
+                    tContentHeight + dMargin,
+                    Property1Text5W,
+                    ContentHeight,
+                    WS_DISABLED
+
+    COMBOBOX        IDC_LASTKEY,
+                    iMargin + Property1Text4W + BoxSpacing + KeySelectW + Property1Text5W,
+                    tContentHeight + dMargin + mhMargin,
+                    KeySelectW,
+                    ContentHeight + Margin,
+                    CBS_DROPDOWNLIST | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
+
+    CONTROL         Property1Text6,IDC_SHOWCONTROLS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    dMargin,
+                    iContentHeight + dMargin + hMargin,
+                    Property1Text6W + BoxSpacing,
+                    ContentHeight
+
+    CONTROL         Property1Text7,IDC_SAMEWIDTH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    dMargin,
+                    xContentHeight + tMargin,
+                    Property1Text7W + BoxSpacing,
+                    ContentHeight
+
+    LTEXT           Property1Text8,-1,
+                    dMargin,
+                    pContentHeight + iMargin,
+                    Property1Text8W,
+                    ContentHeight
+
+    CONTROL         "",IDC_COLOR1,"Button",BS_OWNERDRAW,
+                    dMargin,
+                    oContentHeight + iMargin,
+                    ColorBox,
+                    ColorBox,
+                    WS_EX_CLIENTEDGE
+
+    CONTROL         "",IDC_COLOR2,"Button",BS_OWNERDRAW,
+                    dMargin + hMargin + ColorBox,
+                    oContentHeight + iMargin,
+                    ColorBox,
+                    ColorBox,
+                    WS_EX_CLIENTEDGE
+
+    CONTROL         "",IDC_COLOR3,"Button",BS_OWNERDRAW,
+                    tMargin + dColorBox,
+                    oContentHeight + iMargin,
+                    ColorBox,
+                    ColorBox,
+                    WS_EX_CLIENTEDGE
+
+    CONTROL         "",IDC_COLOR4,"Button",BS_OWNERDRAW,
+                    tMargin + hMargin + tColorBox,
+                    oContentHeight + iMargin,
+                    ColorBox,
+                    ColorBox,
+                    WS_EX_CLIENTEDGE
+
+    CONTROL         "",IDC_COLOR5,"Button",BS_OWNERDRAW,
+                    qMargin + qColorBox,
+                    oContentHeight + iMargin,
+                    ColorBox,
+                    ColorBox,
+                    WS_EX_CLIENTEDGE
+
+    CONTROL         "",IDC_COLOR6,"Button",BS_OWNERDRAW,
+                    qMargin + hMargin + iColorBox,
+                    oContentHeight + iMargin,
+                    ColorBox,
+                    ColorBox,
+                    WS_EX_CLIENTEDGE
+
+    CONTROL         "",IDC_COLOR7,"Button",BS_OWNERDRAW,
+                    iMargin + xColorBox,
+                    oContentHeight + iMargin,
+                    ColorBox,
+                    ColorBox,
+                    WS_EX_CLIENTEDGE
+
+    CONTROL         "",IDC_COLOR8,"Button",BS_OWNERDRAW,
+                    iMargin + hMargin + pColorBox,
+                    oContentHeight + iMargin,
+                    ColorBox,
+                    ColorBox,
+                    WS_EX_CLIENTEDGE
+
+    CONTROL         "",IDC_COLOR9,"Button",BS_OWNERDRAW,
+                    xMargin + oColorBox,
+                    oContentHeight + iMargin,
+                    ColorBox,
+                    ColorBox,
+                    WS_EX_CLIENTEDGE
+
+    CONTROL         "",IDC_COLOR10,"Button",BS_OWNERDRAW,
+                    xMargin + hMargin + nColorBox,
+                    oContentHeight + iMargin,
+                    ColorBox,
+                    ColorBox,
+                    WS_EX_CLIENTEDGE
+
+    CONTROL         "",IDC_COLOR11,"Button",BS_OWNERDRAW,
+                    pMargin + cColorBox,
+                    oContentHeight + iMargin,
+                    ColorBox,
+                    ColorBox,
+                    WS_EX_CLIENTEDGE
+
+    CONTROL         "",IDC_COLOR12,"Button",BS_OWNERDRAW,
+                    pMargin + hMargin + cColorBox + ColorBox,
+                    oContentHeight + iMargin,
+                    ColorBox,
+                    ColorBox,
+                    WS_EX_CLIENTEDGE
+
+    CONTROL         "",IDC_COLOR13,"Button",BS_OWNERDRAW,
+                    oMargin + cColorBox + dColorBox,
+                    oContentHeight + iMargin,
+                    ColorBox,
+                    ColorBox,
+                    WS_EX_CLIENTEDGE
+
+    CONTROL         "",IDC_COLOR14,"Button",BS_OWNERDRAW,
+                    oMargin + hMargin + cColorBox + tColorBox,
+                    oContentHeight + iMargin,
+                    ColorBox,
+                    ColorBox,
+                    WS_EX_CLIENTEDGE
+
+    CONTROL         "",IDC_COLOR15,"Button",BS_OWNERDRAW,
+                    nMargin + cColorBox + qColorBox,
+                    oContentHeight + iMargin,
+                    ColorBox,
+                    ColorBox,
+                    WS_EX_CLIENTEDGE
+
+    CONTROL         "",IDC_COLOR16,"Button",BS_OWNERDRAW,
+                    nMargin + hMargin + cColorBox + iColorBox,
+                    oContentHeight + iMargin,
+                    ColorBox,
+                    ColorBox,
+                    WS_EX_CLIENTEDGE
+
+    LTEXT           Property1Text9,
+                    -1,
+                    dMargin,
+                    cContentHeight + xMargin,
+                    Property1Text9W,
+                    ContentHeight
+
+    CONTROL         "",IDC_BKGCOLOR,"Button",BS_OWNERDRAW,
+                    tMargin + Property1Text9W,
+                    cContentHeight + xMargin + mhMargin,
+                    ColorBox,
+                    ColorBox,
+                    WS_EX_CLIENTEDGE
+
+    LTEXT           Property1Text10,
+                    -1,
+                    qMargin + Property1Text9W + ColorBox,
+                    cContentHeight + xMargin,
+                    Property1Text10W,
+                    ContentHeight
+
+    CONTROL         "",IDC_BARCOLOR,"Button",BS_OWNERDRAW,
+                    iMargin + Property1Text9W + ColorBox + Property1Text10W,
+                    cContentHeight + xMargin + mhMargin,
+                    ColorBox,
+                    ColorBox,
+                    WS_EX_CLIENTEDGE
+
+    PUSHBUTTON      Property1Text11,IDC_RESTOREDEFAULTS,
+                    PropertyWindowW - Property1Text11W - BoxSpacing + mdMargin,
+                    cContentHeight + xMargin + mhMargin,
+                    Property1Text11W + BoxSpacing,
+                    ContentHeight + dMargin
+
 END
 
-IDD_PP2_AUDIO DIALOGEX 0, 0, 300, 150
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CAPTION
-CAPTION "Property Page"
-FONT 8, "Segoe UI", 400, 0, 0x0
+IDD_PP2_AUDIO DIALOGEX 0,0,PropertyWindowW,PropertyWindowH
+STYLE DialogStyle
+CAPTION PropertyWindowTitle
+FONT FontSize,FontName
 BEGIN
-    LTEXT           "Standard WinMM Output: ",IDC_STATIC,8,8,90,8
-    LISTBOX         IDC_MIDIOUT,8,20,284,100,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Use more efficient KDMAPI instead of WinMM (Requires OmniMIDI)",IDC_KDMAPI,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,126,240,8
+
+    LTEXT           Property2Text1,-1,
+                    dMargin,
+                    dMargin,
+                    Property2Text1W,
+                    ContentHeight
+
+    LISTBOX         IDC_MIDIOUT,
+                    dMargin,
+                    tMargin+ContentHeight,
+                    PropertyWindowW + mqMargin,
+                    PropertyWindowH + mqContentHeight + mdMargin,
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+
+    CONTROL         Property2Text2,IDC_KDMAPI,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    dMargin,
+                    PropertyWindowH + mContentHeight + mdMargin,
+                    Property2Text2W + BoxSpacing,
+                    ContentHeight
+
 END
 
-IDD_PP3_VIDEO DIALOGEX 0, 0, 300, 150
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CAPTION
-CAPTION "Property Page"
-FONT 8, "Segoe UI", 400, 0, 0x0
+IDD_PP3_VIDEO DIALOGEX 0,0,PropertyWindowW,PropertyWindowH
+STYLE DialogStyle
+CAPTION PropertyWindowTitle
+FONT FontSize,FontName
 BEGIN
-    GROUPBOX        "Render options",IDC_STATIC,4,4,292,38
-    CONTROL         "Show debug information",IDC_DISPLAYFPS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,28,276,10
-    CONTROL         "Lock FPS to 60",IDC_LIMITFPS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,16,276,10
+
+    GROUPBOX        Property3Text1,-1,
+                    Margin,
+                    Margin,
+                    PropertyWindowW+mdMargin,
+                    tContentHeight+tMargin
+
+    CONTROL         Property3Text2,IDC_DISPLAYFPS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    tMargin,
+                    ContentHeight + dMargin,
+                    Property3Text2W + BoxSpacing,
+                    ContentHeight
+
+    CONTROL         Property3Text3,IDC_LIMITFPS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    tMargin,
+                    dContentHeight + dMargin + hMargin,
+                    Property3Text2W + BoxSpacing,
+                    ContentHeight
+
 END
 
-IDD_PP5_VIZ DIALOGEX 0, 0, 300, 150
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CAPTION
-CAPTION "Property Page"
-FONT 8, "Segoe UI", 400, 0, 0x0
+IDD_PP4_CONTROLS DIALOGEX 0,0,PropertyWindowW,PropertyWindowH
+STYLE DialogStyle
+CAPTION PropertyWindowTitle
+FONT FontSize,FontName
 BEGIN
-    GROUPBOX        "Other options",IDC_STATIC,4,4,292,145
-    CONTROL         "Show markers",IDC_MARKERS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,52,64,10
-    COMBOBOX        IDC_MARKERENC,90,64,90,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Marker text encoding:",IDC_STATIC,12,66,76,8
-    CONTROL         "Phigros style scoring system",IDC_STATS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,40,106,10
-    EDITTEXT        IDC_SPLASHMIDI,58,78,120,14,ES_AUTOHSCROLL | ES_READONLY
-    LTEXT           "Splash MIDI:",IDC_STATIC,12,80,44,8
-    PUSHBUTTON      "Browse",IDC_SPLASHBROWSE,184,78,50,14
-    PUSHBUTTON      "Reset",IDC_SPLASHRESET,238,78,50,14
-    CONTROL         "Tick-based rendering",IDC_TICKBASED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,16,83,10
-    CONTROL         "Visualize pitch bends",IDC_PITCHBENDS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,28,84,10
-    CONTROL         "Video output (ffmpeg.exe required)",IDC_FFMPEG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,120,132,10
-    EDITTEXT        IDC_BACKGROUND,58,92,120,14,ES_AUTOHSCROLL | ES_READONLY
-    LTEXT           "Background:",IDC_STATIC,12,94,44,8
-    PUSHBUTTON      "Browse",IDC_BACKGROUNDBROWSE,184,92,50,14
-    PUSHBUTTON      "Reset",IDC_BACKGROUNDRESET,238,92,50,14
-    CONTROL         "Color loop",IDC_COLORLOOP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,108,48,10
-    CONTROL         "Disable UI",IDC_DISABLEUI,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,132,48,10
+
+    GROUPBOX        Property4Text1,-1,
+                    Margin,
+                    Margin,
+                    PropertyWindowW + mdMargin,
+                    tContentHeight + xMargin
+
+    LTEXT           Property4Text2,-1,
+                    tMargin,
+                    ContentHeight + dMargin + hMargin,
+                    Property4Text2W,
+                    ContentHeight
+
+    EDITTEXT        IDC_LRARROWS,
+                    qMargin + Property4Text2W,
+                    ContentHeight + dMargin,
+                    SpinnerW,
+                    ContentHeight + Margin,
+                    ES_AUTOHSCROLL
+
+    CONTROL         "",IDC_LRARROWSSPIN,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,0,0,0,0
+
+    LTEXT           Property4Text3,-1,
+                    iMargin + Property4Text2W + SpinnerW,
+                    ContentHeight + dMargin + hMargin,
+                    Property4Text3W,
+                    ContentHeight
+
+    LTEXT           Property4Text4,-1,
+                    tMargin,
+                    dContentHeight + qMargin + hMargin,
+                    Property4Text4W,
+                    ContentHeight
+
+    EDITTEXT        IDC_UDARROWS,
+                    qMargin + Property4Text4W,
+                    dContentHeight + qMargin,
+                    SpinnerW,
+                    ContentHeight + Margin,
+                    ES_AUTOHSCROLL
+
+    CONTROL         "",IDC_UDARROWSSPIN,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,0,0,0,0
+
+    LTEXT           Property4Text5,-1,
+                    iMargin + Property4Text4W + SpinnerW,
+                    dContentHeight + qMargin + hMargin,
+                    Property4Text5W,
+                    ContentHeight
+
 END
 
-IDD_TRACKSETTINGS DIALOGEX 0, 0, 300, 190
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Track Settings"
-FONT 8, "Segoe UI", 400, 0, 0x1
+IDD_PP5_VIZ DIALOGEX 0,0,PropertyWindowW,PropertyWindowH
+STYLE DialogStyle
+CAPTION PropertyWindowTitle
+FONT FontSize,FontName
 BEGIN
-    LTEXT           "File:",IDC_STATIC,7,7,14,8
-    EDITTEXT        IDC_FILE,50,7,244,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
-    LTEXT           "Folder:",IDC_STATIC,7,17,24,8
-    EDITTEXT        IDC_FOLDER,50,17,244,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
-    LTEXT           "Notes:",IDC_STATIC,7,27,22,8
-    EDITTEXT        IDC_NOTES,50,27,244,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
-    LTEXT           "Length:",IDC_STATIC,7,37,26,8
-    EDITTEXT        IDC_LENGTH,50,37,244,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
-    CONTROL         "",IDC_TRACKS,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,50,287,91
-    DEFPUSHBUTTON   "OK",IDOK,192,168,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,246,168,50,14
-    CONTROL         "Slow down instead of lag",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | BS_LEFTTEXT | WS_TABSTOP,7,146,98,10
-    CONTROL         "Override instruments with piano",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | BS_LEFTTEXT | WS_TABSTOP,7,156,121,10
+    GROUPBOX        Property5Text1,-1,
+                    Margin,
+                    Margin,
+                    PropertyWindowW + mdMargin,
+                    PropertyWindowH + mdMargin
+
+    CONTROL         Property5Text2,IDC_TICKBASED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    tMargin,
+                    ContentHeight + dMargin,
+                    Property5Text2W+BoxSpacing,
+                    ContentHeight
+
+    CONTROL         Property5Text3,IDC_PITCHBENDS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    tMargin,
+                    dContentHeight + dMargin + hMargin,
+                    Property5Text3W + BoxSpacing,
+                    ContentHeight
+
+    CONTROL         Property5Text4,IDC_STATS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    tMargin,
+                    tContentHeight + tMargin,
+                    Property5Text4W + BoxSpacing,
+                    ContentHeight
+
+    CONTROL         Property5Text5,IDC_MARKERS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    tMargin,
+                    qContentHeight + tMargin + hMargin,
+                    Property5Text5W + BoxSpacing,
+                    ContentHeight
+
+    LTEXT           Property5Text6,-1,
+                    tMargin,
+                    iContentHeight + qMargin + hMargin,
+                    Property5Text6W,
+                    ContentHeight
+
+    COMBOBOX        IDC_MARKERENC,
+                    qMargin + Property5Text6W,
+                    iContentHeight + qMargin,
+                    MarkerEncodingW,
+                    ContentHeight + Margin,
+                    CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+
+    LTEXT           Property5Text7,-1,
+                    tMargin,
+                    xContentHeight + iMargin + hMargin,
+                    Property5Text7W,
+                    ContentHeight
+
+    EDITTEXT        IDC_SPLASHMIDI,
+                    qMargin + Property5Text7W,
+                    xContentHeight + iMargin,
+                    PropertyWindowW - Property5Text7W - Property5Text9W - Property5Text10W + mcMargin + miMargin,
+                    ContentHeight + Margin,
+                    ES_AUTOHSCROLL | ES_READONLY
+
+    PUSHBUTTON      Property5Text9,IDC_SPLASHBROWSE,
+                    PropertyWindowW - Property5Text9W - Property5Text10W + mcMargin,
+                    xContentHeight + iMargin,
+                    Property5Text9W + qMargin,
+                    ContentHeight + Margin,
+
+    PUSHBUTTON      Property5Text10,IDC_SPLASHRESET,
+                    PropertyWindowW - Property5Text10W + mxMargin,
+                    xContentHeight + iMargin,
+                    Property5Text10W + qMargin,
+                    ContentHeight + Margin,
+
+    LTEXT           Property5Text8,-1,
+                    tMargin,
+                    pContentHeight + xMargin + hMargin,
+                    Property5Text8W,
+                    ContentHeight
+
+    EDITTEXT        IDC_BACKGROUND,
+                    qMargin + Property5Text8W,
+                    pContentHeight + xMargin,
+                    PropertyWindowW - Property5Text8W - Property5Text9W - Property5Text10W + mcMargin + miMargin,
+                    ContentHeight + Margin,
+                    ES_AUTOHSCROLL | ES_READONLY
+
+    PUSHBUTTON      Property5Text9,IDC_BACKGROUNDBROWSE
+                    PropertyWindowW - Property5Text9W - Property5Text10W + mcMargin,
+                    pContentHeight + xMargin,
+                    Property5Text9W + qMargin,
+                    ContentHeight + Margin,
+
+    PUSHBUTTON      Property5Text10,IDC_BACKGROUNDRESET,
+                    PropertyWindowW - Property5Text10W + mxMargin,
+                    pContentHeight + xMargin,
+                    Property5Text10W + qMargin,
+                    ContentHeight + Margin,
+
+    CONTROL         Property5Text11,IDC_COLORLOOP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    tMargin,
+                    oContentHeight + pMargin + hMargin,
+                    Property5Text11W + BoxSpacing,
+                    ContentHeight
+
+    CONTROL         Property5Text12,IDC_FFMPEG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    tMargin,
+                    nContentHeight + oMargin,
+                    Property5Text12W + BoxSpacing,
+                    ContentHeight
+
+    CONTROL         Property5Text13,IDC_DISABLEUI,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    tMargin,
+                    cContentHeight + oMargin + hMargin,
+                    Property5Text13W + BoxSpacing,
+                    ContentHeight
+
 END
 
-IDD_PP4_CONTROLS DIALOGEX 0, 0, 300, 150
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CAPTION
-CAPTION "Property Page"
-FONT 8, "Segoe UI", 400, 0, 0x0
+IDD_TRACKSETTINGS DIALOGEX 0,0,TrackWindowW,TrackWindowH
+STYLE AltDialogStyle
+CAPTION TrackWindowTitle
+FONT FontSize,FontName
 BEGIN
-    GROUPBOX        "Control options",IDC_STATIC,4,4,292,62
-    LTEXT           "Left and right arrows skips the song by: ",IDC_STATIC,12,24,136,8
-    EDITTEXT        IDC_LRARROWS,150,22,48,14,ES_AUTOHSCROLL
-    CONTROL         "",IDC_LRARROWSSPIN,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,0,0,14,14
-    LTEXT           "seconds",IDC_STATIC,200,24,28,8
-    LTEXT           "Up and down arrows speeds up the playback by: ",IDC_STATIC,12,46,168,8
-    EDITTEXT        IDC_UDARROWS,182,44,48,14,ES_AUTOHSCROLL
-    CONTROL         "",IDC_UDARROWSSPIN,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,0,0,14,14
-    LTEXT           "percent",IDC_STATIC,232,46,26,8
+
+    LTEXT           TrackText1,-1,
+                    dMargin,
+                    dMargin,
+                    TrackText1W,
+                    ContentHeight
+
+    EDITTEXT        IDC_FILE,
+                    tMargin + TrackAlign,
+                    dMargin,
+                    TrackWindowW - TrackAlign + mqMargin,
+                    ContentHeight,
+                    ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
+
+    LTEXT           TrackText2,-1,
+                    dMargin,
+                    dMargin + ContentHeight,
+                    TrackText2W,
+                    ContentHeight
+
+    EDITTEXT        IDC_FOLDER,
+                    tMargin + TrackAlign,
+                    dMargin + ContentHeight,
+                    TrackWindowW - TrackAlign + mqMargin,
+                    ContentHeight,
+                    ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
+
+    LTEXT           TrackText3,-1,
+                    dMargin,
+                    dMargin + dContentHeight,
+                    TrackText3W,
+                    ContentHeight
+
+    EDITTEXT        IDC_NOTES,
+                    tMargin + TrackAlign,
+                    dMargin + dContentHeight,
+                    TrackWindowW - TrackAlign + mqMargin,
+                    ContentHeight,
+                    ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
+
+    LTEXT           TrackText4,-1,
+                    dMargin,
+                    dMargin + tContentHeight,
+                    TrackText4W,
+                    ContentHeight
+
+    EDITTEXT        IDC_LENGTH,
+                    tMargin + TrackAlign,
+                    dMargin + tContentHeight,
+                    TrackWindowW - TrackAlign + mqMargin,
+                    ContentHeight,
+                    ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
+
+    CONTROL         "",IDC_TRACKS,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,
+                    7,
+                    50,
+                    287,
+                    91
+
+    CONTROL         TrackText5,IDC_NOLAG,"Button",BS_AUTOCHECKBOX | BS_LEFTTEXT | WS_TABSTOP,
+                    7,
+                    146,
+                    98,
+                    10
+
+    CONTROL         TrackText6,IDC_PIANO,"Button",BS_AUTOCHECKBOX | BS_LEFTTEXT | WS_TABSTOP,
+                    7,
+                    156,
+                    121,
+                    10
+
+    DEFPUSHBUTTON   TrackText7,IDOK,
+                    192,
+                    168,
+                    50,
+                    14
+
+    PUSHBUTTON      TrackText8,IDCANCEL,
+                    246,
+                    168,
+                    50,
+                    14
+
 END
 
-IDD_ABOUT DIALOGEX 0, 0, 250, 100
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "About"
-FONT 12, "Arial Rounded MT Bold", 0, 0, 0x1
+IDD_ABOUT DIALOGEX 0,0,AboutWindowW,AboutWindowH
+STYLE AltDialogStyle
+CAPTION AboutWindowTitle
+FONT LargeFontSize,AltFontName
 BEGIN
-    CONTROL         "",-1,"Static",SS_WHITERECT,0,0,0,0
-    LTEXT           "Piano-FX Pro v3.06 | Forked from Piano From Above v1.1.0\n\nContributors list : \nHappy_mimimix(25 %) <-Funny special effects && Final optimization\nanon64(5 %) <-Color events support\nKhangaroo(30 %) <-Performance boost\nBrianPantano(40 %) <-Main program",-1,5,5,240,60,WS_DISABLED | NOT WS_GROUP
-    CONTROL         "",1093,"Static",SS_ETCHEDHORZ | WS_DISABLED,1,70,249,1
-    DEFPUSHBUTTON   "OK",1,185,75,60,20
+    LTEXT           AboutText1,-1,5,5,240,60,WS_DISABLED | NOT WS_GROUP
+    CONTROL         "",-1,"Static",SS_ETCHEDHORZ | WS_DISABLED,1,70,249,1
+    DEFPUSHBUTTON   AboutText2,IDOK,185,75,60,20
 END
 
-IDD_LOADING DIALOGEX 0, 0, 250, 62
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Loading..."
-FONT 8, "Segoe UI", 400, 0, 0x1
+IDD_LOADING DIALOGEX 0,0,LoadingWindowW,LoadingWindowH
+STYLE AltDialogStyle
+CAPTION LoadWindowTitle
+FONT FontSize,FontName
 BEGIN
     CONTROL         "",IDC_LOADINGPROGRESS,"msctls_progress32",WS_BORDER,24,36,204,14
-    LTEXT           "Loading...",IDC_LOADINGDESC,24,12,132,8
+    LTEXT           LoadWindowTitle,IDC_LOADINGDESC,24,12,132,8
     LTEXT           "0 / 0",IDC_LOADINGNUM,24,24,132,8
-    LTEXT           "0 MB used",IDC_MEMUSAGE,156,24,71,8,0,WS_EX_RIGHT
+    LTEXT           "0 MB",IDC_MEMUSAGE,156,24,71,8,0,WS_EX_RIGHT
 END
 
-IDD_SETRESOLUTION DIALOGEX 0, 0, 120, 72
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Set resolution"
-FONT 8, "Segoe UI", 400, 0, 0x1
+IDD_SETRESOLUTION DIALOGEX 0,0,ResolutionWindowW,ResolutionWindowH
+STYLE AltDialogStyle
+CAPTION ResolutionWindowTitle
+FONT FontSize,FontName
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,6,54,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,60,54,50,14
-    LTEXT           "Width:",IDC_STATIC,25,15,22,8
+    LTEXT           ResolutionText1,-1,25,15,ResolutionText1W,FontSize
     EDITTEXT        IDC_WIDTH,52,13,40,14,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "Height:",IDC_STATIC,25,33,24,8
+    LTEXT           ResolutionText2,-1,25,33,ResolutionText2W,FontSize
     EDITTEXT        IDC_HEIGHT,52,31,40,14,ES_AUTOHSCROLL | ES_NUMBER
+    DEFPUSHBUTTON   ResolutionText3,IDOK,6,54,ResolutionText3W,14
+    PUSHBUTTON      ResolutionText4,IDCANCEL,60,54,ResolutionText4W,14
 END
 
 
@@ -213,41 +589,41 @@ END
 
 IDM_MAINMENU MENU
 BEGIN
-    MENUITEM "Open",                        ID_FILE_PRACTICESONGCUSTOM
-    MENUITEM "Close",                       ID_FILE_CLOSEFILE
-    POPUP "Play"
+    MENUITEM MenuText1,ID_FILE_PRACTICE
+    MENUITEM MenuText2,ID_FILE_CLOSEFILE
+    POPUP MenuText3
     BEGIN
-        MENUITEM "Play/Pause\tSpace",           ID_PLAY_PLAYPAUSE
-        MENUITEM "Stop\tEsc",                   ID_PLAY_STOP
-        MENUITEM "Skip Fwd\tRight",             ID_PLAY_SKIPFWD
-        MENUITEM "Skip Back\tLeft",             ID_PLAY_SKIPBACK
+        MENUITEM MenuText4,ID_PLAY_PLAYPAUSE
+        MENUITEM MenuText5,ID_PLAY_STOP
+        MENUITEM MenuText6,ID_PLAY_SKIPFWD
+        MENUITEM MenuText7,ID_PLAY_SKIPBACK
         MENUITEM SEPARATOR
-        MENUITEM "Faster Playback\tCtrl+Down",  ID_PLAY_INCREASERATE
-        MENUITEM "Slower Playback\tCtrl+Up",    ID_PLAY_DECREASERATE
-        MENUITEM "Reset Playback\tCtrl+R",      ID_PLAY_RESETRATE
+        MENUITEM MenuText8,ID_PLAY_INCREASERATE
+        MENUITEM MenuText9,ID_PLAY_DECREASERATE
+        MENUITEM MenuText10,ID_PLAY_RESETRATE
         MENUITEM SEPARATOR
-        MENUITEM "Faster Notes\tShift+Up",      ID_PLAY_NFASTER
-        MENUITEM "Slower Notes\tShift+Down",    ID_PLAY_NSLOWER
-        MENUITEM "Reset Notes\tShift+R",        ID_PLAY_NRESET
+        MENUITEM MenuText11,ID_PLAY_NFASTER
+        MENUITEM MenuText12,ID_PLAY_NSLOWER
+        MENUITEM MenuText13,ID_PLAY_NRESET
         MENUITEM SEPARATOR
-        MENUITEM "Volume Up\tUp",               ID_PLAY_VOLUMEUP
-        MENUITEM "Volume Down\tDown",           ID_PLAY_VOLUMEDOWN
-        MENUITEM "Mute\tCtrl+M",                ID_PLAY_MUTE
+        MENUITEM MenuText14,ID_PLAY_VOLUMEUP
+        MENUITEM MenuText15,ID_PLAY_VOLUMEDOWN
+        MENUITEM MenuText16,ID_PLAY_MUTE
     END
-    POPUP "View"
+    POPUP MenuText17
     BEGIN
-        MENUITEM "Playback Toolbar",            ID_VIEW_CONTROLS, CHECKED
-        MENUITEM "Keyboard",                    ID_VIEW_KEYBOARD, CHECKED
-        MENUITEM "Always On Top",               ID_VIEW_ALWAYSONTOP
-        MENUITEM "Full Screen\tAlt+Enter",      ID_VIEW_FULLSCREEN
-        MENUITEM "Set Window Size\tCtrl+W",     ID_VIEW_SETWINDOWSIZE
-        MENUITEM "Move and Zoom",               ID_VIEW_MOVEANDZOOM
-        MENUITEM "Reset Move and Zoom",         ID_VIEW_RESETMOVEANDZOOM
+        MENUITEM MenuText18,ID_VIEW_CONTROLS,CHECKED
+        MENUITEM MenuText19,ID_VIEW_KEYBOARD,CHECKED
+        MENUITEM MenuText20,ID_VIEW_ALWAYSONTOP
+        MENUITEM MenuText21,ID_VIEW_FULLSCREEN
+        MENUITEM MenuText22,ID_VIEW_SETWINDOWSIZE
+        MENUITEM MenuText23,ID_VIEW_MOVEANDZOOM
+        MENUITEM MenuText24,ID_VIEW_RESETMOVEANDZOOM
     END
-    MENUITEM "Options",                     ID_OPTIONS_PREFERENCES
-    MENUITEM "About",                       ID_HELP_ABOUT
+    MENUITEM MenuText25,ID_OPTIONS_PREFERENCES
+    MENUITEM MenuText26,ID_HELP_ABOUT
     MENUITEM SEPARATOR
-    MENUITEM "Open Piano-FX Studio",        ID_STUDIO
+    MENUITEM MenuText27,ID_STUDIO
 END
 
 
@@ -258,21 +634,21 @@ END
 
 IDA_MAINMENU ACCELERATORS
 BEGIN
-    VK_UP,          ID_PLAY_DECREASERATE,   VIRTKEY, CONTROL, NOINVERT
-    VK_DOWN,        ID_PLAY_INCREASERATE,   VIRTKEY, CONTROL, NOINVERT
-    "M",            ID_PLAY_MUTE,           VIRTKEY, CONTROL, NOINVERT
-    VK_UP,          ID_PLAY_NFASTER,        VIRTKEY, SHIFT, NOINVERT
-    "R",            ID_PLAY_NRESET,         VIRTKEY, SHIFT, NOINVERT
-    VK_DOWN,        ID_PLAY_NSLOWER,        VIRTKEY, SHIFT, NOINVERT
-    VK_SPACE,       ID_PLAY_PLAYPAUSE,      VIRTKEY, NOINVERT
-    "R",            ID_PLAY_RESETRATE,      VIRTKEY, CONTROL, NOINVERT
-    VK_LEFT,        ID_PLAY_SKIPBACK,       VIRTKEY, NOINVERT
-    VK_RIGHT,       ID_PLAY_SKIPFWD,        VIRTKEY, NOINVERT
-    VK_ESCAPE,      ID_PLAY_STOP,           VIRTKEY, NOINVERT
-    VK_DOWN,        ID_PLAY_VOLUMEDOWN,     VIRTKEY, NOINVERT
-    VK_UP,          ID_PLAY_VOLUMEUP,       VIRTKEY, NOINVERT
-    VK_RETURN,      ID_VIEW_FULLSCREEN,     VIRTKEY, ALT, NOINVERT
-    "W",            ID_VIEW_SETWINDOWSIZE,  VIRTKEY, CONTROL, NOINVERT
+    VK_UP,          ID_PLAY_DECREASERATE,   VIRTKEY,CONTROL,NOINVERT
+    VK_DOWN,        ID_PLAY_INCREASERATE,   VIRTKEY,CONTROL,NOINVERT
+    "M",            ID_PLAY_MUTE,           VIRTKEY,CONTROL,NOINVERT
+    VK_UP,          ID_PLAY_NFASTER,        VIRTKEY,SHIFT,NOINVERT
+    "R",            ID_PLAY_NRESET,         VIRTKEY,SHIFT,NOINVERT
+    VK_DOWN,        ID_PLAY_NSLOWER,        VIRTKEY,SHIFT,NOINVERT
+    VK_SPACE,       ID_PLAY_PLAYPAUSE,      VIRTKEY,NOINVERT
+    "R",            ID_PLAY_RESETRATE,      VIRTKEY,CONTROL,NOINVERT
+    VK_LEFT,        ID_PLAY_SKIPBACK,       VIRTKEY,NOINVERT
+    VK_RIGHT,       ID_PLAY_SKIPFWD,        VIRTKEY,NOINVERT
+    VK_ESCAPE,      ID_PLAY_STOP,           VIRTKEY,NOINVERT
+    VK_DOWN,        ID_PLAY_VOLUMEDOWN,     VIRTKEY,NOINVERT
+    VK_UP,          ID_PLAY_VOLUMEUP,       VIRTKEY,NOINVERT
+    VK_RETURN,      ID_VIEW_FULLSCREEN,     VIRTKEY,ALT,NOINVERT
+    "W",            ID_VIEW_SETWINDOWSIZE,  VIRTKEY,CONTROL,NOINVERT
 END
 
 
@@ -293,8 +669,6 @@ IDB_BITMAP2             BITMAP                  "Images\\Tutorial\\TestingImage.
 // Icon
 //
 
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
 IDI_PFAICON             ICON                    "Images\\PFA Icon.ico"
 
 
@@ -304,57 +678,3 @@ IDI_PFAICON             ICON                    "Images\\PFA Icon.ico"
 //
 
 IDR_SPLASHMIDI          MIDI                    "Images\\chase.mid.xz"
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
-BEGIN
-    IDD_PP5_VIZ, DIALOG
-    BEGIN
-    END
-
-    IDD_TRACKSETTINGS, DIALOG
-    BEGIN
-    END
-
-    IDD_ABOUT, DIALOG
-    BEGIN
-    END
-
-    IDD_LOADING, DIALOG
-    BEGIN
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// AFX_DIALOG_LAYOUT
-//
-
-IDD_TRACKSETTINGS AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-#endif    // English (United States) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-
-#ifndef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// Generated from the TEXTINCLUDE 3 resource.
-//
-
-
-/////////////////////////////////////////////////////////////////////////////
-#endif    // not APSTUDIO_INVOKED
-

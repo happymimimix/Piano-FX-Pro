@@ -28,6 +28,7 @@
 
 #include "MainProcs.h"
 #include "resource.h"
+#include "Language.h"
 
 #include "Config.h"
 #include "GameState.h"
@@ -79,6 +80,9 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
     //Debug console
     AllocConsole();
     freopen("CONOUT$", "w", stdout);
+    SetConsoleOutputCP(65001);
+    wcin.imbue(locale("en_US.UTF-8"));
+    wcout.imbue(locale("en_US.UTF-8"));
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     COORD pos;
     CONSOLE_SCREEN_BUFFER_INFO csbi;
@@ -86,14 +90,14 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
     pos.X = 4;
     pos.Y = 2;
     SetConsoleCursorPosition(hConsole, pos);
-    cout << "Welcome to Piano-FX Pro v";
-    cout << VersionString;
-    cout << "\n\n\n";
+    wcout << WelcomeText;
+    wcout << L" v" << VersionString;
+    wcout << L"\n\n\n";
     for (uint8_t i = 0; i < (1 << 6); i++) {
-        cout << "=";
+        wcout << L"=";
     }
-    cout << "\n\n";
-    cout << "Preparing...\n";
+    wcout << L"\n\n";
+    wcout << StartupStage1Text << "\n";
 
     if (__argc == 3) {
         string ARG1 = __argv[1];
@@ -131,7 +135,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += "PhigrosMode=\"" + GetProcessName() + "+" + GetAddress(cViz.bPhigros) + "\"\n";
                 Code += "ShowMarkers=\"" + GetProcessName() + "+" + GetAddress(cViz.bShowMarkers) + "\"\n";
                 Code += "TickBased=\"" + GetProcessName() + "+" + GetAddress(cViz.bTickBased) + "\"\n";
-                Code += "DisableUI=\"" + GetProcessName() + "+" + GetAddress(cViz.bDisableUI) + "\"\n";
+                Code += "HideStatistics=\"" + GetProcessName() + "+" + GetAddress(cViz.bDisableUI) + "\"\n";
                 Code += "LimitFPS=\"" + GetProcessName() + "+" + GetAddress(cVideo.bLimitFPS) + "\"\n";
                 Code += "Caption=\"" + GetProcessName() + "+" + GetAddress(CheatEngineCaption) + "\"\n";
                 Code += "-- Custom Variable Definitions: (Version: " + RVersionString + ")\n";
@@ -287,8 +291,8 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += "function GetTickBased()\n";
                 Code += "return readByte(TickBased)\n";
                 Code += "end\n";
-                Code += "function GetDisableUI()\n";
-                Code += "return readByte(DisableUI)\n";
+                Code += "function GetHideStatistics()\n";
+                Code += "return readByte(HideStatistics)\n";
                 Code += "end\n";
                 Code += "function GetLimitFPS()\n";
                 Code += "return readByte(LimitFPS)\n";
@@ -392,8 +396,8 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += "function SetTickBased(VAL)\n";
                 Code += "writeByte(TickBased,VAL)\n";
                 Code += "end\n";
-                Code += "function SetDisableUI(VAL)\n";
-                Code += "writeByte(DisableUI,VAL)\n";
+                Code += "function SetHideStatistics(VAL)\n";
+                Code += "writeByte(HideStatistics,VAL)\n";
                 Code += "end\n";
                 Code += "function SetLimitFPS(VAL)\n";
                 Code += "writeByte(LimitFPS,VAL)\n";
@@ -2361,7 +2365,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += "SetPhigrosMode(1)\n";
                 Code += "SetShowMarkers(1)\n";
                 Code += "SetTickBased(1)\n";
-                Code += "SetDisableUI(0)\n";
+                Code += "SetHideStatistics(0)\n";
                 Code += "SetLimitFPS(1)\n";
                 Code += "SetCaption(\"Welcome to Piano-FX Pro\")\n";
                 Code += "DisplayShaderFPS=true\n";
@@ -2505,13 +2509,13 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
         delete[] pData;
     }
     else {
-        std::cout << "Embedded ffmpeg.exe data length incorrect! \n";
-        std::cout << "Expected: ";
-        std::cout << ffmpeg_len;
-        std::cout << "\n";
-        std::cout << "Actual: ";
-        std::cout << offset;
-        std::cout << "\n";
+        cout << "Embedded ffmpeg.exe data length incorrect! \n";
+        cout << "Expected: ";
+        cout << ffmpeg_len;
+        cout << "\n";
+        cout << "Actual: ";
+        cout << offset;
+        cout << "\n";
         while (true) {
 
         }
@@ -2570,13 +2574,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
     PlaybackSettings& cPlayback = config.GetPlaybackSettings();
 
     // Create the application window
-#ifdef SOFTWARE_RENDER_ONLY
-    g_hWnd = CreateWindowEx(0, CLASSNAME, L"Piano-FX Pro v" LVersionString " | Made by: happy_mimimix | Now playing: None  (Enforced Software Rendering)", WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, cView.GetMainLeft(), cView.GetMainTop(),
-        cView.GetMainWidth(), cView.GetMainHeight(), NULL, NULL, wc.hInstance, NULL);
-#else
-    g_hWnd = CreateWindowEx(0, CLASSNAME, L"Piano-FX Pro v" LVersionString " | Made by: happy_mimimix | Now playing: None", WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, cView.GetMainLeft(), cView.GetMainTop(),
-        cView.GetMainWidth(), cView.GetMainHeight(), NULL, NULL, wc.hInstance, NULL);
-#endif // SOFTWARE_RENDER_ONLY
+    g_hWnd = CreateWindowEx(0, CLASSNAME, MainWindowTitle1 L" v" LVersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, cView.GetMainLeft(), cView.GetMainTop(),cView.GetMainWidth(), cView.GetMainHeight(), NULL, NULL, wc.hInstance, NULL);
 
     if (!g_hWnd) return 1;
 
@@ -2590,8 +2588,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
     if (!g_hWndBar) return 1;
 
     // Create the graphics window
-    g_hWndGfx = CreateWindowEx(0, GFXCLASSNAME, NULL, WS_CHILD | WS_TABSTOP | WS_CLIPSIBLINGS,
-        0, 0, 0, 0, g_hWnd, NULL, wc.hInstance, NULL);
+    g_hWndGfx = CreateWindowEx(0, GFXCLASSNAME, NULL, WS_CHILD | WS_TABSTOP | WS_CLIPSIBLINGS, 0, 0, 0, 0, g_hWnd, NULL, wc.hInstance, NULL);
     if (!g_hWndGfx) return 1;
 
     HACCEL hAccel = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDA_MAINMENU));
@@ -2617,7 +2614,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
         PlayFile(sFilename);
     }
     else {
-        cout << "Loading splash midi...\n";
+        wcout << StartupStage2Text << "\n";
         // Get the game going
         hThread = CreateThread(NULL, 0, GameThread, new SplashScreen(NULL, NULL, true), 0, NULL);
         if (!hThread) return 1;
@@ -2631,7 +2628,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
         SetFocus(g_hWndGfx);
         cPlayback.SetPaused(false, false);
     }
-    cout << "Let's go! \n";
+    wcout << StartupStage3Text << "\n";
 
     // Enter the message loop
     MSG msg = {};
@@ -2681,13 +2678,8 @@ DWORD WINAPI GameThread(LPVOID lpParameter)
     pGameState->Init();
     GameState::GameError ge;
 
-    // Put the adapter in the window title
     wchar_t buf[1 << 10] = {};
-#ifdef SOFTWARE_RENDER_ONLY
-    _snwprintf_s(buf, 1 << 10, L"Piano-FX Pro v" LVersionString L" | Made by: happy_mimimix | Now playing: Splash MIDI  (Enforced Software Rendering)");
-#else
-    _snwprintf_s(buf, 1 << 10, L"Piano-FX Pro v" LVersionString L" | Made by: happy_mimimix | Now playing: Splash MIDI");
-#endif
+    _snwprintf_s(buf, 1 << 10, MainWindowTitle1 L" v" LVersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle6 MainWindowTitle7);
     SetWindowTextW(g_hWnd, buf);
 
     // Event, logic, render...

@@ -17,14 +17,15 @@
 #include "MainProcs.h"
 #include "Globals.h"
 #include "resource.h"
+#include "Language.h"
 
 #include "GameState.h"
 
 VOID DoPreferences( HWND hWndOwner )
 {
     int pDialogs[] = { IDD_PP1_VISUAL, IDD_PP2_AUDIO, IDD_PP3_VIDEO, IDD_PP4_CONTROLS, IDD_PP5_VIZ };
-    DLGPROC pProcs[] = { VisualProc, AudioProc, VideoProc, ControlsProc, VizProc };
-    LPCWSTR pTitles[] = { TEXT( "Video" ), TEXT( "Audio" ), TEXT( "Render" ), TEXT( "Control" ), TEXT( "Other" ) };
+    DLGPROC pProcs[] = {VisualProc, AudioProc, VideoProc, ControlsProc, VizProc};
+    LPCWSTR pTitles[] = {Property1Title, Property2Title, Property3Title, Property4Title, Property5Title};
     PROPSHEETPAGE psp[sizeof(pDialogs) / sizeof(int)];
     PROPSHEETHEADER psh;
 
@@ -45,7 +46,7 @@ VOID DoPreferences( HWND hWndOwner )
     psh.hwndParent = hWndOwner;
     psh.hInstance = g_hInstance;
     psh.pszIcon = NULL;
-    psh.pszCaption = TEXT( "Preferences" );
+    psh.pszCaption = PropertyWindowTitle;
     psh.nPages = sizeof( psp ) / sizeof( PROPSHEETPAGE );
     psh.nStartPage = 0;
     psh.ppsp = (LPCPROPSHEETPAGE) &psp;
@@ -691,15 +692,15 @@ INT_PTR WINAPI TracksProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
             SendMessage( hWndTracks, LVM_GETITEMRECT, 0, ( LPARAM )&rcItem );
 
             if (Config::GetConfig().GetVizSettings().bDumpFrames) {
-                SendMessage(GetDlgItem(hWnd, IDC_CHECK1), BM_SETCHECK, BST_CHECKED, 0);
-                EnableWindow(GetDlgItem(hWnd, IDC_CHECK1), FALSE);
+                SendMessage(GetDlgItem(hWnd, IDC_NOLAG), BM_SETCHECK, BST_CHECKED, 0);
+                EnableWindow(GetDlgItem(hWnd, IDC_NOLAG), FALSE);
             }
             else {
-                SendMessage(GetDlgItem(hWnd, IDC_CHECK1), BM_SETCHECK, BST_UNCHECKED, 0);
-                EnableWindow(GetDlgItem(hWnd, IDC_CHECK1), TRUE);
+                SendMessage(GetDlgItem(hWnd, IDC_NOLAG), BM_SETCHECK, BST_UNCHECKED, 0);
+                EnableWindow(GetDlgItem(hWnd, IDC_NOLAG), TRUE);
             }
-            SendMessage(GetDlgItem(hWnd, IDC_CHECK2), BM_SETCHECK, BST_UNCHECKED, 0);
-            EnableWindow(GetDlgItem(hWnd, IDC_CHECK2), TRUE);
+            SendMessage(GetDlgItem(hWnd, IDC_PIANO), BM_SETCHECK, BST_UNCHECKED, 0);
+            EnableWindow(GetDlgItem(hWnd, IDC_PIANO), TRUE);
 
             return TRUE;
         }
@@ -859,8 +860,8 @@ INT_PTR WINAPI TracksProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                     MainScreen *pGameState = ( MainScreen* )GetWindowLongPtr( hWnd, GWLP_USERDATA );
                     pGameState->SetChannelSettings( vMuted, vHidden, vColors );
 
-                    Config::GetConfig().m_bManualTimer = IsDlgButtonChecked(hWnd, IDC_CHECK1);
-                    Config::GetConfig().m_bPianoOverride = IsDlgButtonChecked(hWnd, IDC_CHECK2);
+                    Config::GetConfig().m_bManualTimer = IsDlgButtonChecked(hWnd, IDC_NOLAG);
+                    Config::GetConfig().m_bPianoOverride = IsDlgButtonChecked(hWnd, IDC_PIANO);
                 }
                 case IDCANCEL:
                     EndDialog( hWnd, iId );

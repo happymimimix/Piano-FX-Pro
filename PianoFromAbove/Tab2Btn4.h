@@ -87,7 +87,7 @@ void Tab2::SubViewBtn4::Open() {
     AnimationTarget1.AddItem(L"PhigrosMode");
     AnimationTarget1.AddItem(L"ShowMarkers");
     AnimationTarget1.AddItem(L"TickBased");
-    AnimationTarget1.AddItem(L"DisableUI");
+    AnimationTarget1.AddItem(L"HideStatistics");
     AnimationTarget1.AddItem(L"LimitFPS");
     AnimationTarget1.AddItem(L"Caption");
     AnimationTarget1.SetSelection(0);

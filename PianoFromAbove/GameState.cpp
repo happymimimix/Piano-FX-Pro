@@ -17,6 +17,7 @@
 #include "GameState.h"
 #include "Config.h"
 #include "resource.h"
+#include "Language.h"
 #include "ConfigProcs.h"
 #include <d3d9types.h>
 #include "lzma.h"
@@ -2447,119 +2448,119 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
 
     polyFormatted = std::to_string(polyphony);
 
-    for (int i = polyFormatted.length() - 3; i > 0; i -= 3)
+    for (int i = polyFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
         polyFormatted.insert(i, ",");
 
     long long nps = std::distance(upper_bound(m_vNoteOns.begin(), m_vNoteOns.end(), pair< long long, int >(m_llStartTime - 1000000, m_vEvents.size())), upper_bound(m_vNoteOns.begin(), m_vNoteOns.end(), pair< long long, int >(m_llStartTime, m_vEvents.size())));
     
     npsFormatted = std::to_string(nps);
 
-    for (int i = npsFormatted.length() - 3; i > 0; i -= 3)
+    for (int i = npsFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
         npsFormatted.insert(i, ",");
 
     passed = std::distance(m_vNoteOns.begin(), upper_bound(m_vNoteOns.begin(), m_vNoteOns.end(), pair< long long, int >(m_llStartTime, m_vEvents.size())));
 
     passedFormatted = std::to_string(passed);
 
-    for (int i = passedFormatted.length() - 3; i > 0; i -= 3)
+    for (int i = passedFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
         passedFormatted.insert(i, ",");
 
-    RenderStatusLine(cur_line++,"Piano-FX Pro", ("v" + RVersionString).c_str());
-    RenderStatusLine(cur_line++,"Made by: happy_mimimix", "");
+    RenderStatusLine(cur_line++, StatisticsText1, ("v" + RVersionString).c_str());
+    RenderStatusLine(cur_line++, StatisticsText2, "");
     RenderStatusLine(cur_line++,"", "");
-    RenderStatusLine(cur_line++, "Time:", "%s%lld:%02d.%d / %lld:%02d.%d",
+    RenderStatusLine(cur_line++, StatisticsText3, "%s%lld:%02d.%d / %lld:%02d.%d",
         m_llStartTime >= 0 ? "" : "-",
         min, sec, cs,
         tmin, tsec, tcs);
-    RenderStatusLine(cur_line++, "Tick:", "%d/%d", m_iStartTick, mInfo.iDivision);
+    RenderStatusLine(cur_line++, StatisticsText4, "%d/%d", m_iStartTick, mInfo.iDivision);
     if (m_bDebug) {
-        RenderStatusLine(cur_line++, "Microseconds:", llStartTimeFormatted.c_str());
+        RenderStatusLine(cur_line++, StatisticsText5, llStartTimeFormatted.c_str());
     }
     if (!cViz.bDumpFrames) {
-        RenderStatusLine(cur_line++, "FPS:", "%.2lf", m_dFPS);
+        RenderStatusLine(cur_line++, StatisticsText6, "%.2lf", m_dFPS);
     }
-    RenderStatusLine(cur_line++, "Tempo:", "%.3lf bpm", tempo);
+    RenderStatusLine(cur_line++, StatisticsText7, "%.3lf bpm", tempo);
     if (cViz.bPhigros) {
-        RenderStatusLine(cur_line++,"Combo:", passedFormatted.c_str());
-        RenderStatusLine(cur_line++,"ClicksPerSecond:", npsFormatted.c_str());
-        RenderStatusLine(cur_line++,"Simultaneity:", polyFormatted.c_str());
+        RenderStatusLine(cur_line++, StatisticsText8, passedFormatted.c_str());
+        RenderStatusLine(cur_line++, StatisticsText9, npsFormatted.c_str());
+        RenderStatusLine(cur_line++, StatisticsText10, polyFormatted.c_str());
     }
     else {
-        RenderStatusLine(cur_line++,"Notes:", passedFormatted.c_str());
-        RenderStatusLine(cur_line++,"NotesPerSecond:", npsFormatted.c_str());
-        RenderStatusLine(cur_line++,"Polyphony:", polyFormatted.c_str());
+        RenderStatusLine(cur_line++, StatisticsText11, passedFormatted.c_str());
+        RenderStatusLine(cur_line++, StatisticsText12, npsFormatted.c_str());
+        RenderStatusLine(cur_line++, StatisticsText13, polyFormatted.c_str());
     }
     if (m_bDebug) {
-        RenderStatusLine(cur_line++,"Rendered:", "%lld", m_pRenderer->GetRenderedNotesCount());
+        RenderStatusLine(cur_line++, StatisticsText14, "%lld", m_pRenderer->GetRenderedNotesCount());
         if (m_bMute) {
-            RenderStatusLine(cur_line++, "Volume:", "MUTED");
+            RenderStatusLine(cur_line++, StatisticsText15, StatisticsText16);
         }else{
-            RenderStatusLine(cur_line++, "Volume:", "%.0lf%%", cPlayback.GetVolume() * 100);
+            RenderStatusLine(cur_line++, StatisticsText15, "%.0lf%%", cPlayback.GetVolume() * 100);
         }
     }
     if (cViz.bDumpFrames) {
         if (m_bDebug) {
-            RenderStatusLine(cur_line++, "PlaybackSpeed:", "%.0lf%%", cPlayback.GetSpeed() * 100);
+            RenderStatusLine(cur_line++, StatisticsText17, "%.0lf%%", cPlayback.GetSpeed() * 100);
         }
     }
     else {
         if (m_bDebug) {
             if (m_Timer.m_bManualTimer) {
-                RenderStatusLine(cur_line++, "PlaybackSpeed:", "%.0lf%%", cPlayback.GetSpeed() * (m_dFPS / m_Timer.m_dFramerate) * 100);
+                RenderStatusLine(cur_line++, StatisticsText17, "%.0lf%%", cPlayback.GetSpeed() * (m_dFPS / m_Timer.m_dFramerate) * 100);
             }
             else {
-                RenderStatusLine(cur_line++, "PlaybackSpeed:", "%.0lf%%", cPlayback.GetSpeed() * 100);
+                RenderStatusLine(cur_line++, StatisticsText17, "%.0lf%%", cPlayback.GetSpeed() * 100);
             }
         }
         else {
             if (m_Timer.m_bManualTimer) {
-                RenderStatusLine(cur_line++, "PlaybackSpeed:", "%.0lf%%", (m_dFPS / m_Timer.m_dFramerate) * 100);
+                RenderStatusLine(cur_line++, StatisticsText17, "%.0lf%%", (m_dFPS / m_Timer.m_dFramerate) * 100);
             }
         }
     }
     if (m_bDebug) {
-        RenderStatusLine(cur_line++,"NoteSpeed:", "%f", cPlayback.GetNSpeed());
-        RenderStatusLine(cur_line++,"Offset-X:", "%f", cView.GetOffsetX() + m_fTempOffsetX);
-        RenderStatusLine(cur_line++,"Offset-Y:", "%f", cView.GetOffsetY() + m_fTempOffsetY);
-        RenderStatusLine(cur_line++,"Zoom:", "%f", cView.GetZoomX() * m_fTempZoomX);
-        RenderStatusLine(cur_line++,"WindowSize:", "%d*%d", width, height);
-        RenderStatusLine(cur_line++,"KeyRange:", "%d~%d", m_bFlipKeyboard ? m_iEndNote : m_iStartNote, m_bFlipKeyboard ? m_iStartNote : m_iEndNote);
+        RenderStatusLine(cur_line++, StatisticsText18, "%f", cPlayback.GetNSpeed());
+        RenderStatusLine(cur_line++, StatisticsText19, "%f", cView.GetOffsetX() + m_fTempOffsetX);
+        RenderStatusLine(cur_line++, StatisticsText20, "%f", cView.GetOffsetY() + m_fTempOffsetY);
+        RenderStatusLine(cur_line++, StatisticsText21, "%f", cView.GetZoomX() * m_fTempZoomX);
+        RenderStatusLine(cur_line++, StatisticsText22, "%d*%d", width, height);
+        RenderStatusLine(cur_line++, StatisticsText23, "%d~%d", m_bFlipKeyboard ? m_iEndNote : m_iStartNote, m_bFlipKeyboard ? m_iStartNote : m_iEndNote);
     }
     if (cViz.bPhigros) {
-        RenderStatusLine(cur_line++, "Score:", "%07.0f", (passed == static_cast<long long>(mInfo.iNoteCount) ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(mInfo.iNoteCount) * 1000000)));
-             if (mInfo.iNoteCount < 100000) {RenderStatusLine(cur_line++,"Level:", "EZ Lv.1");}
-        else if (mInfo.iNoteCount < 200000) {RenderStatusLine(cur_line++,"Level:", "EZ Lv.2");}
-        else if (mInfo.iNoteCount < 400000) {RenderStatusLine(cur_line++,"Level:", "EZ Lv.3");}
-        else if (mInfo.iNoteCount < 600000) {RenderStatusLine(cur_line++,"Level:", "EZ Lv.4");}
-        else if (mInfo.iNoteCount < 800000) {RenderStatusLine(cur_line++,"Level:", "EZ Lv.5");}
-        else if (mInfo.iNoteCount < 1000000) {RenderStatusLine(cur_line++,"Level:", "HD Lv.6");}
-        else if (mInfo.iNoteCount < 2000000) {RenderStatusLine(cur_line++,"Level:", "HD Lv.7");}
-        else if (mInfo.iNoteCount < 4000000) {RenderStatusLine(cur_line++,"Level:", "HD Lv.8");}
-        else if (mInfo.iNoteCount < 6000000) {RenderStatusLine(cur_line++,"Level:", "HD Lv.9");}
-        else if (mInfo.iNoteCount < 8000000) {RenderStatusLine(cur_line++,"Level:", "HD Lv.10");}
-        else if (mInfo.iNoteCount < 10000000) {RenderStatusLine(cur_line++,"Level:", "IN Lv.11");}
-        else if (mInfo.iNoteCount < 20000000) {RenderStatusLine(cur_line++,"Level:", "IN Lv.12");}
-        else if (mInfo.iNoteCount < 40000000) {RenderStatusLine(cur_line++,"Level:", "IN Lv.13");}
-        else if (mInfo.iNoteCount < 60000000) {RenderStatusLine(cur_line++,"Level:", "IN Lv.14");}
-        else if (mInfo.iNoteCount < 80000000) {RenderStatusLine(cur_line++,"Level:", "IN Lv.15");}
-        else if (mInfo.iNoteCount < 100000000) {RenderStatusLine(cur_line++,"Level:", "AT Lv.16");}
-        else if (mInfo.iNoteCount < 200000000) {RenderStatusLine(cur_line++,"Level:", "AT Lv.17");}
-        else if (mInfo.iNoteCount < 400000000) {RenderStatusLine(cur_line++,"Level:", "AT Lv.18");}
-        else {RenderStatusLine(cur_line++,"Level:", "SP Lv.?");}
-        RenderStatusLine(cur_line++, "AutoPlay:", "ON ");
+        RenderStatusLine(cur_line++, StatisticsText24, "%07.0f", (passed == static_cast<long long>(mInfo.iNoteCount) ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(mInfo.iNoteCount) * 1000000)));
+             if (mInfo.iNoteCount < 100000) {RenderStatusLine(cur_line++,StatisticsText25, "EZ Lv.1");}
+        else if (mInfo.iNoteCount < 200000) {RenderStatusLine(cur_line++,StatisticsText25, "EZ Lv.2");}
+        else if (mInfo.iNoteCount < 400000) {RenderStatusLine(cur_line++,StatisticsText25, "EZ Lv.3");}
+        else if (mInfo.iNoteCount < 600000) {RenderStatusLine(cur_line++,StatisticsText25, "EZ Lv.4");}
+        else if (mInfo.iNoteCount < 800000) {RenderStatusLine(cur_line++,StatisticsText25, "EZ Lv.5");}
+        else if (mInfo.iNoteCount < 1000000) {RenderStatusLine(cur_line++,StatisticsText25, "HD Lv.6");}
+        else if (mInfo.iNoteCount < 2000000) {RenderStatusLine(cur_line++,StatisticsText25, "HD Lv.7");}
+        else if (mInfo.iNoteCount < 4000000) {RenderStatusLine(cur_line++,StatisticsText25, "HD Lv.8");}
+        else if (mInfo.iNoteCount < 6000000) {RenderStatusLine(cur_line++,StatisticsText25, "HD Lv.9");}
+        else if (mInfo.iNoteCount < 8000000) {RenderStatusLine(cur_line++,StatisticsText25, "HD Lv.10");}
+        else if (mInfo.iNoteCount < 10000000) {RenderStatusLine(cur_line++,StatisticsText25, "IN Lv.11");}
+        else if (mInfo.iNoteCount < 20000000) {RenderStatusLine(cur_line++,StatisticsText25, "IN Lv.12");}
+        else if (mInfo.iNoteCount < 40000000) {RenderStatusLine(cur_line++,StatisticsText25, "IN Lv.13");}
+        else if (mInfo.iNoteCount < 60000000) {RenderStatusLine(cur_line++,StatisticsText25, "IN Lv.14");}
+        else if (mInfo.iNoteCount < 80000000) {RenderStatusLine(cur_line++,StatisticsText25, "IN Lv.15");}
+        else if (mInfo.iNoteCount < 100000000) {RenderStatusLine(cur_line++,StatisticsText25, "AT Lv.16");}
+        else if (mInfo.iNoteCount < 200000000) {RenderStatusLine(cur_line++,StatisticsText25, "AT Lv.17");}
+        else if (mInfo.iNoteCount < 400000000) {RenderStatusLine(cur_line++,StatisticsText25, "AT Lv.18");}
+        else {RenderStatusLine(cur_line++,StatisticsText25, "SP Lv.?");}
+        RenderStatusLine(cur_line++, StatisticsText26, StatisticsText27);
         if (static_cast<float>(passed == mInfo.iNoteCount ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(mInfo.iNoteCount) * 1000000)) == static_cast<float>(1000000)) {
-            RenderStatusLine(cur_line++, "FULL COMBO!!! ", "");
+            RenderStatusLine(cur_line++, StatisticsText28, "");
         }
         else if (static_cast<float>(passed == mInfo.iNoteCount ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(mInfo.iNoteCount) * 1000000)) < static_cast<float>(1000000)) {
             if (!cPlayback.GetPaused()) {
-                RenderStatusLine(cur_line++, "Deomonstration in progress... ", "");
+                RenderStatusLine(cur_line++, StatisticsText29, "");
             }
             else {
-                RenderStatusLine(cur_line++, "Game paused... ", "");
+                RenderStatusLine(cur_line++, StatisticsText30, "");
             }
         }
         else if (static_cast<float>(passed == mInfo.iNoteCount ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(mInfo.iNoteCount) * 1000000)) > static_cast<float>(1000000)) {
-            RenderStatusLine(cur_line++, "ERROR: Score overflow! ", "");
+            RenderStatusLine(cur_line++, StatisticsText31, "");
         }
     }
     if (FrameCount % (1<<4) == 0) {
@@ -2703,7 +2704,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    DisableUI: " << cViz.bDisableUI << " (Byte +" + GetAddress(cViz.bDisableUI) + ") [Read / Write]";
+        cout << "    HideStatistics: " << cViz.bDisableUI << " (Byte +" + GetAddress(cViz.bDisableUI) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);

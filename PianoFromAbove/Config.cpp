@@ -39,7 +39,7 @@ string Config::GetFolder()
         return string();
 
     strcat_s( sAppData, "\\" );
-    strcat_s( sAppData, "Piano From Above" );
+    strcat_s( sAppData, APPNAME );
     if ( GetFileAttributesA( sAppData ) == INVALID_FILE_ATTRIBUTES )
         if ( !CreateDirectoryA( sAppData, NULL ) )
             return string();
