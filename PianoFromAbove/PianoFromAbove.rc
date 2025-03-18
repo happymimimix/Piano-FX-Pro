@@ -54,7 +54,7 @@ BEGIN
                     qMargin + Property1Text4W + BoxSpacing + KeySelectW,
                     tContentHeight + tMargin,
                     Property1Text5W,
-                    ContentHeight,
+                    FontSize,
                     WS_DISABLED
 
     COMBOBOX        IDC_LASTKEY,
