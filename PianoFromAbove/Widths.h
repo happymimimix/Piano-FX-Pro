@@ -1,6 +1,6 @@
 ﻿#ifdef ENG
 #define MainWindowTitle1W 44
-#define MainWindowTitle2W 82
+#define MainWindowTitle2W 99
 #define MainWindowTitle3W 45
 #define MainWindowTitle4W 54
 #define MainWindowTitle5W 19
@@ -15,7 +15,7 @@
 #define StartupStage2TextW 73
 #define StartupStage3TextW 29
 #define StatisticsText1W 44
-#define StatisticsText2W 82
+#define StatisticsText2W 99
 #define StatisticsText3W 22
 #define StatisticsText4W 18
 #define StatisticsText5W 48
@@ -133,7 +133,7 @@
 #endif
 #ifdef CHN
 #define MainWindowTitle1W 50
-#define MainWindowTitle2W 70
+#define MainWindowTitle2W 77
 #define MainWindowTitle3W 34
 #define MainWindowTitle4W 34
 #define MainWindowTitle5W 9
@@ -148,7 +148,7 @@
 #define StartupStage2TextW 58
 #define StartupStage3TextW 51
 #define StatisticsText1W 50
-#define StatisticsText2W 70
+#define StatisticsText2W 77
 #define StatisticsText3W 16
 #define StatisticsText4W 18
 #define StatisticsText5W 20
@@ -266,7 +266,7 @@
 #endif
 #ifdef ARN
 #define MainWindowTitle1W 50
-#define MainWindowTitle2W 70
+#define MainWindowTitle2W 77
 #define MainWindowTitle3W 34
 #define MainWindowTitle4W 34
 #define MainWindowTitle5W 9
@@ -281,7 +281,7 @@
 #define StartupStage2TextW 58
 #define StartupStage3TextW 51
 #define StatisticsText1W 50
-#define StatisticsText2W 70
+#define StatisticsText2W 77
 #define StatisticsText3W 16
 #define StatisticsText4W 18
 #define StatisticsText5W 20

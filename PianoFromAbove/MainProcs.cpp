@@ -540,7 +540,7 @@ LRESULT WINAPI BarProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 HWND CreateRebar( HWND hWndOwner )
 {
     // Create the Rebar. Just houses the toolbar.
-    HWND hWndRebar = CreateWindowEx( WS_EX_CONTROLPARENT, REBARCLASSNAME, NULL, WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CCS_NODIVIDER | RBS_VARHEIGHT, 0, 0, 0, 0, hWndOwner, ( HMENU )IDC_TOPREBAR, g_hInstance, NULL );
+    HWND hWndRebar = CreateWindowEx( WS_EX_CONTROLPARENT, REBARCLASSNAME, NULL, WS_CHILD | WS_DLGFRAME | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CCS_NODIVIDER | RBS_VARHEIGHT, 0, 0, 0, 0, hWndOwner, ( HMENU )IDC_TOPREBAR, g_hInstance, NULL );
     if( !hWndRebar ) return NULL;
 
     // Create the system font
@@ -564,26 +564,35 @@ HWND CreateRebar( HWND hWndOwner )
     ReleaseDC(hWndOwner, hDC);
 
     // Create and load the button icons
-    HIMAGELIST hIml = ImageList_LoadImage( g_hInstance, MAKEINTRESOURCE( IDB_MEDIAICONSSMALL ), 16, 20, RGB( 255, 255, 0), IMAGE_BITMAP, LR_CREATEDIBSECTION );
+    HIMAGELIST hIml = ImageList_LoadImage( g_hInstance, MAKEINTRESOURCE( IDB_MEDIAICONSSMALL ), 1<<4, (1<<4)+(1<<2), RGB( 255, 255, 0), IMAGE_BITMAP, LR_CREATEDIBSECTION );
 
     // Create the toolbar. Houses custom controls too. Don't want multiple rebar brands because you lose too much control
     HWND hWndToolbar = CreateWindowEx( WS_EX_CONTROLPARENT, TOOLBARCLASSNAME, NULL, WS_CHILD | WS_TABSTOP | CCS_NODIVIDER | CCS_NOPARENTALIGN | CCS_NORESIZE | TBSTYLE_FLAT | TBSTYLE_LIST | TBSTYLE_TOOLTIPS, 0, 0, 0, 0, hWndRebar, ( HMENU )IDC_TOPTOOLBAR, g_hInstance, NULL);
     if (hWndToolbar == NULL)
         return NULL;
 
-    TBBUTTON tbButtons[11] = 
+#define hWndVolumePlaceholder 999
+#define hWndSpeedPlaceholder 998
+#define hWndNSpeedPlaceholder 997
+
+    TBBUTTON tbButtons[1<<4] =
     {
-        { MAKELONG(0, 0), ID_PLAY_PLAY, 0, BTNS_BUTTON, {0}, 0, ( INT_PTR )TEXT( "Play" ) },
-        { MAKELONG(1, 0), ID_PLAY_PAUSE, 0, BTNS_BUTTON, {0}, 0, ( INT_PTR )TEXT( "Pause" ) },
-        { MAKELONG(2, 0), ID_PLAY_STOP, 0, BTNS_BUTTON, {0}, 0, ( INT_PTR )TEXT( "Stop" ) },
+        { MAKELONG(0, 0), ID_PLAY_PLAY, TBSTATE_ENABLED, BTNS_BUTTON, {0}, 0, (INT_PTR)TEXT("Play") },
+        { MAKELONG(1, 0), ID_PLAY_PAUSE, TBSTATE_ENABLED, BTNS_BUTTON, {0}, 0, (INT_PTR)TEXT("Pause") },
+        { MAKELONG(2, 0), ID_PLAY_STOP, TBSTATE_ENABLED, BTNS_BUTTON, {0}, 0, (INT_PTR)TEXT("Stop") },
         { 0, 0, TBSTATE_ENABLED, BTNS_SEP, {0}, 0, NULL },
-        { MAKELONG(3, 0), ID_PLAY_SKIPBACK, 0, BTNS_BUTTON, {0}, 0, ( INT_PTR )TEXT( "Skip Back" ) },
-        { MAKELONG(4, 0), ID_PLAY_SKIPFWD, 0, BTNS_BUTTON, {0}, 0, ( INT_PTR )TEXT( "Skip Fwd" ) },
+        { MAKELONG(3, 0), ID_PLAY_SKIPBACK, TBSTATE_ENABLED, BTNS_BUTTON, {0}, 0, (INT_PTR)TEXT("Skip Back") },
+        { MAKELONG(4, 0), ID_PLAY_SKIPFWD, TBSTATE_ENABLED, BTNS_BUTTON, {0}, 0, (INT_PTR)TEXT("Skip Fwd") },
         { 0, 0, TBSTATE_ENABLED, BTNS_SEP, {0}, 0, NULL },
-        { MAKELONG(5, 0), ID_PLAY_MUTE, TBSTATE_ENABLED, BTNS_BUTTON, {0}, 0, ( INT_PTR )TEXT( "Mute" ) },
-        { I_IMAGENONE, 0, 0, BTNS_BUTTON | BTNS_NOPREFIX, {0}, 0, NULL },
+        { MAKELONG(5, 0), ID_PLAY_MUTE, TBSTATE_ENABLED, BTNS_BUTTON, {0}, 0, (INT_PTR)TEXT("Mute") },
+        { I_IMAGENONE, hWndVolumePlaceholder, 0, BTNS_BUTTON, {0}, 0, NULL },
         { 0, 0, TBSTATE_ENABLED, BTNS_SEP, {0}, 0, NULL },
-        { I_IMAGENONE, 11, TBSTATE_ENABLED, BTNS_BUTTON | BTNS_SHOWTEXT, {0}, 0, (INT_PTR)TEXT("tytyty") }
+        { MAKELONG(7, 0), ID_PLAY_RESETRATE, TBSTATE_ENABLED, BTNS_BUTTON, {0}, 0, (INT_PTR)TEXT("Reset Playback Speed") },
+        { I_IMAGENONE, hWndSpeedPlaceholder, 0, BTNS_BUTTON, {0}, 0, NULL },
+        { 0, 0, TBSTATE_ENABLED, BTNS_SEP, {0}, 0, NULL },
+        { MAKELONG(8, 0), ID_PLAY_NRESET, TBSTATE_ENABLED, BTNS_BUTTON, {0}, 0, (INT_PTR)TEXT("Reset Note Speed") },
+        { I_IMAGENONE, hWndNSpeedPlaceholder, 0, BTNS_BUTTON, {0}, 0, NULL },
+        { 0, 0, TBSTATE_ENABLED, BTNS_SEP, {0}, 0, NULL }
     };
 
     // First add the toolbar buttons
@@ -592,48 +601,37 @@ HWND CreateRebar( HWND hWndOwner )
     SendMessage( hWndToolbar, TB_SETMAXTEXTROWS, 0, 0 );
     SendMessage( hWndToolbar, TB_BUTTONSTRUCTSIZE, sizeof( TBBUTTON ), 0 );
     SendMessage( hWndToolbar, TB_ADDBUTTONS, sizeof( tbButtons ) / sizeof( TBBUTTON ), ( LPARAM )&tbButtons );
-    //SendMessage( hWndToolbar, TB_SETBUTTONSIZE, 0, MAKELONG( 32, 32 ) );
-    TBBUTTONINFO tbi = { sizeof(TBBUTTONINFO) };
-    tbi.dwMask = TBIF_SIZE;
-    tbi.cx = 200;  // 200px width
-    SendMessage(hWndToolbar, TB_SETBUTTONINFO, 8, (LPARAM)&tbi);
-    SendMessage(hWndToolbar, TB_AUTOSIZE, 0, 0);
+    SendMessage( hWndToolbar, TB_SETBUTTONSIZE, 0, MAKELONG(1 << 5, 1 << 5) );
+    TBBUTTONINFO tbbi = { sizeof(TBBUTTONINFO) };
+    tbbi.dwMask = TBIF_SIZE;
+    tbbi.cx = 100;
+    SendMessage(hWndToolbar, TB_SETBUTTONINFO, hWndVolumePlaceholder, (LPARAM)&tbbi);
+    SendMessage(hWndToolbar, TB_SETBUTTONINFO, hWndSpeedPlaceholder, (LPARAM)&tbbi);
+    SendMessage(hWndToolbar, TB_SETBUTTONINFO, hWndNSpeedPlaceholder, (LPARAM)&tbbi);
 
-#define WS_VISIBLE       0x00000000L
+    RECT SliderPos;
     // Now add the other controls
-    HWND hWndVolume = CreateWindowEx( 0, TRACKBAR_CLASS, NULL, WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS, 4*32, 2, 75, 26, hWndToolbar, ( HMENU )IDC_VOLUME, g_hInstance, NULL );
+    SendMessage(hWndToolbar, TB_GETITEMRECT, 8, (LPARAM)&SliderPos);
+    HWND hWndVolume = CreateWindowEx( 0, TRACKBAR_CLASS, NULL, WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_BOTH | TBS_NOTICKS, SliderPos.left, SliderPos.top + 4, SliderPos.right - SliderPos.left, SliderPos.bottom - SliderPos.top - 4, hWndToolbar, ( HMENU )IDC_VOLUME, g_hInstance, NULL );
     SendMessage( hWndVolume, TBM_SETRANGE, FALSE, MAKELONG( 0, 100 ) );
     SendMessage( hWndVolume, TBM_SETLINESIZE, 0, 5 ); 
 
-    HWND hWndStatic1 = CreateWindowEx( 0, WC_STATIC, NULL, WS_CHILD | WS_VISIBLE | SS_BLACKFRAME,
-                                       288, 2, 1, 25, hWndToolbar, NULL, g_hInstance, NULL );
-    HWND hWndStatic2 = CreateWindowEx( 0, WC_STATIC, NULL, WS_CHILD | WS_VISIBLE | SS_WHITEFRAME,
-                                       289, 2, 1, 25, hWndToolbar, NULL, g_hInstance, NULL );
-
-    HWND hWndStatic3 = CreateWindowEx( 0, WC_STATIC, TEXT( "Playback:" ), WS_CHILD | WS_VISIBLE | SS_LEFT,
-                                       297, 8, 44, 13, hWndToolbar, NULL, g_hInstance, NULL );
-    HWND hWndSpeed = CreateWindowEx( 0, TRACKBAR_CLASS, NULL, WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_BOTH | TBS_NOTICKS,
-                                     342, 2, 100, 26, hWndToolbar, ( HMENU )IDC_SPEED, g_hInstance, NULL );
+    SendMessage(hWndToolbar, TB_GETITEMRECT, 11, (LPARAM)&SliderPos);
+    HWND hWndSpeed = CreateWindowEx( 0, TRACKBAR_CLASS, NULL, WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_BOTH | TBS_NOTICKS, SliderPos.left, SliderPos.top + 4, SliderPos.right - SliderPos.left, SliderPos.bottom - SliderPos.top - 4, hWndToolbar, ( HMENU )IDC_SPEED, g_hInstance, NULL );
     SendMessage( hWndSpeed, TBM_SETRANGE, FALSE, MAKELONG( 5, 195 ) );
     SendMessage( hWndSpeed, TBM_SETLINESIZE, 0, 10 ); 
 
-    HWND hWndStatic4 = CreateWindowEx( 0, WC_STATIC, TEXT( "Notes:" ), WS_CHILD | WS_VISIBLE | SS_LEFT,
-                                       449, 8, 35, 13, hWndToolbar, NULL, g_hInstance, NULL );
-    HWND hWndNSpeed = CreateWindowEx( 0, TRACKBAR_CLASS, NULL, WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_BOTH | TBS_NOTICKS,
-                                      485, 2, 100, 26, hWndToolbar, ( HMENU )IDC_NSPEED, g_hInstance, NULL );
+    SendMessage(hWndToolbar, TB_GETITEMRECT, 14, (LPARAM)&SliderPos);
+    HWND hWndNSpeed = CreateWindowEx( 0, TRACKBAR_CLASS, NULL, WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_BOTH | TBS_NOTICKS, SliderPos.left, SliderPos.top + 4, SliderPos.right - SliderPos.left, SliderPos.bottom - SliderPos.top - 4, hWndToolbar, ( HMENU )IDC_NSPEED, g_hInstance, NULL );
     SendMessage( hWndNSpeed, TBM_SETRANGE, FALSE, MAKELONG( 5, 195 ) );
     SendMessage( hWndNSpeed, TBM_SETLINESIZE, 0, 10 );
-#define WS_VISIBLE          0x10000000L
 
-    HWND hWndPosn = CreateWindowEx( 0, POSNCLASSNAME, NULL, WS_CHILD | WS_VISIBLE | WS_DISABLED, 0, 0, 0, 0, hWndRebar, ( HMENU )IDC_POSNCTRL, g_hInstance, NULL );
+    HWND hWndPosn = CreateWindowEx( 0, POSNCLASSNAME, NULL, WS_CHILD | WS_VISIBLE, 0, 0, 0, 0, hWndRebar, ( HMENU )IDC_POSNCTRL, g_hInstance, NULL );
 
     // Set the font to the dialog font
     SendMessage( hWndVolume, WM_SETFONT, ( WPARAM )hFont, FALSE );
-    SendMessage( hWndStatic1, WM_SETFONT, ( WPARAM )hFont, FALSE );
-    SendMessage( hWndStatic2, WM_SETFONT, ( WPARAM )hFont, FALSE );
-    SendMessage( hWndStatic3, WM_SETFONT, ( WPARAM )hFont, FALSE );
-    SendMessage( hWndStatic4, WM_SETFONT, ( WPARAM )hFont, FALSE );
     SendMessage( hWndSpeed, WM_SETFONT, ( WPARAM )hFont, FALSE );
+    SendMessage( hWndNSpeed, WM_SETFONT, ( WPARAM )hFont, FALSE );
 
     REBARBANDINFO rbbi;
     rbbi.cbSize = sizeof(REBARBANDINFO);
@@ -643,13 +641,13 @@ HWND CreateRebar( HWND hWndOwner )
     rbbi.lpText = (LPWSTR)TEXT( "" );
     rbbi.hwndChild = hWndToolbar;
     rbbi.cxMinChild = rbbi.cyIntegral = 0;
-    rbbi.cyMinChild = rbbi.cyChild = rbbi.cyMaxChild = 31;
+    rbbi.cyMinChild = rbbi.cyChild = rbbi.cyMaxChild = 1 << 5;
     SendMessage( hWndRebar, RB_INSERTBAND, -1, (LPARAM)&rbbi );
 
     rbbi.fStyle = RBBS_NOGRIPPER | RBBS_VARIABLEHEIGHT | RBBS_BREAK;
     rbbi.lpText = (LPWSTR)TEXT( "" );
     rbbi.hwndChild = hWndPosn;
-    rbbi.cyMinChild = rbbi.cyChild = rbbi.cyMaxChild = 20;
+    rbbi.cyMinChild = rbbi.cyChild = rbbi.cyMaxChild = 1 << 4;
     SendMessage( hWndRebar, RB_INSERTBAND, -1, (LPARAM)&rbbi );
 
     // Now that the controls are created and set up, fill out the default values
@@ -706,8 +704,7 @@ LRESULT WINAPI PosnProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
     switch( msg )
     {
         case WM_CREATE:
-            hIml = ImageList_LoadImage( g_hInstance, MAKEINTRESOURCE( IDB_MEDIAICONSSMALL ),
-                                        16, 20, CLR_DEFAULT, IMAGE_BITMAP, LR_CREATEDIBSECTION );
+            hIml = ImageList_LoadImage( g_hInstance, MAKEINTRESOURCE( IDB_MEDIAICONSSMALL ), 1<<4, (1<<4)+(1<<2), CLR_DEFAULT, IMAGE_BITMAP, LR_CREATEDIBSECTION );
             bEnabled = ( ( GetWindowLongPtr( hWnd, GWL_STYLE ) & WS_DISABLED ) == 0 );
             return 0;
         case WM_ENABLE:
@@ -773,7 +770,7 @@ LRESULT WINAPI PosnProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
                 FillRect( hDCMem, &rcChannel, hBrush );
             }
             DrawEdge( hDCMem, &rcChannel, BDR_SUNKENOUTER, BF_RECT );
-            ImageList_DrawEx( hIml, 7 + bEnabled, hDCMem, rcThumb.left, rcThumb.top, rcThumb.right - rcThumb.left, rcThumb.bottom - rcThumb.top,
+            ImageList_DrawEx( hIml, 9 + bEnabled, hDCMem, rcThumb.left, rcThumb.top, rcThumb.right - rcThumb.left, rcThumb.bottom - rcThumb.top,
                               CLR_DEFAULT, CLR_DEFAULT, ILD_NORMAL );
             BitBlt( hDC, ps.rcPaint.left, ps.rcPaint.top, ps.rcPaint.right - ps.rcPaint.left, ps.rcPaint.bottom - ps.rcPaint.top,
                 hDCMem, ps.rcPaint.left, ps.rcPaint.top, SRCCOPY );

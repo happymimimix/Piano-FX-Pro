@@ -3,13 +3,16 @@
 #define PropertyWindowW 300
 #define PropertyWindowH 150
 #define TrackWindowW 300
-#define TrackWindowH 190
+#define TrackWindowH 200
 #define AboutWindowW 250
 #define AboutWindowH 100
-#define LoadingWindowW 250
-#define LoadingWindowH 60
-#define ResolutionWindowW 120
-#define ResolutionWindowH 70
+#define hLoadingWindowW 125
+#define mhLoadingWindowW 0-hLoadingWindowW
+#define LoadingWindowW hLoadingWindowW+hLoadingWindowW
+#define mLoadingWindowW mhLoadingWindowW+mhLoadingWindowW
+#define LoadingWindowH 50
+#define ResolutionWindowW 100
+#define ResolutionWindowH 60
 #define DialogStyle DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CAPTION
 #define AltDialogStyle DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 #define FontSize 8

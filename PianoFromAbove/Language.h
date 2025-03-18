@@ -1,6 +1,6 @@
 ﻿#ifdef ENG
 #define MainWindowTitle1 L"Piano-FX Pro"
-#define MainWindowTitle2 L"Made by: happy_mimimix"
+#define MainWindowTitle2 L"Developed by: happy_mimimix"
 #define MainWindowTitle3 L"Now playing: "
 #define MainWindowTitle4 L"Now rendering: "
 #define MainWindowTitle5 L"None"
@@ -16,7 +16,7 @@
 #define StartupStage3Text L"Let's go!"
 #define DigitSeparate 3
 #define StatisticsText1 "Piano-FX Pro"
-#define StatisticsText2 "Made by: happy_mimimix"
+#define StatisticsText2 "Developed by: happy_mimimix"
 #define StatisticsText3 "Time:"
 #define StatisticsText4 "Tick:"
 #define StatisticsText5 "Microseconds:"
@@ -134,7 +134,7 @@
 #endif
 #ifdef CHN
 #define MainWindowTitle1 L"专业の钢琴特效"
-#define MainWindowTitle2 L"作者：happy_mimimix"
+#define MainWindowTitle2 L"开发者：happy_mimimix"
 #define MainWindowTitle3 L"正在播放："
 #define MainWindowTitle4 L"正在渲染："
 #define MainWindowTitle5 L"无"
@@ -150,7 +150,7 @@
 #define StartupStage3Text L"让我们开始吧！"
 #define DigitSeparate 4
 #define StatisticsText1 "专业の钢琴特效"
-#define StatisticsText2 "作者: happy_mimimix"
+#define StatisticsText2 "开发者: happy_mimimix"
 #define StatisticsText3 "时长"
 #define StatisticsText4 "Tick:"
 #define StatisticsText5 "微秒:"
@@ -268,7 +268,7 @@
 #endif
 #ifdef ARN
 #define MainWindowTitle1 L"专业の钢琴特效"
-#define MainWindowTitle2 L"作者：happy_mimimix"
+#define MainWindowTitle2 L"开发者：happy_mimimix"
 #define MainWindowTitle3 L"正在播放："
 #define MainWindowTitle4 L"正在渲染："
 #define MainWindowTitle5 L"无"
@@ -284,7 +284,7 @@
 #define StartupStage3Text L"让我们开始吧！"
 #define DigitSeparate 3
 #define StatisticsText1 "专业の钢琴特效"
-#define StatisticsText2 "作者: happy_mimimix"
+#define StatisticsText2 "开发者: happy_mimimix"
 #define StatisticsText3 "时长"
 #define StatisticsText4 "Tick:"
 #define StatisticsText5 "微秒:"
