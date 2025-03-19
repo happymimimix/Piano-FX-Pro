@@ -1191,7 +1191,7 @@ BOOL PlayFile(const wstring& sFile)
     if (cPlayback.GetPlayMode() != ePlayMode) cPlayback.SetPlayMode(ePlayMode, true);
     cPlayback.SetPaused(ePlayMode != GameState::Practice, true);
     cPlayback.SetPosition(0);
-    cView.SetZoomMove(false, true);
+    cView.SetZoomMove(false);
     TCHAR sTitle[1 << 10];
     if (cViz.bDumpFrames) {
         _stprintf_s(sTitle, MainWindowTitle1 L" v" LVersionString L" | " MainWindowTitle2 L" | " MainWindowTitle4 L"%ws" MainWindowTitle7, sFile.c_str() + (sFile.find_last_of(L'\\') + 1));

@@ -134,7 +134,7 @@ public:
     void ToggleKeyboard( bool bUpdateGUI = false ) { SetKeyboard( !m_bKeyboard, bUpdateGUI ); }
     void ToggleOnTop( bool bUpdateGUI = false ) { SetOnTop( !m_bOnTop, bUpdateGUI ); }
     void ToggleFullScreen( bool bUpdateGUI = false ) { SetFullScreen( !m_bFullScreen, bUpdateGUI ); }
-    void ToggleZoomMove( bool bUpdateGUI = false ) { SetZoomMove( !m_bZoomMove, bUpdateGUI ); }
+    void ToggleZoomMove( bool bUpdateGUI = false ) { SetZoomMove( !m_bZoomMove ); }
 
     void SetMainPos( int iMainLeft, int iMainTop ) { m_iMainLeft = iMainLeft; m_iMainTop = iMainTop; }
     void SetMainSize( int iMainWidth, int iMainHeight ) { m_iMainWidth = iMainWidth; m_iMainHeight = iMainHeight; }
@@ -145,7 +145,7 @@ public:
     void SetKeyboard( bool bKeyboard, bool bUpdateGUI = false ) { m_bKeyboard = bKeyboard; if ( bUpdateGUI ) ::ShowKeyboard( bKeyboard ); }
     void SetOnTop( bool bOnTop, bool bUpdateGUI = false ) { m_bOnTop = bOnTop; if ( bUpdateGUI ) ::SetOnTop( bOnTop ); }
     void SetFullScreen( bool bFullScreen, bool bUpdateGUI = false ) { m_bFullScreen = bFullScreen; if ( bUpdateGUI ) ::SetFullScreen( bFullScreen ); }
-    void SetZoomMove( bool bZoomMove, bool bUpdateGUI = false ) { m_bZoomMove = bZoomMove; if ( bUpdateGUI ) ::SetZoomMove( bZoomMove ); }
+    void SetZoomMove( bool bZoomMove ) { m_bZoomMove = bZoomMove; ::SetZoomMove(bZoomMove); }
 
     int GetMainLeft() const { return m_iMainLeft == -32000 ? CW_USEDEFAULT : m_iMainLeft; }
     int GetMainTop() const { return m_iMainTop == -32000 ? CW_USEDEFAULT : m_iMainTop; }

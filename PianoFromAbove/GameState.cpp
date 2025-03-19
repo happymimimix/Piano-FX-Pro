@@ -948,22 +948,23 @@ GameState::GameError MainScreen::MsgProc( HWND, UINT msg, WPARAM wParam, LPARAM 
                         cView.SetOffsetX( cView.GetOffsetX() + m_fTempOffsetX );
                         cView.SetOffsetY( cView.GetOffsetY() + m_fTempOffsetY );
                         cView.SetZoomX( cView.GetZoomX() * m_fTempZoomX );
-                        cView.SetZoomMove( false, true );
-                        m_bTrackPos = m_bTrackZoom = false;
                         m_fTempOffsetX = 0.0f;
                         m_fTempOffsetY = 0.0f;
                         m_fTempZoomX = 1.0f;
+                        cView.SetZoomMove(false);
                         return Success;
                     }
                     else
                     {
-                        cView.SetZoomMove( true, true );
+                        cView.SetZoomMove(true);
                         return Success;
                     }
                 case ID_VIEW_RESETMOVEANDZOOM:
-                    cView.SetOffsetX( 0.0f );
-                    cView.SetOffsetY( 0.0f );
-                    cView.SetZoomX( 1.0f );
+                    if (m_fTempOffsetX == 0.0f && m_fTempOffsetY == 0.0f && m_fTempZoomX == 1.0f) {
+                        cView.SetOffsetX(0.0f);
+                        cView.SetOffsetY(0.0f);
+                        cView.SetZoomX(1.0f);
+                    }
                     m_fTempOffsetX = 0.0f;
                     m_fTempOffsetY = 0.0f;
                     m_fTempZoomX = 1.0f;
@@ -2368,6 +2369,9 @@ void MainScreen::RenderText()
     RenderStatus(&rcStatus);
     if (!m_sMarker.empty() && viz.bShowMarkers) {
         RenderMarker(m_sMarker.c_str());
+    }
+    if (m_bZoomMove) {
+        RenderMessage(&rcMsg, ZoomMoveMsg);
     }
     if (strlen(CheatEngineCaption) > 0) {
         if (strlen(CheatEngineCaption) < sizeof(CheatEngineCaption)/sizeof(CheatEngineCaption[0])) {

@@ -504,6 +504,9 @@
     <ClInclude Include="DebugLanguageOverride.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
+    <ClInclude Include="imgui\Fonts.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PianoFromAbove.rc">

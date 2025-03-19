@@ -1,21 +1,32 @@
-#define UNICODE
-
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
 #include <algorithm>
 #include <Windows.h>
-#include "matrices.h"
+#include "imgui/Fonts.h"
 #include <locale>
 #include <codecvt>
 
 using namespace std;
 
-size_t CalculateTextWidth(wstring text) {
-    HDC DC = GetDC(NULL);
-    HFONT hFont = CreateFont(
-        FontSize, //FontHeight
+void ReplaceAll(wstring& INPUT, wstring BEFORE, wstring AFTER) {
+    size_t i = 0;
+    while ((i = INPUT.find(BEFORE, i)) != wstring::npos) {
+        INPUT.replace(i, BEFORE.size(), AFTER);
+        i += AFTER.size();
+    }
+}
+
+int main() {
+    SetConsoleOutputCP(65001);
+    wcin.imbue(locale("en_US.UTF-8"));
+    wcout.imbue(locale("en_US.UTF-8"));
+    cerr << "Calculating text widths..." << endl;
+    HWND cmd = GetConsoleWindow();
+    HDC cmdDC = GetDC(cmd);
+    HFONT hFont = CreateFontW(
+        -MulDiv(FontSize, GetDeviceCaps(cmdDC, LOGPIXELSY), 72), //FontHeight
         0, //FontWidth
         0, //Escapement
         0, //Orientation
@@ -30,33 +41,26 @@ size_t CalculateTextWidth(wstring text) {
         0, //PitchAndFamily
         TEXT(FontName) //FaceName
     );
-    HFONT oldFont = (HFONT)SelectObject(DC, hFont);
-    SIZE size;
-    GetTextExtentPoint32(DC, text.c_str(), text.length(), &size);
-    SelectObject(DC, oldFont);
-    DeleteObject(hFont);
-    ReleaseDC(NULL, DC);
-    return size.cx;
-}
-
-void ReplaceAll(wstring& INPUT, wstring BEFORE, wstring AFTER) {
-    size_t i = 0;
-    while ((i = INPUT.find(BEFORE, i)) != wstring::npos) {
-        INPUT.replace(i, BEFORE.size(), AFTER);
-        i += AFTER.size();
-    }
-}
-
-int main() {
-    wifstream INPUT("Language.h");
-    INPUT.imbue(locale("en_US.UTF-8"));
-    wofstream OUTPUT("Widths.h");
-    OUTPUT.imbue(locale("en_US.UTF-8"));
+    TEXTMETRIC cmdTM;
+    GetTextMetricsW(cmdDC, &cmdTM);
+    SelectObject(cmdDC, hFont);
+    SetBkMode(cmdDC, 1);
+    SetTextColor(cmdDC, 0x0000FF);
+    HBRUSH hBrush = CreateSolidBrush(0x0000FF);
+    SelectObject(cmdDC, hBrush);
     wstring Line = L"";
-    while (getline(INPUT, Line)) {
+    while (true) {
+        getline(wcin, Line);
+        if (Line.length() == 0) {
+            DeleteObject(hFont);
+            DeleteObject(hBrush);
+            ReleaseDC(cmd, cmdDC);
+            Sleep(1 << 10);
+            return 0;
+        }
         if (Line.length() < 8 || Line.substr(0, 8) != L"#define ") {
             if ((Line.length() < 9 || Line.substr(0, 9) != L"#include ") && (Line.length() < 7 || Line.substr(0, 7) != L"#undef ")) {
-                OUTPUT << Line << endl;
+                wcout << Line << endl;
             }
             continue;
         }
@@ -82,24 +86,18 @@ int main() {
                 ReplaceAll(DefString, L"\\v", L"\v");
                 ReplaceAll(DefString, L"\\b", L"\b");
                 ReplaceAll(DefString, L"\\\\", L"\\");
-                if (
-                    DefString[DefString.length() - 1] == L':' ||
-                    DefString[DefString.length() - 1] == L';' ||
-                    DefString[DefString.length() - 1] == L',' ||
-                    DefString[DefString.length() - 1] == L'.' ||
-                    DefString[DefString.length() - 1] == L'?' ||
-                    DefString[DefString.length() - 1] == L'!' ||
-                    DefString[DefString.length() - 1] == L'"' ||
-                    DefString[DefString.length() - 1] == L'\''
-                    ) {
-                    DefString += ' ';
-                }
-                size_t Width = CalculateTextWidth(DefString);
-                OUTPUT << L"#define " << DefName << L"W " << Width+2 << endl;
+                SIZE TextSize;
+                GetTextExtentPoint32W(cmdDC, DefString.c_str(), DefString.length(), &TextSize);
+                wcout << L"#define " << DefName << L"W " << MulDiv(TextSize.cx, 4, cmdTM.tmAveCharWidth*(0x1.fffffffffffffp-1)) << L" //Text: " << LineNdef.substr(Splitter + 1, LineNdef.length() - Splitter - 1) << endl;
+                RECT cmdRECT;
+                GetClientRect(cmd, &cmdRECT);
+                LONG W = cmdRECT.right - cmdRECT.left;
+                LONG H = cmdRECT.bottom - cmdRECT.top;
+                BitBlt(cmdDC, 0, 0, W, H - cmdTM.tmHeight, cmdDC, 0, cmdTM.tmHeight, SRCCOPY);
+                PatBlt(cmdDC, 0, H - cmdTM.tmHeight, W, cmdTM.tmHeight, BLACKNESS);
+                TextOutW(cmdDC, 0, H - cmdTM.tmHeight, DefString.c_str(), DefString.length());
+                PatBlt(cmdDC, TextSize.cx, H - cmdTM.tmHeight, 1, cmdTM.tmHeight, PATCOPY);
             }
         }
     }
-    INPUT.close();
-    OUTPUT.close();
-    return 0;
 }

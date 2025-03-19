@@ -250,14 +250,16 @@ del .\Colorizer.exe /f /q
 del .\Colorizer.exe.h /f /q
 del .\PFXGDI.exe /f /q
 del .\PFXGDI.exe.h /f /q
+del .\Widths.h /f /q
 msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
 xxd -i Colorizer.exe &gt; Colorizer.exe.h
 xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
-clang-cl /fallback /EHsc /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-.\tmp.exe
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\Language.h ^|.\tmp.exe ^&gt;.\Widths.h
 del .\tmp.exe /f /q
-del .\tmp.obj /f /q</Command>
+del .\tmp.obj /f /q
+</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -271,7 +273,8 @@ rmdir .\Release /s /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 mkdir ..\Release
-move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
+move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
+</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <ShowProgress>true</ShowProgress>
@@ -329,14 +332,16 @@ del .\Colorizer.exe /f /q
 del .\Colorizer.exe.h /f /q
 del .\PFXGDI.exe /f /q
 del .\PFXGDI.exe.h /f /q
+del .\Widths.h /f /q
 msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
 xxd -i Colorizer.exe &gt; Colorizer.exe.h
 xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
-clang-cl /fallback /EHsc /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-.\tmp.exe
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\Language.h ^|.\tmp.exe ^&gt;.\Widths.h
 del .\tmp.exe /f /q
-del .\tmp.obj /f /q</Command>
+del .\tmp.obj /f /q
+</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -350,7 +355,8 @@ rmdir .\Release /s /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 mkdir ..\Release
-move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
+move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
+</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <ShowProgress>true</ShowProgress>
@@ -408,14 +414,16 @@ del .\Colorizer.exe /f /q
 del .\Colorizer.exe.h /f /q
 del .\PFXGDI.exe /f /q
 del .\PFXGDI.exe.h /f /q
+del .\Widths.h /f /q
 msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
 xxd -i Colorizer.exe &gt; Colorizer.exe.h
 xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
-clang-cl /fallback /EHsc /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-.\tmp.exe
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\Language.h ^|.\tmp.exe ^&gt;.\Widths.h
 del .\tmp.exe /f /q
-del .\tmp.obj /f /q</Command>
+del .\tmp.obj /f /q
+</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -429,7 +437,8 @@ rmdir .\Release /s /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 mkdir ..\Release
-move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
+move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
+</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <ShowProgress>true</ShowProgress>
@@ -487,14 +496,16 @@ del .\Colorizer.exe /f /q
 del .\Colorizer.exe.h /f /q
 del .\PFXGDI.exe /f /q
 del .\PFXGDI.exe.h /f /q
+del .\Widths.h /f /q
 msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
 xxd -i Colorizer.exe &gt; Colorizer.exe.h
 xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
-clang-cl /fallback /EHsc /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-.\tmp.exe
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\Language.h ^|.\tmp.exe ^&gt;.\Widths.h
 del .\tmp.exe /f /q
-del .\tmp.obj /f /q</Command>
+del .\tmp.obj /f /q
+</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -508,7 +519,8 @@ rmdir .\Release /s /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 mkdir ..\Release
-move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
+move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
+</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <ShowProgress>true</ShowProgress>
@@ -566,14 +578,16 @@ del .\Colorizer.exe /f /q
 del .\Colorizer.exe.h /f /q
 del .\PFXGDI.exe /f /q
 del .\PFXGDI.exe.h /f /q
+del .\Widths.h /f /q
 msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
 xxd -i Colorizer.exe &gt; Colorizer.exe.h
 xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
-clang-cl /fallback /EHsc /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-.\tmp.exe
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\Language.h ^|.\tmp.exe ^&gt;.\Widths.h
 del .\tmp.exe /f /q
-del .\tmp.obj /f /q</Command>
+del .\tmp.obj /f /q
+</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -587,7 +601,8 @@ rmdir .\Release /s /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 mkdir ..\Release
-move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
+move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
+</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <ShowProgress>true</ShowProgress>
@@ -645,14 +660,16 @@ del .\Colorizer.exe /f /q
 del .\Colorizer.exe.h /f /q
 del .\PFXGDI.exe /f /q
 del .\PFXGDI.exe.h /f /q
+del .\Widths.h /f /q
 msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
 xxd -i Colorizer.exe &gt; Colorizer.exe.h
 xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
-clang-cl /fallback /EHsc /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-.\tmp.exe
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\Language.h ^|.\tmp.exe ^&gt;.\Widths.h
 del .\tmp.exe /f /q
-del .\tmp.obj /f /q</Command>
+del .\tmp.obj /f /q
+</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -666,7 +683,8 @@ rmdir .\Release /s /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 mkdir ..\Release
-move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
+move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
+</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <ShowProgress>true</ShowProgress>
@@ -722,14 +740,16 @@ del .\Colorizer.exe /f /q
 del .\Colorizer.exe.h /f /q
 del .\PFXGDI.exe /f /q
 del .\PFXGDI.exe.h /f /q
+del .\Widths.h /f /q
 msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
 xxd -i Colorizer.exe &gt; Colorizer.exe.h
 xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
-clang-cl /fallback /EHsc /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-.\tmp.exe
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\Language.h ^|.\tmp.exe ^&gt;.\Widths.h
 del .\tmp.exe /f /q
-del .\tmp.obj /f /q</Command>
+del .\tmp.obj /f /q
+</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -743,7 +763,8 @@ rmdir .\Release /s /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 mkdir ..\Release
-move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
+move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
+</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <ShowProgress>true</ShowProgress>
@@ -789,8 +810,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
-clang-cl /fallback /EHsc /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-.\tmp.exe</Command>
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\Language.h ^|.\tmp.exe ^&gt;.\Widths.h
+</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -904,6 +926,7 @@ clang-cl /fallback /EHsc /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /li
     <ClInclude Include="GameState.h" />
     <ClInclude Include="GDITutorial.h" />
     <ClInclude Include="Globals.h" />
+    <ClInclude Include="imgui\Fonts.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_freetype.h" />

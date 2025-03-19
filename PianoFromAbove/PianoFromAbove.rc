@@ -4,7 +4,6 @@
 
 #include "resource.h"
 #include "matrices.h"
-#include "Widths.h"
 #include "Language.h"
 #include "afxres.h"
 
@@ -302,7 +301,7 @@ BEGIN
                     FontSize
 
     EDITTEXT        IDC_LRARROWS,
-                    qMargin + Property4Text2W,
+                    tMargin + Property4Text2W,
                     ContentHeight + dMargin,
                     SpinnerW,
                     ContentHeight + Margin,
@@ -311,7 +310,7 @@ BEGIN
     CONTROL         "",IDC_LRARROWSSPIN,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,0,0,0,0
 
     LTEXT           Property4Text3,-1,
-                    iMargin + Property4Text2W + SpinnerW,
+                    tMargin + Property4Text2W + SpinnerW,
                     ContentHeight + dMargin + hMargin,
                     Property4Text3W,
                     FontSize
@@ -323,7 +322,7 @@ BEGIN
                     FontSize
 
     EDITTEXT        IDC_UDARROWS,
-                    qMargin + Property4Text4W,
+                    tMargin + Property4Text4W,
                     dContentHeight + qMargin,
                     SpinnerW,
                     ContentHeight + Margin,
@@ -332,7 +331,7 @@ BEGIN
     CONTROL         "",IDC_UDARROWSSPIN,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,0,0,0,0
 
     LTEXT           Property4Text5,-1,
-                    iMargin + Property4Text4W + SpinnerW,
+                    tMargin + Property4Text4W + SpinnerW,
                     dContentHeight + qMargin + hMargin,
                     Property4Text5W,
                     FontSize

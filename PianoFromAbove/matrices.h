@@ -1,4 +1,6 @@
 //Matix definitions
+#include <Widths.h>
+#include "imgui/Fonts.h"
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define PropertyWindowW 300
 #define PropertyWindowH 150
@@ -13,12 +15,8 @@
 #define LoadingWindowH 50
 #define ResolutionWindowW 100
 #define ResolutionWindowH 60
-#define DialogStyle DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_CAPTION
-#define AltDialogStyle DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-#define FontSize 8
-#define LargeFontSize 12
-#define FontName "Tahoma"
-#define AltFontName "Tahoma Bold"
+#define DialogStyle DS_SETFONT | WS_CHILD | WS_CAPTION
+#define AltDialogStyle DS_SETFONT | WS_POPUP | WS_CAPTION
 #define BoxSpacing 14
 #define dBoxSpacing BoxSpacing+BoxSpacing //Double
 #define tBoxSpacing dBoxSpacing+BoxSpacing //Triple

@@ -18,12 +18,12 @@
 
 #ifdef INCLUDE_FFMPEG
 // Do not include these files in Debug configuration as these files are too large and would cause significant lag in intellisense! 
-#include "ffmpeg1.h"
-#include "ffmpeg2.h"
-#include "ffmpeg3.h"
-#include "ffmpeg4.h"
-#include "ffmpeg5.h"
-#include "ffmpeg6.h"
+#include <ffmpeg1.h>
+#include <ffmpeg2.h>
+#include <ffmpeg3.h>
+#include <ffmpeg4.h>
+#include <ffmpeg5.h>
+#include <ffmpeg6.h>
 #endif
 
 #include "MainProcs.h"
