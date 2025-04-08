@@ -18,14 +18,17 @@
 #include "Globals.h"
 #include "resource.h"
 #include "Language.h"
-
+#include "imgui/Fonts.h"
+#include "imgui/imguiCompressedFont2GDI.h"
 #include "GameState.h"
+
+HFONT PHIFON_GDI;
 
 VOID DoPreferences(HWND hWndOwner)
 {
-    int pDialogs[] = { IDD_PP1_VISUAL, IDD_PP2_AUDIO, IDD_PP3_VIDEO, IDD_PP4_CONTROLS, IDD_PP5_VIZ };
-    DLGPROC pProcs[] = { VisualProc, AudioProc, VideoProc, ControlsProc, VizProc };
-    LPCWSTR pTitles[] = { Property1Title, Property2Title, Property3Title, Property4Title, Property5Title };
+    int pDialogs[] = { IDD_PP1_VISUAL, IDD_PP2_AUDIO, IDD_PP3_VIDEO, IDD_PP4_CONTROLS };
+    DLGPROC pProcs[] = { VisualProc, AudioProc, VideoProc, ControlsProc };
+    LPCWSTR pTitles[] = { Property1Title, Property2Title, Property3Title, Property4Title };
     PROPSHEETPAGE psp[sizeof(pDialogs) / sizeof(int)];
     PROPSHEETHEADER psh;
 
@@ -66,19 +69,29 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
     case WM_INITDIALOG:
     {
+        const VisualSettings& cVisual = Config::GetConfig().GetVisualSettings();
         HWND hWndFirstKey = GetDlgItem(hWnd, IDC_FIRSTKEY);
         HWND hWndLastKey = GetDlgItem(hWnd, IDC_LASTKEY);
-
         // Enumerate the keys
         for (int i = 0; i < 128; i++)
         {
             SendMessage(hWndFirstKey, CB_ADDSTRING, i, (LPARAM)MIDI::NoteName(i).c_str());
             SendMessage(hWndLastKey, CB_ADDSTRING, i, (LPARAM)MIDI::NoteName(i).c_str());
         }
-
-        // Config to fill out the form
-        Config& config = Config::GetConfig();
-        SetVisualProc(hWnd, config.GetVisualSettings(), config.GetVizSettings());
+        // Set values
+        CheckRadioButton(hWnd, IDC_SHOWALLKEYS, IDC_SHOWCUSTOMKEYS, IDC_SHOWALLKEYS + (cVisual.eKeysShown > cVisual.Custom ? cVisual.All : cVisual.eKeysShown));
+        SendMessage(hWnd, WM_COMMAND, IDC_SHOWALLKEYS + (cVisual.eKeysShown > cVisual.Custom ? cVisual.All : cVisual.eKeysShown), 0);
+        SendMessage(hWndFirstKey, CB_SETCURSEL, cVisual.iFirstKey, 0);
+        SendMessage(hWndLastKey, CB_SETCURSEL, cVisual.iLastKey, 0);
+        CheckDlgButton(hWnd, IDC_RANDOMIZE, cVisual.bRandomizeColor);
+        for (int i = 0; i < IDC_COLOR16 - IDC_COLOR1 + 1; i++)
+            EnableWindow(GetDlgItem(hWnd, IDC_COLOR1 + i), !IsDlgButtonChecked(hWnd, IDC_RANDOMIZE));
+        // Colors
+        for (int i = 0; i < IDC_COLOR16 - IDC_COLOR1 + 1; i++)
+            SetWindowLongPtr(GetDlgItem(hWnd, IDC_COLOR1 + i), GWLP_USERDATA, cVisual.colors[i]);
+        SetWindowLongPtr(GetDlgItem(hWnd, IDC_BKGCOLOR), GWLP_USERDATA, cVisual.iBkgColor);
+        SetWindowLongPtr(GetDlgItem(hWnd, IDC_BARCOLOR), GWLP_USERDATA, cVisual.iBarColor);
+        SetDlgItemTextW(hWnd, IDC_BACKGROUND, cVisual.sBackground.c_str());
         return TRUE;
     }
     // Draws the colored buttons
@@ -88,8 +101,18 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         if ((pdis->CtlID < IDC_COLOR1 || pdis->CtlID > IDC_COLOR16) && pdis->CtlID != IDC_BKGCOLOR && pdis->CtlID != IDC_BARCOLOR)
             return FALSE;
 
-        SetDCBrushColor(pdis->hDC, (COLORREF)GetWindowLongPtr(pdis->hwndItem, GWLP_USERDATA));
+        SetTextColor(pdis->hDC, RGB(255, 255, 255));
+        SetBkMode(pdis->hDC, TRANSPARENT);
+        SetDCBrushColor(pdis->hDC, IsDlgButtonChecked(hWnd, IDC_RANDOMIZE) && pdis->CtlID >= IDC_COLOR1 && pdis->CtlID <= IDC_COLOR16 ? 0x7f7f7f : (COLORREF)GetWindowLongPtr(pdis->hwndItem, GWLP_USERDATA));
         FillRect(pdis->hDC, &pdis->rcItem, (HBRUSH)GetStockObject(DC_BRUSH));
+        if (IsDlgButtonChecked(hWnd, IDC_RANDOMIZE) && pdis->CtlID >= IDC_COLOR1 && pdis->CtlID <= IDC_COLOR16)
+        {
+            if (!PHIFON_GDI) {
+                PHIFON_GDI = imguiFont2GDI(PHIFON_compressed_data, PHIFON_compressed_size, -MulDiv(LargeFontSize, GetDeviceCaps(pdis->hDC, LOGPIXELSY), 72));
+            }
+            SelectObject(pdis->hDC, PHIFON_GDI);
+            DrawText(pdis->hDC, L"?", -1, &pdis->rcItem, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+        }
         return TRUE;
     }
     case WM_COMMAND:
@@ -133,26 +156,46 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
             // Draw the button (indirect)
             SetWindowLongPtr(hWndBtn, GWLP_USERDATA, cc.rgbResult);
-            InvalidateRect(hWndBtn, NULL, FALSE);
+            InvalidateRect(hWndBtn, nullptr, FALSE);
+            return TRUE;
+        }
+        case IDC_RANDOMIZE:
+        {
+            for (int i = 0; i < IDC_COLOR16 - IDC_COLOR1 + 1; i++)
+                EnableWindow(GetDlgItem(hWnd, IDC_COLOR1 + i), !IsDlgButtonChecked(hWnd, IDC_RANDOMIZE));
+            //InvalidateRect(hWnd, nullptr, FALSE);
             return TRUE;
         }
         case IDC_RESTOREDEFAULTS:
         {
-            PSHNOTIFY pshn;
-            pshn.hdr.hwndFrom = hWnd;
-            pshn.hdr.idFrom = GetDlgCtrlID(hWnd);
-            pshn.hdr.code = PSN_APPLY;
-            pshn.lParam = 0;
-            SendMessage(hWnd, WM_NOTIFY, (WPARAM)pshn.hdr.idFrom, (LPARAM)&pshn);
-            VisualSettings cVisualSettings = Config::GetConfig().GetVisualSettings();
-            cVisualSettings.LoadDefaultColors();
-            VizSettings cVizSettings = Config::GetConfig().GetVizSettings();
-            cVizSettings.LoadDefaultColors();
-            SendMessage(hWnd, WM_SETREDRAW, FALSE, 0);
-            SetVisualProc(hWnd, cVisualSettings, cVizSettings);
-            SendMessage(hWnd, WM_SETREDRAW, TRUE, 0);
-            InvalidateRect(hWnd, NULL, FALSE);
-            SendMessage(hWnd, WM_NOTIFY, (WPARAM)pshn.hdr.idFrom, (LPARAM)&pshn);
+            VisualSettings cVisual = Config::GetConfig().GetVisualSettings();
+            cVisual.LoadDefaultColors();
+            for (int i = 0; i < IDC_COLOR16 - IDC_COLOR1 + 1; i++)
+                SetWindowLongPtr(GetDlgItem(hWnd, IDC_COLOR1 + i), GWLP_USERDATA, cVisual.colors[i]);
+            SetWindowLongPtr(GetDlgItem(hWnd, IDC_BKGCOLOR), GWLP_USERDATA, cVisual.iBkgColor);
+            SetWindowLongPtr(GetDlgItem(hWnd, IDC_BARCOLOR), GWLP_USERDATA, cVisual.iBarColor);
+            InvalidateRect(hWnd, nullptr, FALSE);
+            return TRUE;
+        }
+        case IDC_BACKGROUNDBROWSE: 
+        {
+            OPENFILENAME ofn = {};
+            TCHAR sFilename[1<<10] = { 0 };
+            ofn.lStructSize = sizeof(OPENFILENAME);
+            ofn.hwndOwner = hWnd;
+            ofn.lpstrFilter = TEXT("Image files\0*.png;*.jpg;*.jpeg\0");
+            ofn.lpstrFile = sFilename;
+            ofn.nMaxFile = sizeof(sFilename) / sizeof(TCHAR);
+            ofn.lpstrTitle = OpenBackgroundFileTitle;
+            ofn.Flags = OFN_EXPLORER | OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
+            if (GetOpenFileName(&ofn))
+                SetDlgItemTextW(hWnd, IDC_BACKGROUND, sFilename);
+            return TRUE;
+        }
+        case IDC_BACKGROUNDRESET: 
+        {
+            Changed(hWnd);
+            SetDlgItemTextW(hWnd, IDC_BACKGROUND, L"");
             return TRUE;
         }
         }
@@ -169,28 +212,25 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             // Get a copy of the config to overwrite the settings
             Config& config = Config::GetConfig();
             VisualSettings cVisual = config.GetVisualSettings();
-            ViewSettings& cView = config.GetViewSettings();
-            VizSettings& cViz = config.GetVizSettings();
 
             // VisualSettings struct
-            bool bAlwaysShowControls = cVisual.bAlwaysShowControls;
-            cVisual.eKeysShown = (IsDlgButtonChecked(hWnd, IDC_SHOWALLKEYS) == BST_CHECKED ? cVisual.All :
-                IsDlgButtonChecked(hWnd, IDC_SHOWSONGKEYS) == BST_CHECKED ? cVisual.Song :
-                IsDlgButtonChecked(hWnd, IDC_SHOWCUSTOMKEYS) == BST_CHECKED ? cVisual.Custom :
-                cVisual.Song);
-            cVisual.bAlwaysShowControls = (IsDlgButtonChecked(hWnd, IDC_SHOWCONTROLS) == BST_CHECKED);
+            cVisual.eKeysShown = (IsDlgButtonChecked(hWnd, IDC_SHOWALLKEYS) ? cVisual.All :
+                IsDlgButtonChecked(hWnd, IDC_SHOWSONGKEYS) ? cVisual.Song :
+                IsDlgButtonChecked(hWnd, IDC_SHOWCUSTOMKEYS) ? cVisual.Custom :
+                cVisual.All);
             cVisual.iFirstKey = (int)SendMessage(GetDlgItem(hWnd, IDC_FIRSTKEY), CB_GETCURSEL, 0, 0);
             cVisual.iLastKey = (int)SendMessage(GetDlgItem(hWnd, IDC_LASTKEY), CB_GETCURSEL, 0, 0);
+            cVisual.bRandomizeColor = IsDlgButtonChecked(hWnd, IDC_RANDOMIZE);
             for (int i = 0; i < IDC_COLOR16 - IDC_COLOR1 + 1; i++)
                 cVisual.colors[i] = (int)GetWindowLongPtr(GetDlgItem(hWnd, IDC_COLOR1 + i), GWLP_USERDATA);
             cVisual.iBkgColor = (int)GetWindowLongPtr(GetDlgItem(hWnd, IDC_BKGCOLOR), GWLP_USERDATA);
-            cViz.iBarColor = (int)GetWindowLongPtr(GetDlgItem(hWnd, IDC_BARCOLOR), GWLP_USERDATA);
-            cViz.bSameWidth = IsDlgButtonChecked(hWnd, IDC_SAMEWIDTH);
+            cVisual.iBarColor = (int)GetWindowLongPtr(GetDlgItem(hWnd, IDC_BARCOLOR), GWLP_USERDATA);
+            wchar_t background[1 << 10]{};
+            GetWindowTextW(GetDlgItem(hWnd, IDC_BACKGROUND), background, 1 << 10);
+            cVisual.sBackground = background;
 
             // Report success and return
             config.SetVisualSettings(cVisual);
-            if (cView.GetFullScreen() && bAlwaysShowControls != cVisual.bAlwaysShowControls)
-                cView.SetControls(cView.GetControls(), true);
             SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_NOERROR);
 
             // Save settings
@@ -205,34 +245,24 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     return FALSE;
 }
 
-// Sets the values in the playback settings dialog. Used at init and restoring defaults
-VOID SetVisualProc(HWND hWnd, const VisualSettings& cVisual, const VizSettings& cViz)
-{
-    HWND hWndFirstKey = GetDlgItem(hWnd, IDC_FIRSTKEY);
-    HWND hWndLastKey = GetDlgItem(hWnd, IDC_LASTKEY);
-
-    // Set values
-    CheckRadioButton(hWnd, IDC_SHOWALLKEYS, IDC_SHOWCUSTOMKEYS, IDC_SHOWALLKEYS + cVisual.eKeysShown);
-    CheckDlgButton(hWnd, IDC_SHOWCONTROLS, cVisual.bAlwaysShowControls ? BST_CHECKED : BST_UNCHECKED);
-    SendMessage(hWnd, WM_COMMAND, IDC_SHOWALLKEYS + cVisual.eKeysShown, 0);
-    SendMessage(hWndFirstKey, CB_SETCURSEL, cVisual.iFirstKey, 0);
-    SendMessage(hWndLastKey, CB_SETCURSEL, cVisual.iLastKey, 0);
-    // Colors
-    for (int i = 0; i < IDC_COLOR16 - IDC_COLOR1 + 1; i++)
-        SetWindowLongPtr(GetDlgItem(hWnd, IDC_COLOR1 + i), GWLP_USERDATA, cVisual.colors[i]);
-    SetWindowLongPtr(GetDlgItem(hWnd, IDC_BKGCOLOR), GWLP_USERDATA, cVisual.iBkgColor);
-    SetWindowLongPtr(GetDlgItem(hWnd, IDC_BARCOLOR), GWLP_USERDATA, cViz.iBarColor);
-    CheckDlgButton(hWnd, IDC_SAMEWIDTH, cViz.bSameWidth ? BST_CHECKED : BST_UNCHECKED);
-}
-
 INT_PTR WINAPI AudioProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg)
     {
     case WM_INITDIALOG:
-        SetAudioProc(hWnd, Config::GetConfig().GetAudioSettings());
-        CheckDlgButton(hWnd, IDC_KDMAPI, Config::GetConfig().GetVizSettings().bKDMAPI);
+    {
+        const AudioSettings& cAudio = Config::GetConfig().GetAudioSettings();
+        Config::GetConfig().LoadMIDIDevices();
+
+        HWND hWndOutDevs = GetDlgItem(hWnd, IDC_MIDIOUT);
+        while (SendMessage(hWndOutDevs, LB_DELETESTRING, 0, 0) > 0);
+        for (vector< wstring >::const_iterator it = cAudio.vMIDIOutDevices.begin(); it != cAudio.vMIDIOutDevices.end(); ++it)
+            SendMessage(hWndOutDevs, LB_ADDSTRING, 0, (LPARAM)(it->c_str()));
+        SendMessage(hWndOutDevs, LB_SETCURSEL, cAudio.iOutDevice, 0);
+
+        CheckDlgButton(hWnd, IDC_KDMAPI, cAudio.bKDMAPI);
         return TRUE;
+    }
     case WM_COMMAND:
     {
         int iId = LOWORD(wParam);
@@ -252,31 +282,29 @@ INT_PTR WINAPI AudioProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             // Get a copy of the config to overwrite the settings
             Config& config = Config::GetConfig();
             AudioSettings cAudio = config.GetAudioSettings();
-            VizSettings cViz = config.GetVizSettings();
 
             // Get the values
             cAudio.iOutDevice = (int)SendDlgItemMessage(hWnd, IDC_MIDIOUT, LB_GETCURSEL, 0, 0);
-            cViz.bKDMAPI = IsDlgButtonChecked(hWnd, IDC_KDMAPI) == BST_CHECKED;
+            cAudio.bKDMAPI = IsDlgButtonChecked(hWnd, IDC_KDMAPI);
             cAudio.sDesiredOut = cAudio.vMIDIOutDevices[cAudio.iOutDevice];
 
             // Set the values
             bool bChanged = false;
-            if (cViz.bKDMAPI) {
-                if (cViz.bKDMAPI != config.GetVizSettings().bKDMAPI) {
+            if (cAudio.bKDMAPI) {
+                if (cAudio.bKDMAPI != config.GetAudioSettings().bKDMAPI) {
                     bChanged = true;
                 }
             }
             else {
-                if (cViz.bKDMAPI != config.GetVizSettings().bKDMAPI || cAudio.iOutDevice != config.GetAudioSettings().iOutDevice) {
+                if (cAudio.bKDMAPI != config.GetAudioSettings().bKDMAPI || cAudio.iOutDevice != config.GetAudioSettings().iOutDevice) {
                     bChanged = true;
                 }
             }
-            config.SetAudioSettings(cAudio);
-            config.SetVizSettings(cViz);
-
             if (bChanged)
                 HandOffMsg(WM_DEVICECHANGE, 0, 0);
 
+            // Report success and return
+            config.SetAudioSettings(cAudio);
             SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_NOERROR);
 
             // Save settings
@@ -290,29 +318,27 @@ INT_PTR WINAPI AudioProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     return FALSE;
 }
 
-// Sets the values in the playback settings dialog. Used at init and restoring defaults
-VOID SetAudioProc(HWND hWnd, const AudioSettings& cAudio)
-{
-    Config::GetConfig().LoadMIDIDevices();
-
-    HWND hWndOutDevs = GetDlgItem(hWnd, IDC_MIDIOUT);
-    while (SendMessage(hWndOutDevs, LB_DELETESTRING, 0, 0) > 0);
-    for (vector< wstring >::const_iterator it = cAudio.vMIDIOutDevices.begin(); it != cAudio.vMIDIOutDevices.end(); ++it)
-        SendMessage(hWndOutDevs, LB_ADDSTRING, 0, (LPARAM)(it->c_str()));
-    SendMessage(hWndOutDevs, LB_SETCURSEL, cAudio.iOutDevice, 0);
-}
-
-INT_PTR WINAPI VideoProc(HWND hWnd, UINT msg, WPARAM, LPARAM lParam)
+INT_PTR WINAPI VideoProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg)
     {
     case WM_INITDIALOG:
     {
         // Config to fill out the form
-        Config& config = Config::GetConfig();
-        const VideoSettings& cVideo = config.GetVideoSettings();
-        CheckDlgButton(hWnd, IDC_DISPLAYFPS, cVideo.bShowFPS ? BST_CHECKED : BST_UNCHECKED);
-        CheckDlgButton(hWnd, IDC_LIMITFPS, cVideo.bLimitFPS ? BST_CHECKED : BST_UNCHECKED);
+        const VideoSettings& cVideo = Config::GetConfig().GetVideoSettings();
+
+        CheckDlgButton(hWnd, IDC_TICKBASED, cVideo.bTickBased);
+        CheckDlgButton(hWnd, IDC_PITCHBENDS, cVideo.bVisualizePitchBends);
+        CheckDlgButton(hWnd, IDC_SAMEWIDTH, cVideo.bSameWidth);
+        CheckDlgButton(hWnd, IDC_MARKERS, cVideo.bShowMarkers);
+        const wchar_t* codepages[] = { L"CP-1252 (Western)", L"CP-437 (American)", L"CP-82 (Korean)", L"CP-886 (Taiwan)", L"CP-932 (Japanese)", L"CP-936 (Chinese)", L"UTF-8" };
+        for (size_t i = 0; i < sizeof(codepages) / sizeof(const wchar_t*); i++)
+            SendMessage(GetDlgItem(hWnd, IDC_MARKERENC), CB_ADDSTRING, i, (LPARAM)codepages[i]);
+        SendMessage(GetDlgItem(hWnd, IDC_MARKERENC), CB_SETCURSEL, cVideo.eMarkerEncoding, 0);
+        CheckDlgButton(hWnd, IDC_LIMITFPS, cVideo.bLimitFPS);
+        CheckDlgButton(hWnd, IDC_FFMPEG, cVideo.bDumpFrames);
+        CheckDlgButton(hWnd, IDC_DEBUG, cVideo.bDebug);
+        CheckDlgButton(hWnd, IDC_DISABLEUI, cVideo.bDisableUI);
 
         return TRUE;
     }
@@ -330,9 +356,17 @@ INT_PTR WINAPI VideoProc(HWND hWnd, UINT msg, WPARAM, LPARAM lParam)
             // Get a copy of the config to overwrite the settings
             Config& config = Config::GetConfig();
             VideoSettings cVideo = config.GetVideoSettings();
-            cVideo.bShowFPS = (IsDlgButtonChecked(hWnd, IDC_DISPLAYFPS) == BST_CHECKED);
-            cVideo.bLimitFPS = (IsDlgButtonChecked(hWnd, IDC_LIMITFPS) == BST_CHECKED);
+            cVideo.bTickBased = IsDlgButtonChecked(hWnd, IDC_TICKBASED);
+            cVideo.bVisualizePitchBends = IsDlgButtonChecked(hWnd, IDC_PITCHBENDS);
+            cVideo.bSameWidth = IsDlgButtonChecked(hWnd, IDC_SAMEWIDTH);
+            cVideo.bShowMarkers = IsDlgButtonChecked(hWnd, IDC_MARKERS);
+            cVideo.eMarkerEncoding = (VideoSettings::MarkerEncoding)SendMessage(GetDlgItem(hWnd, IDC_MARKERENC), CB_GETCURSEL, 0, 0);
+            cVideo.bLimitFPS = (IsDlgButtonChecked(hWnd, IDC_LIMITFPS));
+            cVideo.bDumpFrames = IsDlgButtonChecked(hWnd, IDC_FFMPEG);
+            cVideo.bDebug = (IsDlgButtonChecked(hWnd, IDC_DEBUG));
+            cVideo.bDisableUI = (IsDlgButtonChecked(hWnd, IDC_DISABLEUI));
 
+            // Report success and return
             config.SetVideoSettings(cVideo);
             SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_NOERROR);
 
@@ -347,27 +381,55 @@ INT_PTR WINAPI VideoProc(HWND hWnd, UINT msg, WPARAM, LPARAM lParam)
     return FALSE;
 }
 
-INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM, LPARAM lParam)
+INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg)
     {
     case WM_INITDIALOG:
     {
         // Config to fill out the form
-        Config& config = Config::GetConfig();
-        const ControlsSettings& cControls = config.GetControlsSettings();
+        const ControlsSettings& cControls = Config::GetConfig().GetControlsSettings();
 
         HWND hWndFwdBack = GetDlgItem(hWnd, IDC_LRARROWS);
         HWND hWndSpeedPct = GetDlgItem(hWnd, IDC_UDARROWS);
-
         // Edit boxes
         TCHAR buf[32];
         _stprintf_s(buf, TEXT("%g"), cControls.dFwdBackSecs);
         SetWindowText(hWndFwdBack, buf);
         _stprintf_s(buf, TEXT("%g"), cControls.dSpeedUpPct);
         SetWindowText(hWndSpeedPct, buf);
+        CheckDlgButton(hWnd, IDC_SHOWCONTROLS, cControls.bAlwaysShowControls);
+        CheckDlgButton(hWnd, IDC_PHIGROS, cControls.bPhigros);
+        SetDlgItemTextW(hWnd, IDC_SPLASHMIDI, cControls.sSplashMIDI.c_str());
 
         return TRUE;
+    }
+    case WM_COMMAND: {
+        int iId = LOWORD(wParam);
+        Changed(hWnd);
+        switch (iId)
+        {
+        case IDC_SPLASHBROWSE: {
+            OPENFILENAME ofn = {};
+            TCHAR sFilename[1024] = { 0 };
+            ofn.lStructSize = sizeof(OPENFILENAME);
+            ofn.hwndOwner = hWnd;
+            ofn.lpstrFilter = TEXT("MIDI Files (*.mid, *.mid.xz)\0*.mid;*.xz\0");
+            ofn.lpstrFile = sFilename;
+            ofn.nMaxFile = sizeof(sFilename) / sizeof(TCHAR);
+            ofn.lpstrTitle = OpenSplashFileTitle;
+            ofn.Flags = OFN_EXPLORER | OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
+            if (GetOpenFileName(&ofn))
+                SetDlgItemTextW(hWnd, IDC_SPLASHMIDI, sFilename);
+            return TRUE;
+        }
+        case IDC_SPLASHRESET: {
+            Changed(hWnd);
+            SetDlgItemTextW(hWnd, IDC_SPLASHMIDI, L"");
+            return TRUE;
+        }
+        }
+        break;
     }
     case WM_NOTIFY:
     {
@@ -418,7 +480,7 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM, LPARAM lParam)
             ControlsSettings cControls = config.GetControlsSettings();
 
             // Edit boxes
-            TCHAR buf[32];
+            TCHAR buf[1<<10];
             double dEditVal = 0;
 
             HWND hWndFwdBack = GetDlgItem(hWnd, IDC_LRARROWS);
@@ -427,7 +489,7 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM, LPARAM lParam)
                 cControls.dFwdBackSecs = dEditVal;
             else
             {
-                MessageBox(hWnd, TEXT("Please specify a numeric value for the left and right arrows"), TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
+                MessageBox(hWnd, TEXT("Please specify a numeric value! "), TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
                 PostMessage(hWnd, WM_NEXTDLGCTL, (WPARAM)hWndFwdBack, TRUE);
                 SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_INVALID);
                 return TRUE;
@@ -439,11 +501,17 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM, LPARAM lParam)
                 cControls.dSpeedUpPct = dEditVal;
             else
             {
-                MessageBox(hWnd, TEXT("Please specify a numeric value for the up and down arrows"), TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
+                MessageBox(hWnd, TEXT("Please specify a numeric value! "), TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
                 PostMessage(hWnd, WM_NEXTDLGCTL, (WPARAM)hWndSpeedPct, TRUE);
                 SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_INVALID);
                 return TRUE;
             }
+
+            cControls.bAlwaysShowControls = IsDlgButtonChecked(hWnd, IDC_SHOWCONTROLS);
+            cControls.bPhigros = IsDlgButtonChecked(hWnd, IDC_PHIGROS);
+            wchar_t splash[1 << 10]{};
+            GetWindowTextW(GetDlgItem(hWnd, IDC_SPLASHMIDI), splash, 1 << 10);
+            cControls.sSplashMIDI = splash;
 
             // Report success and return
             config.SetControlsSettings(cControls);
@@ -461,130 +529,6 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM, LPARAM lParam)
     return FALSE;
 }
 
-INT_PTR WINAPI VizProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-    switch (msg) {
-    case WM_INITDIALOG: {
-        Config& config = Config::GetConfig();
-        const VizSettings& viz = config.GetVizSettings();
-
-        CheckDlgButton(hWnd, IDC_TICKBASED, viz.bTickBased);
-        CheckDlgButton(hWnd, IDC_MARKERS, viz.bShowMarkers);
-        CheckDlgButton(hWnd, IDC_STATS, viz.bPhigros);
-        CheckDlgButton(hWnd, IDC_PITCHBENDS, viz.bVisualizePitchBends);
-        CheckDlgButton(hWnd, IDC_FFMPEG, viz.bDumpFrames);
-        CheckDlgButton(hWnd, IDC_COLORLOOP, viz.bColorLoop);
-        CheckDlgButton(hWnd, IDC_DISABLEUI, viz.bDisableUI);
-
-        const wchar_t* codepages[] = { L"CP-1252 (Western)", L"CP-437 (American)", L"CP-82 (Korean)", L"CP-886 (Taiwan)", L"CP-932 (Japanese)", L"CP-936 (Chinese)", L"UTF-8" };
-        for (size_t i = 0; i < sizeof(codepages) / sizeof(const wchar_t*); i++)
-            SendMessage(GetDlgItem(hWnd, IDC_MARKERENC), CB_ADDSTRING, i, (LPARAM)codepages[i]);
-        SendMessage(GetDlgItem(hWnd, IDC_MARKERENC), CB_SETCURSEL, viz.eMarkerEncoding, 0);
-
-        SetDlgItemTextW(hWnd, IDC_SPLASHMIDI, viz.sSplashMIDI.c_str());
-        SetDlgItemTextW(hWnd, IDC_BACKGROUND, viz.sBackground.c_str());
-
-        return TRUE;
-    }
-    case WM_COMMAND: {
-        Changed(hWnd);
-        int id = LOWORD(wParam);
-        switch (id) {
-        case IDC_SPLASHBROWSE: {
-            OPENFILENAME ofn = {};
-            TCHAR sFilename[1024] = { 0 };
-            ofn.lStructSize = sizeof(OPENFILENAME);
-            ofn.hwndOwner = hWnd;
-            ofn.lpstrFilter = TEXT("MIDI Files (*.mid, *.mid.xz)\0*.mid;*.xz\0");
-            ofn.lpstrFile = sFilename;
-            ofn.nMaxFile = sizeof(sFilename) / sizeof(TCHAR);
-            ofn.lpstrTitle = OpenSplashFileTitle;
-            ofn.Flags = OFN_EXPLORER | OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
-            if (GetOpenFileName(&ofn))
-                SetDlgItemTextW(hWnd, IDC_SPLASHMIDI, sFilename);
-            return TRUE;
-        }
-        case IDC_SPLASHRESET: {
-            Changed(hWnd);
-            SetDlgItemTextW(hWnd, IDC_SPLASHMIDI, L"");
-            return TRUE;
-        }
-        case IDC_BACKGROUNDBROWSE: {
-            OPENFILENAME ofn = {};
-            TCHAR sFilename[1024] = { 0 };
-            ofn.lStructSize = sizeof(OPENFILENAME);
-            ofn.hwndOwner = hWnd;
-            ofn.lpstrFilter = TEXT("Image files\0*.png;*.jpg;*.jpeg\0");
-            ofn.lpstrFile = sFilename;
-            ofn.nMaxFile = sizeof(sFilename) / sizeof(TCHAR);
-            ofn.lpstrTitle = OpenBackgroundFileTitle;
-            ofn.Flags = OFN_EXPLORER | OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
-            if (GetOpenFileName(&ofn))
-                SetDlgItemTextW(hWnd, IDC_BACKGROUND, sFilename);
-            return TRUE;
-        }
-        case IDC_BACKGROUNDRESET: {
-            Changed(hWnd);
-            SetDlgItemTextW(hWnd, IDC_BACKGROUND, L"");
-            return TRUE;
-        }
-        }
-        break;
-    }
-    case WM_NOTIFY: {
-        LPNMHDR lpnmhdr = (LPNMHDR)lParam;
-        switch (lpnmhdr->code) {
-        case PSN_APPLY: {
-            Config& config = Config::GetConfig();
-            VizSettings viz = config.GetVizSettings();
-            wchar_t splash[1 << 10]{};
-            wchar_t background[1 << 10]{};
-
-            viz.bTickBased = IsDlgButtonChecked(hWnd, IDC_TICKBASED);
-            viz.bShowMarkers = IsDlgButtonChecked(hWnd, IDC_MARKERS);
-            viz.eMarkerEncoding = (VizSettings::MarkerEncoding)SendMessage(GetDlgItem(hWnd, IDC_MARKERENC), CB_GETCURSEL, 0, 0);
-            viz.bPhigros = IsDlgButtonChecked(hWnd, IDC_STATS);
-            GetWindowTextW(GetDlgItem(hWnd, IDC_SPLASHMIDI), splash, 1 << 10);
-            viz.sSplashMIDI = splash;
-            GetWindowTextW(GetDlgItem(hWnd, IDC_BACKGROUND), background, 1 << 10);
-            viz.sBackground = background;
-            viz.bVisualizePitchBends = IsDlgButtonChecked(hWnd, IDC_PITCHBENDS);
-            viz.bDumpFrames = IsDlgButtonChecked(hWnd, IDC_FFMPEG);
-            viz.bColorLoop = IsDlgButtonChecked(hWnd, IDC_COLORLOOP);
-            viz.bDisableUI = IsDlgButtonChecked(hWnd, IDC_DISABLEUI);
-            config.SetVizSettings(viz);
-            SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_NOERROR);
-
-            // Save settings
-            config.SaveConfigValues();
-            return TRUE;
-        }
-        }
-        break;
-    }
-    }
-
-    return FALSE;
-}
-
-BOOL ToggleYN(HWND hWndListview, int iItem)
-{
-    if (iItem < 0) return FALSE;
-
-    LVITEM lvi;
-    TCHAR YN[2];
-    lvi.iSubItem = 1;
-    lvi.pszText = YN;
-    lvi.cchTextMax = 2;
-    if (SendMessage(hWndListview, LVM_GETITEMTEXT, iItem, (LPARAM)&lvi) <= 0) return FALSE;
-
-    if (YN[0] == TEXT('Y')) lvi.pszText = (LPWSTR)TEXT("No");
-    else if (YN[0] == TEXT('N')) lvi.pszText = (LPWSTR)TEXT("Yes");
-    else return TRUE;
-
-    SendMessage(hWndListview, LVM_SETITEMTEXT, iItem, (LPARAM)&lvi);
-    return TRUE;
-}
-
 BOOL GetCustomSettings(MainScreen* pGameState)
 {
     INT_PTR iDlgResult = DialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_TRACKSETTINGS),
@@ -595,7 +539,6 @@ BOOL GetCustomSettings(MainScreen* pGameState)
 INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     static const VisualSettings& cVisual = Config::GetConfig().GetVisualSettings();
-    static const VizSettings& cViz = Config::GetConfig().GetVizSettings();
     static vector< bool > vMuted, vHidden; // Would rather be part of control, but no subitem lparam available
     static vector< unsigned > vColors;
 
@@ -627,16 +570,14 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         vMuted.resize(mInfo.iNumChannels);
         vHidden.resize(mInfo.iNumChannels);
         vColors.resize(mInfo.iNumChannels);
-        size_t iMax = sizeof(cVisual.colors) / sizeof(cVisual.colors[0]);
         for (size_t i = 0; i < mInfo.iNumChannels; i++)
         {
             vMuted[i] = vHidden[i] = false;
-            if (cViz.bColorLoop) {
-                vColors[i] = cVisual.colors[i % 16];
+            if (cVisual.bRandomizeColor) {
+                vColors[i] = Util::RandColor();
             }
             else {
-                if (i < iMax) vColors[i] = cVisual.colors[i];
-                else vColors[i] = Util::RandColor();
+                vColors[i] = cVisual.colors[i % 16];
             }
         }
 
@@ -692,7 +633,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         RECT rcItem = { LVIR_BOUNDS };
         SendMessage(hWndTracks, LVM_GETITEMRECT, 0, (LPARAM)&rcItem);
 
-        if (Config::GetConfig().GetVizSettings().bDumpFrames) {
+        if (Config::GetConfig().GetVideoSettings().bDumpFrames) {
             SendMessage(GetDlgItem(hWnd, IDC_NOLAG), BM_SETCHECK, BST_CHECKED, 0);
             EnableWindow(GetDlgItem(hWnd, IDC_NOLAG), FALSE);
         }
@@ -729,7 +670,6 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             {
                 LPNMLISTVIEW lpnmlv = (LPNMLISTVIEW)lParam;
                 bool bAllChecked = true;
-                size_t iMax = sizeof(cVisual.colors) / sizeof(cVisual.colors[0]);
                 switch (lpnmlv->iSubItem)
                 {
                 case 3:
@@ -744,12 +684,11 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                     return TRUE;
                 case 5:
                     for (size_t i = 0; i < vColors.size(); i++)
-                        if (cViz.bColorLoop) {
-                            vColors[i] = cVisual.colors[i % 16];
+                        if (cVisual.bRandomizeColor) {
+                            vColors[i] = Util::RandColor();
                         }
                         else {
-                            if (i < iMax) vColors[i] = cVisual.colors[i];
-                            else vColors[i] = Util::RandColor();
+                            vColors[i] = cVisual.colors[i % 16];
                         }
                     InvalidateRect(lpnmlv->hdr.hwndFrom, NULL, FALSE);
                     return TRUE;

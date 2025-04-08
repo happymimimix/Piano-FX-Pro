@@ -1,7 +1,6 @@
 //Matix definitions
 #include <Widths.h>
 #include "imgui/Fonts.h"
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define PropertyWindowW 300
 #define PropertyWindowH 150
 #define TrackWindowW 300
@@ -90,16 +89,6 @@
 #define oColorBox pColorBox+ColorBox //Octuple
 #define nColorBox oColorBox+ColorBox //Nonuple
 #define cColorBox nColorBox+ColorBox //deCuple
-#define mColorBox 0-ColorBox //Minus
-#define mdColorBox mColorBox+mColorBox //Double
-#define mtColorBox mdColorBox+mColorBox //Triple
-#define mqColorBox mtColorBox+mColorBox //Quadruple
-#define miColorBox mqColorBox+mColorBox //quIntuple
-#define mxColorBox miColorBox+mColorBox //seXtuple
-#define mpColorBox mxColorBox+mColorBox //sePtuple
-#define moColorBox mpColorBox+mColorBox //Octuple
-#define mnColorBox moColorBox+mColorBox //Nonuple
-#define mcColorBox mnColorBox+mColorBox //deCuple
 #define KeySelectW 30+Margin
 #define SpinnerW 40+Margin
 #define MarkerEncodingW 80+Margin

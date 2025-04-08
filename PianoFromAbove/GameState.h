@@ -16,31 +16,33 @@
 #include <deque>
 using namespace std;
 
-//#include "ProtoBuf\MetaData.pb.h"
 #include "Renderer.h"
 #include "MIDI.h"
 #include "Misc.h"
 
 inline long long m_llStartTime;
 inline string llStartTimeFormatted;
-inline uint32_t polyphony;
+inline int polyphony;
 inline string polyFormatted;
-inline uint32_t nps;
+inline int nps;
 inline string npsFormatted;
-inline uint32_t passed;
+inline int passed;
 inline string passedFormatted;
 inline uint8_t FrameCount = 0;
 inline int width = -1;
 inline int height = -1;
 inline int m_iStartTick;
 inline uint16_t resolution = -1;
-inline char CheatEngineCaption[1 << 10] = {};
+inline char CheatEngineCaption[(1<<7)*(1<<10)] = {};
+inline int TotalNC;
+inline long long MinimalTime;
+inline long long TotalTime;
 
 //Abstract base class
 class GameState
 {
 public:
-    enum GameError : uint8_t { Success = 0, BadPointer, OutOfMemory, DirectXError };
+    enum GameError : uint8_t { Success = 0, BadPointer, DirectXError };
     enum State : uint8_t { Intro = 0, Splash, Practice };
 
     //Static methods
@@ -208,6 +210,7 @@ private:
 
     // Logic
     void UpdateState(int key, const thread_work_t& work);
+    void UpdateStateReversed(int iPos);
     void JumpTo(long long llStartTime, boolean loadingMode = false);
     void ApplyMarker(unsigned char* data, size_t size);
     void ApplyColor(MIDIMetaEvent* event);
@@ -274,9 +277,11 @@ private:
     long long m_llTimeSpan;  // Times of the start and end events of the current window
     long long m_llPrevTime;
     vector<int> m_vState[128];  // The notes that are on at time m_llStartTime.
+    vector<int> m_vStateReversed[128];  // The notes that are on at m_iEndPos.
     vector<thread_work_t> m_vThreadWork[128];
     int m_pNoteState[128]; // The last note that was turned on
     double m_dSpeed; // Speed multiplier
+    double m_dNSpeed; // Note Speed multiplier
     bool m_bPaused; // Paused state
     Timer m_Timer; // Frame timers
     Timer m_RealTimer;
@@ -286,7 +291,6 @@ private:
     bool m_bTickMode = false;
 
     // FPS variables
-    bool m_bDebug;
     int m_iFPSCount;
     long long m_llFPSTime;
     double m_dFPS;

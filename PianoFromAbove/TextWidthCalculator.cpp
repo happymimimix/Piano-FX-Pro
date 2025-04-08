@@ -1,12 +1,7 @@
 #include <iostream>
-#include <fstream>
 #include <string>
-#include <vector>
-#include <algorithm>
 #include <Windows.h>
 #include "imgui/Fonts.h"
-#include <locale>
-#include <codecvt>
 
 using namespace std;
 
@@ -49,15 +44,7 @@ int main() {
     HBRUSH hBrush = CreateSolidBrush(0x0000FF);
     SelectObject(cmdDC, hBrush);
     wstring Line = L"";
-    while (true) {
-        getline(wcin, Line);
-        if (Line.length() == 0) {
-            DeleteObject(hFont);
-            DeleteObject(hBrush);
-            ReleaseDC(cmd, cmdDC);
-            Sleep(1 << 10);
-            return 0;
-        }
+    while (getline(wcin, Line)) {
         if (Line.length() < 8 || Line.substr(0, 8) != L"#define ") {
             if ((Line.length() < 9 || Line.substr(0, 9) != L"#include ") && (Line.length() < 7 || Line.substr(0, 7) != L"#undef ")) {
                 wcout << Line << endl;
@@ -100,4 +87,9 @@ int main() {
             }
         }
     }
+    DeleteObject(hFont);
+    DeleteObject(hBrush);
+    ReleaseDC(cmd, cmdDC);
+    Sleep(1 << 10);
+    return 0;
 }

@@ -306,7 +306,7 @@ HMENU GetMainMenu()
 VOID SizeWindows(int iMainWidth, int iMainHeight)
 {
     static const ViewSettings& cView = Config::GetConfig().GetViewSettings();
-    static const VisualSettings& cVisual = Config::GetConfig().GetVisualSettings();
+    static const ControlsSettings& cControls = Config::GetConfig().GetControlsSettings();
     int iBarHeight = 0, iLibWidth = 0;
     UINT swpFlags = SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOOWNERZORDER;
 
@@ -326,7 +326,7 @@ VOID SizeWindows(int iMainWidth, int iMainHeight)
         iBarHeight = rcBarDlg.bottom - rcBarDlg.top;
         if (hdwp) hdwp = DeferWindowPos(hdwp, g_hWndBar, NULL, 0, 0, iMainWidth, iBarHeight, swpFlags);
     }
-    if (cView.GetFullScreen() && !cVisual.bAlwaysShowControls) iBarHeight = 0;
+    if (cView.GetFullScreen() && !cControls.bAlwaysShowControls) iBarHeight = 0;
     if (cView.GetFullScreen()) iLibWidth = 0;
     if (hdwp) hdwp = DeferWindowPos(hdwp, g_hWndGfx, NULL, iLibWidth, iBarHeight, iMainWidth - iLibWidth, iMainHeight - iBarHeight, swpFlags);
     if (hdwp) EndDeferWindowPos(hdwp);
@@ -336,7 +336,7 @@ LRESULT WINAPI GfxProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     // Static vars for poping up the lib and bar in full screen mode
     static const ViewSettings& cView = Config::GetConfig().GetViewSettings();
-    static const VisualSettings& cVisual = Config::GetConfig().GetVisualSettings();
+    static const ControlsSettings& cControls = Config::GetConfig().GetControlsSettings();
     static bool bShowBar;
     static int iBarHeight;
 
@@ -422,7 +422,7 @@ LRESULT WINAPI GfxProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 iBarHeight = rcBar.bottom - rcBar.top;
             }
 
-            if (!cVisual.bAlwaysShowControls)
+            if (!cControls.bAlwaysShowControls)
             {
                 if (iYPos < iBarHeight && cView.GetControls())
                 {
@@ -943,9 +943,9 @@ VOID HandOffMsg(UINT msg, WPARAM wParam, LPARAM lParam)
 VOID ShowControls(BOOL bShow)
 {
     static const ViewSettings& cView = Config::GetConfig().GetViewSettings();
-    static const VisualSettings& cVisual = Config::GetConfig().GetVisualSettings();
+    static const ControlsSettings& cControls = Config::GetConfig().GetControlsSettings();
     SizeWindows(0, 0);
-    if (!cView.GetFullScreen() || cVisual.bAlwaysShowControls)
+    if (!cView.GetFullScreen() || cControls.bAlwaysShowControls)
         ShowWindow(g_hWndBar, bShow ? SW_SHOWNA : SW_HIDE);
     else if (cView.GetFullScreen())
         ShowWindow(g_hWndBar, SW_HIDE);
@@ -975,7 +975,7 @@ VOID SetOnTop(BOOL bOnTop)
 VOID SetFullScreen(BOOL bFullScreen)
 {
     static const ViewSettings& cView = Config::GetConfig().GetViewSettings();
-    static const VisualSettings& cVisual = Config::GetConfig().GetVisualSettings();
+    static const ControlsSettings& cControls = Config::GetConfig().GetControlsSettings();
     static RECT rcOld = {};
     HMENU hMenu = GetMainMenu();
 
@@ -986,7 +986,7 @@ VOID SetFullScreen(BOOL bFullScreen)
         GetWindowRect(GetDesktopWindow(), &rcDesktop);
 
         SetMenu(g_hWnd, NULL);
-        if (!cVisual.bAlwaysShowControls) ShowWindow(g_hWndBar, SW_HIDE);
+        if (!cControls.bAlwaysShowControls) ShowWindow(g_hWndBar, SW_HIDE);
         SetWindowLongPtr(g_hWnd, GWL_STYLE, GetWindowLongPtr(g_hWnd, GWL_STYLE) & ~WS_CAPTION & ~WS_THICKFRAME);
         SetWindowPos(g_hWnd, HWND_TOPMOST, rcDesktop.left, rcDesktop.top,
             rcDesktop.right - rcDesktop.left, rcDesktop.bottom - rcDesktop.top,
@@ -1126,23 +1126,24 @@ INT_PTR LoadingProc(HWND hwnd, UINT msg, WPARAM, LPARAM) {
             return true;
         }
 
-        SetWindowText(GetDlgItem(hwnd, IDC_LOADINGDESC), desc.c_str());
-
-        char buf[1 << 10];
+        wchar_t buf[1 << 10];
         auto prog = g_LoadingProgress.progress.load();
-        snprintf(buf, sizeof(buf), "%llu / %llu", prog, g_LoadingProgress.max);
-        SetWindowTextA(GetDlgItem(hwnd, IDC_LOADINGNUM), buf);
-
-        PROCESS_MEMORY_COUNTERS mem{};
-        mem.cb = sizeof(mem);
-        GetProcessMemoryInfo(GetCurrentProcess(), &mem, sizeof(mem));
-        snprintf(buf, sizeof(buf), "%llu MB", mem.PagefileUsage / 1048576);
-        SetWindowTextA(GetDlgItem(hwnd, IDC_MEMUSAGE), buf);
-
         auto bar = GetDlgItem(hwnd, IDC_LOADINGPROGRESS);
         SendMessage(bar, PBM_SETRANGE32, 0, g_LoadingProgress.max);
         SendMessage(bar, PBM_SETPOS, prog, 0);
         UpdateWindow(bar);
+
+        SetWindowText(GetDlgItem(hwnd, IDC_LOADINGDESC), desc.c_str());
+
+        swprintf(buf, sizeof(buf), L"%llu / %llu", prog, g_LoadingProgress.max);
+        SetWindowText(GetDlgItem(hwnd, IDC_LOADINGNUM), buf);
+
+        PROCESS_MEMORY_COUNTERS mem{};
+        mem.cb = sizeof(mem);
+        GetProcessMemoryInfo(GetCurrentProcess(), &mem, sizeof(mem));
+        swprintf(buf, sizeof(buf), L"%llu MB", mem.PagefileUsage / 1048576);
+        SetWindowText(GetDlgItem(hwnd, IDC_MEMUSAGE), buf);
+
         return true;
     }
     case WM_CLOSE: {
@@ -1158,7 +1159,7 @@ BOOL PlayFile(const wstring& sFile)
     Config& config = Config::GetConfig();
     PlaybackSettings& cPlayback = config.GetPlaybackSettings();
     ViewSettings& cView = config.GetViewSettings();
-    VizSettings& cViz = config.GetVizSettings();
+    const VideoSettings& cVideo = config.GetVideoSettings();
 
     const GameState::State ePlayMode = GameState::Practice;
 
@@ -1193,7 +1194,7 @@ BOOL PlayFile(const wstring& sFile)
     cPlayback.SetPosition(0);
     cView.SetZoomMove(false);
     TCHAR sTitle[1 << 10];
-    if (cViz.bDumpFrames) {
+    if (cVideo.bDumpFrames) {
         _stprintf_s(sTitle, MainWindowTitle1 L" v" LVersionString L" | " MainWindowTitle2 L" | " MainWindowTitle4 L"%ws" MainWindowTitle7, sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
     }
     else {
@@ -1210,7 +1211,7 @@ BOOL PlayFile(const wstring& sFile)
 VOID CheckActivity(BOOL bIsActive, POINT* ptNew, BOOL bToggleEnable)
 {
     static const ViewSettings& cView = Config::GetConfig().GetViewSettings();
-    static const VisualSettings& cVisual = Config::GetConfig().GetVisualSettings();
+    static const ControlsSettings& cControls = Config::GetConfig().GetControlsSettings();
     static bool bEnabled = true;
     static bool bWasActive = true;
     static bool bMouseHidden = false;
@@ -1239,7 +1240,7 @@ VOID CheckActivity(BOOL bIsActive, POINT* ptNew, BOOL bToggleEnable)
         bWasActive = true;
         if (bMouseHidden) bMouseHidden = (ShowCursor(TRUE) < 0);
     }
-    else if (!bIsActive && GetFocus() == g_hWndGfx && (!IsWindowVisible(g_hWndBar) || cVisual.bAlwaysShowControls))
+    else if (!bIsActive && GetFocus() == g_hWndGfx && (!IsWindowVisible(g_hWndBar) || cControls.bAlwaysShowControls))
     {
         if (bWasActive)
             bWasActive = false;

@@ -28,7 +28,6 @@
 
 class ISettings;
 class Config;
-class SongLibrary;
 
 class ISettings
 {
@@ -47,8 +46,10 @@ struct VisualSettings : public ISettings
 
     enum KeysShown : uint8_t { All, Song, Custom } eKeysShown;
     int iFirstKey, iLastKey;
-    bool bAlwaysShowControls;
     unsigned int colors[16], iBkgColor;
+    int iBarColor;
+    bool bRandomizeColor;
+    wstring sBackground;
 };
 
 struct AudioSettings : public ISettings
@@ -61,6 +62,7 @@ struct AudioSettings : public ISettings
     vector< wstring > vMIDIOutDevices;
     int iOutDevice;
     wstring sDesiredOut;
+    bool bKDMAPI;
 };
 
 struct VideoSettings : public ISettings
@@ -69,7 +71,15 @@ struct VideoSettings : public ISettings
     void LoadConfigValues( TiXmlElement *txRoot );
     bool SaveConfigValues( TiXmlElement *txRoot );
 
-    bool bShowFPS, bLimitFPS;
+    bool bTickBased;
+    bool bVisualizePitchBends;
+    bool bSameWidth;
+    bool bShowMarkers;
+    enum MarkerEncoding : uint8_t { CP1252, CP437, CP82, CP886, CP932, CP936, UTF8 } eMarkerEncoding;
+    bool bLimitFPS;
+    bool bDumpFrames;
+    bool bDebug;
+    bool bDisableUI;
 };
 
 struct ControlsSettings : public ISettings
@@ -79,6 +89,9 @@ struct ControlsSettings : public ISettings
     bool SaveConfigValues( TiXmlElement *txRoot );
 
     double dFwdBackSecs, dSpeedUpPct;
+    bool bAlwaysShowControls;
+    bool bPhigros;
+    wstring sSplashMIDI;
 };
 
 class PlaybackSettings : public ISettings
@@ -134,7 +147,6 @@ public:
     void ToggleKeyboard( bool bUpdateGUI = false ) { SetKeyboard( !m_bKeyboard, bUpdateGUI ); }
     void ToggleOnTop( bool bUpdateGUI = false ) { SetOnTop( !m_bOnTop, bUpdateGUI ); }
     void ToggleFullScreen( bool bUpdateGUI = false ) { SetFullScreen( !m_bFullScreen, bUpdateGUI ); }
-    void ToggleZoomMove( bool bUpdateGUI = false ) { SetZoomMove( !m_bZoomMove ); }
 
     void SetMainPos( int iMainLeft, int iMainTop ) { m_iMainLeft = iMainLeft; m_iMainTop = iMainTop; }
     void SetMainSize( int iMainWidth, int iMainHeight ) { m_iMainWidth = iMainWidth; m_iMainHeight = iMainHeight; }
@@ -170,27 +182,6 @@ private:
     int m_iMainLeft, m_iMainTop, m_iMainWidth, m_iMainHeight;
 };
 
-struct VizSettings : public ISettings {
-    void LoadDefaultValues();
-    void LoadDefaultColors();
-    void LoadConfigValues(TiXmlElement* txRoot);
-    bool SaveConfigValues(TiXmlElement* txRoot);
-
-    bool bTickBased;
-    bool bShowMarkers;
-    enum MarkerEncoding : uint8_t { CP1252, CP437, CP82, CP886, CP932, CP936, UTF8 } eMarkerEncoding;
-    bool bPhigros;
-    std::wstring sSplashMIDI;
-    bool bVisualizePitchBends;
-    bool bDumpFrames;
-    int iBarColor;
-    std::wstring sBackground;
-    bool bColorLoop;
-    bool bKDMAPI;
-    bool bDisableUI;
-    bool bSameWidth;
-};
-
 class Config : public ISettings
 {
 public:
@@ -213,13 +204,11 @@ public:
     const ControlsSettings& GetControlsSettings() const { return m_ControlsSettings; }
     PlaybackSettings& GetPlaybackSettings() { return m_PlaybackSettings; }
     ViewSettings& GetViewSettings() { return m_ViewSettings; }
-    VizSettings& GetVizSettings() { return m_VizSettings; }
 
     void SetVisualSettings(const VisualSettings &VisualSettings) { m_VisualSettings = VisualSettings; }
     void SetAudioSettings(const AudioSettings &audioSettings) { m_AudioSettings = audioSettings; }
     void SetVideoSettings(const VideoSettings &videoSettings) { m_VideoSettings = videoSettings; }
     void SetControlsSettings(const ControlsSettings &ControlsSettings) { m_ControlsSettings = ControlsSettings; }
-    void SetVizSettings(const VizSettings& VizSettings) { m_VizSettings = VizSettings; }
 
     bool m_bManualTimer = false;
     bool m_bPianoOverride = false;
@@ -237,5 +226,4 @@ private:
     ControlsSettings m_ControlsSettings;
     PlaybackSettings m_PlaybackSettings;
     ViewSettings m_ViewSettings;
-    VizSettings m_VizSettings;
 };

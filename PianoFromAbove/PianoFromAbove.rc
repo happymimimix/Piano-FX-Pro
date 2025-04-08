@@ -18,214 +18,239 @@ CAPTION PropertyWindowTitle
 FONT FontSize,FontName
 BEGIN
 
-    GROUPBOX        Property1Text1,-1,
-                    Margin,
-                    Margin,
-                    PropertyWindowW + mdMargin,
-                    qContentHeight + tMargin + hMargin
+	LTEXT           Property1Text1,-1,
+					dMargin,
+					dMargin,
+					Property1Text1W,
+					FontSize
 
-    CONTROL         Property1Text2,IDC_SHOWALLKEYS,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,
-                    tMargin,
-                    ContentHeight + dMargin,
-                    Property1Text2W + BoxSpacing,
-                    ContentHeight
+	CONTROL         Property1Text2,IDC_SHOWALLKEYS,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,
+					dMargin,
+					dMargin + ContentHeight + hMargin,
+					Property1Text2W + BoxSpacing,
+					ContentHeight
 
-    CONTROL         Property1Text3,IDC_SHOWSONGKEYS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,
-                    tMargin,
-                    dContentHeight + dMargin + hMargin,
-                    Property1Text3W + BoxSpacing,
-                    ContentHeight
+	CONTROL         Property1Text3,IDC_SHOWSONGKEYS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,
+					dMargin,
+					tMargin + dContentHeight,
+					Property1Text3W + BoxSpacing,
+					ContentHeight
 
-    CONTROL         Property1Text4,IDC_SHOWCUSTOMKEYS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,
-                    tMargin,
-                    tContentHeight + tMargin,
-                    Property1Text4W + BoxSpacing,
-                    ContentHeight
+	CONTROL         Property1Text4,IDC_SHOWCUSTOMKEYS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,
+					dMargin,
+					tMargin + tContentHeight + hMargin,
+					Property1Text4W + BoxSpacing,
+					ContentHeight
 
-    COMBOBOX        IDC_FIRSTKEY,
-                    tMargin + Property1Text4W + BoxSpacing,
-                    tContentHeight + tMargin + mhMargin,
-                    KeySelectW,
-                    ContentHeight + Margin,
-                    CBS_DROPDOWNLIST | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
+	COMBOBOX        IDC_FIRSTKEY,
+					dMargin + Property1Text4W + BoxSpacing,
+					tMargin + tContentHeight,
+					KeySelectW,
+					ContentHeight + Margin,
+					CBS_DROPDOWNLIST | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
 
-    LTEXT           Property1Text5,IDC_THROUGH,
-                    qMargin + Property1Text4W + BoxSpacing + KeySelectW,
-                    tContentHeight + tMargin,
-                    Property1Text5W,
-                    FontSize,
-                    WS_DISABLED
+	LTEXT           Property1Text5,IDC_THROUGH,
+					tMargin + Property1Text4W + BoxSpacing + KeySelectW,
+					tMargin + tContentHeight + hMargin,
+					Property1Text5W,
+					FontSize,
+					WS_DISABLED
 
-    COMBOBOX        IDC_LASTKEY,
-                    iMargin + Property1Text4W + BoxSpacing + KeySelectW + Property1Text5W,
-                    tContentHeight + tMargin + mhMargin,
-                    KeySelectW,
-                    ContentHeight + Margin,
-                    CBS_DROPDOWNLIST | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
+	COMBOBOX        IDC_LASTKEY,
+					qMargin + Property1Text4W + BoxSpacing + KeySelectW + Property1Text5W,
+					tMargin + tContentHeight,
+					KeySelectW,
+					ContentHeight + Margin,
+					CBS_DROPDOWNLIST | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
 
-    CONTROL         Property1Text6,IDC_SHOWCONTROLS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    dMargin,
-                    iContentHeight + tMargin,
-                    Property1Text6W + BoxSpacing,
-                    ContentHeight
+	LTEXT           Property1Text6,-1,
+					dMargin,
+					qContentHeight + iMargin,
+					Property1Text6W,
+					FontSize
 
-    CONTROL         Property1Text7,IDC_SAMEWIDTH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    dMargin,
-                    xContentHeight + tMargin + hMargin,
-                    Property1Text7W + BoxSpacing,
-                    ContentHeight
+	CONTROL         Property1Text7,IDC_RANDOMIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+					dMargin + Property1Text6W + hMargin,
+					qContentHeight + iMargin,
+					Property1Text7W + BoxSpacing,
+					ContentHeight
 
-    LTEXT           Property1Text8,-1,
-                    dMargin,
-                    pContentHeight + xMargin,
-                    Property1Text8W,
-                    FontSize
+	CONTROL         "",IDC_COLOR1,"Button",BS_OWNERDRAW,
+					dMargin,
+					iContentHeight + iMargin,
+					ColorBox,
+					ColorBox,
+					WS_EX_CLIENTEDGE
 
-    CONTROL         "",IDC_COLOR1,"Button",BS_OWNERDRAW,
-                    dMargin,
-                    oContentHeight + xMargin,
-                    ColorBox,
-                    ColorBox,
-                    WS_EX_CLIENTEDGE
+	CONTROL         "",IDC_COLOR2,"Button",BS_OWNERDRAW,
+					dMargin + hMargin + ColorBox,
+					iContentHeight + iMargin,
+					ColorBox,
+					ColorBox,
+					WS_EX_CLIENTEDGE
 
-    CONTROL         "",IDC_COLOR2,"Button",BS_OWNERDRAW,
-                    dMargin + hMargin + ColorBox,
-                    oContentHeight + xMargin,
-                    ColorBox,
-                    ColorBox,
-                    WS_EX_CLIENTEDGE
+	CONTROL         "",IDC_COLOR3,"Button",BS_OWNERDRAW,
+					tMargin + dColorBox,
+					iContentHeight + iMargin,
+					ColorBox,
+					ColorBox,
+					WS_EX_CLIENTEDGE
 
-    CONTROL         "",IDC_COLOR3,"Button",BS_OWNERDRAW,
-                    tMargin + dColorBox,
-                    oContentHeight + xMargin,
-                    ColorBox,
-                    ColorBox,
-                    WS_EX_CLIENTEDGE
+	CONTROL         "",IDC_COLOR4,"Button",BS_OWNERDRAW,
+					tMargin + hMargin + tColorBox,
+					iContentHeight + iMargin,
+					ColorBox,
+					ColorBox,
+					WS_EX_CLIENTEDGE
 
-    CONTROL         "",IDC_COLOR4,"Button",BS_OWNERDRAW,
-                    tMargin + hMargin + tColorBox,
-                    oContentHeight + xMargin,
-                    ColorBox,
-                    ColorBox,
-                    WS_EX_CLIENTEDGE
+	CONTROL         "",IDC_COLOR5,"Button",BS_OWNERDRAW,
+					qMargin + qColorBox,
+					iContentHeight + iMargin,
+					ColorBox,
+					ColorBox,
+					WS_EX_CLIENTEDGE
 
-    CONTROL         "",IDC_COLOR5,"Button",BS_OWNERDRAW,
-                    qMargin + qColorBox,
-                    oContentHeight + xMargin,
-                    ColorBox,
-                    ColorBox,
-                    WS_EX_CLIENTEDGE
+	CONTROL         "",IDC_COLOR6,"Button",BS_OWNERDRAW,
+					qMargin + hMargin + iColorBox,
+					iContentHeight + iMargin,
+					ColorBox,
+					ColorBox,
+					WS_EX_CLIENTEDGE
 
-    CONTROL         "",IDC_COLOR6,"Button",BS_OWNERDRAW,
-                    qMargin + hMargin + iColorBox,
-                    oContentHeight + xMargin,
-                    ColorBox,
-                    ColorBox,
-                    WS_EX_CLIENTEDGE
+	CONTROL         "",IDC_COLOR7,"Button",BS_OWNERDRAW,
+					iMargin + xColorBox,
+					iContentHeight + iMargin,
+					ColorBox,
+					ColorBox,
+					WS_EX_CLIENTEDGE
 
-    CONTROL         "",IDC_COLOR7,"Button",BS_OWNERDRAW,
-                    iMargin + xColorBox,
-                    oContentHeight + xMargin,
-                    ColorBox,
-                    ColorBox,
-                    WS_EX_CLIENTEDGE
+	CONTROL         "",IDC_COLOR8,"Button",BS_OWNERDRAW,
+					iMargin + hMargin + pColorBox,
+					iContentHeight + iMargin,
+					ColorBox,
+					ColorBox,
+					WS_EX_CLIENTEDGE
 
-    CONTROL         "",IDC_COLOR8,"Button",BS_OWNERDRAW,
-                    iMargin + hMargin + pColorBox,
-                    oContentHeight + xMargin,
-                    ColorBox,
-                    ColorBox,
-                    WS_EX_CLIENTEDGE
+	CONTROL         "",IDC_COLOR9,"Button",BS_OWNERDRAW,
+					xMargin + oColorBox,
+					iContentHeight + iMargin,
+					ColorBox,
+					ColorBox,
+					WS_EX_CLIENTEDGE
 
-    CONTROL         "",IDC_COLOR9,"Button",BS_OWNERDRAW,
-                    xMargin + oColorBox,
-                    oContentHeight + xMargin,
-                    ColorBox,
-                    ColorBox,
-                    WS_EX_CLIENTEDGE
+	CONTROL         "",IDC_COLOR10,"Button",BS_OWNERDRAW,
+					xMargin + hMargin + nColorBox,
+					iContentHeight + iMargin,
+					ColorBox,
+					ColorBox,
+					WS_EX_CLIENTEDGE
 
-    CONTROL         "",IDC_COLOR10,"Button",BS_OWNERDRAW,
-                    xMargin + hMargin + nColorBox,
-                    oContentHeight + xMargin,
-                    ColorBox,
-                    ColorBox,
-                    WS_EX_CLIENTEDGE
+	CONTROL         "",IDC_COLOR11,"Button",BS_OWNERDRAW,
+					pMargin + cColorBox,
+					iContentHeight + iMargin,
+					ColorBox,
+					ColorBox,
+					WS_EX_CLIENTEDGE
 
-    CONTROL         "",IDC_COLOR11,"Button",BS_OWNERDRAW,
-                    pMargin + cColorBox,
-                    oContentHeight + xMargin,
-                    ColorBox,
-                    ColorBox,
-                    WS_EX_CLIENTEDGE
+	CONTROL         "",IDC_COLOR12,"Button",BS_OWNERDRAW,
+					pMargin + hMargin + cColorBox + ColorBox,
+					iContentHeight + iMargin,
+					ColorBox,
+					ColorBox,
+					WS_EX_CLIENTEDGE
 
-    CONTROL         "",IDC_COLOR12,"Button",BS_OWNERDRAW,
-                    pMargin + hMargin + cColorBox + ColorBox,
-                    oContentHeight + xMargin,
-                    ColorBox,
-                    ColorBox,
-                    WS_EX_CLIENTEDGE
+	CONTROL         "",IDC_COLOR13,"Button",BS_OWNERDRAW,
+					oMargin + cColorBox + dColorBox,
+					iContentHeight + iMargin,
+					ColorBox,
+					ColorBox,
+					WS_EX_CLIENTEDGE
 
-    CONTROL         "",IDC_COLOR13,"Button",BS_OWNERDRAW,
-                    oMargin + cColorBox + dColorBox,
-                    oContentHeight + xMargin,
-                    ColorBox,
-                    ColorBox,
-                    WS_EX_CLIENTEDGE
+	CONTROL         "",IDC_COLOR14,"Button",BS_OWNERDRAW,
+					oMargin + hMargin + cColorBox + tColorBox,
+					iContentHeight + iMargin,
+					ColorBox,
+					ColorBox,
+					WS_EX_CLIENTEDGE
 
-    CONTROL         "",IDC_COLOR14,"Button",BS_OWNERDRAW,
-                    oMargin + hMargin + cColorBox + tColorBox,
-                    oContentHeight + xMargin,
-                    ColorBox,
-                    ColorBox,
-                    WS_EX_CLIENTEDGE
+	CONTROL         "",IDC_COLOR15,"Button",BS_OWNERDRAW,
+					nMargin + cColorBox + qColorBox,
+					iContentHeight + iMargin,
+					ColorBox,
+					ColorBox,
+					WS_EX_CLIENTEDGE
 
-    CONTROL         "",IDC_COLOR15,"Button",BS_OWNERDRAW,
-                    nMargin + cColorBox + qColorBox,
-                    oContentHeight + xMargin,
-                    ColorBox,
-                    ColorBox,
-                    WS_EX_CLIENTEDGE
+	CONTROL         "",IDC_COLOR16,"Button",BS_OWNERDRAW,
+					nMargin + hMargin + cColorBox + iColorBox,
+					iContentHeight + iMargin,
+					ColorBox,
+					ColorBox,
+					WS_EX_CLIENTEDGE
 
-    CONTROL         "",IDC_COLOR16,"Button",BS_OWNERDRAW,
-                    nMargin + hMargin + cColorBox + iColorBox,
-                    oContentHeight + xMargin,
-                    ColorBox,
-                    ColorBox,
-                    WS_EX_CLIENTEDGE
+	LTEXT           Property1Text8,
+					-1,
+					dMargin,
+					pContentHeight + iMargin + 1,
+					Property1Text8W,
+					FontSize
 
-    LTEXT           Property1Text9,
-                    -1,
-                    dMargin,
-                    cContentHeight + pMargin,
-                    Property1Text9W,
-                    FontSize
+	CONTROL         "",IDC_BKGCOLOR,"Button",BS_OWNERDRAW,
+					tMargin + Property1Text8W,
+					pContentHeight + iMargin + mhMargin,
+					ColorBox,
+					ColorBox,
+					WS_EX_CLIENTEDGE
 
-    CONTROL         "",IDC_BKGCOLOR,"Button",BS_OWNERDRAW,
-                    tMargin + Property1Text9W,
-                    cContentHeight + pMargin + mhMargin,
-                    ColorBox,
-                    ColorBox,
-                    WS_EX_CLIENTEDGE
+	LTEXT           Property1Text9,
+					-1,
+					qMargin + Property1Text8W + ColorBox,
+					pContentHeight + iMargin + 1,
+					Property1Text9W,
+					FontSize
 
-    LTEXT           Property1Text10,
-                    -1,
-                    qMargin + Property1Text9W + ColorBox,
-                    cContentHeight + pMargin,
-                    Property1Text10W,
-                    FontSize
+	CONTROL         "",IDC_BARCOLOR,"Button",BS_OWNERDRAW,
+					iMargin + Property1Text8W + ColorBox + Property1Text9W,
+					pContentHeight + iMargin + mhMargin,
+					ColorBox,
+					ColorBox,
+					WS_EX_CLIENTEDGE
 
-    CONTROL         "",IDC_BARCOLOR,"Button",BS_OWNERDRAW,
-                    iMargin + Property1Text9W + ColorBox + Property1Text10W,
-                    cContentHeight + pMargin + mhMargin,
-                    ColorBox,
-                    ColorBox,
-                    WS_EX_CLIENTEDGE
+	PUSHBUTTON      Property1Text10,IDC_RESTOREDEFAULTS,
+					PropertyWindowW - Property1Text10W + mBoxSpacing + mdMargin,
+					pContentHeight + iMargin + mhMargin,
+					Property1Text10W + BoxSpacing,
+					ContentHeight + dMargin
 
-    PUSHBUTTON      Property1Text11,IDC_RESTOREDEFAULTS,
-                    PropertyWindowW - Property1Text11W + mBoxSpacing + mdMargin,
-                    cContentHeight + pMargin + mhMargin,
-                    Property1Text11W + BoxSpacing,
-                    ContentHeight + dMargin
+	LTEXT           Property1Text11,-1,
+					dMargin,
+					oContentHeight + oMargin,
+					Property1Text11W,
+					FontSize
+
+	EDITTEXT        IDC_BACKGROUND,
+					dMargin + Property1Text11W,
+					oContentHeight + oMargin + mhMargin,
+					PropertyWindowW - Property1Text11W - Property1Text12W - Property1Text13W + mdBoxSpacing + mqMargin + mhMargin,
+					ContentHeight + Margin,
+					ES_AUTOHSCROLL | ES_READONLY
+
+	PUSHBUTTON      Property1Text12,IDC_BACKGROUNDBROWSE
+					PropertyWindowW - Property1Text12W - Property1Text13W + mdBoxSpacing + mdMargin,
+					oContentHeight + oMargin + mhMargin,
+					Property1Text12W + BoxSpacing,
+					ContentHeight + Margin,
+
+	PUSHBUTTON      Property1Text13,IDC_BACKGROUNDRESET,
+					PropertyWindowW - Property1Text13W + mBoxSpacing + mdMargin,
+					oContentHeight + oMargin + mhMargin,
+					Property1Text13W + BoxSpacing,
+					ContentHeight + Margin,
+
+	LTEXT           Property1Text14,-1,
+					dMargin,
+					PropertyWindowH + mContentHeight + mMargin,
+					Property1Text14W,
+					FontSize
 
 END
 
@@ -235,24 +260,24 @@ CAPTION PropertyWindowTitle
 FONT FontSize,FontName
 BEGIN
 
-    LTEXT           Property2Text1,-1,
-                    dMargin,
-                    dMargin,
-                    Property2Text1W,
-                    FontSize
+	LTEXT           Property2Text1,-1,
+					dMargin,
+					dMargin,
+					Property2Text1W,
+					FontSize
 
-    LISTBOX         IDC_MIDIOUT,
-                    dMargin,
-                    tMargin+ContentHeight,
-                    PropertyWindowW + mqMargin,
-                    PropertyWindowH + mqContentHeight + mdMargin,
-                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+	LISTBOX         IDC_MIDIOUT,
+					dMargin,
+					tMargin+ContentHeight,
+					PropertyWindowW + mqMargin,
+					PropertyWindowH + mqContentHeight + mdMargin,
+					LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
 
-    CONTROL         Property2Text2,IDC_KDMAPI,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    dMargin,
-                    PropertyWindowH + mContentHeight + mdMargin,
-                    Property2Text2W + BoxSpacing,
-                    ContentHeight
+	CONTROL         Property2Text2,IDC_KDMAPI,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+					dMargin,
+					PropertyWindowH + mContentHeight + mdMargin,
+					Property2Text2W + BoxSpacing,
+					ContentHeight
 
 END
 
@@ -262,23 +287,72 @@ CAPTION PropertyWindowTitle
 FONT FontSize,FontName
 BEGIN
 
-    GROUPBOX        Property3Text1,-1,
-                    Margin,
-                    Margin,
-                    PropertyWindowW+mdMargin,
-                    tContentHeight+tMargin
+	LTEXT           Property3Text1,-1,
+					dMargin,
+					dMargin,
+					Property3Text1W,
+					FontSize
 
-    CONTROL         Property3Text2,IDC_DISPLAYFPS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    tMargin,
-                    ContentHeight + dMargin,
-                    Property3Text2W + BoxSpacing,
-                    ContentHeight
+	CONTROL         Property3Text2,IDC_TICKBASED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+					dMargin,
+					dMargin + ContentHeight + hMargin,
+					Property3Text2W + BoxSpacing,
+					ContentHeight
 
-    CONTROL         Property3Text3,IDC_LIMITFPS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    tMargin,
-                    dContentHeight + dMargin + hMargin,
-                    Property3Text3W + BoxSpacing,
-                    ContentHeight
+	CONTROL         Property3Text3,IDC_PITCHBENDS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+					dMargin,
+					tMargin + dContentHeight,
+					Property3Text3W + BoxSpacing,
+					ContentHeight
+
+	CONTROL         Property3Text4,IDC_SAMEWIDTH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+					dMargin,
+					tMargin + tContentHeight + hMargin,
+					Property3Text4W + BoxSpacing,
+					ContentHeight
+
+	CONTROL         Property3Text5,IDC_MARKERS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+					dMargin,
+					qMargin + qContentHeight,
+					Property3Text5W + BoxSpacing,
+					ContentHeight
+
+	LTEXT           Property3Text6,-1,
+					dMargin,
+					qMargin + iContentHeight + hMargin,
+					Property3Text6W,
+					FontSize
+
+	COMBOBOX        IDC_MARKERENC,
+					tMargin + Property3Text6W,
+					qMargin + iContentHeight,
+					MarkerEncodingW,
+					ContentHeight + Margin,
+					CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+
+	CONTROL         Property3Text7,IDC_LIMITFPS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+					dMargin,
+					iMargin + xContentHeight,
+					Property3Text7W + BoxSpacing,
+					ContentHeight
+
+	CONTROL         Property3Text8,IDC_FFMPEG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+					dMargin,
+					iMargin + pContentHeight + hMargin,
+					Property3Text8W + BoxSpacing,
+					ContentHeight
+
+	CONTROL         Property3Text9,IDC_DEBUG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+					dMargin,
+					xMargin + oContentHeight,
+					Property3Text9W + BoxSpacing,
+					ContentHeight
+
+	CONTROL         Property3Text10,IDC_DISABLEUI,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+					dMargin,
+					xMargin + nContentHeight + hMargin,
+					Property3Text10W + BoxSpacing,
+					ContentHeight
 
 END
 
@@ -288,172 +362,90 @@ CAPTION PropertyWindowTitle
 FONT FontSize,FontName
 BEGIN
 
-    GROUPBOX        Property4Text1,-1,
-                    Margin,
-                    Margin,
-                    PropertyWindowW + mdMargin,
-                    tContentHeight + xMargin
+	LTEXT           Property4Text1,-1,
+					dMargin,
+					dMargin,
+					Property4Text1W,
+					FontSize
 
-    LTEXT           Property4Text2,-1,
-                    tMargin,
-                    ContentHeight + dMargin + hMargin,
-                    Property4Text2W,
-                    FontSize
+	LTEXT           Property4Text2,-1,
+					dMargin,
+					tMargin + ContentHeight,
+					Property4Text2W,
+					FontSize
 
-    EDITTEXT        IDC_LRARROWS,
-                    tMargin + Property4Text2W,
-                    ContentHeight + dMargin,
-                    SpinnerW,
-                    ContentHeight + Margin,
-                    ES_AUTOHSCROLL
+	EDITTEXT        IDC_LRARROWS,
+					dMargin + Property4Text2W,
+					tMargin + ContentHeight + mhMargin,
+					SpinnerW,
+					ContentHeight + Margin,
+					ES_AUTOHSCROLL
 
-    CONTROL         "",IDC_LRARROWSSPIN,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,0,0,0,0
+	CONTROL         "",IDC_LRARROWSSPIN,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,0,0,0,0
 
-    LTEXT           Property4Text3,-1,
-                    tMargin + Property4Text2W + SpinnerW,
-                    ContentHeight + dMargin + hMargin,
-                    Property4Text3W,
-                    FontSize
+	LTEXT           Property4Text3,-1,
+					dMargin + Property4Text2W + SpinnerW,
+					tMargin + ContentHeight,
+					Property4Text3W,
+					FontSize
 
-    LTEXT           Property4Text4,-1,
-                    tMargin,
-                    dContentHeight + qMargin + hMargin,
-                    Property4Text4W,
-                    FontSize
+	LTEXT           Property4Text4,-1,
+					dMargin,
+					qMargin + dContentHeight + hMargin,
+					Property4Text4W,
+					FontSize
 
-    EDITTEXT        IDC_UDARROWS,
-                    tMargin + Property4Text4W,
-                    dContentHeight + qMargin,
-                    SpinnerW,
-                    ContentHeight + Margin,
-                    ES_AUTOHSCROLL
+	EDITTEXT        IDC_UDARROWS,
+					dMargin + Property4Text4W,
+					qMargin + dContentHeight,
+					SpinnerW,
+					ContentHeight + Margin,
+					ES_AUTOHSCROLL
 
-    CONTROL         "",IDC_UDARROWSSPIN,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,0,0,0,0
+	CONTROL         "",IDC_UDARROWSSPIN,"msctls_updown32",UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,0,0,0,0
 
-    LTEXT           Property4Text5,-1,
-                    tMargin + Property4Text4W + SpinnerW,
-                    dContentHeight + qMargin + hMargin,
-                    Property4Text5W,
-                    FontSize
+	LTEXT           Property4Text5,-1,
+					dMargin + Property4Text4W + SpinnerW,
+					qMargin + dContentHeight + hMargin,
+					Property4Text5W,
+					FontSize
 
-END
+	CONTROL         Property4Text6,IDC_SHOWCONTROLS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+					dMargin,
+					xMargin + tContentHeight,
+					Property4Text6W + BoxSpacing,
+					ContentHeight
 
-IDD_PP5_VIZ DIALOGEX 0,0,PropertyWindowW,PropertyWindowH
-STYLE DialogStyle
-CAPTION PropertyWindowTitle
-FONT FontSize,FontName
-BEGIN
+	CONTROL         Property4Text7,IDC_PHIGROS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+					dMargin,
+					xMargin + qContentHeight + hMargin,
+					Property4Text7W + BoxSpacing,
+					ContentHeight
 
-    GROUPBOX        Property5Text1,-1,
-                    Margin,
-                    Margin,
-                    PropertyWindowW + mdMargin,
-                    PropertyWindowH + mdMargin
+	LTEXT           Property4Text8,-1,
+					dMargin,
+					iContentHeight + oMargin,
+					Property4Text8W,
+					FontSize
 
-    CONTROL         Property5Text2,IDC_TICKBASED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    tMargin,
-                    ContentHeight + dMargin,
-                    Property5Text2W+BoxSpacing,
-                    ContentHeight
+	EDITTEXT        IDC_SPLASHMIDI,
+					dMargin + Property4Text8W,
+					iContentHeight + oMargin + mhMargin,
+					PropertyWindowW - Property4Text8W - Property1Text12W - Property1Text13W + mdBoxSpacing + mqMargin + mhMargin,
+					ContentHeight + Margin,
+					ES_AUTOHSCROLL | ES_READONLY
 
-    CONTROL         Property5Text3,IDC_PITCHBENDS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    tMargin,
-                    dContentHeight + dMargin + hMargin,
-                    Property5Text3W + BoxSpacing,
-                    ContentHeight
+	PUSHBUTTON      Property1Text12,IDC_SPLASHBROWSE
+					PropertyWindowW - Property1Text12W - Property1Text13W + mdBoxSpacing + mdMargin,
+					iContentHeight + oMargin + mhMargin,
+					Property1Text12W + BoxSpacing,
+					ContentHeight + Margin,
 
-    CONTROL         Property5Text4,IDC_STATS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    tMargin,
-                    tContentHeight + tMargin,
-                    Property5Text4W + BoxSpacing,
-                    ContentHeight
-
-    CONTROL         Property5Text5,IDC_MARKERS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    tMargin,
-                    qContentHeight + tMargin + hMargin,
-                    Property5Text5W + BoxSpacing,
-                    ContentHeight
-
-    LTEXT           Property5Text6,-1,
-                    tMargin,
-                    iContentHeight + qMargin + hMargin,
-                    Property5Text6W,
-                    FontSize
-
-    COMBOBOX        IDC_MARKERENC,
-                    qMargin + Property5Text6W,
-                    iContentHeight + qMargin,
-                    MarkerEncodingW,
-                    ContentHeight + Margin,
-                    CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-
-    LTEXT           Property5Text7,-1,
-                    tMargin,
-                    xContentHeight + iMargin + hMargin,
-                    Property5Text7W,
-                    FontSize
-
-    EDITTEXT        IDC_SPLASHMIDI,
-                    qMargin + Property5Text7W,
-                    xContentHeight + iMargin,
-                    PropertyWindowW - Property5Text7W - Property5Text9W - Property5Text10W + mcMargin + miMargin,
-                    ContentHeight + Margin,
-                    ES_AUTOHSCROLL | ES_READONLY
-
-    PUSHBUTTON      Property5Text9,IDC_SPLASHBROWSE,
-                    PropertyWindowW - Property5Text9W - Property5Text10W + mcMargin,
-                    xContentHeight + iMargin,
-                    Property5Text9W + BoxSpacing,
-                    ContentHeight + Margin,
-
-    PUSHBUTTON      Property5Text10,IDC_SPLASHRESET,
-                    PropertyWindowW - Property5Text10W + mxMargin,
-                    xContentHeight + iMargin,
-                    Property5Text10W + BoxSpacing,
-                    ContentHeight + Margin,
-
-    LTEXT           Property5Text8,-1,
-                    tMargin,
-                    pContentHeight + xMargin + hMargin,
-                    Property5Text8W,
-                    FontSize
-
-    EDITTEXT        IDC_BACKGROUND,
-                    qMargin + Property5Text8W,
-                    pContentHeight + xMargin,
-                    PropertyWindowW - Property5Text8W - Property5Text9W - Property5Text10W + mcMargin + miMargin,
-                    ContentHeight + Margin,
-                    ES_AUTOHSCROLL | ES_READONLY
-
-    PUSHBUTTON      Property5Text9,IDC_BACKGROUNDBROWSE
-                    PropertyWindowW - Property5Text9W - Property5Text10W + mcMargin,
-                    pContentHeight + xMargin,
-                    Property5Text9W + BoxSpacing,
-                    ContentHeight + Margin,
-
-    PUSHBUTTON      Property5Text10,IDC_BACKGROUNDRESET,
-                    PropertyWindowW - Property5Text10W + mxMargin,
-                    pContentHeight + xMargin,
-                    Property5Text10W + BoxSpacing,
-                    ContentHeight + Margin,
-
-    CONTROL         Property5Text11,IDC_COLORLOOP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    tMargin,
-                    oContentHeight + pMargin + hMargin,
-                    Property5Text11W + BoxSpacing,
-                    ContentHeight
-
-    CONTROL         Property5Text12,IDC_FFMPEG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    tMargin,
-                    nContentHeight + oMargin,
-                    Property5Text12W + BoxSpacing,
-                    ContentHeight
-
-    CONTROL         Property5Text13,IDC_DISABLEUI,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    tMargin,
-                    cContentHeight + oMargin + hMargin,
-                    Property5Text13W + BoxSpacing,
-                    ContentHeight
+	PUSHBUTTON      Property1Text13,IDC_SPLASHRESET,
+					PropertyWindowW - Property1Text13W + mBoxSpacing + mdMargin,
+					iContentHeight + oMargin + mhMargin,
+					Property1Text13W + BoxSpacing,
+					ContentHeight + Margin,
 
 END
 
@@ -463,87 +455,87 @@ CAPTION TrackWindowTitle
 FONT FontSize,FontName
 BEGIN
 
-    LTEXT           TrackText1,-1,
-                    dMargin,
-                    dMargin,
-                    TrackText1W,
-                    FontSize
+	LTEXT           TrackText1,-1,
+					dMargin,
+					dMargin,
+					TrackText1W,
+					FontSize
 
-    EDITTEXT        IDC_FILE,
-                    tMargin + TrackAlign,
-                    dMargin,
-                    TrackWindowW - TrackAlign + mqMargin,
-                    FontSize,
-                    ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
+	EDITTEXT        IDC_FILE,
+					tMargin + TrackAlign,
+					dMargin,
+					TrackWindowW - TrackAlign + mqMargin,
+					FontSize,
+					ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
 
-    LTEXT           TrackText2,-1,
-                    dMargin,
-                    dMargin + ContentHeight,
-                    TrackText2W,
-                    FontSize
+	LTEXT           TrackText2,-1,
+					dMargin,
+					dMargin + ContentHeight,
+					TrackText2W,
+					FontSize
 
-    EDITTEXT        IDC_FOLDER,
-                    tMargin + TrackAlign,
-                    dMargin + ContentHeight,
-                    TrackWindowW - TrackAlign + mqMargin,
-                    FontSize,
-                    ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
+	EDITTEXT        IDC_FOLDER,
+					tMargin + TrackAlign,
+					dMargin + ContentHeight,
+					TrackWindowW - TrackAlign + mqMargin,
+					FontSize,
+					ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
 
-    LTEXT           TrackText3,-1,
-                    dMargin,
-                    dMargin + dContentHeight,
-                    TrackText3W,
-                    FontSize
+	LTEXT           TrackText3,-1,
+					dMargin,
+					dMargin + dContentHeight,
+					TrackText3W,
+					FontSize
 
-    EDITTEXT        IDC_NOTES,
-                    tMargin + TrackAlign,
-                    dMargin + dContentHeight,
-                    TrackWindowW - TrackAlign + mqMargin,
-                    FontSize,
-                    ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
+	EDITTEXT        IDC_NOTES,
+					tMargin + TrackAlign,
+					dMargin + dContentHeight,
+					TrackWindowW - TrackAlign + mqMargin,
+					FontSize,
+					ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
 
-    LTEXT           TrackText4,-1,
-                    dMargin,
-                    dMargin + tContentHeight,
-                    TrackText4W,
-                    FontSize
+	LTEXT           TrackText4,-1,
+					dMargin,
+					dMargin + tContentHeight,
+					TrackText4W,
+					FontSize
 
-    EDITTEXT        IDC_LENGTH,
-                    tMargin + TrackAlign,
-                    dMargin + tContentHeight,
-                    TrackWindowW - TrackAlign + mqMargin,
-                    FontSize,
-                    ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
+	EDITTEXT        IDC_LENGTH,
+					tMargin + TrackAlign,
+					dMargin + tContentHeight,
+					TrackWindowW - TrackAlign + mqMargin,
+					FontSize,
+					ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
 
-    CONTROL         "",IDC_TRACKS,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,
-                    dMargin,
-                    tMargin + qContentHeight,
-                    TrackWindowW + mqMargin,
-                    TrackWindowH + moMargin + mpContentHeight
+	CONTROL         "",IDC_TRACKS,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,
+					dMargin,
+					tMargin + qContentHeight,
+					TrackWindowW + mqMargin,
+					TrackWindowH + moMargin + mpContentHeight
 
-    CONTROL         TrackText5,IDC_NOLAG,"Button",BS_AUTOCHECKBOX | BS_LEFTTEXT | WS_TABSTOP,
-                    dMargin,
-                    TrackWindowH + mtContentHeight + mtMargin + mhMargin,
-                    TrackText5W + BoxSpacing + mMargin,
-                    ContentHeight
+	CONTROL         TrackText5,IDC_NOLAG,"Button",BS_AUTOCHECKBOX | BS_LEFTTEXT | WS_TABSTOP,
+					dMargin,
+					TrackWindowH + mtContentHeight + mtMargin + mhMargin,
+					TrackText5W + BoxSpacing + mMargin,
+					ContentHeight
 
-    CONTROL         TrackText6,IDC_PIANO,"Button",BS_AUTOCHECKBOX | BS_LEFTTEXT | WS_TABSTOP,
-                    dMargin,
-                    TrackWindowH + mdContentHeight + mtMargin,
-                    TrackText6W + BoxSpacing + mMargin,
-                    ContentHeight
+	CONTROL         TrackText6,IDC_PIANO,"Button",BS_AUTOCHECKBOX | BS_LEFTTEXT | WS_TABSTOP,
+					dMargin,
+					TrackWindowH + mdContentHeight + mtMargin,
+					TrackText6W + BoxSpacing + mMargin,
+					ContentHeight
 
-    DEFPUSHBUTTON   TrackText7,IDOK,
-                    TrackWindowW - TrackText7W - TrackText8W + mdBoxSpacing + mtMargin,
-                    TrackWindowH + mContentHeight + mtMargin,
-                    TrackText7W + BoxSpacing,
-                    ContentHeight + Margin
+	DEFPUSHBUTTON   TrackText7,IDOK,
+					TrackWindowW - TrackText7W - TrackText8W + mdBoxSpacing + mtMargin,
+					TrackWindowH + mContentHeight + mtMargin,
+					TrackText7W + BoxSpacing,
+					ContentHeight + Margin
 
-    PUSHBUTTON      TrackText8,IDCANCEL,
-                    TrackWindowW - TrackText8W + mBoxSpacing + mdMargin,
-                    TrackWindowH + mContentHeight + mtMargin,
-                    TrackText8W + BoxSpacing,
-                    ContentHeight + Margin
+	PUSHBUTTON      TrackText8,IDCANCEL,
+					TrackWindowW - TrackText8W + mBoxSpacing + mdMargin,
+					TrackWindowH + mContentHeight + mtMargin,
+					TrackText8W + BoxSpacing,
+					ContentHeight + Margin
 
 END
 
@@ -553,23 +545,23 @@ CAPTION AboutWindowTitle
 FONT LargeFontSize,AltFontName
 BEGIN
 
-    LTEXT           AboutText1,-1,
-                    Margin,
-                    Margin,
-                    AboutWindowW+mdMargin,
-                    AboutWindowH+mdContentHeight+mqMargin
+	LTEXT           AboutText1,-1,
+					Margin,
+					Margin,
+					AboutWindowW+mdMargin,
+					AboutWindowH+mdContentHeight+mqMargin
 
-    CONTROL         "",-1,"Static",SS_ETCHEDHORZ | WS_DISABLED,
-                    1,
-                    AboutWindowH + mdContentHeight + mdMargin,
-                    AboutWindowW - 1,
-                    1
+	CONTROL         "",-1,"Static",SS_ETCHEDHORZ | WS_DISABLED,
+					1,
+					AboutWindowH + mdContentHeight + mdMargin,
+					AboutWindowW - 1,
+					1
 
-    DEFPUSHBUTTON   AboutText2,IDOK,
-                    AboutWindowW + mMargin - AboutText2W + mdBoxSpacing,
-                    AboutWindowH + mdContentHeight + mMargin,
-                    AboutText2W + dBoxSpacing,
-                    dContentHeight
+	DEFPUSHBUTTON   AboutText2,IDOK,
+					AboutWindowW + mMargin - AboutText2W + mdBoxSpacing,
+					AboutWindowH + mdContentHeight + mMargin,
+					AboutText2W + dBoxSpacing,
+					dContentHeight
 
 END
 
@@ -579,31 +571,31 @@ CAPTION LoadWindowTitle
 FONT FontSize,FontName
 BEGIN
 
-    LTEXT           LoadWindowTitle,IDC_LOADINGDESC,
-                    dMargin,
-                    dMargin + mhMargin,
-                    LoadingWindowW+mqMargin,
-                    FontSize
+	LTEXT           LoadWindowTitle,IDC_LOADINGDESC,
+					dMargin,
+					dMargin + mhMargin,
+					LoadingWindowW+mqMargin,
+					FontSize
 
-    LTEXT           "0 / 0",IDC_LOADINGNUM,
-                    dMargin,
-                    dMargin + ContentHeight + mhMargin,
-                    LoadingWindowW + mhLoadingWindowW,
-                    FontSize
+	LTEXT           "0 / 0",IDC_LOADINGNUM,
+					dMargin,
+					dMargin + ContentHeight + mhMargin,
+					LoadingWindowW + mhLoadingWindowW,
+					FontSize
 
-    LTEXT           "0 MB",IDC_MEMUSAGE,
-                    dMargin + hLoadingWindowW,
-                    dMargin + ContentHeight + mhMargin,
-                    LoadingWindowW + mqMargin + mhLoadingWindowW,
-                    FontSize,
-                    0,
-                    WS_EX_RIGHT
+	LTEXT           "0 MB",IDC_MEMUSAGE,
+					dMargin + hLoadingWindowW,
+					dMargin + ContentHeight + mhMargin,
+					LoadingWindowW + mqMargin + mhLoadingWindowW,
+					FontSize,
+					0,
+					WS_EX_RIGHT
 
-    CONTROL         "",IDC_LOADINGPROGRESS,"msctls_progress32",WS_BORDER,
-                    dMargin,
-                    tMargin + dContentHeight + mhMargin,
-                    LoadingWindowW + mqMargin,
-                    ContentHeight + Margin
+	CONTROL         "",IDC_LOADINGPROGRESS,"msctls_progress32",WS_BORDER,
+					dMargin,
+					tMargin + dContentHeight + mhMargin,
+					LoadingWindowW + mqMargin,
+					ContentHeight + Margin
 
 END
 
@@ -613,43 +605,43 @@ CAPTION ResolutionWindowTitle
 FONT FontSize,FontName
 BEGIN
 
-    LTEXT           ResolutionText1,-1,
-                    dMargin,
-                    dMargin,
-                    ResolutionText1W,
-                    FontSize
+	LTEXT           ResolutionText1,-1,
+					dMargin,
+					dMargin,
+					ResolutionText1W,
+					FontSize
 
-    EDITTEXT        IDC_WIDTH,
-                    tMargin + ResolutionText1W,
-                    dMargin + mhMargin,
-                    ResolutionWindowW + miMargin - ResolutionText1W,
-                    ContentHeight + Margin,
-                    ES_AUTOHSCROLL | ES_NUMBER
+	EDITTEXT        IDC_WIDTH,
+					tMargin + ResolutionText1W,
+					dMargin + mhMargin,
+					ResolutionWindowW + miMargin - ResolutionText1W,
+					ContentHeight + Margin,
+					ES_AUTOHSCROLL | ES_NUMBER
 
-    LTEXT           ResolutionText2,-1,
-                    dMargin,
-                    tMargin + hMargin + ContentHeight,
-                    ResolutionText2W,
-                    FontSize
+	LTEXT           ResolutionText2,-1,
+					dMargin,
+					tMargin + hMargin + ContentHeight,
+					ResolutionText2W,
+					FontSize
 
-    EDITTEXT        IDC_HEIGHT,
-                    tMargin + ResolutionText2W,
-                    tMargin + ContentHeight,
-                    ResolutionWindowW + miMargin - ResolutionText2W,
-                    ContentHeight + Margin,
-                    ES_AUTOHSCROLL | ES_NUMBER
+	EDITTEXT        IDC_HEIGHT,
+					tMargin + ResolutionText2W,
+					tMargin + ContentHeight,
+					ResolutionWindowW + miMargin - ResolutionText2W,
+					ContentHeight + Margin,
+					ES_AUTOHSCROLL | ES_NUMBER
 
-    DEFPUSHBUTTON   ResolutionText3,IDOK,
-                    ResolutionWindowW + mMargin + mhMargin - ResolutionText3W - ResolutionText4W + mdBoxSpacing,
-                    ResolutionWindowH + mContentHeight + mdMargin,
-                    ResolutionText3W + BoxSpacing,
-                    ContentHeight + Margin
+	DEFPUSHBUTTON   ResolutionText3,IDOK,
+					ResolutionWindowW + mMargin + mhMargin - ResolutionText3W - ResolutionText4W + mdBoxSpacing,
+					ResolutionWindowH + mContentHeight + mdMargin,
+					ResolutionText3W + BoxSpacing,
+					ContentHeight + Margin
 
-    PUSHBUTTON      ResolutionText4,IDCANCEL,
-                    ResolutionWindowW + mMargin + mhMargin - ResolutionText4W + mBoxSpacing,
-                    ResolutionWindowH + mContentHeight + mdMargin,
-                    ResolutionText4W + BoxSpacing,
-                    ContentHeight + Margin
+	PUSHBUTTON      ResolutionText4,IDCANCEL,
+					ResolutionWindowW + mMargin + mhMargin - ResolutionText4W + mBoxSpacing,
+					ResolutionWindowH + mContentHeight + mdMargin,
+					ResolutionText4W + BoxSpacing,
+					ContentHeight + Margin
 
 END
 
@@ -661,41 +653,41 @@ END
 
 IDM_MAINMENU MENU
 BEGIN
-    MENUITEM MenuText1,ID_FILE_PRACTICE
-    MENUITEM MenuText2,ID_FILE_CLOSEFILE
-    POPUP MenuText3
-    BEGIN
-        MENUITEM MenuText4,ID_PLAY_PLAYPAUSE
-        MENUITEM MenuText5,ID_PLAY_STOP
-        MENUITEM MenuText6,ID_PLAY_SKIPFWD
-        MENUITEM MenuText7,ID_PLAY_SKIPBACK
-        MENUITEM SEPARATOR
-        MENUITEM MenuText8,ID_PLAY_INCREASERATE
-        MENUITEM MenuText9,ID_PLAY_DECREASERATE
-        MENUITEM MenuText10,ID_PLAY_RESETRATE
-        MENUITEM SEPARATOR
-        MENUITEM MenuText11,ID_PLAY_NFASTER
-        MENUITEM MenuText12,ID_PLAY_NSLOWER
-        MENUITEM MenuText13,ID_PLAY_NRESET
-        MENUITEM SEPARATOR
-        MENUITEM MenuText14,ID_PLAY_VOLUMEUP
-        MENUITEM MenuText15,ID_PLAY_VOLUMEDOWN
-        MENUITEM MenuText16,ID_PLAY_MUTE
-    END
-    POPUP MenuText17
-    BEGIN
-        MENUITEM MenuText18,ID_VIEW_CONTROLS,CHECKED
-        MENUITEM MenuText19,ID_VIEW_KEYBOARD,CHECKED
-        MENUITEM MenuText20,ID_VIEW_ALWAYSONTOP
-        MENUITEM MenuText21,ID_VIEW_FULLSCREEN
-        MENUITEM MenuText22,ID_VIEW_SETWINDOWSIZE
-        MENUITEM MenuText23,ID_VIEW_MOVEANDZOOM
-        MENUITEM MenuText24,ID_VIEW_RESETMOVEANDZOOM
-    END
-    MENUITEM MenuText25,ID_OPTIONS_PREFERENCES
-    MENUITEM MenuText26,ID_HELP_ABOUT
-    MENUITEM SEPARATOR
-    MENUITEM MenuText27,ID_STUDIO
+	MENUITEM MenuText1,ID_FILE_PRACTICE
+	MENUITEM MenuText2,ID_FILE_CLOSEFILE
+	POPUP MenuText3
+	BEGIN
+		MENUITEM MenuText4,ID_PLAY_PLAYPAUSE
+		MENUITEM MenuText5,ID_PLAY_STOP
+		MENUITEM MenuText6,ID_PLAY_SKIPFWD
+		MENUITEM MenuText7,ID_PLAY_SKIPBACK
+		MENUITEM SEPARATOR
+		MENUITEM MenuText8,ID_PLAY_INCREASERATE
+		MENUITEM MenuText9,ID_PLAY_DECREASERATE
+		MENUITEM MenuText10,ID_PLAY_RESETRATE
+		MENUITEM SEPARATOR
+		MENUITEM MenuText11,ID_PLAY_NFASTER
+		MENUITEM MenuText12,ID_PLAY_NSLOWER
+		MENUITEM MenuText13,ID_PLAY_NRESET
+		MENUITEM SEPARATOR
+		MENUITEM MenuText14,ID_PLAY_VOLUMEUP
+		MENUITEM MenuText15,ID_PLAY_VOLUMEDOWN
+		MENUITEM MenuText16,ID_PLAY_MUTE
+	END
+	POPUP MenuText17
+	BEGIN
+		MENUITEM MenuText18,ID_VIEW_CONTROLS,CHECKED
+		MENUITEM MenuText19,ID_VIEW_KEYBOARD,CHECKED
+		MENUITEM MenuText20,ID_VIEW_ALWAYSONTOP
+		MENUITEM MenuText21,ID_VIEW_FULLSCREEN
+		MENUITEM MenuText22,ID_VIEW_SETWINDOWSIZE
+		MENUITEM MenuText23,ID_VIEW_MOVEANDZOOM
+		MENUITEM MenuText24,ID_VIEW_RESETMOVEANDZOOM
+	END
+	MENUITEM MenuText25,ID_OPTIONS_PREFERENCES
+	MENUITEM MenuText26,ID_HELP_ABOUT
+	MENUITEM SEPARATOR
+	MENUITEM MenuText27,ID_STUDIO
 END
 
 
@@ -706,21 +698,21 @@ END
 
 IDA_MAINMENU ACCELERATORS
 BEGIN
-    VK_UP,          ID_PLAY_DECREASERATE,   VIRTKEY,CONTROL,NOINVERT
-    VK_DOWN,        ID_PLAY_INCREASERATE,   VIRTKEY,CONTROL,NOINVERT
-    "M",            ID_PLAY_MUTE,           VIRTKEY,CONTROL,NOINVERT
-    VK_UP,          ID_PLAY_NFASTER,        VIRTKEY,SHIFT,NOINVERT
-    "R",            ID_PLAY_NRESET,         VIRTKEY,SHIFT,NOINVERT
-    VK_DOWN,        ID_PLAY_NSLOWER,        VIRTKEY,SHIFT,NOINVERT
-    VK_SPACE,       ID_PLAY_PLAYPAUSE,      VIRTKEY,NOINVERT
-    "R",            ID_PLAY_RESETRATE,      VIRTKEY,CONTROL,NOINVERT
-    VK_LEFT,        ID_PLAY_SKIPBACK,       VIRTKEY,NOINVERT
-    VK_RIGHT,       ID_PLAY_SKIPFWD,        VIRTKEY,NOINVERT
-    VK_ESCAPE,      ID_PLAY_STOP,           VIRTKEY,NOINVERT
-    VK_DOWN,        ID_PLAY_VOLUMEDOWN,     VIRTKEY,NOINVERT
-    VK_UP,          ID_PLAY_VOLUMEUP,       VIRTKEY,NOINVERT
-    VK_RETURN,      ID_VIEW_FULLSCREEN,     VIRTKEY,ALT,NOINVERT
-    "W",            ID_VIEW_SETWINDOWSIZE,  VIRTKEY,CONTROL,NOINVERT
+	VK_UP,          ID_PLAY_DECREASERATE,   VIRTKEY,CONTROL,NOINVERT
+	VK_DOWN,        ID_PLAY_INCREASERATE,   VIRTKEY,CONTROL,NOINVERT
+	"M",            ID_PLAY_MUTE,           VIRTKEY,CONTROL,NOINVERT
+	VK_UP,          ID_PLAY_NFASTER,        VIRTKEY,SHIFT,NOINVERT
+	"R",            ID_PLAY_NRESET,         VIRTKEY,SHIFT,NOINVERT
+	VK_DOWN,        ID_PLAY_NSLOWER,        VIRTKEY,SHIFT,NOINVERT
+	VK_SPACE,       ID_PLAY_PLAYPAUSE,      VIRTKEY,NOINVERT
+	"R",            ID_PLAY_RESETRATE,      VIRTKEY,CONTROL,NOINVERT
+	VK_LEFT,        ID_PLAY_SKIPBACK,       VIRTKEY,NOINVERT
+	VK_RIGHT,       ID_PLAY_SKIPFWD,        VIRTKEY,NOINVERT
+	VK_ESCAPE,      ID_PLAY_STOP,           VIRTKEY,NOINVERT
+	VK_DOWN,        ID_PLAY_VOLUMEDOWN,     VIRTKEY,NOINVERT
+	VK_UP,          ID_PLAY_VOLUMEUP,       VIRTKEY,NOINVERT
+	VK_RETURN,      ID_VIEW_FULLSCREEN,     VIRTKEY,ALT,NOINVERT
+	"W",            ID_VIEW_SETWINDOWSIZE,  VIRTKEY,CONTROL,NOINVERT
 END
 
 

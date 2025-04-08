@@ -117,7 +117,6 @@ public:
         void AddTrackInfo( const MIDITrack &mTrack);
 
         wstring sFilename;
-        string sMd5;
         uint16_t iFormatType;
         uint16_t iNumTracks, iNumChannels;
         uint16_t iDivision;

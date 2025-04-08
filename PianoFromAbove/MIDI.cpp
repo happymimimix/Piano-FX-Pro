@@ -691,8 +691,7 @@ void MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vP
             pChannelEvent->SetSimultaneous(iSimultaneous);
             if ( pChannelEvent->HasSister() )
             {
-                if ( pChannelEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn &&
-                     pChannelEvent->GetParam2() > 0 )
+                if ( pChannelEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn)
                 {
                     if ( llFirstNote < 0  )
                         llFirstNote = llTime;
@@ -705,8 +704,7 @@ void MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vP
                 auto sister = pChannelEvent->GetPassDone() ? pChannelEvent->GetSister(vChannelEvents) : pChannelEvent->GetSister(m_vTracks[pEvent->GetTrack()]->m_vEvents);
                 sister->SetSisterIdx(vChannelEvents.size());
                 sister->SetPassDone(true);
-                if (pChannelEvent->GetChannelEventType() != MIDIChannelEvent::NoteOn ||
-                    pChannelEvent->GetParam2() == 0) {
+                if (pChannelEvent->GetChannelEventType() != MIDIChannelEvent::NoteOn) {
                     sister->SetLength(llTime - sister->GetAbsMicroSec());
                 }
             }
@@ -931,26 +929,23 @@ void MIDITrack::MIDITrackInfo::AddEventInfo( const MIDIEvent &mEvent )
             switch ( eChannelEventType )
             {
                 case MIDIChannelEvent::NoteOn:
-                    if ( iParam2 > 0 )
+                    //MinNote and MaxNote
+                    if ( !this->iNoteCount )
                     {
-                        //MinNote and MaxNote
-                        if ( !this->iNoteCount )
-                        {
-                            this->iMinNote = this->iMaxNote = iParam1;
-                        }
-                        else
-                        {
-                            this->iMinNote = min( iParam1, this->iMinNote );
-                            this->iMaxNote = max( iParam1, this->iMaxNote );
-                        }
-                        //NoteCount
-                        this->iNoteCount++;
-
-                        //Channel info
-                        if ( !this->aNoteCount[ iChannel ] )
-                            this->iNumChannels++;
-                        this->aNoteCount[ iChannel ]++;
+                        this->iMinNote = this->iMaxNote = iParam1;
                     }
+                    else
+                    {
+                        this->iMinNote = min( iParam1, this->iMinNote );
+                        this->iMaxNote = max( iParam1, this->iMaxNote );
+                    }
+                    //NoteCount
+                    this->iNoteCount++;
+
+                    //Channel info
+                    if ( !this->aNoteCount[ iChannel ] )
+                        this->iNumChannels++;
+                    this->aNoteCount[ iChannel ]++;
                     break;
                 // Should we break it down further?
                 case MIDIChannelEvent::ProgramChange:

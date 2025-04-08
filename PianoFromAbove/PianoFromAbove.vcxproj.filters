@@ -507,6 +507,9 @@
     <ClInclude Include="imgui\Fonts.h">
       <Filter>Header Files\imgui</Filter>
     </ClInclude>
+    <ClInclude Include="imgui\imguiCompressedFont2GDI.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PianoFromAbove.rc">

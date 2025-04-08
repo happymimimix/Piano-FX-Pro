@@ -12,6 +12,7 @@
 #include <tchar.h>
 #include <ppl.h>
 #include <dwmapi.h>
+#include <d3d9types.h>
 
 #include "Globals.h"
 #include "GameState.h"
@@ -19,39 +20,37 @@
 #include "resource.h"
 #include "Language.h"
 #include "ConfigProcs.h"
-#include <d3d9types.h>
 #include "lzma.h"
 
 const wstring GameState::Errors[] =
 {
     L"Success.",
     L"Invalid pointer passed. It would be nice if you could submit feedback with a description of how this happened.",
-    L"Out of memory. This is a problem",
-    L"Error calling DirectX. It would be nice if you could submit feedback with a description of how this happened.",
+    L"Error calling DirectX. It would be nice if you could submit feedback with a description of how this happened."
 };
 
-GameState::GameError GameState::ChangeState( GameState *pNextState, GameState **pDestObj )
+GameState::GameError GameState::ChangeState(GameState* pNextState, GameState** pDestObj)
 {
     // Null NextState is valid. Signifies no change in state.
-    if ( !pNextState )
+    if (!pNextState)
         return Success;
-    if (!pDestObj )
+    if (!pDestObj)
         return BadPointer;
 
     // Get rid of the old one. Carry over new window/renderer if needed
-    if ( *pDestObj )
+    if (*pDestObj)
     {
-        if ( !pNextState->m_hWnd ) pNextState->m_hWnd = ( *pDestObj )->m_hWnd;
-        if ( !pNextState->m_pRenderer ) pNextState->m_pRenderer = ( *pDestObj )->m_pRenderer;
-        delete *pDestObj;
+        if (!pNextState->m_hWnd) pNextState->m_hWnd = (*pDestObj)->m_hWnd;
+        if (!pNextState->m_pRenderer) pNextState->m_pRenderer = (*pDestObj)->m_pRenderer;
+        delete* pDestObj;
     }
     *pDestObj = pNextState;
     GameError iResult = pNextState->Init();
-    if ( iResult )
+    if (iResult)
     {
-        *pDestObj = new IntroScreen( pNextState->m_hWnd, pNextState->m_pRenderer );
+        *pDestObj = new IntroScreen(pNextState->m_hWnd, pNextState->m_pRenderer);
         delete pNextState;
-        ( *pDestObj )->Init();
+        (*pDestObj)->Init();
         return iResult;
     }
 
@@ -63,23 +62,23 @@ GameState::GameError GameState::ChangeState( GameState *pNextState, GameState **
 // IntroScreen GameState object
 //-----------------------------------------------------------------------------
 
-GameState::GameError IntroScreen::MsgProc( HWND, UINT msg, WPARAM wParam, LPARAM lParam )
+GameState::GameError IntroScreen::MsgProc(HWND, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg)
     {
-        case WM_COMMAND:
+    case WM_COMMAND:
+    {
+        int iId = LOWORD(wParam);
+        switch (iId)
         {
-            int iId = LOWORD( wParam );
-            switch( iId )
-            {
-                case ID_CHANGESTATE:
-                    m_pNextState = reinterpret_cast< GameState* >( lParam );
-                    return Success;
-                case ID_VIEW_RESETDEVICE:
-                    m_pRenderer->ResetDevice();
-                    return Success;
-            }
+        case ID_CHANGESTATE:
+            m_pNextState = reinterpret_cast<GameState*>(lParam);
+            return Success;
+        case ID_VIEW_RESETDEVICE:
+            m_pRenderer->ResetDevice();
+            return Success;
         }
+    }
     }
 
     return Success;
@@ -95,13 +94,13 @@ GameState::GameError IntroScreen::Logic()
     // Start new ImGui frame
     m_pRenderer->ImGuiStartFrame();
 
-    Sleep( 10 );
+    Sleep(10);
     return Success;
 }
 
 GameState::GameError IntroScreen::Render()
 {
-    if ( FAILED( m_pRenderer->ResetDeviceIfNeeded() ) ) return DirectXError;
+    if (FAILED(m_pRenderer->ResetDeviceIfNeeded())) return DirectXError;
 
     // Clear the backbuffer to a blue color
     unsigned int iColor = Config::GetConfig().GetVisualSettings().iBkgColor;
@@ -145,7 +144,7 @@ GameState::GameError IntroScreen::Render()
 // SplashScreen GameState object
 //-----------------------------------------------------------------------------
 
-SplashScreen::SplashScreen( HWND hWnd, D3D12Renderer *pRenderer, bool enableSplash ) : GameState( hWnd, pRenderer )
+SplashScreen::SplashScreen(HWND hWnd, D3D12Renderer* pRenderer, bool enableSplash) : GameState(hWnd, pRenderer)
 {
     if (enableSplash) {
         HRSRC hResInfo = FindResource(NULL, MAKEINTRESOURCE(IDR_SPLASHMIDI), TEXT("MIDI"));
@@ -154,13 +153,13 @@ SplashScreen::SplashScreen( HWND hWnd, D3D12Renderer *pRenderer, bool enableSpla
         unsigned char* pData = (unsigned char*)LockResource(hRes);
 
         Config& config = Config::GetConfig();
-        VizSettings viz = config.GetVizSettings();
+        const ControlsSettings& cControls = config.GetControlsSettings();
 
         // Parse MIDI
-        if (!viz.sSplashMIDI.empty()) {
+        if (!cControls.sSplashMIDI.empty()) {
             // this is REALLY BAD, but i can't figure out how to make it move ownership of the memory pool vector instead of copying
             m_MIDI.~MIDI();
-            new (&m_MIDI) MIDI(viz.sSplashMIDI);
+            new (&m_MIDI) MIDI(cControls.sSplashMIDI);
             if (!m_MIDI.IsValid()) {
                 MessageBox(hWnd, L"The custom splash MIDI failed to load. Please choose a different MIDI.", L"", MB_ICONWARNING);
                 m_MIDI = MIDI();
@@ -251,22 +250,21 @@ SplashScreen::SplashScreen( HWND hWnd, D3D12Renderer *pRenderer, bool enableSpla
     InitState();
 }
 
-void SplashScreen::InitNotes( const vector< MIDIEvent* > &vEvents )
+void SplashScreen::InitNotes(const vector< MIDIEvent* >& vEvents)
 {
     //Get only the channel events
-    m_vEvents.reserve( vEvents.size() );
-    for ( vector< MIDIEvent* >::const_iterator it = vEvents.begin(); it != vEvents.end(); ++it )
-        if ( (*it)->GetEventType() == MIDIEvent::ChannelEvent )
-            m_vEvents.push_back( reinterpret_cast< MIDIChannelEvent* >( *it ) );
+    m_vEvents.reserve(vEvents.size());
+    for (vector< MIDIEvent* >::const_iterator it = vEvents.begin(); it != vEvents.end(); ++it)
+        if ((*it)->GetEventType() == MIDIEvent::ChannelEvent)
+            m_vEvents.push_back(reinterpret_cast<MIDIChannelEvent*>(*it));
 }
 
 void SplashScreen::InitState()
 {
-    static Config &config = Config::GetConfig();
-    static const PlaybackSettings &cPlayback = config.GetPlaybackSettings();
-    static const VisualSettings &cVisual = config.GetVisualSettings();
-    static const AudioSettings &cAudio = config.GetAudioSettings();
-    static const VizSettings &cViz = config.GetVizSettings();
+    static Config& config = Config::GetConfig();
+    static const PlaybackSettings& cPlayback = config.GetPlaybackSettings();
+    static const VisualSettings& cVisual = config.GetVisualSettings();
+    static const AudioSettings& cAudio = config.GetAudioSettings();
 
     m_iStartPos = 0;
     m_iEndPos = -1;
@@ -274,12 +272,13 @@ void SplashScreen::InitState()
     m_bPaused = cPlayback.GetPaused();
     m_bMute = cPlayback.GetMute();
 
-    SetChannelSettings( vector< bool >(), vector< bool >(),
-        vector< unsigned >( cVisual.colors, cVisual.colors + sizeof( cVisual.colors ) / sizeof( cVisual.colors[0] ) ) );
+    SetChannelSettings(vector< bool >(), vector< bool >(),
+        vector< unsigned >(cVisual.colors, cVisual.colors + sizeof(cVisual.colors) / sizeof(cVisual.colors[0])));
 
-    if (cViz.bKDMAPI) {
+    if (cAudio.bKDMAPI) {
         m_OutDevice.OpenKDMAPI();
-    } else {
+    }
+    else {
         if (cAudio.iOutDevice >= 0)
             m_OutDevice.Open(cAudio.iOutDevice);
     }
@@ -293,70 +292,68 @@ GameState::GameError SplashScreen::Init()
     return Success;
 }
 
-void SplashScreen::ColorChannel( int iTrack, int iChannel, unsigned int iColor, bool bRandom )
+void SplashScreen::ColorChannel(int iTrack, int iChannel, unsigned int iColor, bool bRandom)
 {
-    if ( bRandom )
+    if (bRandom)
         m_vTrackSettings[iTrack].aChannels[iChannel].SetColor();
     else
-        m_vTrackSettings[iTrack].aChannels[iChannel].SetColor( iColor );
+        m_vTrackSettings[iTrack].aChannels[iChannel].SetColor(iColor);
 }
 
-void SplashScreen::SetChannelSettings( const vector< bool > &, const vector< bool > &, const vector< unsigned > &vColor )
+void SplashScreen::SetChannelSettings(const vector< bool >&, const vector< bool >&, const vector< unsigned >& vColor)
 {
-    const MIDI::MIDIInfo &mInfo = m_MIDI.GetInfo();
-    const vector< MIDITrack* > &vTracks = m_MIDI.GetTracks();
+    const MIDI::MIDIInfo& mInfo = m_MIDI.GetInfo();
+    const vector< MIDITrack* >& vTracks = m_MIDI.GetTracks();
 
     static Config& config = Config::GetConfig();
-    static const VizSettings& cViz = config.GetVizSettings();
+    static const VisualSettings& cVisual = config.GetVisualSettings();
 
     int iPos = 0;
-    for (uint16_t i = 0; i < mInfo.iNumTracks; i++ )
+    for (uint16_t i = 0; i < mInfo.iNumTracks; i++)
     {
-        const MIDITrack::MIDITrackInfo &mTrackInfo = vTracks[i]->GetInfo();
-        for ( int j = 0; j < 16; j++ )
-            if ( mTrackInfo.aNoteCount[j] > 0 )
+        const MIDITrack::MIDITrackInfo& mTrackInfo = vTracks[i]->GetInfo();
+        for (int j = 0; j < 16; j++)
+            if (mTrackInfo.aNoteCount[j] > 0)
             {
-                if (cViz.bColorLoop) {
+                if (cVisual.bRandomizeColor) {
+                    ColorChannel(i, j, 0, true);
+                }
+                else {
                     ColorChannel(i, j, vColor[iPos % vColor.size()]);
-                } else {
-                    if (iPos < vColor.size())
-                        ColorChannel(i, j, vColor[iPos]);
-                    else
-                        ColorChannel(i, j, 0, true);
                 }
                 iPos++;
             }
     }
 }
 
-GameState::GameError SplashScreen::MsgProc( HWND, UINT msg, WPARAM wParam, LPARAM lParam )
+GameState::GameError SplashScreen::MsgProc(HWND, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    static Config &config = Config::GetConfig();
+    static Config& config = Config::GetConfig();
     static const AudioSettings& cAudio = config.GetAudioSettings();
-    static const VizSettings& cViz = config.GetVizSettings();
 
     switch (msg)
     {
-        case WM_COMMAND:
+    case WM_COMMAND:
+    {
+        int iId = LOWORD(wParam);
+        switch (iId)
         {
-            int iId = LOWORD( wParam );
-            switch( iId )
-            {
-                case ID_CHANGESTATE:
-                    m_pNextState = reinterpret_cast< GameState* >( lParam );
-                    return Success;
-                case ID_VIEW_RESETDEVICE:
-                    m_pRenderer->ResetDevice();
-                    return Success;
-            }
+        case ID_CHANGESTATE:
+            m_pNextState = reinterpret_cast<GameState*>(lParam);
+            return Success;
+        case ID_VIEW_RESETDEVICE:
+            m_pRenderer->ResetDevice();
+            return Success;
         }
-        case WM_DEVICECHANGE:
-            if (cViz.bKDMAPI) {
-                m_OutDevice.OpenKDMAPI();
-            } else {
-                m_OutDevice.Open(cAudio.iOutDevice);
-            }
-            break;
+    }
+    case WM_DEVICECHANGE:
+        if (cAudio.bKDMAPI) {
+            m_OutDevice.OpenKDMAPI();
+        }
+        else {
+            m_OutDevice.Open(cAudio.iOutDevice);
+        }
+        break;
     }
 
     return Success;
@@ -367,15 +364,15 @@ GameState::GameError SplashScreen::Logic()
     // Start new ImGui frame
     m_pRenderer->ImGuiStartFrame();
 
-    static Config &config = Config::GetConfig();
-    static PlaybackSettings &cPlayback = config.GetPlaybackSettings();
+    static Config& config = Config::GetConfig();
+    static PlaybackSettings& cPlayback = config.GetPlaybackSettings();
 
     // Detect changes in state
     bool bPaused = cPlayback.GetPaused();
     bool bMute = cPlayback.GetMute();
-    bool bMuteChanged = ( bMute != m_bMute );
-    bool bPausedChanged = ( bPaused != m_bPaused );
-    
+    bool bMuteChanged = (bMute != m_bMute);
+    bool bPausedChanged = (bPaused != m_bPaused);
+
     // Set the state
     m_bMute = bMute;
     m_bPaused = bPaused;
@@ -387,12 +384,12 @@ GameState::GameError SplashScreen::Logic()
     m_Timer.Start();
 
     // If we just paused, kill the music. SetVolume is better than AllNotesOff
-    if ( ( bPausedChanged || bMuteChanged ) && ( m_bPaused || m_bMute ) )
+    if ((bPausedChanged || bMuteChanged) && (m_bPaused || m_bMute))
         m_OutDevice.AllNotesOff();
 
     // Figure out start and end times for display
     long long llNextStartTime = m_llStartTime + llElapsed;
-    if ( !bPaused && m_llStartTime < llMaxTime )
+    if (!bPaused && m_llStartTime < llMaxTime)
         m_llStartTime = llNextStartTime;
     long long llEndTime = m_llStartTime + TimeSpan;
 
@@ -400,20 +397,20 @@ GameState::GameError SplashScreen::Logic()
     RenderGlobals();
 
     // Advance end position
-    int iEventCount = (int)m_vEvents.size();
-    while ( m_iEndPos + 1 < iEventCount && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() < llEndTime )
+    size_t iEventCount = m_vEvents.size();
+    while (m_iEndPos + 1 < iEventCount && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() < llEndTime)
         m_iEndPos++;
-        
+
     // Advance start position updating initial state as we pass stale events
     // Also PLAYS THE MUSIC
-    while ( m_iStartPos < iEventCount && m_vEvents[m_iStartPos]->GetAbsMicroSec() <= m_llStartTime )
+    while (m_iStartPos < iEventCount && m_vEvents[m_iStartPos]->GetAbsMicroSec() <= m_llStartTime)
     {
-        MIDIChannelEvent *pEvent = m_vEvents[m_iStartPos];
-        if ( pEvent->GetChannelEventType() != MIDIChannelEvent::NoteOn )
-            m_OutDevice.PlayEvent( pEvent->GetEventCode(), pEvent->GetParam1(), pEvent->GetParam2() );
-        else if (!m_bMute && !m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bMuted )
-            m_OutDevice.PlayEvent( pEvent->GetEventCode(), pEvent->GetParam1(), static_cast<unsigned char>(cPlayback.GetVolume() > 1.0 ? static_cast<double>(INT8_MAX) - (static_cast<double>(INT8_MAX) - static_cast<double>(pEvent->GetParam2())) * (2.0 - cPlayback.GetVolume()) : static_cast<double>(pEvent->GetParam2())*cPlayback.GetVolume()));
-        UpdateState( m_iStartPos );
+        MIDIChannelEvent* pEvent = m_vEvents[m_iStartPos];
+        if (pEvent->GetChannelEventType() != MIDIChannelEvent::NoteOn)
+            m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), pEvent->GetParam2());
+        else if (!m_bMute && !m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bMuted)
+            m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), static_cast<unsigned char>(cPlayback.GetVolume() > 1.0 ? static_cast<double>(INT8_MAX) - (static_cast<double>(INT8_MAX) - static_cast<double>(pEvent->GetParam2())) * (2.0 - cPlayback.GetVolume()) : static_cast<double>(pEvent->GetParam2()) * cPlayback.GetVolume()));
+        UpdateState(m_iStartPos);
         m_iStartPos++;
     }
 
@@ -512,7 +509,7 @@ const float SplashScreen::SharpRatio = 0.65f;
 
 GameState::GameError SplashScreen::Render()
 {
-    if ( FAILED( m_pRenderer->ResetDeviceIfNeeded() ) ) return DirectXError;
+    if (FAILED(m_pRenderer->ResetDeviceIfNeeded())) return DirectXError;
 
     // Clear the backbuffer to a blue color
     unsigned int iColor = Config::GetConfig().GetVisualSettings().iBkgColor;
@@ -552,26 +549,26 @@ GameState::GameError SplashScreen::Render()
 void SplashScreen::RenderGlobals()
 {
     // Midi info
-    const MIDI::MIDIInfo &mInfo = m_MIDI.GetInfo();
+    const MIDI::MIDIInfo& mInfo = m_MIDI.GetInfo();
     m_iStartNote = mInfo.iMinNote;
     m_iEndNote = mInfo.iMaxNote;
 
     // Screen info
     m_fNotesX = 0.0f;
-    m_fNotesCX = static_cast< float >( m_pRenderer->GetBufferWidth() );
+    m_fNotesCX = static_cast<float>(m_pRenderer->GetBufferWidth());
     m_fNotesY = 0.0f;
-    m_fNotesCY = static_cast< float >( m_pRenderer->GetBufferHeight() );
+    m_fNotesCY = static_cast<float>(m_pRenderer->GetBufferHeight());
 
     // Keys info
-    m_iAllWhiteKeys = MIDI::WhiteCount( m_iStartNote, m_iEndNote + 1 );
-    float fBuffer = ( MIDI::IsSharp( m_iStartNote ) ? SharpRatio / 2.0f : 0.0f ) +
-                    ( MIDI::IsSharp( m_iEndNote ) ? SharpRatio / 2.0f : 0.0f );
-    m_fWhiteCX = m_fNotesCX / ( m_iAllWhiteKeys + fBuffer );
+    m_iAllWhiteKeys = MIDI::WhiteCount(m_iStartNote, m_iEndNote + 1);
+    float fBuffer = (MIDI::IsSharp(m_iStartNote) ? SharpRatio / 2.0f : 0.0f) +
+        (MIDI::IsSharp(m_iEndNote) ? SharpRatio / 2.0f : 0.0f);
+    m_fWhiteCX = m_fNotesCX / (m_iAllWhiteKeys + fBuffer);
 
     // Round down start time. This is only used for rendering purposes
-    long long llMicroSecsPP = static_cast< long long >( TimeSpan / m_fNotesCY + 0.5f );
-    m_llRndStartTime = m_llStartTime - ( m_llStartTime < 0 ? llMicroSecsPP : 0 );
-    m_llRndStartTime = ( m_llRndStartTime / llMicroSecsPP ) * llMicroSecsPP;
+    long long llMicroSecsPP = static_cast<long long>(TimeSpan / m_fNotesCY + 0.5f);
+    m_llRndStartTime = m_llStartTime - (m_llStartTime < 0 ? llMicroSecsPP : 0);
+    m_llRndStartTime = (m_llRndStartTime / llMicroSecsPP) * llMicroSecsPP;
 
     GenNoteXTable();
 }
@@ -579,7 +576,7 @@ void SplashScreen::RenderGlobals()
 void SplashScreen::RenderNotes()
 {
     // Do we have any notes to render?
-    if ( m_iEndPos < 0 || m_iStartPos >= static_cast< int >( m_vEvents.size() ) )
+    if (m_iEndPos < 0 || m_iStartPos >= static_cast<int>(m_vEvents.size()))
         return;
 
     for (int i = 0; i < 128; i++) {
@@ -591,10 +588,9 @@ void SplashScreen::RenderNotes()
     }
     for (int i = m_iStartPos; i <= m_iEndPos; i++) {
         MIDIChannelEvent* pEvent = m_vEvents[i];
-        if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn &&
-            pEvent->GetParam2() > 0 && pEvent->HasSister() &&
+        if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->HasSister() &&
             !MIDI::IsSharp(pEvent->GetParam1())) {
-                RenderNote(pEvent);
+            RenderNote(pEvent);
         }
     }
     for (int i = 0; i < 128; i++) {
@@ -606,8 +602,7 @@ void SplashScreen::RenderNotes()
     }
     for (int i = m_iStartPos; i <= m_iEndPos; i++) {
         MIDIChannelEvent* pEvent = m_vEvents[i];
-        if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn &&
-            pEvent->GetParam2() > 0 && pEvent->HasSister() &&
+        if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->HasSister() &&
             MIDI::IsSharp(pEvent->GetParam1())) {
             RenderNote(pEvent);
         }
@@ -707,6 +702,8 @@ MainScreen::MainScreen( wstring sMIDIFile, State eGameMode, HWND hWnd, D3D12Rend
     m_vTrackSettings.resize( m_MIDI.GetInfo().iNumTracks );
     for (auto note_state : m_vState)
         note_state.reserve(m_MIDI.GetInfo().iNumTracks * 16);
+    for (auto note_state : m_vStateReversed)
+        note_state.reserve(m_MIDI.GetInfo().iNumTracks * 16);
 
     m_MIDI.PostProcess(m_vEvents, &m_vProgramChange, &m_vMetaEvents, &m_vNoteOns, &m_vTempo, &m_vSignature, &m_vMarkers, &m_vColors);
 
@@ -722,11 +719,10 @@ void MainScreen::InitColors()
 {
     static Config& config = Config::GetConfig();
     static const VisualSettings& cVisual = config.GetVisualSettings();
-    static const VizSettings& cViz = config.GetVizSettings();
 
     m_csBackground.SetColor(cVisual.iBkgColor, 0.7f, 1.3f );
     m_csKBBackground.SetColor(0x00999999, 0.4f, 0.0f);
-    m_csKBRed.SetColor(cViz.iBarColor, 0.5f);
+    m_csKBRed.SetColor(cVisual.iBarColor, 0.5f);
     m_csKBWhite.SetColor(0x00FFFFFF, 0.8f, 0.6f);
     m_csKBSharp.SetColor(0x00404040, 0.5f, 0.0f);
 }
@@ -737,7 +733,8 @@ void MainScreen::InitState()
     static Config &config = Config::GetConfig();
     static const PlaybackSettings &cPlayback = config.GetPlaybackSettings();
     static const ViewSettings &cView = config.GetViewSettings();
-    static const VizSettings& cViz = config.GetVizSettings();
+    static const VideoSettings& cVideo = config.GetVideoSettings();
+    static const MIDI::MIDIInfo& mInfo = m_MIDI.GetInfo();
 
     m_eGameMode = Practice;
     m_iStartPos = 0;
@@ -752,19 +749,20 @@ void MainScreen::InitState()
     m_llFPSTime = 0;
     m_dSpeed = -1.0; // Forces a speed reset upon first call to Logic
     m_llPrevTime = m_llStartTime;
+    TotalNC = mInfo.iNoteCount;
 
     m_fZoomX = cView.GetZoomX();
     m_fOffsetX = cView.GetOffsetX();
     m_fOffsetY = cView.GetOffsetY();
     m_bPaused = true;
     m_bMute = cPlayback.GetMute();
-    double dNSpeed = cPlayback.GetNSpeed();
-    m_llTimeSpan = static_cast< long long >( 3.0 * abs(dNSpeed) * 1000000 );
+    m_dNSpeed = cPlayback.GetNSpeed();
+    m_llTimeSpan = static_cast< long long >( 3.0 * abs(m_dNSpeed) * 1000000 );
 
     // m_Timer will be initialized *later*
     m_RealTimer.Init(false);
 
-    m_bDumpFrames = cViz.bDumpFrames;
+    m_bDumpFrames = cVideo.bDumpFrames;
     if (m_bDumpFrames) {
         RECT rect = {};
         GetWindowRect(g_hWndGfx, &rect);
@@ -789,8 +787,7 @@ GameState::GameError MainScreen::Init()
 {
     static Config& config = Config::GetConfig();
     static const AudioSettings &cAudio = config.GetAudioSettings();
-    static const VizSettings &cViz = config.GetVizSettings();
-    if (cViz.bKDMAPI) {
+    if (cAudio.bKDMAPI) {
         m_OutDevice.OpenKDMAPI();
     } else {
         if (cAudio.iOutDevice >= 0)
@@ -882,9 +879,6 @@ void MainScreen::SetChannelSettings( const vector< bool > &vMuted, const vector<
     bool bHidden = vHidden.size() > 0;
     bool bColor = vColor.size() > 0;
 
-    static Config& config = Config::GetConfig();
-    static const VizSettings& cViz = config.GetVizSettings();
-
     size_t iPos = 0;
     for (int i = 0; i < (int)vTracks.size(); i++) {
         const MIDITrack::MIDITrackInfo& mTrackInfo = vTracks[i]->GetInfo();
@@ -892,15 +886,11 @@ void MainScreen::SetChannelSettings( const vector< bool > &vMuted, const vector<
             if (mTrackInfo.aNoteCount[j] > 0) {
                 MuteChannel(i, j, bMuted ? vMuted[min(iPos, vMuted.size() - 1)] : false);
                 HideChannel(i, j, bHidden ? vHidden[min(iPos, vHidden.size() - 1)] : false);
-                if (cViz.bColorLoop && bColor) {
+                if (bColor) {
                     ColorChannel(i, j, vColor[iPos % vColor.size()]);
-                } else {
-                    if (bColor && iPos < vColor.size()) {
-                        ColorChannel(i, j, vColor[iPos]);
-                    }
-                    else {
-                        ColorChannel(i, j, 0, true);
-                    }
+                }
+                else {
+                    ColorChannel(i, j, 0, true);
                 }
                 iPos++;
             }
@@ -916,7 +906,6 @@ GameState::GameError MainScreen::MsgProc( HWND, UINT msg, WPARAM wParam, LPARAM 
     static ViewSettings &cView = config.GetViewSettings();
     static const ControlsSettings &cControls = config.GetControlsSettings();
     static const AudioSettings &cAudio = config.GetAudioSettings();
-    static const VizSettings &cViz = config.GetVizSettings();
 
     switch (msg)
     {
@@ -974,7 +963,7 @@ GameState::GameError MainScreen::MsgProc( HWND, UINT msg, WPARAM wParam, LPARAM 
         }
         // These are doubled from MainProcs.cpp. Allows to get rid of the Ctrl requirement for accellerators
         case WM_DEVICECHANGE:
-            if (cViz.bKDMAPI) {
+            if (cAudio.bKDMAPI) {
                 m_OutDevice.OpenKDMAPI();
             } else {
                 m_OutDevice.Open(cAudio.iOutDevice);
@@ -1056,10 +1045,9 @@ GameState::GameError MainScreen::Logic( void )
     static const ViewSettings &cView = config.GetViewSettings();
     static const VisualSettings &cVisual = config.GetVisualSettings();
     static const VideoSettings &cVideo = config.GetVideoSettings();
-    static const VizSettings &cViz = config.GetVizSettings();
 
     // people are probably going to yell at me if you can't change the bar color during playback
-    m_csKBRed.SetColor(cViz.iBarColor, 0.5f);
+    m_csKBRed.SetColor(cVisual.iBarColor, 0.5f);
 
     // Detect changes in state
     bool bPaused = cPlayback.GetPaused();
@@ -1071,9 +1059,10 @@ GameState::GameError MainScreen::Logic( void )
     bool bMuteChanged = ( bMute != m_bMute );
     
     // Set the state
-    m_bTickMode = cViz.bTickBased;
+    m_bTickMode = cVideo.bTickBased;
     m_bPaused = bPaused;
     m_dSpeed = dSpeed;
+    m_dNSpeed = dNSpeed;
     m_bMute = bMute;
     m_llTimeSpan = m_bTickMode ? abs(dNSpeed) * 3000 : llTimeSpan;
     m_dVolume = cPlayback.GetVolume();
@@ -1087,7 +1076,6 @@ GameState::GameError MainScreen::Logic( void )
     m_iStartNote = max(0, min(127, min(cVisual.iFirstKey, cVisual.iLastKey)));
     m_iEndNote = max(0, min(127, max(cVisual.iFirstKey, cVisual.iLastKey)));
     m_bFlipKeyboard = cVisual.iFirstKey > cVisual.iLastKey && cVisual.eKeysShown != 0 && cVisual.eKeysShown != 1;
-    m_bDebug = cVideo.bShowFPS;
     m_pRenderer->SetLimitFPS( cVideo.bLimitFPS );
     if ( cVisual.iBkgColor != m_csBackground.iOrigBGR ) m_csBackground.SetColor( cVisual.iBkgColor, 0.7f, 1.3f );
 
@@ -1099,13 +1087,14 @@ GameState::GameError MainScreen::Logic( void )
         }
     }
 
-    if (cViz.eMarkerEncoding != m_iCurEncoding) {
-        m_iCurEncoding = cViz.eMarkerEncoding;
+    if (cVideo.eMarkerEncoding != m_iCurEncoding) {
+        m_iCurEncoding = cVideo.eMarkerEncoding;
         ApplyMarker(m_pMarkerData, m_iMarkerSize);
     }
 
     // Time stuff
     long long llMaxTime = GetMaxTime();
+    long long llMinTime = GetMinTime();
     long long llElapsed = m_Timer.GetMicroSecs();
     long long llRealElapsed = m_RealTimer.GetMicroSecs();
     m_Timer.Start();
@@ -1148,6 +1137,17 @@ GameState::GameError MainScreen::Logic( void )
             llEndTime = m_llStartTime + m_llTimeSpan;
         }
     }
+    if (abs(m_llStartTime - m_llPrevTime) > 1e+6) { // Handle time jump and negative playback speed from cheat engine
+        JumpTo(m_llStartTime - (1e+6 / (m_dFPS / 4)), true);
+    }
+    else {
+        if (m_llPrevTime > m_llStartTime && !m_bPaused) {
+            JumpTo(m_llStartTime - (1e+6 / (m_dFPS / 4)), true);
+        }
+        else {
+            m_llPrevTime = m_llStartTime;
+        }
+    }
 
     size_t iEventCount = m_vEvents.size();
     RenderGlobals();
@@ -1177,11 +1177,10 @@ GameState::GameError MainScreen::Logic( void )
     {
         // Advance start position updating initial state as we pass stale events
         // Also PLAYS THE MUSIC
-        long long notes_played = 0;
-        long long events_processed = 0;
-        for (auto& work : m_vThreadWork)
+        for (auto& work : m_vThreadWork) {
             work.clear();
-        while ( m_iStartPos < iEventCount && m_vEvents[m_iStartPos]->GetAbsMicroSec() <= m_llStartTime )
+        }
+        while (m_iStartPos < iEventCount && m_vEvents[m_iStartPos]->GetAbsMicroSec() <= m_llStartTime)
         {
             MIDIChannelEvent* pEvent = m_vEvents[m_iStartPos];
             MIDIChannelEvent* pChannelEvent = reinterpret_cast<MIDIChannelEvent*>(pEvent);
@@ -1191,53 +1190,33 @@ GameState::GameError MainScreen::Logic( void )
                     pEvent->SetParam1(0);
                 }
                 if (pEvent->GetChannelEventType() == MIDIChannelEvent::PitchBend) {
-                    float NoteWidth = (m_pRenderer->GetBufferWidth() * m_fZoomX * m_fTempZoomX) / (m_iEndNote - m_iStartNote);
                     m_pBendsValue[pEvent->GetChannel()] = ((pEvent->GetParam2() << 7) | pEvent->GetParam1()) - (1 << 13);
-                    float ShiftAmount = m_pBendsRange[pEvent->GetChannel()] == 0 ? 0 : m_pBendsValue[pEvent->GetChannel()] / ((1 << 13) / m_pBendsRange[pEvent->GetChannel()]);
-                    if (m_bFlipKeyboard) ShiftAmount *= -1;
-                    m_pBends[pEvent->GetChannel()] = NoteWidth * ShiftAmount;
                 }
                 if (pChannelEvent->GetChannelEventType() == MIDIChannelEvent::Controller) {
                     if (pEvent->GetParam1() == 100) { Next_is_PBS[pEvent->GetChannel()] = pEvent->GetParam2() == 0; }//[101] RPN LSB | 0:Pitch Bend Sensitivity
                     if (pEvent->GetParam1() == 6 && Next_is_PBS[pEvent->GetChannel()]) {
                         m_pBendsRange[pEvent->GetChannel()] = pEvent->GetParam2();
-                        float NoteWidth = (m_pRenderer->GetBufferWidth() * m_fZoomX * m_fTempZoomX) / (m_iEndNote - m_iStartNote);
-                        float ShiftAmount = m_pBendsRange[pEvent->GetChannel()] == 0 ? 0 : m_pBendsValue[pEvent->GetChannel()] / ((1 << 13) / m_pBendsRange[pEvent->GetChannel()]);
-                        if (m_bFlipKeyboard) ShiftAmount *= -1;
-                        m_pBends[pEvent->GetChannel()] = NoteWidth * ShiftAmount;
                     }
                 }
                 if (!m_bMute) m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), pEvent->GetParam2());
             }
             else if (!m_bMute && (!m_bAnyChannelMuted || !m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bMuted)) {
                 m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), static_cast<unsigned char>(cPlayback.GetVolume() > 1.0 ? static_cast<double>(INT8_MAX) - (static_cast<double>(INT8_MAX) - static_cast<double>(pEvent->GetParam2())) * (2.0 - cPlayback.GetVolume()) : static_cast<double>(pEvent->GetParam2()) * cPlayback.GetVolume()));
-                notes_played++;
             }
             if ((pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn || pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOff)
                 && pEvent->GetParam1() < 128 && pEvent->HasSister())
             {
                 m_vThreadWork[pEvent->GetParam1()].push_back({
                     .idx = (unsigned)m_iStartPos,
-                    .sister_idx = (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0) ? ~0 : pEvent->GetSisterIdx(),
-                });
+                    .sister_idx = (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn) ? ~0 : pEvent->GetSisterIdx(),
+                    });
             }
             m_iStartPos++;
-            events_processed++;
         }
-
-        // Only parallelize after an events threshold is hit for this frame
-        if (events_processed < 131072) {
-            for (int i = 0; i < 128; i++) {
-                for (const auto& work : m_vThreadWork[i])
-                    UpdateState(i, work);
-            }
-        }
-        else {
-            concurrency::parallel_for(size_t(0), size_t(128), [&](int key) {
-                for (const auto& work : m_vThreadWork[key])
-                    UpdateState(key, work);
+        concurrency::parallel_for(size_t(0), size_t(128), [&](int key) {
+            for (const auto& work : m_vThreadWork[key])
+                UpdateState(key, work);
             });
-        }
     }
 
     // Advance end position AFTER advancing start for negative note speed
@@ -1264,7 +1243,13 @@ GameState::GameError MainScreen::Logic( void )
         m_iPrevStartPos = m_iStartPos;
     }
 
-    AdvanceIterators( m_llStartTime, false );
+    if (dNSpeed < 0) {
+        UpdateStateReversed(m_iStartPos - (m_iEndPos - m_iStartPos));
+    }
+
+    if (m_dSpeed >= 0) {
+        AdvanceIterators(m_llStartTime, false);
+    }
 
     // Update the position slider
     long long llFirstTime = GetMinTime();
@@ -1274,7 +1259,7 @@ GameState::GameError MainScreen::Logic( void )
     if ( llOldPos != llNewPos ) cPlayback.SetPosition( static_cast< int >( llNewPos ) );
 
     // Song's over
-    if (!m_bPaused && m_llStartTime >= llMaxTime) {
+    if (!m_bPaused && ((m_dSpeed < 0) ? (m_llStartTime < llMinTime) : (m_llStartTime > llMaxTime))) {
         if (m_bDumpFrames) {
             char buf[1<<10] = {};
             snprintf(buf, sizeof(buf), "start \"Result\" \"C:\\Windows\\Explorer.exe\" \"%s\\PianoFX_Framedump\\\"", GetExePath().c_str());
@@ -1298,7 +1283,7 @@ GameState::GameError MainScreen::Logic( void )
     // Update fixed size constants
     auto& fixed_consts = m_pRenderer->GetFixedSizeConstants();
     memcpy(&fixed_consts.note_x, &notex_table, sizeof(float) * 128);
-    if (cViz.bVisualizePitchBends)
+    if (cVideo.bVisualizePitchBends)
         memcpy(&fixed_consts.bends, &m_pBends, sizeof(float) * 16);
     else
         memset(&fixed_consts.bends, 0, sizeof(float) * 16);
@@ -1338,6 +1323,92 @@ void MainScreen::UpdateState(int key, const thread_work_t& work)
     }
 }
 
+void MainScreen::UpdateStateReversed(int iPos)
+{
+    const auto DeadLine = chrono::high_resolution_clock::now() + chrono::milliseconds(1 << 4);
+
+    if (iPos <= 0 || iPos >= static_cast<int>(m_vEvents.size())) {
+        // Clear all and return if position is invalid
+        concurrency::parallel_for(size_t(0), size_t(128), [&](size_t i) {
+            m_vStateReversed[i].clear();
+            });
+        return;
+    }
+
+    // Cache frequently used values
+    const auto& events = m_vEvents; // avoid repeated member access
+    const size_t eventSize = events.size();
+     
+    // Find the last note on event before iPos
+    MIDIChannelEvent* prevEvent = nullptr;
+    for (int idx = iPos - 1; idx >= 0; --idx) {
+        MIDIChannelEvent* evt = events[idx];
+        if (evt->GetChannelEventType() == MIDIChannelEvent::NoteOn) {
+            prevEvent = evt;
+            break;
+        }
+    }
+
+    if (!prevEvent) {
+        // Clear all and return if no previous note found
+        concurrency::parallel_for(size_t(0), size_t(128), [&](size_t i) {
+            m_vStateReversed[i].clear();
+            });
+        return;
+    }
+
+    // Get the simultaneous count and time boundary
+    const unsigned iSimultaneous = prevEvent->GetSimultaneous() + 1;
+    const long long prevTime = prevEvent->GetAbsMicroSec();
+    const long long targetTime = events[iPos]->GetAbsMicroSec();
+
+    // Pre-calculate max possible notes per key to avoid reallocations
+    // Each simultaneous note could potentially go to the same key
+    const size_t maxNotesPerKey = iSimultaneous;
+
+    // Clear and pre-reserve space
+    concurrency::parallel_for(size_t(0), size_t(128), [&](size_t i) {
+        m_vStateReversed[i].clear();
+        m_vStateReversed[i].reserve(maxNotesPerKey);
+        });
+
+    // Process events in reverse order
+    unsigned iFound = 0;
+    const int startIdx = iPos - 1;
+    for (int idx = startIdx; idx >= 0 && iFound < iSimultaneous; --idx) {
+        if (m_bDumpFrames || chrono::high_resolution_clock::now() < DeadLine) {
+            MIDIChannelEvent* pEvent = events[idx];
+            if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn &&
+                pEvent->HasSister()) {
+
+                MIDIChannelEvent* pSister = pEvent->GetSister(events);
+                const long long sisterTime = pSister->GetAbsMicroSec();
+
+                if (sisterTime > prevTime) {
+                    iFound++;
+                    if (sisterTime > targetTime) {
+                        const int noteKey = pEvent->GetParam1();
+                        m_vStateReversed[noteKey].push_back(idx);
+                    }
+                }
+            }
+        }
+        else {
+            goto funcend;
+        }
+    }
+
+    funcend:
+    // Reverse the vectors that were actually modified
+    concurrency::parallel_for(size_t(0), size_t(128), [&](size_t i) {
+        auto& vec = m_vStateReversed[i];
+        if (!vec.empty()) {
+            std::reverse(vec.begin(), vec.end());
+        }
+        });
+    return;
+}
+
 void MainScreen::JumpTo(long long llStartTime, boolean loadingMode)
 {
     // Kill the music!
@@ -1353,7 +1424,7 @@ void MainScreen::JumpTo(long long llStartTime, boolean loadingMode)
         m_llStartTime = min(max(llStartTime, llFirstTime), llLastTime);
     }
     
-    if (Config::GetConfig().GetPlaybackSettings().GetNSpeed() < 0) {
+    if (m_dNSpeed < 0) {
         if (m_bTickMode) {
             llEndTime = m_iStartTick - m_llTimeSpan;
         }
@@ -1385,7 +1456,7 @@ void MainScreen::JumpTo(long long llStartTime, boolean loadingMode)
 
     // Need to scan up to the next note on event
     for (; itMiddle != itEnd; itMiddle++) {
-        if ((*itMiddle)->GetChannelEventType() == MIDIChannelEvent::NoteOn && (*itMiddle)->GetParam2() > 0)
+        if ((*itMiddle)->GetChannelEventType() == MIDIChannelEvent::NoteOn)
             break;
     }
 
@@ -1398,7 +1469,7 @@ void MainScreen::JumpTo(long long llStartTime, boolean loadingMode)
         // Need to scan down to the last note on event
         auto itPrev = itMiddle - 1;
         for (; itPrev != itBegin; itPrev--) {
-            if ((*itPrev)->GetChannelEventType() == MIDIChannelEvent::NoteOn && (*itPrev)->GetParam2() > 0)
+            if ((*itPrev)->GetChannelEventType() == MIDIChannelEvent::NoteOn)
                 break;
         }
 
@@ -1408,7 +1479,7 @@ void MainScreen::JumpTo(long long llStartTime, boolean loadingMode)
         {
             auto idx = m_vEvents.size() - 1 - (it - m_vEvents.rbegin());
             MIDIChannelEvent* pEvent = m_vEvents[idx];
-            if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0 && pEvent->HasSister()) {
+            if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->HasSister()) {
                 MIDIChannelEvent* pSister = pEvent->GetSister(m_vEvents);
                 if (pSister->GetAbsMicroSec() > (*itPrev)->GetAbsMicroSec()) // > because itMiddle is the max for its time
                     iFound++;
@@ -1428,7 +1499,7 @@ void MainScreen::JumpTo(long long llStartTime, boolean loadingMode)
     m_iStartTick = GetCurrentTick(m_llStartTime);
 
     // End position: a little tricky. Same as logic code. Only needed for paused jumping.
-    if (Config::GetConfig().GetPlaybackSettings().GetNSpeed() < 0) {
+    if (m_dNSpeed < 0) {
         if (m_bTickMode) {
             m_iEndPos = m_iStartPos + 1;
             auto iEventCount = (long long)m_vEvents.size();
@@ -1498,8 +1569,8 @@ void MainScreen::ApplyMarker(unsigned char* data, size_t size) {
     m_pMarkerData = data;
     m_iMarkerSize = size;
     if (data) {
-        Config& config = Config::GetConfig();
-        VizSettings viz = config.GetVizSettings();
+        static Config& config = Config::GetConfig();
+        static const VideoSettings& cVideo = config.GetVideoSettings();
 
         constexpr int codepages[] = {1252, 437, 82, 886, 932, 936, CP_UTF8};
 
@@ -1507,11 +1578,11 @@ void MainScreen::ApplyMarker(unsigned char* data, size_t size) {
         memcpy(temp_str, data, size);
         temp_str[size] = '\0';
         
-        if (codepages[viz.eMarkerEncoding] != CP_UTF8) {
+        if (codepages[cVideo.eMarkerEncoding] != CP_UTF8) {
             // Yes, I have to convert to wide and then back to UTF-8...
-            auto wide_len = MultiByteToWideChar(codepages[viz.eMarkerEncoding], 0, temp_str, size + 1, NULL, 0);
+            auto wide_len = MultiByteToWideChar(codepages[cVideo.eMarkerEncoding], 0, temp_str, size + 1, NULL, 0);
             auto wide_temp_str = new WCHAR[wide_len];
-            MultiByteToWideChar(codepages[viz.eMarkerEncoding], 0, temp_str, size + 1, wide_temp_str, wide_len);
+            MultiByteToWideChar(codepages[cVideo.eMarkerEncoding], 0, temp_str, size + 1, wide_temp_str, wide_len);
 
             auto utf8_len = WideCharToMultiByte(CP_UTF8, 0, wide_temp_str, -1, 0, 0, 0, 0);
             auto utf8_temp_str = new char[utf8_len];
@@ -1740,22 +1811,18 @@ GameState::GameError MainScreen::Render()
 
     // Update background if it changed
     static Config& config = Config::GetConfig();
-    static const VizSettings& cViz = config.GetVizSettings();
+    static const VisualSettings& cVisual = config.GetVisualSettings();
     const PlaybackSettings& cPlayback = config.GetPlaybackSettings();
-    if (cViz.sBackground != m_sCurBackground || cViz.sBackground.empty()) {
-        m_bBackgroundLoaded = cViz.sBackground.empty() ? false : m_pRenderer->LoadBackgroundBitmap(cViz.sBackground);
-        m_sCurBackground = cViz.sBackground;
+    if (cVisual.sBackground != m_sCurBackground || cVisual.sBackground.empty()) {
+        m_bBackgroundLoaded = cVisual.sBackground.empty() ? false : m_pRenderer->LoadBackgroundBitmap(cVisual.sBackground);
+        m_sCurBackground = cVisual.sBackground;
     }
 
     m_pRenderer->ClearAndBeginScene(m_csBackground.iPrimaryRGB);
-    if (config.GetViewSettings().GetZoomX() != 0.0f) {
-        if (config.GetViewSettings().GetZoomX() > 0.0f) {
-            RenderLines();
-            RenderNotes();
-        }
-        if (m_bShowKB) {
-            RenderKeys();
-        }
+    if (m_fZoomX*m_fTempZoomX != 0.0f) {
+        RenderLines();
+        RenderNotes();
+        if (m_bShowKB) RenderKeys();
     }
     RenderText();
 
@@ -1810,7 +1877,7 @@ void MainScreen::RenderGlobals()
 
     // Screen X info
     m_fNotesX = m_fOffsetX + m_fTempOffsetX;
-    m_fNotesCX = m_pRenderer->GetBufferWidth() * m_fZoomX * m_fTempZoomX;
+    m_fNotesCX = m_pRenderer->GetBufferWidth() * abs(m_fZoomX) * abs(m_fTempZoomX);
 
     // Keys info
     m_iAllWhiteKeys = MIDI::WhiteCount( m_iStartNote, m_iEndNote + 1 );
@@ -1829,6 +1896,9 @@ void MainScreen::RenderGlobals()
         // .95 for the top vs near. 2.0 for the spacer. .93 for the transition and the red. ESTIMATE.
         fIdealKeyCY = ( fIdealKeyCY / 0.95f + 2.0f ) / 0.93f;
         m_fNotesCY = floor( m_pRenderer->GetBufferHeight() - min( fIdealKeyCY, fMaxKeyCY ) + 0.5f );
+    }
+    if (m_fZoomX * m_fTempZoomX < 0) {
+        m_fNotesY += m_pRenderer->GetBufferHeight() - m_fNotesCY;
     }
 
     // Round down start time. This is only used for rendering purposes
@@ -1929,34 +1999,35 @@ void MainScreen::RenderLines()
 
 void MainScreen::RenderNotes()
 {
-    if (m_llPrevTime > m_llStartTime) { // Handle time jump and negative playback speed from cheat engine
-        JumpTo(m_llStartTime - (1e+6 / (m_dFPS / 4)), true);
-    }
-    else {
-        m_llPrevTime = m_llStartTime;
-    }
-
     // Do we have any notes to render?
     if (m_iEndPos < 0 || m_iStartPos >= (int64_t)m_vEvents.size())
         return;
 
-    long long iStartPos = Config::GetConfig().GetPlaybackSettings().GetNSpeed() < 0 ? m_iStartPos - (m_iEndPos - m_iStartPos) : m_iStartPos;
-    long long iEndPos = Config::GetConfig().GetPlaybackSettings().GetNSpeed() < 0 ? m_iEndPos - (m_iEndPos - m_iStartPos) : m_iEndPos;
+    long long iStartPos = m_dNSpeed < 0 ? m_iStartPos - (m_iEndPos - m_iStartPos) : m_iStartPos;
+    long long iEndPos = m_dNSpeed < 0 ? m_iEndPos - (m_iEndPos - m_iStartPos) : m_iEndPos;
 
     if (iStartPos < 0 || iEndPos >= m_vEvents.size()) return; // the note speed has been changed after processing these positions but before reaching here. 
 
     // Ensure that any rects rendered after this point render over the notes
     m_pRenderer->SplitRect();
 
-    for (int i = 0; i < 128; i++) {
-        for (vector< int >::iterator it = (m_vState[i]).begin(); it != (m_vState[i]).end(); it++) {
-            RenderNote(m_vEvents[*it]);
+    if (m_dNSpeed < 0) {
+        for (int i = 0; i < 128; i++) {
+            for (vector< int >::iterator it = (m_vStateReversed[i]).begin(); it != (m_vStateReversed[i]).end(); it++) {
+                RenderNote(m_vEvents[*it]);
+            }
+        }
+    }
+    else {
+        for (int i = 0; i < 128; i++) {
+            for (vector< int >::iterator it = (m_vState[i]).begin(); it != (m_vState[i]).end(); it++) {
+                RenderNote(m_vEvents[*it]);
+            }
         }
     }
     for (int i = iStartPos; i <= iEndPos; i++) {
         MIDIChannelEvent* pEvent = m_vEvents[i];
-        if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn &&
-            pEvent->GetParam2() > 0 && pEvent->HasSister()) {
+        if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->HasSister()) {
             RenderNote(pEvent);
         }
     }
@@ -1979,7 +2050,7 @@ void MainScreen::RenderNote(const MIDIChannelEvent* pNote)
                 .key = (uint8_t)iNote,
                 .channel = (uint8_t)iChannel,
                 .track = (uint16_t)iTrack,
-                .pos = static_cast<float>(Config::GetConfig().GetPlaybackSettings().GetNSpeed() < 0 ? - (llNoteStart - m_llRndStartTime) - (llNoteEnd - llNoteStart) : llNoteStart - m_llRndStartTime),
+                .pos = static_cast<float>((m_dNSpeed < 0) != (m_fZoomX * m_fTempZoomX < 0) ? -(llNoteStart - m_llRndStartTime) - (llNoteEnd - llNoteStart) + (m_fZoomX * m_fTempZoomX < 0 ? m_llTimeSpan : 0) : llNoteStart - m_llRndStartTime + (m_fZoomX * m_fTempZoomX < 0 ? m_llTimeSpan : 0)),
                 .length = static_cast<float>(llNoteEnd - llNoteStart),
             }
         );
@@ -1987,9 +2058,15 @@ void MainScreen::RenderNote(const MIDIChannelEvent* pNote)
 }
 
 void MainScreen::GenNoteXTable() {
+    float NoteWidth = (m_pRenderer->GetBufferWidth() * abs(m_fZoomX) * abs(m_fTempZoomX)) / (m_iEndNote - m_iStartNote);
+    for (char ch = 0; ch < 16; ch++) {
+        float ShiftAmount = m_pBendsRange[ch] == 0 ? 0 : m_pBendsValue[ch] / ((1 << 13) / m_pBendsRange[ch]);
+        if (m_bFlipKeyboard) ShiftAmount *= -1;
+        m_pBends[ch] = NoteWidth * ShiftAmount;
+    }
     if (m_bFlipKeyboard) {
         for (int i = m_iStartNote; i <= m_iEndNote; i++) {
-            if (Config::GetConfig().GetVizSettings().bSameWidth) {
+            if (Config::GetConfig().GetVideoSettings().bSameWidth) {
                 float fStartNote = m_iStartNote;
                 float fEndNote = m_iEndNote;
                 float KeyCount = i - (m_iStartNote - 1);
@@ -2016,7 +2093,7 @@ void MainScreen::GenNoteXTable() {
     }
     else {
         for (int i = m_iStartNote; i <= m_iEndNote; i++) {
-            if (Config::GetConfig().GetVizSettings().bSameWidth) {
+            if (Config::GetConfig().GetVideoSettings().bSameWidth) {
                 float fStartNote = m_iStartNote;
                 float fEndNote = m_iEndNote;
                 float KeyCount = i - m_iStartNote;
@@ -2050,7 +2127,7 @@ float MainScreen::GetNoteX(int iNote) {
 void MainScreen::RenderKeys()
 {
     // Screen info
-    float fKeysY = m_fNotesY + m_fNotesCY;
+    float fKeysY = m_fZoomX * m_fTempZoomX < 0 ? m_fNotesY - (m_pRenderer->GetBufferHeight() - m_fNotesCY) : m_fNotesY + m_fNotesCY;
     float fKeysCY = m_pRenderer->GetBufferHeight() - m_fNotesCY;
 
     float fTransitionPct = .02f;
@@ -2063,12 +2140,22 @@ void MainScreen::RenderKeys()
 
     // Draw the background
     m_pRenderer->DrawRect(m_fNotesX, fKeysY, m_fNotesCX, fKeysCY, m_csKBBackground.iPrimaryRGB);
-    m_pRenderer->DrawRect(m_fNotesX, fKeysY, m_fNotesCX, fTransitionCY,
-        m_csBackground.iPrimaryRGB, m_csBackground.iPrimaryRGB, m_csKBBackground.iVeryDarkRGB, m_csKBBackground.iVeryDarkRGB);
-    m_pRenderer->DrawRect(m_fNotesX, fKeysY + fTransitionCY, m_fNotesCX, fRedCY,
-        m_csKBRed.iDarkRGB, m_csKBRed.iDarkRGB, m_csKBRed.iPrimaryRGB, m_csKBRed.iPrimaryRGB);
-    m_pRenderer->DrawRect(m_fNotesX, fKeysY + fTransitionCY + fRedCY, m_fNotesCX, fSpacerCY,
-        m_csKBBackground.iDarkRGB, m_csKBBackground.iDarkRGB, m_csKBBackground.iDarkRGB, m_csKBBackground.iDarkRGB);
+    if (m_fZoomX * m_fTempZoomX < 0) {
+        m_pRenderer->DrawRect(m_fNotesX, fKeysY + fKeysCY - fTransitionCY, m_fNotesCX, fTransitionCY,
+            m_csKBBackground.iVeryDarkRGB, m_csKBBackground.iVeryDarkRGB, m_csBackground.iPrimaryRGB, m_csBackground.iPrimaryRGB);
+        m_pRenderer->DrawRect(m_fNotesX, fKeysY + fKeysCY - fTransitionCY - fRedCY, m_fNotesCX, fRedCY,
+            m_csKBRed.iPrimaryRGB, m_csKBRed.iPrimaryRGB, m_csKBRed.iDarkRGB, m_csKBRed.iDarkRGB);
+        m_pRenderer->DrawRect(m_fNotesX, fKeysY + fKeysCY - fTransitionCY - fRedCY - fSpacerCY, m_fNotesCX, fSpacerCY,
+            m_csKBBackground.iDarkRGB, m_csKBBackground.iDarkRGB, m_csKBBackground.iDarkRGB, m_csKBBackground.iDarkRGB);
+    }
+    else {
+        m_pRenderer->DrawRect(m_fNotesX, fKeysY, m_fNotesCX, fTransitionCY,
+            m_csBackground.iPrimaryRGB, m_csBackground.iPrimaryRGB, m_csKBBackground.iVeryDarkRGB, m_csKBBackground.iVeryDarkRGB);
+        m_pRenderer->DrawRect(m_fNotesX, fKeysY + fTransitionCY, m_fNotesCX, fRedCY,
+            m_csKBRed.iDarkRGB, m_csKBRed.iDarkRGB, m_csKBRed.iPrimaryRGB, m_csKBRed.iPrimaryRGB);
+        m_pRenderer->DrawRect(m_fNotesX, fKeysY + fTransitionCY + fRedCY, m_fNotesCX, fSpacerCY,
+            m_csKBBackground.iDarkRGB, m_csKBBackground.iDarkRGB, m_csKBBackground.iDarkRGB, m_csKBBackground.iDarkRGB);
+    }
 
     // Keys info
     float fKeyGap = max(1.0f, floor(m_fWhiteCX * 0.05f + 0.5f));
@@ -2078,7 +2165,7 @@ void MainScreen::RenderKeys()
     if (m_bFlipKeyboard) {
         // Draw the white keys
         float fCurX = m_fNotesX + (MIDI::IsSharp(m_iEndNote) ? m_fWhiteCX * SharpRatio / 2.0f : 0.0f);
-        float fCurY = fKeysY + fTransitionCY + fRedCY + fSpacerCY;
+        float fCurY = m_fZoomX * m_fTempZoomX < 0 ? fKeysY : fKeysY + fTransitionCY + fRedCY + fSpacerCY;
         for (int i = m_iEndNote; i >= m_iStartNote; i--)
             if (!MIDI::IsSharp(i))
             {
@@ -2116,7 +2203,7 @@ void MainScreen::RenderKeys()
         // Draw the sharps
         float fSharpTop = SharpRatio * 0.7f;
         fCurX = m_fNotesX + (MIDI::IsSharp(m_iEndNote) ? m_fWhiteCX * SharpRatio / 2.0f : 0.0f);
-        fCurY = fKeysY + fTransitionCY + fRedCY + fSpacerCY;
+        fCurY = m_fZoomX * m_fTempZoomX < 0 ? fKeysY + fKeysCY - fSharpCY - fTransitionCY - fRedCY - fSpacerCY : fKeysY + fTransitionCY + fRedCY + fSpacerCY;
         for (int i = m_iEndNote; i >= m_iStartNote; i--)
             if (!MIDI::IsSharp(i))
                 fCurX += m_fWhiteCX;
@@ -2201,7 +2288,7 @@ void MainScreen::RenderKeys()
     else {
         // Draw the white keys
         float fCurX = m_fNotesX + (MIDI::IsSharp(m_iStartNote) ? m_fWhiteCX * SharpRatio / 2.0f : 0.0f);
-        float fCurY = fKeysY + fTransitionCY + fRedCY + fSpacerCY;
+        float fCurY = m_fZoomX * m_fTempZoomX < 0 ? fKeysY : fKeysY + fTransitionCY + fRedCY + fSpacerCY;
         for (int i = m_iStartNote; i <= m_iEndNote; i++)
             if (!MIDI::IsSharp(i))
             {
@@ -2239,7 +2326,7 @@ void MainScreen::RenderKeys()
         // Draw the sharps
         float fSharpTop = SharpRatio * 0.7f;
         fCurX = m_fNotesX + (MIDI::IsSharp(m_iStartNote) ? m_fWhiteCX * SharpRatio / 2.0f : 0.0f);
-        fCurY = fKeysY + fTransitionCY + fRedCY + fSpacerCY;
+        fCurY = m_fZoomX * m_fTempZoomX < 0 ? fKeysY + fKeysCY - fSharpCY - fTransitionCY - fRedCY - fSpacerCY : fKeysY + fTransitionCY + fRedCY + fSpacerCY;
         for (int i = m_iStartNote; i <= m_iEndNote; i++)
             if (!MIDI::IsSharp(i))
                 fCurX += m_fWhiteCX;
@@ -2329,30 +2416,31 @@ void MainScreen::RenderKeys()
 
 void MainScreen::RenderText()
 {
-    Config& config = Config::GetConfig();
-    VizSettings viz = config.GetVizSettings();
+    static Config& config = Config::GetConfig();
+    static const VideoSettings& cVideo = config.GetVideoSettings();
+    static const ControlsSettings& cControls = config.GetControlsSettings();
 
     int Lines = 10; //Basic info
-    if (m_bDebug) {
+    if (cVideo.bDebug) {
         Lines += 9; //Debug info
     }
-    if (viz.bPhigros) {
+    if (cControls.bPhigros) {
         Lines += 4; //Score and level
     }
-    if (viz.bDumpFrames) {
-        if (m_bDebug) {
+    if (cVideo.bDumpFrames) {
+        if (cVideo.bDebug) {
             Lines += 1; //Playback speed
         }
     }
     else {
-        if (m_bDebug) {
+        if (cVideo.bDebug) {
             Lines += 1; //Playback speed
         }
         else if (m_Timer.m_bManualTimer) {
             Lines += 1; //Playback speed
         }
     }
-    if (viz.bDumpFrames) {
+    if (cVideo.bDumpFrames) {
         Lines -= 1; //Don't show FPS when exporting videos
     }
 
@@ -2367,7 +2455,7 @@ void MainScreen::RenderText()
     // Draw the text
     m_pRenderer->BeginText();
     RenderStatus(&rcStatus);
-    if (!m_sMarker.empty() && viz.bShowMarkers) {
+    if (!m_sMarker.empty() && cVideo.bShowMarkers) {
         RenderMarker(m_sMarker.c_str());
     }
     if (m_bZoomMove) {
@@ -2388,7 +2476,7 @@ void MainScreen::RenderStatusLine(int line, const char* left, const char* format
     va_list varargs;
     va_start(varargs, format);
 
-    if (Config::GetConfig().GetVizSettings().bDisableUI) return;
+    if (Config::GetConfig().GetVideoSettings().bDisableUI) return;
 
     char buf[1<<10] = {};
     vsnprintf_s(buf, sizeof(buf), format, varargs);
@@ -2410,8 +2498,8 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
     const VisualSettings& cVisual = config.GetVisualSettings();
     const ViewSettings& cView = config.GetViewSettings();
     const VideoSettings& cVideo = config.GetVideoSettings();
+    const ControlsSettings& cControls = config.GetControlsSettings();
     const PlaybackSettings& cPlayback = config.GetPlaybackSettings();
-    const VizSettings& cViz = config.GetVizSettings();
     const MIDI::MIDIInfo& mInfo = m_MIDI.GetInfo();
 
     resolution = mInfo.iDivision;
@@ -2427,11 +2515,12 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
     auto tempo = 60000000.0 / m_iMicroSecsPerBeat;
     width = m_pRenderer->GetBufferWidth();
     height = m_pRenderer->GetBufferHeight();
+    TotalTime = mInfo.llTotalMicroSecs + 250000;
 
     int cur_line = 0;
 
 
-    if (!cViz.bDisableUI) {
+    if (!cVideo.bDisableUI) {
         m_pRenderer->GetDrawList()->AddRectFilled(ImVec2(prcStatus->left, prcStatus->top), ImVec2(prcStatus->right, prcStatus->bottom), 0x80000000);
     }
     m_llPolyphony = 0;
@@ -2459,7 +2548,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
     for (int i = polyFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
         polyFormatted.insert(i, ",");
 
-    long long nps = std::distance(upper_bound(m_vNoteOns.begin(), m_vNoteOns.end(), pair< long long, int >(m_llStartTime - 1000000, m_vEvents.size())), upper_bound(m_vNoteOns.begin(), m_vNoteOns.end(), pair< long long, int >(m_llStartTime, m_vEvents.size())));
+    nps = std::distance(upper_bound(m_vNoteOns.begin(), m_vNoteOns.end(), pair< long long, int >(m_llStartTime - 1000000, m_vEvents.size())), upper_bound(m_vNoteOns.begin(), m_vNoteOns.end(), pair< long long, int >(m_llStartTime, m_vEvents.size())));
     
     npsFormatted = std::to_string(nps);
 
@@ -2481,14 +2570,14 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
         min, sec, cs,
         tmin, tsec, tcs);
     RenderStatusLine(cur_line++, StatisticsText4, "%d/%d", m_iStartTick, mInfo.iDivision);
-    if (m_bDebug) {
+    if (cVideo.bDebug) {
         RenderStatusLine(cur_line++, StatisticsText5, llStartTimeFormatted.c_str());
     }
-    if (!cViz.bDumpFrames) {
+    if (!cVideo.bDumpFrames) {
         RenderStatusLine(cur_line++, StatisticsText6, "%.2lf", m_dFPS);
     }
     RenderStatusLine(cur_line++, StatisticsText7, "%.3lf bpm", tempo);
-    if (cViz.bPhigros) {
+    if (cControls.bPhigros) {
         RenderStatusLine(cur_line++, StatisticsText8, passedFormatted.c_str());
         RenderStatusLine(cur_line++, StatisticsText9, npsFormatted.c_str());
         RenderStatusLine(cur_line++, StatisticsText10, polyFormatted.c_str());
@@ -2498,7 +2587,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
         RenderStatusLine(cur_line++, StatisticsText12, npsFormatted.c_str());
         RenderStatusLine(cur_line++, StatisticsText13, polyFormatted.c_str());
     }
-    if (m_bDebug) {
+    if (cVideo.bDebug) {
         RenderStatusLine(cur_line++, StatisticsText14, "%lld", m_pRenderer->GetRenderedNotesCount());
         if (m_bMute) {
             RenderStatusLine(cur_line++, StatisticsText15, StatisticsText16);
@@ -2506,13 +2595,13 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
             RenderStatusLine(cur_line++, StatisticsText15, "%.0lf%%", cPlayback.GetVolume() * 100);
         }
     }
-    if (cViz.bDumpFrames) {
-        if (m_bDebug) {
+    if (cVideo.bDumpFrames) {
+        if (cVideo.bDebug) {
             RenderStatusLine(cur_line++, StatisticsText17, "%.0lf%%", cPlayback.GetSpeed() * 100);
         }
     }
     else {
-        if (m_bDebug) {
+        if (cVideo.bDebug) {
             if (m_Timer.m_bManualTimer) {
                 RenderStatusLine(cur_line++, StatisticsText17, "%.0lf%%", cPlayback.GetSpeed() * (m_dFPS / m_Timer.m_dFramerate) * 100);
             }
@@ -2526,7 +2615,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
             }
         }
     }
-    if (m_bDebug) {
+    if (cVideo.bDebug) {
         RenderStatusLine(cur_line++, StatisticsText18, "%f", cPlayback.GetNSpeed());
         RenderStatusLine(cur_line++, StatisticsText19, "%f", cView.GetOffsetX() + m_fTempOffsetX);
         RenderStatusLine(cur_line++, StatisticsText20, "%f", cView.GetOffsetY() + m_fTempOffsetY);
@@ -2534,32 +2623,32 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
         RenderStatusLine(cur_line++, StatisticsText22, "%d*%d", width, height);
         RenderStatusLine(cur_line++, StatisticsText23, "%d~%d", m_bFlipKeyboard ? m_iEndNote : m_iStartNote, m_bFlipKeyboard ? m_iStartNote : m_iEndNote);
     }
-    if (cViz.bPhigros) {
-        RenderStatusLine(cur_line++, StatisticsText24, "%07.0f", (passed == static_cast<long long>(mInfo.iNoteCount) ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(mInfo.iNoteCount) * 1000000)));
-             if (mInfo.iNoteCount < 100000) {RenderStatusLine(cur_line++,StatisticsText25, "EZ Lv.1");}
-        else if (mInfo.iNoteCount < 200000) {RenderStatusLine(cur_line++,StatisticsText25, "EZ Lv.2");}
-        else if (mInfo.iNoteCount < 400000) {RenderStatusLine(cur_line++,StatisticsText25, "EZ Lv.3");}
-        else if (mInfo.iNoteCount < 600000) {RenderStatusLine(cur_line++,StatisticsText25, "EZ Lv.4");}
-        else if (mInfo.iNoteCount < 800000) {RenderStatusLine(cur_line++,StatisticsText25, "EZ Lv.5");}
-        else if (mInfo.iNoteCount < 1000000) {RenderStatusLine(cur_line++,StatisticsText25, "HD Lv.6");}
-        else if (mInfo.iNoteCount < 2000000) {RenderStatusLine(cur_line++,StatisticsText25, "HD Lv.7");}
-        else if (mInfo.iNoteCount < 4000000) {RenderStatusLine(cur_line++,StatisticsText25, "HD Lv.8");}
-        else if (mInfo.iNoteCount < 6000000) {RenderStatusLine(cur_line++,StatisticsText25, "HD Lv.9");}
-        else if (mInfo.iNoteCount < 8000000) {RenderStatusLine(cur_line++,StatisticsText25, "HD Lv.10");}
-        else if (mInfo.iNoteCount < 10000000) {RenderStatusLine(cur_line++,StatisticsText25, "IN Lv.11");}
-        else if (mInfo.iNoteCount < 20000000) {RenderStatusLine(cur_line++,StatisticsText25, "IN Lv.12");}
-        else if (mInfo.iNoteCount < 40000000) {RenderStatusLine(cur_line++,StatisticsText25, "IN Lv.13");}
-        else if (mInfo.iNoteCount < 60000000) {RenderStatusLine(cur_line++,StatisticsText25, "IN Lv.14");}
-        else if (mInfo.iNoteCount < 80000000) {RenderStatusLine(cur_line++,StatisticsText25, "IN Lv.15");}
-        else if (mInfo.iNoteCount < 100000000) {RenderStatusLine(cur_line++,StatisticsText25, "AT Lv.16");}
-        else if (mInfo.iNoteCount < 200000000) {RenderStatusLine(cur_line++,StatisticsText25, "AT Lv.17");}
-        else if (mInfo.iNoteCount < 400000000) {RenderStatusLine(cur_line++,StatisticsText25, "AT Lv.18");}
+    if (cControls.bPhigros) {
+        RenderStatusLine(cur_line++, StatisticsText24, "%07.0f", (passed == static_cast<long long>(TotalNC) ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(TotalNC) * 1000000)));
+             if (TotalNC < 100000) {RenderStatusLine(cur_line++,StatisticsText25, "EZ Lv.1");}
+        else if (TotalNC < 200000) {RenderStatusLine(cur_line++,StatisticsText25, "EZ Lv.2");}
+        else if (TotalNC < 400000) {RenderStatusLine(cur_line++,StatisticsText25, "EZ Lv.3");}
+        else if (TotalNC < 600000) {RenderStatusLine(cur_line++,StatisticsText25, "EZ Lv.4");}
+        else if (TotalNC < 800000) {RenderStatusLine(cur_line++,StatisticsText25, "EZ Lv.5");}
+        else if (TotalNC < 1000000) {RenderStatusLine(cur_line++,StatisticsText25, "HD Lv.6");}
+        else if (TotalNC < 2000000) {RenderStatusLine(cur_line++,StatisticsText25, "HD Lv.7");}
+        else if (TotalNC < 4000000) {RenderStatusLine(cur_line++,StatisticsText25, "HD Lv.8");}
+        else if (TotalNC < 6000000) {RenderStatusLine(cur_line++,StatisticsText25, "HD Lv.9");}
+        else if (TotalNC < 8000000) {RenderStatusLine(cur_line++,StatisticsText25, "HD Lv.10");}
+        else if (TotalNC < 10000000) {RenderStatusLine(cur_line++,StatisticsText25, "IN Lv.11");}
+        else if (TotalNC < 20000000) {RenderStatusLine(cur_line++,StatisticsText25, "IN Lv.12");}
+        else if (TotalNC < 40000000) {RenderStatusLine(cur_line++,StatisticsText25, "IN Lv.13");}
+        else if (TotalNC < 60000000) {RenderStatusLine(cur_line++,StatisticsText25, "IN Lv.14");}
+        else if (TotalNC < 80000000) {RenderStatusLine(cur_line++,StatisticsText25, "IN Lv.15");}
+        else if (TotalNC < 100000000) {RenderStatusLine(cur_line++,StatisticsText25, "AT Lv.16");}
+        else if (TotalNC < 200000000) {RenderStatusLine(cur_line++,StatisticsText25, "AT Lv.17");}
+        else if (TotalNC < 400000000) {RenderStatusLine(cur_line++,StatisticsText25, "AT Lv.18");}
         else {RenderStatusLine(cur_line++,StatisticsText25, "SP Lv.?");}
         RenderStatusLine(cur_line++, StatisticsText26, StatisticsText27);
-        if (static_cast<float>(passed == mInfo.iNoteCount ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(mInfo.iNoteCount) * 1000000)) == static_cast<float>(1000000)) {
+        if (static_cast<float>(passed == TotalNC ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(TotalNC) * 1000000)) == static_cast<float>(1000000)) {
             RenderStatusLine(cur_line++, StatisticsText28, "");
         }
-        else if (static_cast<float>(passed == mInfo.iNoteCount ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(mInfo.iNoteCount) * 1000000)) < static_cast<float>(1000000)) {
+        else if (static_cast<float>(passed == TotalNC ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(TotalNC) * 1000000)) < static_cast<float>(1000000)) {
             if (!cPlayback.GetPaused()) {
                 RenderStatusLine(cur_line++, StatisticsText29, "");
             }
@@ -2567,7 +2656,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
                 RenderStatusLine(cur_line++, StatisticsText30, "");
             }
         }
-        else if (static_cast<float>(passed == mInfo.iNoteCount ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(mInfo.iNoteCount) * 1000000)) > static_cast<float>(1000000)) {
+        else if (static_cast<float>(passed == TotalNC ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(TotalNC) * 1000000)) > static_cast<float>(1000000)) {
             RenderStatusLine(cur_line++, StatisticsText31, "");
         }
     }
@@ -2592,6 +2681,12 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
+        cout << "    SongLength: " << TotalTime << " (Qword +" + GetAddress(TotalTime) + ") [Read Only]";
+        pos.X = 0;
+        pos.Y = line; line++;
+        SetConsoleCursorPosition(hConsole, pos);
+        cout << string(csbi.dwSize.X, ' ');
+        SetConsoleCursorPosition(hConsole, pos);
         cout << "    Microseconds: " << llStartTimeFormatted << " (Qword +" + GetAddress(m_llStartTime) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
@@ -2604,7 +2699,31 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Resolution: " << resolution << " (Integer +" + GetAddress(resolution) + ") [Read Only]";
+        cout << "    Resolution: " << resolution << " (SmallInteger +" + GetAddress(resolution) + ") [Read Only]";
+        pos.X = 0;
+        pos.Y = line; line++;
+        SetConsoleCursorPosition(hConsole, pos);
+        cout << string(csbi.dwSize.X, ' ');
+        SetConsoleCursorPosition(hConsole, pos);
+        cout << "    NoteCount: " << TotalNC << " (Integer +" + GetAddress(TotalNC) + ") [Read Only]";
+        pos.X = 0;
+        pos.Y = line; line++;
+        SetConsoleCursorPosition(hConsole, pos);
+        cout << string(csbi.dwSize.X, ' ');
+        SetConsoleCursorPosition(hConsole, pos);
+        cout << "    NotesPerSecond: " << nps << " (Integer +" + GetAddress(nps) + ") [Read Only]";
+        pos.X = 0;
+        pos.Y = line; line++;
+        SetConsoleCursorPosition(hConsole, pos);
+        cout << string(csbi.dwSize.X, ' ');
+        SetConsoleCursorPosition(hConsole, pos);
+        cout << "    Polyphony: " << polyphony << " (Integer +" + GetAddress(polyphony) + ") [Read Only]";
+        pos.X = 0;
+        pos.Y = line; line++;
+        SetConsoleCursorPosition(hConsole, pos);
+        cout << string(csbi.dwSize.X, ' ');
+        SetConsoleCursorPosition(hConsole, pos);
+        cout << "    Passed: " << passed << " (Integer +" + GetAddress(passed) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
@@ -2616,7 +2735,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Mute: " << cPlayback.GetMute() << " (Byte +" + cPlayback.GetMuteAddress() + ") [Read / Write]";
+        cout << "    Mute: " << cPlayback.GetMute() << " (ShortInteger +" + cPlayback.GetMuteAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
@@ -2652,7 +2771,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    SameWidthNotes: " << cViz.bSameWidth << " (Byte +" + GetAddress(cViz.bSameWidth) + ") [Read / Write]";
+        cout << "    SameWidthNotes: " << cVideo.bSameWidth << " (ShortInteger +" + GetAddress(cVideo.bSameWidth) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
@@ -2664,7 +2783,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    KeyMode: " << static_cast<short>(cVisual.eKeysShown) << " (Bytes +" + GetAddress(cVisual.eKeysShown) + ") [Read / Write]";
+        cout << "    KeyMode: " << static_cast<short>(cVisual.eKeysShown) << " (ShortInteger +" + GetAddress(cVisual.eKeysShown) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
@@ -2676,49 +2795,49 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Paused: " << cPlayback.GetPaused() << " (Byte +" + cPlayback.GetPausedAddress() + ") [Read / Write]";
+        cout << "    Paused: " << cPlayback.GetPaused() << " (ShortInteger +" + cPlayback.GetPausedAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Keyboard: " << cView.GetKeyboard() << " (Byte +" + cView.GetKeyboardAddress() + ") [Read / Write]";
+        cout << "    Keyboard: " << cView.GetKeyboard() << " (ShortInteger +" + cView.GetKeyboardAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    VisualizePitchBends: " << cViz.bVisualizePitchBends << " (Byte +" + GetAddress(cViz.bVisualizePitchBends) + ")[Read / Write]";
+        cout << "    VisualizePitchBends: " << cVideo.bVisualizePitchBends << " (ShortInteger +" + GetAddress(cVideo.bVisualizePitchBends) + ")[Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    PhigrosMode: " << cViz.bPhigros << " (Byte +" + GetAddress(cViz.bPhigros) + ") [Read / Write]";
+        cout << "    PhigrosMode: " << cControls.bPhigros << " (ShortInteger +" + GetAddress(cControls.bPhigros) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    ShowMarkers: " << cViz.bShowMarkers << " (Byte +" + GetAddress(cViz.bShowMarkers) + ") [Read / Write]";
+        cout << "    ShowMarkers: " << cVideo.bShowMarkers << " (ShortInteger +" + GetAddress(cVideo.bShowMarkers) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    TickBased: " << cViz.bTickBased << " (Byte +" + GetAddress(cViz.bTickBased) + ") [Read / Write]";
+        cout << "    TickBased: " << cVideo.bTickBased << " (ShortInteger +" + GetAddress(cVideo.bTickBased) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    HideStatistics: " << cViz.bDisableUI << " (Byte +" + GetAddress(cViz.bDisableUI) + ") [Read / Write]";
+        cout << "    HideStatistics: " << cVideo.bDisableUI << " (ShortInteger +" + GetAddress(cVideo.bDisableUI) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    LimitFPS: " << m_pRenderer->GetLimitFPS() << " (Byte +" + GetAddress(cVideo.bLimitFPS) + ") [Read / Write]";
+        cout << "    LimitFPS: " << m_pRenderer->GetLimitFPS() << " (ShortInteger +" + GetAddress(cVideo.bLimitFPS) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
@@ -2733,9 +2852,9 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
-
-        //These memory addresses will be replaced with the correct one by patching the executable with IDA Pro. 
-        //We cannot hard code them here as they will change every time the program is being compiled. 
+        pos.X = 0;
+        pos.Y = 0;
+        SetConsoleCursorPosition(hConsole, pos);
     }
     FrameCount++;
 }
