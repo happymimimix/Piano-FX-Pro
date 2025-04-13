@@ -8,6 +8,7 @@
 #include <TabSwitcher.h>
 #include <Tab2Graphics.h>
 
+//Tab 2 forward declearations
 struct Tab2 {
     static TouchEventListener* Btn1;
     static TouchEventListener* Btn2;

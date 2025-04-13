@@ -368,30 +368,25 @@ GameState::GameError SplashScreen::Logic()
     static PlaybackSettings& cPlayback = config.GetPlaybackSettings();
 
     // Detect changes in state
-    bool bPaused = cPlayback.GetPaused();
     bool bMute = cPlayback.GetMute();
     bool bMuteChanged = (bMute != m_bMute);
-    bool bPausedChanged = (bPaused != m_bPaused);
 
     // Set the state
     m_bMute = bMute;
-    m_bPaused = bPaused;
     m_dVolume = cPlayback.GetVolume();
 
     // Time stuff
-    long long llMaxTime = m_MIDI.GetInfo().llTotalMicroSecs + 500000;
     long long llElapsed = m_Timer.GetMicroSecs();
     m_Timer.Start();
 
-    // If we just paused, kill the music. SetVolume is better than AllNotesOff
-    if ((bPausedChanged || bMuteChanged) && (m_bPaused || m_bMute))
-        m_OutDevice.AllNotesOff();
-
     // Figure out start and end times for display
-    long long llNextStartTime = m_llStartTime + llElapsed;
-    if (!bPaused && m_llStartTime < llMaxTime)
-        m_llStartTime = llNextStartTime;
+    m_llStartTime = m_llStartTime + llElapsed;
     long long llEndTime = m_llStartTime + TimeSpan;
+    if (m_llStartTime > m_MIDI.GetInfo().llTotalMicroSecs) {
+        m_llStartTime = m_MIDI.GetInfo().llFirstNote - 1000000;
+        m_iStartPos = 0;
+        m_iEndPos = -1;
+    }
 
     // Needs start time to be set. For creating textparticles.
     RenderGlobals();
@@ -471,37 +466,19 @@ void SplashScreen::UpdateState(int iPos)
 
     MIDIChannelEvent::ChannelEventType eEventType = pEvent->GetChannelEventType();
     int iNote = pEvent->GetParam1();
-    int iVelocity = pEvent->GetParam2();
 
     int iSisterIdx = pEvent->GetSisterIdx();
     auto& note_state = m_vState[iNote];
 
     // Turn note on
-    if (eEventType == MIDIChannelEvent::NoteOn && iVelocity > 0)
+    if (eEventType == MIDIChannelEvent::NoteOn)
         note_state.push_back(iPos);
     else
     {
-        if (iSisterIdx != -1) {
-            // binary search
-            auto pos = sse_bin_search(note_state, iSisterIdx);
-            if (pos != -1)
-                note_state.erase(note_state.begin() + pos);
-        }
-        else {
-            // slow path, should rarely happen
-            vector< int >::iterator it = note_state.begin();
-            MIDIChannelEvent* pSearch = pEvent->GetSister(m_vEvents);
-            while (it != note_state.end())
-            {
-                if (m_vEvents[*it] == pSearch) {
-                    it = note_state.erase(it);
-                    break;
-                }
-                else {
-                    ++it;
-                }
-            }
-        }
+        // binary search
+        auto pos = sse_bin_search(note_state, iSisterIdx);
+        if (pos != -1)
+            note_state.erase(note_state.begin() + pos);
     }
 }
 
@@ -734,7 +711,6 @@ void MainScreen::InitState()
     static const PlaybackSettings &cPlayback = config.GetPlaybackSettings();
     static const ViewSettings &cView = config.GetViewSettings();
     static const VideoSettings& cVideo = config.GetVideoSettings();
-    static const MIDI::MIDIInfo& mInfo = m_MIDI.GetInfo();
 
     m_eGameMode = Practice;
     m_iStartPos = 0;
@@ -749,7 +725,6 @@ void MainScreen::InitState()
     m_llFPSTime = 0;
     m_dSpeed = -1.0; // Forces a speed reset upon first call to Logic
     m_llPrevTime = m_llStartTime;
-    TotalNC = mInfo.iNoteCount;
 
     m_fZoomX = cView.GetZoomX();
     m_fOffsetX = cView.GetOffsetX();
@@ -758,6 +733,29 @@ void MainScreen::InitState()
     m_bMute = cPlayback.GetMute();
     m_dNSpeed = cPlayback.GetNSpeed();
     m_llTimeSpan = static_cast< long long >( 3.0 * abs(m_dNSpeed) * 1000000 );
+
+    resolution = m_MIDI.GetInfo().iDivision;
+    TotalTime = m_MIDI.GetInfo().llTotalMicroSecs + 250000;
+    TotalNC = (m_MIDI.GetInfo().iNoteCount);
+    if (TotalNC < 100000) { strcpy(Difficulty, "EZ Lv.1"); }
+    else if (TotalNC < 200000) { strcpy(Difficulty, "EZ Lv.2"); }
+    else if (TotalNC < 400000) { strcpy(Difficulty, "EZ Lv.3"); }
+    else if (TotalNC < 600000) { strcpy(Difficulty, "EZ Lv.4"); }
+    else if (TotalNC < 800000) { strcpy(Difficulty, "EZ Lv.5"); }
+    else if (TotalNC < 1000000) { strcpy(Difficulty, "HD Lv.6"); }
+    else if (TotalNC < 2000000) { strcpy(Difficulty, "HD Lv.7"); }
+    else if (TotalNC < 4000000) { strcpy(Difficulty, "HD Lv.8"); }
+    else if (TotalNC < 6000000) { strcpy(Difficulty, "HD Lv.9"); }
+    else if (TotalNC < 8000000) { strcpy(Difficulty, "HD Lv.10"); }
+    else if (TotalNC < 10000000) { strcpy(Difficulty, "IN Lv.11"); }
+    else if (TotalNC < 20000000) { strcpy(Difficulty, "IN Lv.12"); }
+    else if (TotalNC < 40000000) { strcpy(Difficulty, "IN Lv.13"); }
+    else if (TotalNC < 60000000) { strcpy(Difficulty, "IN Lv.14"); }
+    else if (TotalNC < 80000000) { strcpy(Difficulty, "IN Lv.15"); }
+    else if (TotalNC < 100000000) { strcpy(Difficulty, "AT Lv.16"); }
+    else if (TotalNC < 200000000) { strcpy(Difficulty, "AT Lv.17"); }
+    else if (TotalNC < 400000000) { strcpy(Difficulty, "AT Lv.18"); }
+    else { strcpy(Difficulty, "SP Lv.?"); }
 
     // m_Timer will be initialized *later*
     m_RealTimer.Init(false);
@@ -1109,16 +1107,13 @@ GameState::GameError MainScreen::Logic( void )
         m_llFPSTime = m_iFPSCount = 0;
     }
 
-    // If we just paused, kill the music. SetVolume is better than AllNotesOff
-    if ( ( bPausedChanged || bMuteChanged ) && ( m_bPaused || m_bMute ) )
-        m_OutDevice.AllNotesOff();
+    if ((bPausedChanged || bMuteChanged) && (m_bPaused || m_bMute)) m_OutDevice.AllNotesOff();
 
     // Figure out start and end times for display
     long long llOldStartTime = m_llStartTime;
     long long llNextStartTime = m_llStartTime + static_cast< long long >( llElapsed * m_dSpeed + 0.5 );
 
-    if ( !m_bPaused && m_llStartTime < llMaxTime )
-        m_llStartTime = llNextStartTime;
+    if (!m_bPaused) m_llStartTime = llNextStartTime;
     m_iStartTick = GetCurrentTick( m_llStartTime );
     long long llEndTime = 0;
     if (m_bTickMode) {
@@ -1137,19 +1132,15 @@ GameState::GameError MainScreen::Logic( void )
             llEndTime = m_llStartTime + m_llTimeSpan;
         }
     }
-    if (abs(m_llStartTime - m_llPrevTime) > 1e+6) { // Handle time jump and negative playback speed from cheat engine
-        JumpTo(m_llStartTime - (1e+6 / (m_dFPS / 4)), true);
+
+    if (abs(llOldStartTime - m_llPrevTime) > 1e+6 / (m_dFPS / 4)) { // Handle time jump from cheat engine
+        JumpTo(m_llStartTime, true);
     }
     else {
-        if (m_llPrevTime > m_llStartTime && !m_bPaused) {
-            JumpTo(m_llStartTime - (1e+6 / (m_dFPS / 4)), true);
-        }
-        else {
-            m_llPrevTime = m_llStartTime;
-        }
+        m_llPrevTime = m_llStartTime;
     }
 
-    size_t iEventCount = m_vEvents.size();
+    long long iEventCount = m_vEvents.size();
     RenderGlobals();
 
     // Advance end position
@@ -1180,38 +1171,78 @@ GameState::GameError MainScreen::Logic( void )
         for (auto& work : m_vThreadWork) {
             work.clear();
         }
-        while (m_iStartPos < iEventCount && m_vEvents[m_iStartPos]->GetAbsMicroSec() <= m_llStartTime)
-        {
-            MIDIChannelEvent* pEvent = m_vEvents[m_iStartPos];
-            MIDIChannelEvent* pChannelEvent = reinterpret_cast<MIDIChannelEvent*>(pEvent);
-
-            if (pEvent->GetChannelEventType() != MIDIChannelEvent::NoteOn) {
-                if (pEvent->GetChannelEventType() == MIDIChannelEvent::ProgramChange && pEvent->GetChannel() != MIDI::Drums && config.m_bPianoOverride) {
-                    pEvent->SetParam1(0);
-                }
-                if (pEvent->GetChannelEventType() == MIDIChannelEvent::PitchBend) {
-                    m_pBendsValue[pEvent->GetChannel()] = ((pEvent->GetParam2() << 7) | pEvent->GetParam1()) - (1 << 13);
-                }
-                if (pChannelEvent->GetChannelEventType() == MIDIChannelEvent::Controller) {
-                    if (pEvent->GetParam1() == 100) { Next_is_PBS[pEvent->GetChannel()] = pEvent->GetParam2() == 0; }//[101] RPN LSB | 0:Pitch Bend Sensitivity
-                    if (pEvent->GetParam1() == 6 && Next_is_PBS[pEvent->GetChannel()]) {
-                        m_pBendsRange[pEvent->GetChannel()] = pEvent->GetParam2();
-                    }
-                }
-                if (!m_bMute) m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), pEvent->GetParam2());
-            }
-            else if (!m_bMute && (!m_bAnyChannelMuted || !m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bMuted)) {
-                m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), static_cast<unsigned char>(cPlayback.GetVolume() > 1.0 ? static_cast<double>(INT8_MAX) - (static_cast<double>(INT8_MAX) - static_cast<double>(pEvent->GetParam2())) * (2.0 - cPlayback.GetVolume()) : static_cast<double>(pEvent->GetParam2()) * cPlayback.GetVolume()));
-            }
-            if ((pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn || pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOff)
-                && pEvent->GetParam1() < 128 && pEvent->HasSister())
+        if (m_dSpeed < 0 && m_iStartPos >= 0) {
+            while (m_iStartPos >= iEventCount) m_iStartPos--;
+            while (m_iStartPos > 0 && m_vEvents[m_iStartPos]->GetAbsMicroSec() > m_llStartTime)
             {
-                m_vThreadWork[pEvent->GetParam1()].push_back({
-                    .idx = (unsigned)m_iStartPos,
-                    .sister_idx = (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn) ? ~0 : pEvent->GetSisterIdx(),
-                    });
+                MIDIChannelEvent* pEvent = m_vEvents[m_iStartPos];
+                MIDIChannelEvent* pOrigEvent = m_vEvents[m_iStartPos];
+                if ((pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn || pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOff) && pEvent->HasSister()) {
+                    pEvent = pEvent->GetSister(m_vEvents);
+                }
+                MIDIChannelEvent* pChannelEvent = reinterpret_cast<MIDIChannelEvent*>(pEvent);
+
+                if (pEvent->GetChannelEventType() != MIDIChannelEvent::NoteOn) {
+                    if (pEvent->GetChannelEventType() == MIDIChannelEvent::ProgramChange && config.m_bPianoOverride) {
+                        pEvent->SetParam1(0);
+                    }
+                    if (pEvent->GetChannelEventType() == MIDIChannelEvent::PitchBend) {
+                        m_pBendsValue[pEvent->GetChannel()] = ((pEvent->GetParam2() << 7) | pEvent->GetParam1()) - (1 << 13);
+                    }
+                    if (pChannelEvent->GetChannelEventType() == MIDIChannelEvent::Controller) {
+                        if (pEvent->GetParam1() == 100) { Next_is_PBS[pEvent->GetChannel()] = (pEvent->GetParam2() == 0); }//[101] RPN LSB | 0:Pitch Bend Sensitivity
+                        if (pEvent->GetParam1() == 6 && Next_is_PBS[pEvent->GetChannel()]) {
+                            m_pBendsRange[pEvent->GetChannel()] = pEvent->GetParam2();
+                        }
+                    }
+                    if (!m_bMute) m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), pEvent->GetParam2());
+                }
+                else if (!m_bMute && (!m_bAnyChannelMuted || !m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bMuted)) {
+                    m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), static_cast<unsigned char>(cPlayback.GetVolume() > 1.0 ? static_cast<double>(INT8_MAX) - (static_cast<double>(INT8_MAX) - static_cast<double>(pEvent->GetParam2())) * (2.0 - cPlayback.GetVolume()) : static_cast<double>(pEvent->GetParam2()) * cPlayback.GetVolume()));
+                }
+                if ((pOrigEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn || pOrigEvent->GetChannelEventType() == MIDIChannelEvent::NoteOff) && pOrigEvent->HasSister())
+                {
+                    m_vThreadWork[pOrigEvent->GetParam1()].push_back({
+                        .sister_idx = (unsigned)m_iStartPos,
+                        .idx = (pOrigEvent->GetChannelEventType() == MIDIChannelEvent::NoteOff) ? ~0 : pOrigEvent->GetSisterIdx(),
+                        });
+                }
+                m_iStartPos--;
             }
-            m_iStartPos++;
+        }
+        else {
+            while (m_iStartPos < iEventCount && m_vEvents[m_iStartPos]->GetAbsMicroSec() <= m_llStartTime)
+            {
+                MIDIChannelEvent* pEvent = m_vEvents[m_iStartPos];
+                MIDIChannelEvent* pChannelEvent = reinterpret_cast<MIDIChannelEvent*>(pEvent);
+
+                if (pEvent->GetChannelEventType() != MIDIChannelEvent::NoteOn) {
+                    if (pEvent->GetChannelEventType() == MIDIChannelEvent::ProgramChange && config.m_bPianoOverride) {
+                        pEvent->SetParam1(0);
+                    }
+                    if (pEvent->GetChannelEventType() == MIDIChannelEvent::PitchBend) {
+                        m_pBendsValue[pEvent->GetChannel()] = ((pEvent->GetParam2() << 7) | pEvent->GetParam1()) - (1 << 13);
+                    }
+                    if (pChannelEvent->GetChannelEventType() == MIDIChannelEvent::Controller) {
+                        if (pEvent->GetParam1() == 100) { Next_is_PBS[pEvent->GetChannel()] = (pEvent->GetParam2() == 0); }//[101] RPN LSB | 0:Pitch Bend Sensitivity
+                        if (pEvent->GetParam1() == 6 && Next_is_PBS[pEvent->GetChannel()]) {
+                            m_pBendsRange[pEvent->GetChannel()] = pEvent->GetParam2();
+                        }
+                    }
+                    if (!m_bMute) m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), pEvent->GetParam2());
+                }
+                else if (!m_bMute && (!m_bAnyChannelMuted || !m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bMuted)) {
+                    m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), static_cast<unsigned char>(cPlayback.GetVolume() > 1.0 ? static_cast<double>(INT8_MAX) - (static_cast<double>(INT8_MAX) - static_cast<double>(pEvent->GetParam2())) * (2.0 - cPlayback.GetVolume()) : static_cast<double>(pEvent->GetParam2()) * cPlayback.GetVolume()));
+                }
+                if ((pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn || pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOff) && pEvent->HasSister())
+                {
+                    m_vThreadWork[pEvent->GetParam1()].push_back({
+                        .idx = (unsigned)m_iStartPos,
+                        .sister_idx = (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn) ? ~0 : pEvent->GetSisterIdx(),
+                        });
+                }
+                m_iStartPos++;
+            }
         }
         concurrency::parallel_for(size_t(0), size_t(128), [&](int key) {
             for (const auto& work : m_vThreadWork[key])
@@ -1243,13 +1274,11 @@ GameState::GameError MainScreen::Logic( void )
         m_iPrevStartPos = m_iStartPos;
     }
 
-    if (dNSpeed < 0) {
+    if (m_dNSpeed < 0) {
         UpdateStateReversed(m_iStartPos - (m_iEndPos - m_iStartPos));
     }
 
-    if (m_dSpeed >= 0) {
-        AdvanceIterators(m_llStartTime, false);
-    }
+    AdvanceIterators(m_llStartTime, false);
 
     // Update the position slider
     long long llFirstTime = GetMinTime();
@@ -1334,15 +1363,11 @@ void MainScreen::UpdateStateReversed(int iPos)
             });
         return;
     }
-
-    // Cache frequently used values
-    const auto& events = m_vEvents; // avoid repeated member access
-    const size_t eventSize = events.size();
      
     // Find the last note on event before iPos
     MIDIChannelEvent* prevEvent = nullptr;
     for (int idx = iPos - 1; idx >= 0; --idx) {
-        MIDIChannelEvent* evt = events[idx];
+        MIDIChannelEvent* evt = m_vEvents[idx];
         if (evt->GetChannelEventType() == MIDIChannelEvent::NoteOn) {
             prevEvent = evt;
             break;
@@ -1360,7 +1385,7 @@ void MainScreen::UpdateStateReversed(int iPos)
     // Get the simultaneous count and time boundary
     const unsigned iSimultaneous = prevEvent->GetSimultaneous() + 1;
     const long long prevTime = prevEvent->GetAbsMicroSec();
-    const long long targetTime = events[iPos]->GetAbsMicroSec();
+    const long long targetTime = m_vEvents[iPos]->GetAbsMicroSec();
 
     // Pre-calculate max possible notes per key to avoid reallocations
     // Each simultaneous note could potentially go to the same key
@@ -1377,11 +1402,11 @@ void MainScreen::UpdateStateReversed(int iPos)
     const int startIdx = iPos - 1;
     for (int idx = startIdx; idx >= 0 && iFound < iSimultaneous; --idx) {
         if (m_bDumpFrames || chrono::high_resolution_clock::now() < DeadLine) {
-            MIDIChannelEvent* pEvent = events[idx];
+            MIDIChannelEvent* pEvent = m_vEvents[idx];
             if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn &&
                 pEvent->HasSister()) {
 
-                MIDIChannelEvent* pSister = pEvent->GetSister(events);
+                MIDIChannelEvent* pSister = pEvent->GetSister(m_vEvents);
                 const long long sisterTime = pSister->GetAbsMicroSec();
 
                 if (sisterTime > prevTime) {
@@ -1606,7 +1631,6 @@ void MainScreen::AdvanceIterators( long long llTime, bool bIsJump )
     if ( bIsJump )
     {
         m_itNextProgramChange = upper_bound( m_vProgramChange.begin(), m_vProgramChange.end(), pair< long long, int >( llTime, m_vEvents.size() ) );
-
         m_itNextTempo = upper_bound( m_vTempo.begin(), m_vTempo.end(), pair< long long, int >( llTime, m_vMetaEvents.size() ) );
         MIDIMetaEvent *pPrevious = GetPrevious( m_itNextTempo, m_vTempo, 3 );
         if ( pPrevious )
@@ -1620,7 +1644,6 @@ void MainScreen::AdvanceIterators( long long llTime, bool bIsJump )
             m_iMicroSecsPerBeat = 500000;
             m_llLastTempoTime = m_iLastTempoTick = 0;
         }
-
         m_itNextSignature = upper_bound( m_vSignature.begin(), m_vSignature.end(), pair< long long, int >( llTime, m_vMetaEvents.size() ) );
         pPrevious = GetPrevious( m_itNextSignature, m_vSignature, 4 );
         if ( pPrevious )
@@ -1637,7 +1660,6 @@ void MainScreen::AdvanceIterators( long long llTime, bool bIsJump )
             m_iClocksPerMet = 24;
             m_iLastSignatureTick = 0;
         }
-
         auto itCurMarker = m_itNextMarker;
         m_itNextMarker = upper_bound(m_vMarkers.begin(), m_vMarkers.end(), pair< long long, int >(llTime, m_vMetaEvents.size()));
         if (!m_bNextMarkerInited || itCurMarker != m_itNextMarker) {
@@ -1650,70 +1672,103 @@ void MainScreen::AdvanceIterators( long long llTime, bool bIsJump )
                 ApplyMarker(nullptr, 0);
             }
         }
-
-        auto itCurColorEvent = m_itNextColor;
-        m_itNextColor = upper_bound(m_vColors.begin(), m_vColors.end(), pair<long long, int>(llTime, m_vMetaEvents.size()));
-
-        if (!m_bNextColorInited || itCurColorEvent != m_itNextColor) {
-            if (!m_bNextColorInited) {
-                m_bNextColorInited = true;
-                return;
-            }
-            if (m_itNextColor != m_vColors.begin() && (m_itNextColor - 1)->second != -1) {
-                auto eEvent = m_vMetaEvents[(m_itNextColor - 1)->second];
-                ApplyColor(eEvent);
-            }
-            else {
-                //probably extremely slow
-                for (auto it = m_vColors.begin(); it != itCurColorEvent; ++it) {
-                    if (it != m_vColors.begin() && (it - 1)->second != -1) {
-                        auto eEvent = m_vMetaEvents[(it - 1)->second];
-                        ApplyColor(eEvent);
-                    }
-                }
-            }
+        if (m_dSpeed < 0) {
+            m_itNextColor = lower_bound(m_vColors.begin(), m_vColors.end(), pair<long long, int>(llTime, m_vMetaEvents.size()));
+        }
+        else {
+            m_itNextColor = upper_bound(m_vColors.begin(), m_vColors.end(), pair<long long, int>(llTime, m_vMetaEvents.size()));
         }
     }
     else
     {
-        while ( m_itNextProgramChange != m_vProgramChange.end() && m_itNextProgramChange->first <= llTime )
-            ++m_itNextProgramChange;
-        for ( ; m_itNextTempo != m_vTempo.end() && m_itNextTempo->first <= llTime; ++m_itNextTempo )
-        {
-            MIDIMetaEvent *pEvent = m_vMetaEvents[m_itNextTempo->second];
-            if ( pEvent->GetDataLen() == 3 )
+        if (m_dSpeed < 0) {
+            m_itNextProgramChange = upper_bound(m_vProgramChange.begin(), m_vProgramChange.end(), pair< long long, int >(llTime, m_vEvents.size()));
+            m_itNextTempo = upper_bound(m_vTempo.begin(), m_vTempo.end(), pair< long long, int >(llTime, m_vMetaEvents.size()));
+            MIDIMetaEvent* pPrevious = GetPrevious(m_itNextTempo, m_vTempo, 3);
+            if (pPrevious)
             {
-                MIDI::Parse24Bit( pEvent->GetData(), 3, &m_iMicroSecsPerBeat );
-                m_iLastTempoTick = pEvent->GetAbsT();
-                m_llLastTempoTime = pEvent->GetAbsMicroSec();
+                MIDI::Parse24Bit(pPrevious->GetData(), 3, &m_iMicroSecsPerBeat);
+                m_iLastTempoTick = pPrevious->GetAbsT();
+                m_llLastTempoTime = pPrevious->GetAbsMicroSec();
             }
-        }
-        for ( ; m_itNextSignature != m_vSignature.end() && m_itNextSignature->first <= llTime; ++m_itNextSignature )
-        {
-            MIDIMetaEvent *pEvent = m_vMetaEvents[m_itNextSignature->second];
-            if ( pEvent->GetDataLen() == 4 )
+            else
             {
-                m_iBeatsPerMeasure = pEvent->GetData()[0];
-                m_iBeatType = 1 << pEvent->GetData()[1];
-                m_iClocksPerMet = pEvent->GetData()[2];
-                m_iLastSignatureTick = pEvent->GetAbsT();
+                m_iMicroSecsPerBeat = 500000;
+                m_llLastTempoTime = m_iLastTempoTick = 0;
+            }
+            m_itNextSignature = upper_bound(m_vSignature.begin(), m_vSignature.end(), pair< long long, int >(llTime, m_vMetaEvents.size()));
+            pPrevious = GetPrevious(m_itNextSignature, m_vSignature, 4);
+            if (pPrevious)
+            {
+                m_iBeatsPerMeasure = pPrevious->GetData()[0];
+                m_iBeatType = 1 << pPrevious->GetData()[1];
+                m_iClocksPerMet = pPrevious->GetData()[2];
+                m_iLastSignatureTick = pPrevious->GetAbsT();
+            }
+            else
+            {
+                m_iBeatsPerMeasure = 4;
+                m_iBeatType = 4;
+                m_iClocksPerMet = 24;
+                m_iLastSignatureTick = 0;
+            }
+            auto itCurMarker = m_itNextMarker;
+            m_itNextMarker = upper_bound(m_vMarkers.begin(), m_vMarkers.end(), pair< long long, int >(llTime, m_vMetaEvents.size()));
+            if (!m_bNextMarkerInited || itCurMarker != m_itNextMarker) {
+                m_bNextMarkerInited = true;
+                if (m_itNextMarker != m_vMarkers.begin() && (m_itNextMarker - 1)->second != -1) {
+                    const auto eEvent = m_vMetaEvents[(m_itNextMarker - 1)->second];
+                    ApplyMarker(eEvent->GetData(), eEvent->GetDataLen());
+                }
+                else {
+                    ApplyMarker(nullptr, 0);
+                }
+            }
+            for (; m_itNextColor != m_vColors.begin() && (m_itNextColor-1)->first >= llTime; --m_itNextColor)
+            {
+                MIDIMetaEvent* pEvent = m_vMetaEvents[(m_itNextColor-1)->second];
+                ApplyColor(pEvent);
             }
         }
-        auto itCurMarker = m_itNextMarker;
-        while (m_itNextMarker != m_vMarkers.end() && m_itNextMarker->first <= llTime)
-            ++m_itNextMarker;
-        if (itCurMarker != m_itNextMarker) {
-            if (m_itNextMarker != m_vMarkers.begin() && (m_itNextMarker - 1)->second != -1) {
-                const auto eEvent = m_vMetaEvents[(m_itNextMarker - 1)->second];
-                ApplyMarker(eEvent->GetData(), eEvent->GetDataLen());
-            } else {
-                ApplyMarker(nullptr, 0);
+        else {
+            while (m_itNextProgramChange != m_vProgramChange.end() && m_itNextProgramChange->first <= llTime) ++m_itNextProgramChange;
+            for (; m_itNextTempo != m_vTempo.end() && m_itNextTempo->first <= llTime; ++m_itNextTempo)
+            {
+                MIDIMetaEvent* pEvent = m_vMetaEvents[m_itNextTempo->second];
+                if (pEvent->GetDataLen() == 3)
+                {
+                    MIDI::Parse24Bit(pEvent->GetData(), 3, &m_iMicroSecsPerBeat);
+                    m_iLastTempoTick = pEvent->GetAbsT();
+                    m_llLastTempoTime = pEvent->GetAbsMicroSec();
+                }
             }
-        }
-        for (; m_itNextColor != m_vColors.end() && m_itNextColor->first <= llTime; ++m_itNextColor)
-        {
-            MIDIMetaEvent* pEvent = m_vMetaEvents[m_itNextColor->second];
-            ApplyColor(pEvent);
+            for (; m_itNextSignature != m_vSignature.end() && m_itNextSignature->first <= llTime; ++m_itNextSignature)
+            {
+                MIDIMetaEvent* pEvent = m_vMetaEvents[m_itNextSignature->second];
+                if (pEvent->GetDataLen() == 4)
+                {
+                    m_iBeatsPerMeasure = pEvent->GetData()[0];
+                    m_iBeatType = 1 << pEvent->GetData()[1];
+                    m_iClocksPerMet = pEvent->GetData()[2];
+                    m_iLastSignatureTick = pEvent->GetAbsT();
+                }
+            }
+            auto itCurMarker = m_itNextMarker;
+            while (m_itNextMarker != m_vMarkers.end() && m_itNextMarker->first <= llTime) ++m_itNextMarker;
+            if (itCurMarker != m_itNextMarker) {
+                if (m_itNextMarker != m_vMarkers.begin() && (m_itNextMarker - 1)->second != -1) {
+                    const auto eEvent = m_vMetaEvents[(m_itNextMarker - 1)->second];
+                    ApplyMarker(eEvent->GetData(), eEvent->GetDataLen());
+                }
+                else {
+                    ApplyMarker(nullptr, 0);
+                }
+            }
+            for (; m_itNextColor != m_vColors.end() && m_itNextColor->first <= llTime; ++m_itNextColor)
+            {
+                MIDIMetaEvent* pEvent = m_vMetaEvents[m_itNextColor->second];
+                ApplyColor(pEvent);
+            }
         }
     }
 }
@@ -1999,10 +2054,6 @@ void MainScreen::RenderLines()
 
 void MainScreen::RenderNotes()
 {
-    // Do we have any notes to render?
-    if (m_iEndPos < 0 || m_iStartPos >= (int64_t)m_vEvents.size())
-        return;
-
     long long iStartPos = m_dNSpeed < 0 ? m_iStartPos - (m_iEndPos - m_iStartPos) : m_iStartPos;
     long long iEndPos = m_dNSpeed < 0 ? m_iEndPos - (m_iEndPos - m_iStartPos) : m_iEndPos;
 
@@ -2500,25 +2551,18 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
     const VideoSettings& cVideo = config.GetVideoSettings();
     const ControlsSettings& cControls = config.GetControlsSettings();
     const PlaybackSettings& cPlayback = config.GetPlaybackSettings();
-    const MIDI::MIDIInfo& mInfo = m_MIDI.GetInfo();
 
-    resolution = mInfo.iDivision;
-
-    auto starttime = ((m_llStartTime >= 0) ? m_llStartTime : -m_llStartTime);
-
-    auto min = starttime / 60000000;
-    auto sec = (starttime % 60000000) / 1000000;
-    auto cs = (starttime % 1000000) / 100000;
-    auto tmin = mInfo.llTotalMicroSecs / 60000000;
-    auto tsec = (mInfo.llTotalMicroSecs % 60000000) / 1000000;
-    auto tcs = (mInfo.llTotalMicroSecs % 1000000) / 100000;
-    auto tempo = 60000000.0 / m_iMicroSecsPerBeat;
     width = m_pRenderer->GetBufferWidth();
     height = m_pRenderer->GetBufferHeight();
-    TotalTime = mInfo.llTotalMicroSecs + 250000;
+    auto min = abs(m_llStartTime) / 60000000;
+    auto sec = (abs(m_llStartTime) % 60000000) / 1000000;
+    auto cs = (abs(m_llStartTime) % 1000000) / 100000;
+    auto tmin = TotalTime / 60000000;
+    auto tsec = (TotalTime % 60000000) / 1000000;
+    auto tcs = (TotalTime % 1000000) / 100000;
+    auto tempo = 60000000.0 / m_iMicroSecsPerBeat;
 
     int cur_line = 0;
-
 
     if (!cVideo.bDisableUI) {
         m_pRenderer->GetDrawList()->AddRectFilled(ImVec2(prcStatus->left, prcStatus->top), ImVec2(prcStatus->right, prcStatus->bottom), 0x80000000);
@@ -2540,6 +2584,11 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
 
     if (m_llStartTime < 0)
         llStartTimeFormatted.insert(0, "-");
+
+    TotalTimeFormatted = std::to_string(TotalTime);
+
+    for (int i = TotalTimeFormatted.length() - 3; i > 0; i -= 3)
+        TotalTimeFormatted.insert(i, " ");
 
     polyphony = m_llPolyphony.load();
 
@@ -2569,7 +2618,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
         m_llStartTime >= 0 ? "" : "-",
         min, sec, cs,
         tmin, tsec, tcs);
-    RenderStatusLine(cur_line++, StatisticsText4, "%d/%d", m_iStartTick, mInfo.iDivision);
+    RenderStatusLine(cur_line++, StatisticsText4, "%d/%d", m_iStartTick, resolution);
     if (cVideo.bDebug) {
         RenderStatusLine(cur_line++, StatisticsText5, llStartTimeFormatted.c_str());
     }
@@ -2625,25 +2674,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
     }
     if (cControls.bPhigros) {
         RenderStatusLine(cur_line++, StatisticsText24, "%07.0f", (passed == static_cast<long long>(TotalNC) ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(TotalNC) * 1000000)));
-             if (TotalNC < 100000) {RenderStatusLine(cur_line++,StatisticsText25, "EZ Lv.1");}
-        else if (TotalNC < 200000) {RenderStatusLine(cur_line++,StatisticsText25, "EZ Lv.2");}
-        else if (TotalNC < 400000) {RenderStatusLine(cur_line++,StatisticsText25, "EZ Lv.3");}
-        else if (TotalNC < 600000) {RenderStatusLine(cur_line++,StatisticsText25, "EZ Lv.4");}
-        else if (TotalNC < 800000) {RenderStatusLine(cur_line++,StatisticsText25, "EZ Lv.5");}
-        else if (TotalNC < 1000000) {RenderStatusLine(cur_line++,StatisticsText25, "HD Lv.6");}
-        else if (TotalNC < 2000000) {RenderStatusLine(cur_line++,StatisticsText25, "HD Lv.7");}
-        else if (TotalNC < 4000000) {RenderStatusLine(cur_line++,StatisticsText25, "HD Lv.8");}
-        else if (TotalNC < 6000000) {RenderStatusLine(cur_line++,StatisticsText25, "HD Lv.9");}
-        else if (TotalNC < 8000000) {RenderStatusLine(cur_line++,StatisticsText25, "HD Lv.10");}
-        else if (TotalNC < 10000000) {RenderStatusLine(cur_line++,StatisticsText25, "IN Lv.11");}
-        else if (TotalNC < 20000000) {RenderStatusLine(cur_line++,StatisticsText25, "IN Lv.12");}
-        else if (TotalNC < 40000000) {RenderStatusLine(cur_line++,StatisticsText25, "IN Lv.13");}
-        else if (TotalNC < 60000000) {RenderStatusLine(cur_line++,StatisticsText25, "IN Lv.14");}
-        else if (TotalNC < 80000000) {RenderStatusLine(cur_line++,StatisticsText25, "IN Lv.15");}
-        else if (TotalNC < 100000000) {RenderStatusLine(cur_line++,StatisticsText25, "AT Lv.16");}
-        else if (TotalNC < 200000000) {RenderStatusLine(cur_line++,StatisticsText25, "AT Lv.17");}
-        else if (TotalNC < 400000000) {RenderStatusLine(cur_line++,StatisticsText25, "AT Lv.18");}
-        else {RenderStatusLine(cur_line++,StatisticsText25, "SP Lv.?");}
+        RenderStatusLine(cur_line++,StatisticsText25, Difficulty);
         RenderStatusLine(cur_line++, StatisticsText26, StatisticsText27);
         if (static_cast<float>(passed == TotalNC ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(TotalNC) * 1000000)) == static_cast<float>(1000000)) {
             RenderStatusLine(cur_line++, StatisticsText28, "");
@@ -2660,12 +2691,13 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
             RenderStatusLine(cur_line++, StatisticsText31, "");
         }
     }
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    COORD pos;
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    uint8_t line;
+    GetConsoleScreenBufferInfo(hConsole, &csbi);
     if (FrameCount % (1<<4) == 0) {
-        HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-        COORD pos;
-        CONSOLE_SCREEN_BUFFER_INFO csbi;
-        uint8_t line = 0;
-        GetConsoleScreenBufferInfo(hConsole, &csbi);
+        line = 0;
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
@@ -2675,13 +2707,13 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "  ================================ Debug Info ================================  ";
+        cout << "  "; for (uint8_t i = 0; i < (csbi.dwSize.X - (1<<4))/2; i++) cout << "="; cout << " Debug Info "; for (uint8_t i = 0; i < (csbi.dwSize.X - (1<<4)) / 2; i++) cout << "="; cout << "  ";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    SongLength: " << TotalTime << " (Qword +" + GetAddress(TotalTime) + ") [Read Only]";
+        cout << "    SongLength: " << TotalTimeFormatted << " (Qword +" + GetAddress(TotalTime) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
@@ -2848,14 +2880,30 @@ void MainScreen::RenderStatus(LPRECT prcStatus)
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
+        SetConsoleCursorPosition(hConsole, pos);
+        cout << "    DifficultyText: \"" << (strlen(Difficulty) < sizeof(Difficulty) / sizeof(Difficulty[0]) ? Difficulty : "MAXIMUM LENGTH EXCEEDED! ") << "\" (String[" << sizeof(Difficulty) / sizeof(Difficulty[0]) << "] +" + GetAddress(Difficulty) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         pos.X = 0;
-        pos.Y = 0;
+        pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
+        cout << string(csbi.dwSize.X-1, ' ');
     }
+    pos.X = 0;
+    pos.Y = 0;
+    SetConsoleCursorPosition(hConsole, pos);
+    SMALL_RECT windowSize;
+    windowSize.Left = 0;
+    windowSize.Top = 0;
+    windowSize.Right = csbi.dwSize.X-1;
+    windowSize.Bottom = line-1;
+    COORD bufferSize;
+    bufferSize.X = csbi.dwSize.X;
+    bufferSize.Y = max(line, csbi.dwSize.Y);
+    SetConsoleWindowInfo(GetStdHandle(STD_OUTPUT_HANDLE), TRUE, &windowSize);
+    SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), bufferSize);
     FrameCount++;
 }
 

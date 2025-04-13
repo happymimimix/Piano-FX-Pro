@@ -1,4 +1,8 @@
-﻿#include <Studio.h>
+﻿/*
+The entry point for Piano-FX Studio
+*/
+
+#include <Studio.h>
 #include <PFXSTUDIO_Global_Imports.h>
 #include <EmbededFilesExtractor.h>
 #include <ConsoleSetupScript.h>
@@ -16,6 +20,7 @@ void StudioMain() {
     cout << "[1;2H[40m[91m(0,0)";
     while (!CloseBtn::Terminated) {
         POINT CursorPos = {};
+        //Get mouse cursor position and button states
         if (GetCursorPos(&CursorPos) && GetForegroundWindow() == GetConsoleWindow()) {
             ScreenToClient(GetConsoleWindow(), &CursorPos);
             CursorPos.x /= ChW;
@@ -38,10 +43,11 @@ void StudioMain() {
                 ThisCommandLength++;
             }
             LastCommandLength = CommandText.length();
+            //Process touch event listeners
             TouchEventManager::CheckTouches(CursorPos, Clicked);
         }
         LoopingTask(); //Pseudo multithreading
-        🖥();
-        💬();
+        🖥(); //Graphics update
+        💬(); //Process messages
     }
 }

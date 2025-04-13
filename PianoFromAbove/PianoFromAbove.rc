@@ -1,7 +1,4 @@
-// Microsoft Visual C++ generated resource script.
-//
 #pragma code_page(65001)
-
 #include "resource.h"
 #include "matrices.h"
 #include "Language.h"
@@ -324,7 +321,7 @@ BEGIN
 					FontSize
 
 	COMBOBOX        IDC_MARKERENC,
-					tMargin + Property3Text6W,
+					dMargin + Property3Text6W,
 					qMargin + iContentHeight,
 					MarkerEncodingW,
 					ContentHeight + Margin,

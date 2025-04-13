@@ -1190,7 +1190,7 @@ BOOL PlayFile(const wstring& sFile)
     // Success! Set up the GUI for playback
     if (!cPlayback.GetPlayable()) cPlayback.SetPlayable(true, true);
     if (cPlayback.GetPlayMode() != ePlayMode) cPlayback.SetPlayMode(ePlayMode, true);
-    cPlayback.SetPaused(ePlayMode != GameState::Practice, true);
+    cPlayback.SetPaused(false, true);
     cPlayback.SetPosition(0);
     cView.SetZoomMove(false);
     TCHAR sTitle[1 << 10];

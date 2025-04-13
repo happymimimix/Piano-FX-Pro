@@ -2156,6 +2156,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += DefineMemoryAddress("HideStatistics", GetAddress(cVideo.bDisableUI));
                 Code += DefineMemoryAddress("LimitFPS", GetAddress(cVideo.bLimitFPS));
                 Code += DefineMemoryAddress("Caption", GetAddress(CheatEngineCaption));
+                Code += DefineMemoryAddress("DifficultyText", GetAddress(Difficulty));
                 Code += "-- Custom Variable Definitions: (Version: " + RVersionString + ")\n";
                 Code += "\n";
                 Code += "-- Function Definitions: (DO NOT CHANGE!)\n";
@@ -2198,7 +2199,8 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += GettersAndSetters("TickBased", "ShortInteger", false, "History");
                 Code += GettersAndSetters("HideStatistics", "ShortInteger", false, "History");
                 Code += GettersAndSetters("LimitFPS", "ShortInteger", false, "History");
-                Code += StringTypeGettersAndSetters("Caption", sizeof(CheatEngineCaption), false, "History");
+                Code += StringTypeGettersAndSetters("Caption", sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]), false, "History");
+                Code += StringTypeGettersAndSetters("DifficultyText", sizeof(Difficulty) / sizeof(Difficulty[0]), false, "History");
                 Code += EasingFunctions();
                 Code += WaitUntil(false, "Pending");
                 Code += WaitUntil(true, "Pending");
@@ -2233,6 +2235,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += "\n";
                 Code += "-- Initialization:\n";
                 Code += "EXE(\"SetForegroundWindow\",hPFX)\n";
+                Code += "DisplayShaderFPS=true\n";
                 Code += "SetMicroseconds(-3*S)\n";
                 Code += "SetVolume(1.00)\n";
                 Code += "SetMute(0)\n";
@@ -2254,7 +2257,8 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += "SetHideStatistics(0)\n";
                 Code += "SetLimitFPS(1)\n";
                 Code += "SetCaption(\"Welcome to Piano-FX Pro\")\n";
-                Code += "DisplayShaderFPS=true\n";
+                Code += "-- If you feel the default difficulty is inappropriate, change it with the following code: \n";
+                Code += "SetDifficultyText(\"IN Lv.12\")\n";
                 Code += "-- Do this if you have color events on the first tick:\n";
                 Code += "SetMicroseconds(0)\n";
                 Code += "WaitUntilTime(1)\n";
@@ -2508,7 +2512,6 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
         ShowWindow(g_hWnd, nCmdShow);
         UpdateWindow(g_hWnd);
         SetFocus(g_hWndGfx);
-        cPlayback.SetPaused(false, false);
     }
     wcout << StartupStage3Text << "\n";
 

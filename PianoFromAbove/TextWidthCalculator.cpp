@@ -1,3 +1,8 @@
+/*
+This tool is responsible for calculating text width for automatic layout generation. 
+The results will be stored to Widths.h
+*/
+
 #include <iostream>
 #include <string>
 #include <Windows.h>

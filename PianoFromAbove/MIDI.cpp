@@ -63,47 +63,6 @@ MIDIPos::~MIDIPos() {
         _aligned_free(m_pTrackTime);
 }
 
-#ifdef __AVX2__
-// https://github.com/WojciechMula/toys/blob/master/simd-min-index/avx2.cpp
-size_t min_index_avx2(int32_t* array, size_t size) {
-    const __m256i increment = _mm256_set1_epi32(8);
-    __m256i indices = _mm256_setr_epi32(0, 1, 2, 3, 4, 5, 6, 7);
-    __m256i minindices = indices;
-    __m256i minvalues = _mm256_loadu_si256((__m256i*)array);
-
-    for (size_t i = 8; i < size; i += 8) {
-
-        indices = _mm256_add_epi32(indices, increment);
-
-        const __m256i values = _mm256_loadu_si256((__m256i*)(array + i));
-        const __m256i lt = _mm256_cmpgt_epi32(minvalues, values);
-        minindices = _mm256_blendv_epi8(minindices, indices, lt);
-        minvalues = _mm256_min_epi32(values, minvalues);
-    }
-
-    // find min index in vector result (in an extremely naive way)
-    int32_t values_array[8];
-    uint32_t indices_array[8];
-
-    _mm256_storeu_si256((__m256i*)values_array, minvalues);
-    _mm256_storeu_si256((__m256i*)indices_array, minindices);
-
-    size_t  minindex = indices_array[0];
-    int32_t minvalue = values_array[0];
-    for (int i = 1; i < 8; i++) {
-        if (values_array[i] < minvalue) {
-            minvalue = values_array[i];
-            minindex = indices_array[i];
-        }
-        else if (values_array[i] == minvalue) {
-            minindex = min(minindex, size_t(indices_array[i]));
-        }
-    }
-
-    return minindex;
-}
-#else
-// https://github.com/WojciechMula/toys/blob/master/simd-min-index/sse.cpp
 size_t min_index_sse(int32_t* array, size_t size) {
     const __m128i increment = _mm_set1_epi32(4);
     __m128i indices = _mm_setr_epi32(0, 1, 2, 3);
@@ -141,7 +100,6 @@ size_t min_index_sse(int32_t* array, size_t size) {
 
     return minindex;
 }
-#endif
 
 // Gets the next closest event as long as it occurs before iMicroSecs elapse
 // Always get next event if iMicroSecs is negative
@@ -152,11 +110,8 @@ int MIDIPos::GetNextEvent( int iMicroSecs, MIDIEvent **pOutEvent )
 
     // Get the next closest event
     size_t iTracks = m_vTrackPos.size();
-#ifdef __AVX2__
-    int iMinPos = (int)min_index_avx2(m_pTrackTime, (iTracks + 8) & ~7);
-#else
     int iMinPos = (int)min_index_sse(m_pTrackTime, (iTracks + 8) & ~7);
-#endif
+
     if (m_pTrackTime[iMinPos] == INT_MAX)
         return 0;
 

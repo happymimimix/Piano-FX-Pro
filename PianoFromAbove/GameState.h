@@ -21,22 +21,24 @@ using namespace std;
 #include "Misc.h"
 
 inline long long m_llStartTime;
+inline int m_iStartTick;
 inline string llStartTimeFormatted;
-inline int polyphony;
+inline size_t polyphony;
 inline string polyFormatted;
-inline int nps;
+inline size_t nps;
 inline string npsFormatted;
-inline int passed;
+inline size_t passed;
 inline string passedFormatted;
 inline uint8_t FrameCount = 0;
 inline int width = -1;
 inline int height = -1;
-inline int m_iStartTick;
 inline uint16_t resolution = -1;
 inline char CheatEngineCaption[(1<<7)*(1<<10)] = {};
-inline int TotalNC;
+inline size_t TotalNC;
 inline long long MinimalTime;
 inline long long TotalTime;
+inline string TotalTimeFormatted;
+inline char Difficulty[1 << 10] = {};
 
 //Abstract base class
 class GameState
@@ -265,7 +267,7 @@ private:
     unsigned char* m_pMarkerData = nullptr; // Used for refreshing marker data when changing encoding on the fly
     size_t m_iMarkerSize = 0;
     int m_iCurEncoding;
-    std::atomic<long long> m_llPolyphony;
+    std::atomic<size_t> m_llPolyphony;
 
     // color events and bend range and such
     bool Next_is_PBS[16] = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
@@ -333,5 +335,4 @@ private:
 
     // Debug assertion fail workaround
     bool m_bNextMarkerInited = false;
-    bool m_bNextColorInited = false;
 };

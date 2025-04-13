@@ -1,6 +1,7 @@
 ﻿#include <PFXSTUDIO_Global_Imports.h>
 #include <TouchEventListener.h>
 
+//The close button on the right top corner
 struct CloseBtn {
     static bool Terminated;
     static void Create() {

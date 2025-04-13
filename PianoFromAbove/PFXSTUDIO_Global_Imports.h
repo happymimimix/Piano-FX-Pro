@@ -16,6 +16,7 @@ using namespace std;
 function<void()> inline LoopingTask = []() {};
 
 void inline 💬() {
+    //Process messages
     MSG msg = {};
     if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
         TranslateMessage(&msg);
@@ -24,6 +25,7 @@ void inline 💬() {
 }
 
 void inline 🖥() {
+    //Graphics update
     HWND hComponents = NULL;
     while ((hComponents = FindWindowEx(GetConsoleWindow(), hComponents, NULL, NULL)) != NULL)
     {

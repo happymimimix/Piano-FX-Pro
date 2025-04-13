@@ -1,4 +1,12 @@
-﻿#include <TabSwitcher.h>
+﻿/*
+⚠️ Disguised header file notice: 
+
+This file will be treated as a .cpp source code file when compiling. 
+Please do not be deceived by the .h file extension! 
+See file properties for more details. 
+*/
+
+#include <TabSwitcher.h>
 #include <Tab1.h>
 #include <Tab2.h>
 #include <Tab3.h>

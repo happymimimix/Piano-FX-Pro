@@ -166,12 +166,7 @@ HFONT imguiFont2GDI(const void* compressed_ttf_data, int compressed_ttf_size, in
     unsigned char* buf_decompressed_data = (unsigned char*)IM_ALLOC(buf_decompressed_size);
     stb_decompress(buf_decompressed_data, (const unsigned char*)compressed_ttf_data, (unsigned int)compressed_ttf_size);
     DWORD num_fonts = 0;
-    HANDLE h_font = AddFontMemResourceEx(
-        buf_decompressed_data,  // MUST BE RAW TTF DATA
-        buf_decompressed_size,
-        nullptr,
-        &num_fonts
-    ); 
+    AddFontMemResourceEx(buf_decompressed_data, buf_decompressed_size, nullptr, &num_fonts);
     wstring fontName;
     GetFontNameFromTTF(buf_decompressed_data, buf_decompressed_size, fontName);
     LOGFONT lf;

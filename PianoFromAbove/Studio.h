@@ -1,1 +1,2 @@
-﻿void StudioMain();
+﻿//Forward declearation for StudioMain()
+void StudioMain();
