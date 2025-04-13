@@ -612,7 +612,9 @@
     <None Include="common.hlsli">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="Images\chase.mid.xz" />
+    <None Include="Images\chase.mid.xz">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="rect_vs.hlsl">
