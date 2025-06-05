@@ -75,6 +75,8 @@ void CreateFLP(wstring Path, uint16_t PPQ) {
     Make_FL_Event(FLdt_Data, 80, vector<uint8_t>{0x00});
     Make_FL_Event(FLdt_Data, 17, vector<uint8_t>{0x04});
     Make_FL_Event(FLdt_Data, 18, vector<uint8_t>{0x04});
+    Make_FL_Event(FLdt_Data, 12, vector<uint8_t>{0x00});
+    Make_FL_Event(FLdt_Data, 80, vector<uint8_t>{0xFF, 0xFF});
 
     uint8_t ID_Plugin_New[24];
     for (uint8_t i = 0; i < 24; i++) ID_Plugin_New[i] = 0;
