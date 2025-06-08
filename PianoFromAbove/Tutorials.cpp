@@ -18,7 +18,6 @@ void DisplayTutorial(Tutorials DocumentName) {
 	default:
 		cout << "[1;1H[40m[91mERROR: Unknown tutorial document: ";
 		cout << (short)DocumentName;
-		cout << GetLastError();
 		cout << "\nThe program will now stop. \n";
 		while (true) {
 			// Make the program hang instead of closing! 

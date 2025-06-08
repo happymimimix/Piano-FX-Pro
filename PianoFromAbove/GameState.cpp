@@ -269,7 +269,6 @@ void SplashScreen::InitState()
     m_iStartPos = 0;
     m_iEndPos = -1;
     m_llStartTime = m_MIDI.GetInfo().llFirstNote - 1000000;
-    m_bPaused = cPlayback.GetPaused();
     m_bMute = cPlayback.GetMute();
 
     SetChannelSettings(vector< bool >(), vector< bool >(),
@@ -369,7 +368,6 @@ GameState::GameError SplashScreen::Logic()
 
     // Detect changes in state
     bool bMute = cPlayback.GetMute();
-    bool bMuteChanged = (bMute != m_bMute);
 
     // Set the state
     m_bMute = bMute;
@@ -380,13 +378,13 @@ GameState::GameError SplashScreen::Logic()
     m_Timer.Start();
 
     // Figure out start and end times for display
-    m_llStartTime = m_llStartTime + llElapsed;
-    long long llEndTime = m_llStartTime + TimeSpan;
-    if (m_llStartTime > m_MIDI.GetInfo().llTotalMicroSecs) {
+    m_llStartTime = m_llStartTime + llElapsed; 
+    if (m_llStartTime > m_MIDI.GetInfo().llTotalMicroSecs + 500000) {
         m_llStartTime = m_MIDI.GetInfo().llFirstNote - 1000000;
         m_iStartPos = 0;
         m_iEndPos = -1;
     }
+    long long llEndTime = m_llStartTime + TimeSpan;
 
     // Needs start time to be set. For creating textparticles.
     RenderGlobals();
@@ -812,7 +810,7 @@ GameState::GameError MainScreen::Init()
     }
 
     for (auto& work : m_vThreadWork)
-        work.reserve(1<<(1<<4)*1<<(1<<2)); // Should be plenty for most MIDIs
+        work.reserve(1<<16); // Should be plenty for most MIDIs
 
     return Success;
 }
@@ -1203,12 +1201,16 @@ GameState::GameError MainScreen::Logic( void )
                 if ((pOrigEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn || pOrigEvent->GetChannelEventType() == MIDIChannelEvent::NoteOff) && pOrigEvent->HasSister())
                 {
                     m_vThreadWork[pOrigEvent->GetParam1()].push_back({
-                        .sister_idx = (unsigned)m_iStartPos,
-                        .idx = (pOrigEvent->GetChannelEventType() == MIDIChannelEvent::NoteOff) ? ~0 : pOrigEvent->GetSisterIdx(),
+                        .idx = pOrigEvent->GetSisterIdx(),
+                        .sister_idx = (pOrigEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn) ? (unsigned)m_iStartPos : ~0,
                         });
                 }
                 m_iStartPos--;
             }
+            concurrency::parallel_for(size_t(0), size_t(128), [&](int key) {
+                for (const auto& work : m_vThreadWork[key])
+                    UpdateStateBackwards(key, work);
+                });
         }
         else {
             while (m_iStartPos < iEventCount && m_vEvents[m_iStartPos]->GetAbsMicroSec() <= m_llStartTime)
@@ -1243,11 +1245,11 @@ GameState::GameError MainScreen::Logic( void )
                 }
                 m_iStartPos++;
             }
+            concurrency::parallel_for(size_t(0), size_t(128), [&](int key) {
+                for (const auto& work : m_vThreadWork[key])
+                    UpdateState(key, work);
+                });
         }
-        concurrency::parallel_for(size_t(0), size_t(128), [&](int key) {
-            for (const auto& work : m_vThreadWork[key])
-                UpdateState(key, work);
-            });
     }
 
     // Advance end position AFTER advancing start for negative note speed
@@ -1272,10 +1274,6 @@ GameState::GameError MainScreen::Logic( void )
         }
         m_iEndPos += (m_iStartPos - m_iEndPos) * 2;
         m_iPrevStartPos = m_iStartPos;
-    }
-
-    if (m_dNSpeed < 0) {
-        UpdateStateReversed(m_iStartPos - (m_iEndPos - m_iStartPos));
     }
 
     AdvanceIterators(m_llStartTime, false);
@@ -1342,8 +1340,14 @@ void MainScreen::UpdateState(int key, const thread_work_t& work)
     } else {
         // binary search
         auto pos = sse_bin_search(note_state, work.sister_idx);
-        if (pos != -1)
+        if (pos != -1) {
             note_state.erase(note_state.begin() + pos);
+        }
+        else {
+            char debug_msg[1 << 10];
+            sprintf_s(debug_msg, "Note %d: Cannot find sister event %u in state during forward playback", key, work.sister_idx);
+            MessageBoxA(NULL, debug_msg, "Error", MB_ICONERROR);
+        }
 
         if (note_state.size() == 0)
             m_pNoteState[key] = -1;
@@ -1352,86 +1356,35 @@ void MainScreen::UpdateState(int key, const thread_work_t& work)
     }
 }
 
-void MainScreen::UpdateStateReversed(int iPos)
+void InsertSorted(std::vector<int>& vec, int value) {
+    auto it = std::lower_bound(vec.begin(), vec.end(), value);
+    vec.insert(it, value);
+}
+
+void MainScreen::UpdateStateBackwards(int key, const thread_work_t& work)
 {
-    const auto DeadLine = chrono::high_resolution_clock::now() + chrono::milliseconds(1 << 4);
-
-    if (iPos <= 0 || iPos >= static_cast<int>(m_vEvents.size())) {
-        // Clear all and return if position is invalid
-        concurrency::parallel_for(size_t(0), size_t(128), [&](size_t i) {
-            m_vStateReversed[i].clear();
-            });
-        return;
+    auto& note_state = m_vState[key];
+    if (work.sister_idx == UINT32_MAX) {
+        InsertSorted(note_state, work.idx);
+        m_pNoteState[key] = work.idx;
     }
-     
-    // Find the last note on event before iPos
-    MIDIChannelEvent* prevEvent = nullptr;
-    for (int idx = iPos - 1; idx >= 0; --idx) {
-        MIDIChannelEvent* evt = m_vEvents[idx];
-        if (evt->GetChannelEventType() == MIDIChannelEvent::NoteOn) {
-            prevEvent = evt;
-            break;
-        }
-    }
-
-    if (!prevEvent) {
-        // Clear all and return if no previous note found
-        concurrency::parallel_for(size_t(0), size_t(128), [&](size_t i) {
-            m_vStateReversed[i].clear();
-            });
-        return;
-    }
-
-    // Get the simultaneous count and time boundary
-    const unsigned iSimultaneous = prevEvent->GetSimultaneous() + 1;
-    const long long prevTime = prevEvent->GetAbsMicroSec();
-    const long long targetTime = m_vEvents[iPos]->GetAbsMicroSec();
-
-    // Pre-calculate max possible notes per key to avoid reallocations
-    // Each simultaneous note could potentially go to the same key
-    const size_t maxNotesPerKey = iSimultaneous;
-
-    // Clear and pre-reserve space
-    concurrency::parallel_for(size_t(0), size_t(128), [&](size_t i) {
-        m_vStateReversed[i].clear();
-        m_vStateReversed[i].reserve(maxNotesPerKey);
-        });
-
-    // Process events in reverse order
-    unsigned iFound = 0;
-    const int startIdx = iPos - 1;
-    for (int idx = startIdx; idx >= 0 && iFound < iSimultaneous; --idx) {
-        if (m_bDumpFrames || chrono::high_resolution_clock::now() < DeadLine) {
-            MIDIChannelEvent* pEvent = m_vEvents[idx];
-            if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn &&
-                pEvent->HasSister()) {
-
-                MIDIChannelEvent* pSister = pEvent->GetSister(m_vEvents);
-                const long long sisterTime = pSister->GetAbsMicroSec();
-
-                if (sisterTime > prevTime) {
-                    iFound++;
-                    if (sisterTime > targetTime) {
-                        const int noteKey = pEvent->GetParam1();
-                        m_vStateReversed[noteKey].push_back(idx);
-                    }
-                }
-            }
+    else {
+        // binary search
+        auto pos = sse_bin_search(note_state, work.sister_idx);
+        if (pos != -1) {
+            note_state.erase(note_state.begin() + pos);
         }
         else {
-            goto funcend;
+            char debug_msg[1<<10];
+            sprintf_s(debug_msg, "Note %d: Cannot find sister event %u in state during backward playback", key, work.sister_idx);
+            MessageBoxA(NULL, debug_msg, "Error", MB_ICONERROR);
         }
-    }
 
-    funcend:
-    // Reverse the vectors that were actually modified
-    concurrency::parallel_for(size_t(0), size_t(128), [&](size_t i) {
-        auto& vec = m_vStateReversed[i];
-        if (!vec.empty()) {
-            std::reverse(vec.begin(), vec.end());
-        }
-        });
-    return;
+        if (note_state.size() == 0)
+            m_pNoteState[key] = -1;
+        else
+            m_pNoteState[key] = note_state.back();
+    }
 }
 
 void MainScreen::JumpTo(long long llStartTime, boolean loadingMode)
@@ -2076,12 +2029,14 @@ void MainScreen::RenderNotes()
             }
         }
     }
+    /*
     for (int i = iStartPos; i <= iEndPos; i++) {
         MIDIChannelEvent* pEvent = m_vEvents[i];
         if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->HasSister()) {
             RenderNote(pEvent);
         }
     }
+    */
 }
 
 void MainScreen::RenderNote(const MIDIChannelEvent* pNote)

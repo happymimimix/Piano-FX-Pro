@@ -750,7 +750,7 @@ void CreateFLP(wstring Path, uint16_t PPQ) {
         TrackName += (wchar_t)0x0000;
         Make_FL_Event(FLdt_Data, 192, vector<uint8_t>(reinterpret_cast<const uint8_t*>(TrackName.data()), reinterpret_cast<const uint8_t*>(TrackName.data() + TrackName.size())));
         Make_FL_Event(FLdt_Data, 213, vector<uint8_t>(ID_Plugin_Parameters, ID_Plugin_Parameters + 965));
-        if (Channel < 15) Make_FL_Event(FLdt_Data, 215, vector<uint8_t>(ID_Channel_Parameters, ID_Channel_Parameters + 125));
+        Make_FL_Event(FLdt_Data, 215, vector<uint8_t>(ID_Channel_Parameters, ID_Channel_Parameters + 125));
     }
 
     for (uint16_t i = 0; i < 323; i++) ID_Plugin_Parameters[i] = 0;

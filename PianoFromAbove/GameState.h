@@ -128,7 +128,6 @@ private:
     vector<int> m_vState[128];  // The notes that are on at time m_llStartTime.
     Timer m_Timer; // Frame timers
     double m_dVolume;
-    bool m_bPaused;
     bool m_bMute;
 
     MIDIOutDevice m_OutDevice;
@@ -212,6 +211,7 @@ private:
 
     // Logic
     void UpdateState(int key, const thread_work_t& work);
+    void UpdateStateBackwards(int key, const thread_work_t& work);
     void UpdateStateReversed(int iPos);
     void JumpTo(long long llStartTime, boolean loadingMode = false);
     void ApplyMarker(unsigned char* data, size_t size);
