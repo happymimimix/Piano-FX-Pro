@@ -646,7 +646,8 @@ void MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vP
             pChannelEvent->SetSimultaneous(iSimultaneous);
             if ( pChannelEvent->HasSister() )
             {
-                if ( pChannelEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn)
+                if ( pChannelEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn &&
+                     pChannelEvent->GetParam2() > 0 )
                 {
                     if ( llFirstNote < 0  )
                         llFirstNote = llTime;
@@ -659,7 +660,8 @@ void MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, eventvec_t* vP
                 auto sister = pChannelEvent->GetPassDone() ? pChannelEvent->GetSister(vChannelEvents) : pChannelEvent->GetSister(m_vTracks[pEvent->GetTrack()]->m_vEvents);
                 sister->SetSisterIdx(vChannelEvents.size());
                 sister->SetPassDone(true);
-                if (pChannelEvent->GetChannelEventType() != MIDIChannelEvent::NoteOn) {
+                if (pChannelEvent->GetChannelEventType() != MIDIChannelEvent::NoteOn ||
+                    pChannelEvent->GetParam2() == 0) {
                     sister->SetLength(llTime - sister->GetAbsMicroSec());
                 }
             }
@@ -736,10 +738,9 @@ void MIDI::ConnectNotes()
                 MIDIChannelEvent::ChannelEventType eEventType = pEvent->GetChannelEventType();
                 int iChannel = pEvent->GetChannel();
                 int iNote = pEvent->GetParam1();
-                int iVelocity = pEvent->GetParam2();
                 auto& sStack = vStacks[track * 16 + iChannel][iNote];
 
-                if (eEventType == MIDIChannelEvent::NoteOn && iVelocity > 0) {
+                if (eEventType == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0) {
                     sStack.push(std::make_tuple(i, pEvent));
                 }
                 else if (eEventType == MIDIChannelEvent::NoteOff || eEventType == MIDIChannelEvent::NoteOn) {
@@ -881,35 +882,38 @@ void MIDITrack::MIDITrackInfo::AddEventInfo( const MIDIEvent &mEvent )
             int iParam1 = mChannelEvent.GetParam1();
             int iParam2 = mChannelEvent.GetParam2();
 
-            switch ( eChannelEventType )
+            switch (eChannelEventType)
             {
                 case MIDIChannelEvent::NoteOn:
-                    //MinNote and MaxNote
-                    if ( !this->iNoteCount )
+                    if (iParam2 > 0)
                     {
-                        this->iMinNote = this->iMaxNote = iParam1;
-                    }
-                    else
-                    {
-                        this->iMinNote = min( iParam1, this->iMinNote );
-                        this->iMaxNote = max( iParam1, this->iMaxNote );
-                    }
-                    //NoteCount
-                    this->iNoteCount++;
-
-                    //Channel info
-                    if ( !this->aNoteCount[ iChannel ] )
-                        this->iNumChannels++;
-                    this->aNoteCount[ iChannel ]++;
-                    break;
-                // Should we break it down further?
-                case MIDIChannelEvent::ProgramChange:
-                    if ( this->aProgram[ iChannel ] != iParam1 )
-                    {
-                        if ( this->aNoteCount[ iChannel ] > 0 )
-                            this->aProgram[ iChannel ] = 128; // Various
+                        //MinNote and MaxNote
+                        if (!this->iNoteCount)
+                        {
+                            this->iMinNote = this->iMaxNote = iParam1;
+                        }
                         else
-                            this->aProgram[ iChannel ] = iParam1;
+                        {
+                            this->iMinNote = min(iParam1, this->iMinNote);
+                            this->iMaxNote = max(iParam1, this->iMaxNote);
+                        }
+                        //NoteCount
+                        this->iNoteCount++;
+
+                        //Channel info
+                        if (!this->aNoteCount[iChannel])
+                            this->iNumChannels++;
+                        this->aNoteCount[iChannel]++;
+                    }
+                    break;
+                    // Should we break it down further?
+                case MIDIChannelEvent::ProgramChange:
+                    if (this->aProgram[iChannel] != iParam1)
+                    {
+                        if (this->aNoteCount[iChannel] > 0)
+                            this->aProgram[iChannel] = 128; // Various
+                        else
+                            this->aProgram[iChannel] = iParam1;
                     }
                     break;
                 default:

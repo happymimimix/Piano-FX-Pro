@@ -61,6 +61,7 @@
 #define IDC_FFMPEG                      507
 #define IDC_DEBUG						508
 #define IDC_DISABLEUI                   509
+#define IDC_OR		                    510
 
 #define IDC_LRARROWS                    601
 #define IDC_LRARROWSSPIN                602
@@ -71,6 +72,8 @@
 #define IDC_SPLASHMIDI                  607
 #define IDC_SPLASHBROWSE                608
 #define IDC_SPLASHRESET                 609
+#define IDC_VELSTRSHLD                  610
+#define IDC_VELSTRSHLDSPIN              611
 
 #define IDC_FILE                        801
 #define IDC_FOLDER                      802

@@ -113,7 +113,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             TCHAR sFilename[1 << 10] = { 0 };
             ofn.lStructSize = sizeof(OPENFILENAME);
             ofn.hwndOwner = hWnd;
-            ofn.lpstrFilter = TEXT("MIDI Files (*.mid, *.mid.xz)\0*.mid;*.xz\0");
+            ofn.lpstrFilter = TEXT("MIDI Files (*.mid, *.mid.xz)\0*.mid;*.mid.xz\0");
             ofn.lpstrFile = sFilename;
             ofn.nMaxFile = sizeof(sFilename) / sizeof(TCHAR);
             ofn.lpstrTitle = OpenFileTitle;
@@ -366,30 +366,6 @@ LRESULT WINAPI GfxProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_CAPTURECHANGED:
         bTrackR = bTrackL = false;
         return 0;
-    case WM_CONTEXTMENU:
-    {
-        POINT ptContext = { (short)LOWORD(lParam), (short)HIWORD(lParam) };
-        HWND hWndContext = (HWND)wParam;
-        if (hWndContext != g_hWndGfx || cView.GetZoomMove()) break;
-
-        // VK_APPS or Shift F10 were pressed. Figure out where to display the menu
-        if (ptContext.x < 0 && ptContext.y < 0)
-        {
-            RECT rcGfx;
-            POINT ptMouse;
-            GetCursorPos(&ptMouse);
-            GetWindowRect(g_hWndGfx, &rcGfx);
-
-            if (PtInRect(&rcGfx, ptMouse))
-                ptContext = ptMouse;
-            else
-            {
-                ptContext.x = rcGfx.left;
-                ptContext.y = rcGfx.top;
-            }
-        }
-        return 0;
-    }
     // Send me everything except the tab character
     case WM_GETDLGCODE:
     {
@@ -1070,8 +1046,8 @@ VOID SetPlayMode(INT ePlayMode)
     SendMessage(hWndToolbar, TB_PRESSBUTTON, ID_PLAY_PLAY, TRUE);
     SetZoomMove(FALSE);
 
-    int iMenuItems[][5] = { { 1, ePlayMode, ID_FILE_CLOSEFILE },
-                            { 3, bPractice, ID_PLAY_PLAYPAUSE, ID_PLAY_STOP, ID_VIEW_MOVEANDZOOM },
+    int iMenuItems[][6] = { { 1, ePlayMode, ID_FILE_CLOSEFILE },
+                            { 4, bPractice, ID_PLAY_PLAYPAUSE, ID_PLAY_STOP, ID_VIEW_MOVEANDZOOM, ID_VIEW_RESETMOVEANDZOOM },
                             { 2, bPractice, ID_PLAY_SKIPFWD, ID_PLAY_SKIPBACK },
                             { 3, true, ID_PLAY_INCREASERATE, ID_PLAY_DECREASERATE, ID_PLAY_RESETRATE } };
     for (size_t i = 0; i < sizeof(iMenuItems) / sizeof(iMenuItems[0]); i++)

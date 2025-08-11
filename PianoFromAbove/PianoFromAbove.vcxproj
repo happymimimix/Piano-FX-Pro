@@ -258,7 +258,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/clang:-Ofast /clang:-msse4.2 %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -272,6 +272,8 @@
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
       <SuppressStartupBanner>false</SuppressStartupBanner>
+      <ShowIncludes>true</ShowIncludes>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -290,6 +292,17 @@
 del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
+vmchk.exe
+IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
+:IncludeMods
+rem ToDo
+goto BuildContinue
+:NoMods
+mshta vbscript:msgbox("Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. "+vbCrLf+vbCrLf+"This compilation will not include any mods, only the main program will be compiled. ",48,"Error")(window.close)
+:BuildContinue
+del .\vmchk.exe /f /q
+del .\vmchk.obj /f /q
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
 msbuild ..\Colorizer\Colorizer.sln -t:Clean -p:Configuration=Release /p:Platform=x64
 msbuild ..\PFXGDI\PFXGDI.sln -t:Clean -p:Configuration=Release /p:Platform=x86
@@ -339,7 +352,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/clang:-Ofast /clang:-msse4.2 %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -355,6 +368,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
       <SuppressStartupBanner>false</SuppressStartupBanner>
+      <ShowIncludes>true</ShowIncludes>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -373,6 +388,17 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
 del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
+vmchk.exe
+IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
+:IncludeMods
+rem ToDo
+goto BuildContinue
+:NoMods
+mshta vbscript:msgbox("Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. "+vbCrLf+vbCrLf+"This compilation will not include any mods, only the main program will be compiled. ",48,"Error")(window.close)
+:BuildContinue
+del .\vmchk.exe /f /q
+del .\vmchk.obj /f /q
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
 msbuild ..\Colorizer\Colorizer.sln -t:Clean -p:Configuration=Release /p:Platform=x64
 msbuild ..\PFXGDI\PFXGDI.sln -t:Clean -p:Configuration=Release /p:Platform=x86
@@ -422,7 +448,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/clang:-Ofast /clang:-msse4.2 %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -438,6 +464,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
       <SuppressStartupBanner>false</SuppressStartupBanner>
+      <ShowIncludes>true</ShowIncludes>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -456,6 +484,17 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
 del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
+vmchk.exe
+IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
+:IncludeMods
+rem ToDo
+goto BuildContinue
+:NoMods
+mshta vbscript:msgbox("Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. "+vbCrLf+vbCrLf+"This compilation will not include any mods, only the main program will be compiled. ",48,"Error")(window.close)
+:BuildContinue
+del .\vmchk.exe /f /q
+del .\vmchk.obj /f /q
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
 msbuild ..\Colorizer\Colorizer.sln -t:Clean -p:Configuration=Release /p:Platform=x64
 msbuild ..\PFXGDI\PFXGDI.sln -t:Clean -p:Configuration=Release /p:Platform=x86
@@ -505,7 +544,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/clang:-Ofast /clang:-msse4.2 %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -521,6 +560,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
       <SuppressStartupBanner>false</SuppressStartupBanner>
+      <ShowIncludes>true</ShowIncludes>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -539,6 +580,17 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
 del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
+vmchk.exe
+IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
+:IncludeMods
+rem ToDo
+goto BuildContinue
+:NoMods
+mshta vbscript:msgbox("Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. "+vbCrLf+vbCrLf+"This compilation will not include any mods, only the main program will be compiled. ",48,"Error")(window.close)
+:BuildContinue
+del .\vmchk.exe /f /q
+del .\vmchk.obj /f /q
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
 msbuild ..\Colorizer\Colorizer.sln -t:Clean -p:Configuration=Release /p:Platform=x64
 msbuild ..\PFXGDI\PFXGDI.sln -t:Clean -p:Configuration=Release /p:Platform=x86
@@ -588,7 +640,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/clang:-Ofast /clang:-msse4.2 %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -604,6 +656,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
       <SuppressStartupBanner>false</SuppressStartupBanner>
+      <ShowIncludes>true</ShowIncludes>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -622,6 +676,17 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
 del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
+vmchk.exe
+IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
+:IncludeMods
+rem ToDo
+goto BuildContinue
+:NoMods
+mshta vbscript:msgbox("Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. "+vbCrLf+vbCrLf+"This compilation will not include any mods, only the main program will be compiled. ",48,"Error")(window.close)
+:BuildContinue
+del .\vmchk.exe /f /q
+del .\vmchk.obj /f /q
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
 msbuild ..\Colorizer\Colorizer.sln -t:Clean -p:Configuration=Release /p:Platform=x64
 msbuild ..\PFXGDI\PFXGDI.sln -t:Clean -p:Configuration=Release /p:Platform=x86
@@ -671,7 +736,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/clang:-Ofast /clang:-msse4.2 %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -687,6 +752,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
       <SuppressStartupBanner>false</SuppressStartupBanner>
+      <ShowIncludes>true</ShowIncludes>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -705,6 +772,17 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
 del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
+vmchk.exe
+IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
+:IncludeMods
+rem ToDo
+goto BuildContinue
+:NoMods
+mshta vbscript:msgbox("Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. "+vbCrLf+vbCrLf+"This compilation will not include any mods, only the main program will be compiled. ",48,"Error")(window.close)
+:BuildContinue
+del .\vmchk.exe /f /q
+del .\vmchk.obj /f /q
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
 msbuild ..\Colorizer\Colorizer.sln -t:Clean -p:Configuration=Release /p:Platform=x64
 msbuild ..\PFXGDI\PFXGDI.sln -t:Clean -p:Configuration=Release /p:Platform=x86
@@ -754,7 +832,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/clang:-Ofast /clang:-msse4.2 %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -770,6 +848,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
       <SuppressStartupBanner>false</SuppressStartupBanner>
+      <ShowIncludes>true</ShowIncludes>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -788,6 +868,17 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
 del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
+vmchk.exe
+IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
+:IncludeMods
+rem ToDo
+goto BuildContinue
+:NoMods
+mshta vbscript:msgbox("Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. "+vbCrLf+vbCrLf+"This compilation will not include any mods, only the main program will be compiled. ",48,"Error")(window.close)
+:BuildContinue
+del .\vmchk.exe /f /q
+del .\vmchk.obj /f /q
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
 msbuild ..\Colorizer\Colorizer.sln -t:Clean -p:Configuration=Release /p:Platform=x64
 msbuild ..\PFXGDI\PFXGDI.sln -t:Clean -p:Configuration=Release /p:Platform=x86
@@ -837,7 +928,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/clang:-Ofast /clang:-msse4.2 %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -851,6 +942,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
       <SuppressStartupBanner>false</SuppressStartupBanner>
+      <ShowIncludes>true</ShowIncludes>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -869,6 +962,17 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
 del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
+vmchk.exe
+IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
+:IncludeMods
+rem ToDo
+goto BuildContinue
+:NoMods
+mshta vbscript:msgbox("Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. "+vbCrLf+vbCrLf+"This compilation will not include any mods, only the main program will be compiled. ",48,"Error")(window.close)
+:BuildContinue
+del .\vmchk.exe /f /q
+del .\vmchk.obj /f /q
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
 msbuild ..\Colorizer\Colorizer.sln -t:Clean -p:Configuration=Release /p:Platform=x64
 msbuild ..\PFXGDI\PFXGDI.sln -t:Clean -p:Configuration=Release /p:Platform=x86
@@ -918,7 +1022,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/clang:-Ofast /clang:-msse4.2 %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -932,6 +1036,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <SuppressStartupBanner>false</SuppressStartupBanner>
+      <ShowIncludes>true</ShowIncludes>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -947,6 +1053,15 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
+vmchk.exe
+IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
+:IncludeMods
+rem ToDo
+goto BuildContinue
+:NoMods
+mshta vbscript:msgbox("Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. "+vbCrLf+vbCrLf+"This compilation will not include any mods, only the main program will be compiled. ",48,"Error")(window.close)
+:BuildContinue
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
 start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\Language.h ^|.\tmp.exe ^&gt;.\Widths.h
 </Command>
@@ -971,7 +1086,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/clang:-Ofast /clang:-msse4.2 %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
@@ -987,6 +1102,8 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <SuppressStartupBanner>false</SuppressStartupBanner>
+      <ShowIncludes>true</ShowIncludes>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -1002,6 +1119,15 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
+vmchk.exe
+IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
+:IncludeMods
+rem ToDo
+goto BuildContinue
+:NoMods
+mshta vbscript:msgbox("Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. "+vbCrLf+vbCrLf+"This compilation will not include any mods, only the main program will be compiled. ",48,"Error")(window.close)
+:BuildContinue
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
 start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\Language.h ^|.\tmp.exe ^&gt;.\Widths.h
 </Command>
@@ -1029,6 +1155,18 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Tutorials.cpp" />
+    <ClCompile Include="VMChecker.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClInclude Include="Background.h" />
     <ClInclude Include="ButtonStateDeclarations.h" />
     <ClInclude Include="CheatEngineTutorial.h" />
@@ -1154,6 +1292,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
     <ClInclude Include="matrices.h" />
     <ClInclude Include="MIDI.h" />
     <ClInclude Include="Misc.h" />
+    <ClInclude Include="ModdingAPI.h" />
     <ClInclude Include="NullPtrChecker.h" />
     <ClInclude Include="PFXGDI.exe.h" />
     <ClInclude Include="PFXSTUDIO_Global_Imports.h" />

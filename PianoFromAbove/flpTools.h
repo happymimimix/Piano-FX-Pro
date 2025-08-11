@@ -68,15 +68,15 @@ void CreateFLP(wstring Path, uint16_t PPQ) {
     }
     vector<uint8_t> FLdt_Data;
     Make_FL_Event(FLdt_Data, 199, vector<uint8_t>{'1', '2', '.', '3', '.', '0', '.', '7', '2', 0});
-    Make_FL_Event(FLdt_Data, 156, vector<uint8_t>{0x10, 0xF7, 0x07, 0x00});
-    Make_FL_Event(FLdt_Data, 67, vector<uint8_t>{0x01});
-    Make_FL_Event(FLdt_Data, 9, vector<uint8_t>{0x01});
-    Make_FL_Event(FLdt_Data, 11, vector<uint8_t>{0x00});
-    Make_FL_Event(FLdt_Data, 80, vector<uint8_t>{0x00});
-    Make_FL_Event(FLdt_Data, 17, vector<uint8_t>{0x04});
-    Make_FL_Event(FLdt_Data, 18, vector<uint8_t>{0x04});
-    Make_FL_Event(FLdt_Data, 12, vector<uint8_t>{0x00});
-    Make_FL_Event(FLdt_Data, 80, vector<uint8_t>{0xFF, 0xFF});
+    Make_FL_Event(FLdt_Data, 9, vector<uint8_t>{0x01}); //Loop Active
+    Make_FL_Event(FLdt_Data, 11, vector<uint8_t>{0x00}); //No Shuffle
+    Make_FL_Event(FLdt_Data, 12, vector<uint8_t>{0x00}); //Volume
+    Make_FL_Event(FLdt_Data, 80, vector<uint8_t>{0x00}); //Pitch
+    Make_FL_Event(FLdt_Data, 17, vector<uint8_t>{0x04}); //Time Division Numerator: 4
+    Make_FL_Event(FLdt_Data, 18, vector<uint8_t>{0x04}); //Time Division Denominator: 4
+    Make_FL_Event(FLdt_Data, 156, vector<uint8_t>{0x10, 0xF7, 0x07, 0x00}); //Tempo: 522.000
+    Make_FL_Event(FLdt_Data, 67, vector<uint8_t>{0x01}); //Selected Pattern: 01
+    Make_FL_Event(FLdt_Data, 28, vector<uint8_t>{0x00}); //Is Registered
 
     uint8_t ID_Plugin_New[24];
     for (uint8_t i = 0; i < 24; i++) ID_Plugin_New[i] = 0;
@@ -724,12 +724,12 @@ void CreateFLP(wstring Path, uint16_t PPQ) {
     ID_Plugin_Parameters[963] = 0x38;
     ID_Plugin_Parameters[964] = 0x00;
 
-    uint8_t ID_Channel_Parameters[125];
+    uint8_t ID_Channel_Parameters[124];
     for (uint8_t i = 0; i < 124; i++) ID_Channel_Parameters[i] = 0;
     ID_Channel_Parameters[64] = 0xFF;
     ID_Channel_Parameters[65] = 0xFF;
     ID_Channel_Parameters[73] = 0xFF;
-    ID_Channel_Parameters[112] = 0x0C;
+    ID_Channel_Parameters[112] = 0x0C; //Pitch Range: 12
     ID_Channel_Parameters[116] = 0xFE;
     ID_Channel_Parameters[117] = 0xFF;
     ID_Channel_Parameters[118] = 0xFF;
@@ -750,7 +750,7 @@ void CreateFLP(wstring Path, uint16_t PPQ) {
         TrackName += (wchar_t)0x0000;
         Make_FL_Event(FLdt_Data, 192, vector<uint8_t>(reinterpret_cast<const uint8_t*>(TrackName.data()), reinterpret_cast<const uint8_t*>(TrackName.data() + TrackName.size())));
         Make_FL_Event(FLdt_Data, 213, vector<uint8_t>(ID_Plugin_Parameters, ID_Plugin_Parameters + 965));
-        Make_FL_Event(FLdt_Data, 215, vector<uint8_t>(ID_Channel_Parameters, ID_Channel_Parameters + 125));
+        Make_FL_Event(FLdt_Data, 215, vector<uint8_t>(ID_Channel_Parameters, ID_Channel_Parameters + 124));
     }
 
     for (uint16_t i = 0; i < 323; i++) ID_Plugin_Parameters[i] = 0;
@@ -770,11 +770,8 @@ void CreateFLP(wstring Path, uint16_t PPQ) {
         wstring TrackName = L"MIDI Out -> Any";
         TrackName += (wchar_t)0x0000;
         Make_FL_Event(FLdt_Data, 192, vector<uint8_t>(reinterpret_cast<const uint8_t*>(TrackName.data()), reinterpret_cast<const uint8_t*>(TrackName.data() + TrackName.size())));
-        Make_FL_Event(FLdt_Data, 213, vector<uint8_t>(ID_Plugin_Parameters, ID_Plugin_Parameters + 327));
-        Make_FL_Event(FLdt_Data, 215, vector<uint8_t>(ID_Channel_Parameters, ID_Channel_Parameters + 125));
-    }
-
-    for (uint8_t Channel = 0; Channel < 25; Channel++) {
+        Make_FL_Event(FLdt_Data, 213, vector<uint8_t>(ID_Plugin_Parameters, ID_Plugin_Parameters + 323));
+        Make_FL_Event(FLdt_Data, 215, vector<uint8_t>(ID_Channel_Parameters, ID_Channel_Parameters + 124));
     }
 
     Output_FLP.write("FLhd", 4);

@@ -319,7 +319,7 @@ BEGIN
 					qMargin + iContentHeight + hMargin,
 					Property3Text6W,
 					FontSize
-
+	
 	COMBOBOX        IDC_MARKERENC,
 					dMargin + Property3Text6W,
 					qMargin + iContentHeight,
@@ -351,6 +351,12 @@ BEGIN
 					Property3Text10W + BoxSpacing,
 					ContentHeight
 
+	CONTROL         Property3Text11,IDC_OR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+					dMargin,
+					pMargin + cContentHeight,
+					Property3Text11W + BoxSpacing,
+					ContentHeight
+	
 END
 
 IDD_PP4_CONTROLS DIALOGEX 0,0,PropertyWindowW,PropertyWindowH
@@ -443,6 +449,21 @@ BEGIN
 					iContentHeight + oMargin + mhMargin,
 					Property1Text13W + BoxSpacing,
 					ContentHeight + Margin,
+	
+	LTEXT           Property4Text9,-1,
+					dMargin,
+					xContentHeight + cMargin,
+					Property4Text9W,
+					FontSize
+
+	EDITTEXT        IDC_VELSTRSHLD,
+					dMargin + Property4Text9W,
+					xContentHeight + cMargin + mhMargin,
+					SpinnerW,
+					ContentHeight + Margin,
+					ES_NUMBER | ES_AUTOHSCROLL
+
+	CONTROL         "", IDC_VELSTRSHLDSPIN,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,0,0,0,0
 
 END
 

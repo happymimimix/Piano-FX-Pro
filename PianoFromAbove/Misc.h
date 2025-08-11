@@ -12,8 +12,8 @@
 #include <string>
 using namespace std;
 
-#define VersionString "3.06"
-#define LVersionString L"3.06"
+#define VersionString "4.2"
+#define LVersionString L"4.2"
 static string RVersionString = VersionString;
 static wstring RLVersionString = LVersionString;
 

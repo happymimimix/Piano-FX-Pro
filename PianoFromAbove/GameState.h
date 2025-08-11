@@ -39,6 +39,7 @@ inline long long MinimalTime;
 inline long long TotalTime;
 inline string TotalTimeFormatted;
 inline char Difficulty[1 << 10] = {};
+inline bool UpdateNotePos;
 
 //Abstract base class
 class GameState
@@ -212,7 +213,7 @@ private:
     // Logic
     void UpdateState(int key, const thread_work_t& work);
     void UpdateStateBackwards(int key, const thread_work_t& work);
-    void UpdateStateReversed(int iPos);
+    void UpdateStateReversed(int iPos, bool clear);
     void JumpTo(long long llStartTime, boolean loadingMode = false);
     void ApplyMarker(unsigned char* data, size_t size);
     void ApplyColor(MIDIMetaEvent* event);
@@ -283,12 +284,13 @@ private:
     vector<thread_work_t> m_vThreadWork[128];
     int m_pNoteState[128]; // The last note that was turned on
     double m_dSpeed; // Speed multiplier
+    bool IsLastFrameReversed = false;
+    bool IsReversedStateInitialized = false;
     double m_dNSpeed; // Note Speed multiplier
     bool m_bPaused; // Paused state
     Timer m_Timer; // Frame timers
     Timer m_RealTimer;
     bool m_bMute;
-    bool m_bAnyChannelMuted;
     double m_dVolume;
     bool m_bTickMode = false;
 

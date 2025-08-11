@@ -235,6 +235,8 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
             // Save settings
             config.SaveConfigValues();
+
+            UpdateNotePos = true; //Update Note Pos! 
             return TRUE;
         }
         }
@@ -309,6 +311,8 @@ INT_PTR WINAPI AudioProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
             // Save settings
             config.SaveConfigValues();
+
+            UpdateNotePos = true; //Update Note Pos! 
             return TRUE;
         }
         }
@@ -339,6 +343,7 @@ INT_PTR WINAPI VideoProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         CheckDlgButton(hWnd, IDC_FFMPEG, cVideo.bDumpFrames);
         CheckDlgButton(hWnd, IDC_DEBUG, cVideo.bDebug);
         CheckDlgButton(hWnd, IDC_DISABLEUI, cVideo.bDisableUI);
+        CheckDlgButton(hWnd, IDC_OR, cVideo.bOR);
 
         return TRUE;
     }
@@ -365,6 +370,7 @@ INT_PTR WINAPI VideoProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             cVideo.bDumpFrames = IsDlgButtonChecked(hWnd, IDC_FFMPEG);
             cVideo.bDebug = (IsDlgButtonChecked(hWnd, IDC_DEBUG));
             cVideo.bDisableUI = (IsDlgButtonChecked(hWnd, IDC_DISABLEUI));
+            cVideo.bOR = (IsDlgButtonChecked(hWnd, IDC_OR));
 
             // Report success and return
             config.SetVideoSettings(cVideo);
@@ -372,6 +378,8 @@ INT_PTR WINAPI VideoProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
             // Save settings
             config.SaveConfigValues();
+
+            UpdateNotePos = true; //Update Note Pos! 
             return TRUE;
         }
         }
@@ -392,12 +400,17 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
         HWND hWndFwdBack = GetDlgItem(hWnd, IDC_LRARROWS);
         HWND hWndSpeedPct = GetDlgItem(hWnd, IDC_UDARROWS);
+        HWND hWndVelStrshld = GetDlgItem(hWnd, IDC_VELSTRSHLD);
+        HWND hWndVelStrshldSpin = GetDlgItem(hWnd, IDC_VELSTRSHLDSPIN);
         // Edit boxes
-        TCHAR buf[32];
+        TCHAR buf[1<<5];
         _stprintf_s(buf, TEXT("%g"), cControls.dFwdBackSecs);
         SetWindowText(hWndFwdBack, buf);
         _stprintf_s(buf, TEXT("%g"), cControls.dSpeedUpPct);
         SetWindowText(hWndSpeedPct, buf);
+        _stprintf_s(buf, TEXT("%d"), cControls.iVelocityThreshold);
+        SetWindowText(hWndVelStrshld, buf);
+        SendMessage(hWndVelStrshldSpin, UDM_SETRANGE32, 0, 127);
         CheckDlgButton(hWnd, IDC_SHOWCONTROLS, cControls.bAlwaysShowControls);
         CheckDlgButton(hWnd, IDC_PHIGROS, cControls.bPhigros);
         SetDlgItemTextW(hWnd, IDC_SPLASHMIDI, cControls.sSplashMIDI.c_str());
@@ -411,7 +424,7 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         {
         case IDC_SPLASHBROWSE: {
             OPENFILENAME ofn = {};
-            TCHAR sFilename[1024] = { 0 };
+            TCHAR sFilename[1<<10] = { 0 };
             ofn.lStructSize = sizeof(OPENFILENAME);
             ofn.hwndOwner = hWnd;
             ofn.lpstrFilter = TEXT("MIDI Files (*.mid, *.mid.xz)\0*.mid;*.xz\0");
@@ -442,7 +455,7 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             {
             case IDC_LRARROWSSPIN:
             {
-                TCHAR buf[32];
+                TCHAR buf[1<<5];
                 LPNMUPDOWN lpnmud = (LPNMUPDOWN)lParam;
                 HWND hWndFwdBack = GetDlgItem(hWnd, IDC_LRARROWS);
                 double dOldVal = 0;
@@ -457,7 +470,7 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             }
             case IDC_UDARROWSSPIN:
             {
-                TCHAR buf[32];
+                TCHAR buf[1<<5];
                 LPNMUPDOWN lpnmud = (LPNMUPDOWN)lParam;
                 HWND hWndSpeedPct = GetDlgItem(hWnd, IDC_UDARROWS);
                 double dOldVal = 0;
@@ -482,6 +495,7 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             // Edit boxes
             TCHAR buf[1<<10];
             double dEditVal = 0;
+            int iEditVal = 0;
 
             HWND hWndFwdBack = GetDlgItem(hWnd, IDC_LRARROWS);
             int len = GetWindowText(hWndFwdBack, buf, 32);
@@ -513,12 +527,26 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             GetWindowTextW(GetDlgItem(hWnd, IDC_SPLASHMIDI), splash, 1 << 10);
             cControls.sSplashMIDI = splash;
 
+            HWND hWndVelStrshld = GetDlgItem(hWnd, IDC_VELSTRSHLD);
+            len = GetWindowText(hWndVelStrshld, buf, 32);
+            if (len > 0 && _stscanf_s(buf, TEXT("%d"), &iEditVal) == 1)
+                cControls.iVelocityThreshold = static_cast<uint8_t>(max(0, min(iEditVal, 127)));
+            else
+            {
+                MessageBox(hWnd, TEXT("Please specify a numeric value! "), TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
+                PostMessage(hWnd, WM_NEXTDLGCTL, (WPARAM)hWndSpeedPct, TRUE);
+                SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_INVALID);
+                return TRUE;
+            }
+
             // Report success and return
             config.SetControlsSettings(cControls);
             SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_NOERROR);
 
             // Save settings
             config.SaveConfigValues();
+
+            UpdateNotePos = true; //Update Note Pos! 
             return TRUE;
         }
         }

@@ -50,7 +50,7 @@ void Tab1::EnableAll() {
         Btn2->OnTouch = []() {
             Tab1Graphics::Btn2(3, 5, Touched);
             Sleep(500);
-            ShellExecuteA(0, "open", "http://github.com/happymimimix/Fl-Studio-12.3-Archive/releases/tag/12.3", 0, 0, SW_SHOWNORMAL);
+            ShellExecuteA(0, "open", "http://github.com/happymimimix/Fl-Studio-12.3-Archive/releases/tag/000", 0, 0, SW_SHOWNORMAL);
             Btn2->OnLeave();
         };
         Btn2->OnHover = []() {

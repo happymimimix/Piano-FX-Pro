@@ -9,12 +9,6 @@
 *
 *************************************************************************************************/
 #include <Windows.h>
-#include <CommCtrl.h>
-#include <ctime>
-#include <shlwapi.h>
-#include <winhttp.h>
-#include <regex>
-#include <clocale>
 
 #ifdef INCLUDE_FFMPEG
 // Do not include these files in Debug configuration as these files are too large and would cause significant lag in intellisense! 
@@ -172,7 +166,7 @@ string DefineMemoryAddress(string VariableName, string Address) {
     return Code;
 }
 
-string GettersAndSetters(string VariableName, string Type, bool IsReadOnly, string DebugList, bool IsSigned = false) {
+string GettersAndSetters(string VariableName, string Type, bool IsReadOnly, string DebugList, bool IsSigned = false, bool NotePosUpdateRequired = false) {
     string Code = "";
     Code += "function Get" + VariableName + "()\n";
     Code += "return read" + Type + "(" + VariableName + string(IsSigned ? ",true" : "") + ")\n";
@@ -181,6 +175,7 @@ string GettersAndSetters(string VariableName, string Type, bool IsReadOnly, stri
         Code += "function Set" + VariableName + "(VAL)\n";
         Code += DebugList + "Add(\"" + VariableName + " -> \"..VAL)\n";
         Code += "write" + Type + "(" + VariableName + ",VAL)\n";
+        if (NotePosUpdateRequired) Code += "writeShortInteger(UpdateNotePos,true)\n";
         Code += "end\n";
     }
     return Code;
@@ -203,7 +198,7 @@ string StringTypeGettersAndSetters(string VariableName, size_t Size, bool IsRead
     return Code;
 }
 
-string SetResolutionFunction(string DebugList) {
+string SetResolutionFunction() {
     string Code = "";
     Code += "function SetResolution(W,H)\n";
     Code += "HistoryAdd(\"Resolution -> \"..W..\"*\"..H)\n";
@@ -2141,6 +2136,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += DefineMemoryAddress("OffsetX", cView.GetOffsetXAddress());
                 Code += DefineMemoryAddress("OffsetY", cView.GetOffsetYAddress());
                 Code += DefineMemoryAddress("Zoom", cView.GetZoomXAddress());
+                Code += DefineMemoryAddress("UpdateNotePos", GetAddress(UpdateNotePos));
                 Code += DefineMemoryAddress("SameWidth", GetAddress(cVideo.bSameWidth));
                 Code += DefineMemoryAddress("StartKey", GetAddress(cVisual.iFirstKey));
                 Code += DefineMemoryAddress("EndKey", GetAddress(cVisual.iLastKey));
@@ -2154,7 +2150,9 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += DefineMemoryAddress("ShowMarkers", GetAddress(cVideo.bShowMarkers));
                 Code += DefineMemoryAddress("TickBased", GetAddress(cVideo.bTickBased));
                 Code += DefineMemoryAddress("HideStatistics", GetAddress(cVideo.bDisableUI));
+                Code += DefineMemoryAddress("RemoveOverlaps", GetAddress(cVideo.bOR));
                 Code += DefineMemoryAddress("LimitFPS", GetAddress(cVideo.bLimitFPS));
+                Code += DefineMemoryAddress("VelocityThreshold", GetAddress(cControls.iVelocityThreshold));
                 Code += DefineMemoryAddress("Caption", GetAddress(CheatEngineCaption));
                 Code += DefineMemoryAddress("DifficultyText", GetAddress(Difficulty));
                 Code += "-- Custom Variable Definitions: (Version: " + RVersionString + ")\n";
@@ -2181,24 +2179,26 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += GettersAndSetters("Mute", "ShortInteger", false, "History");
                 Code += GettersAndSetters("PlaybackSpeed", "Double", false, "History");
                 Code += GettersAndSetters("NoteSpeed", "Double", false, "History");
-                Code += GettersAndSetters("OffsetX", "Float", false, "History");
-                Code += GettersAndSetters("OffsetY", "Float", false, "History");
-                Code += GettersAndSetters("Zoom", "Float", false, "History");
-                Code += GettersAndSetters("SameWidth", "ShortInteger", false, "History");
-                Code += GettersAndSetters("StartKey", "Integer", false, "History", true);
-                Code += GettersAndSetters("EndKey", "Integer", false, "History", true);
-                Code += GettersAndSetters("KeyMode", "ShortInteger", false, "History");
-                Code += GettersAndSetters("Width", "Integer", true, "History", true);
-                Code += GettersAndSetters("Height", "Integer", true, "History", true);
-                Code += SetResolutionFunction("History");
+                Code += GettersAndSetters("OffsetX", "Float", false, "History", false, true);
+                Code += GettersAndSetters("OffsetY", "Float", false, "History", false, true);
+                Code += GettersAndSetters("Zoom", "Float", false, "History", false, true);
+                Code += GettersAndSetters("SameWidth", "ShortInteger", false, "History", false, true);
+                Code += GettersAndSetters("StartKey", "Integer", false, "History", true, true);
+                Code += GettersAndSetters("EndKey", "Integer", false, "History", true, true);
+                Code += GettersAndSetters("KeyMode", "ShortInteger", false, "History", false, true);
+                Code += GettersAndSetters("Width", "Integer", true, "History", true, true);
+                Code += GettersAndSetters("Height", "Integer", true, "History", true, true);
+                Code += SetResolutionFunction();
                 Code += GettersAndSetters("Paused", "ShortInteger", false, "History");
                 Code += GettersAndSetters("Keyboard", "ShortInteger", false, "History");
-                Code += GettersAndSetters("VisualizePitchBends", "ShortInteger", false, "History");
+                Code += GettersAndSetters("VisualizePitchBends", "ShortInteger", false, "History", false, true);
                 Code += GettersAndSetters("PhigrosMode", "ShortInteger", false, "History");
                 Code += GettersAndSetters("ShowMarkers", "ShortInteger", false, "History");
                 Code += GettersAndSetters("TickBased", "ShortInteger", false, "History");
                 Code += GettersAndSetters("HideStatistics", "ShortInteger", false, "History");
+                Code += GettersAndSetters("RemoveOverlaps", "ShortInteger", false, "History");
                 Code += GettersAndSetters("LimitFPS", "ShortInteger", false, "History");
+                Code += GettersAndSetters("VelocityThreshold", "ShortInteger", false, "History");
                 Code += StringTypeGettersAndSetters("Caption", sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]), false, "History");
                 Code += StringTypeGettersAndSetters("DifficultyText", sizeof(Difficulty) / sizeof(Difficulty[0]), false, "History");
                 Code += EasingFunctions();
@@ -2255,7 +2255,9 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += "SetShowMarkers(1)\n";
                 Code += "SetTickBased(1)\n";
                 Code += "SetHideStatistics(0)\n";
+                Code += "SetRemoveOverlaps(0)\n";
                 Code += "SetLimitFPS(1)\n";
+                Code += "SetVelocityThreshold(0)\n";
                 Code += "SetCaption(\"Welcome to Piano-FX Pro\")\n";
                 Code += "-- If you feel the default difficulty is inappropriate, change it with the following code: \n";
                 Code += "SetDifficultyText(\"IN Lv.12\")\n";
@@ -2457,7 +2459,6 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
     // In addition to getting settings, triggers loading of saved config
     Config& config = Config::GetConfig();
     ViewSettings& cView = config.GetViewSettings();
-    PlaybackSettings& cPlayback = config.GetPlaybackSettings();
 
     // Create the application window
     g_hWnd = CreateWindowEx(0, CLASSNAME, MainWindowTitle1 L" v" LVersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, cView.GetMainLeft(), cView.GetMainTop(), cView.GetMainWidth(), cView.GetMainHeight(), NULL, NULL, wc.hInstance, NULL);

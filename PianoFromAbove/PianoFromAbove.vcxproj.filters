@@ -91,6 +91,9 @@
     <Filter Include="Source Files\Piano-FX Studio\Tutorials">
       <UniqueIdentifier>{7facbf6c-e561-4c89-ba21-667e99dfa124}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\ModdingRelated">
+      <UniqueIdentifier>{fbf827eb-31a6-4d4b-a72b-c601b6ddc8bb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Config.h">
@@ -510,6 +513,9 @@
     <ClInclude Include="imgui\imguiCompressedFont2GDI.h">
       <Filter>Header Files\imgui</Filter>
     </ClInclude>
+    <ClInclude Include="ModdingAPI.h">
+      <Filter>Source Files\ModdingRelated</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PianoFromAbove.rc">
@@ -599,6 +605,9 @@
       <Filter>Source Files\Piano-FX Studio\Tutorials</Filter>
     </ClCompile>
     <ClCompile Include="TextWidthCalculator.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VMChecker.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
   </ItemGroup>

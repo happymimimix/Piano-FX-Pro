@@ -335,6 +335,22 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
         if (FAILED(res))
             return std::make_tuple(res, "CreateRootSignature (same width note)");
 
+        ComPtr<ID3DBlob> noteOR_serialized;
+        res = D3D12SerializeRootSignature(&root_sig_desc, D3D_ROOT_SIGNATURE_VERSION_1, &noteOR_serialized, nullptr);
+        if (FAILED(res))
+            return std::make_tuple(res, "D3D12SerializeRootSignature (note OR)");
+        res = m_pDevice->CreateRootSignature(0, noteOR_serialized->GetBufferPointer(), noteOR_serialized->GetBufferSize(), IID_PPV_ARGS(&m_pNoteRootSignatureOR));
+        if (FAILED(res))
+            return std::make_tuple(res, "CreateRootSignature (note OR)");
+
+        ComPtr<ID3DBlob> same_width_noteOR_serialized;
+        res = D3D12SerializeRootSignature(&root_sig_desc, D3D_ROOT_SIGNATURE_VERSION_1, &same_width_noteOR_serialized, nullptr);
+        if (FAILED(res))
+            return std::make_tuple(res, "D3D12SerializeRootSignature (same width note OR)");
+        res = m_pDevice->CreateRootSignature(0, same_width_noteOR_serialized->GetBufferPointer(), same_width_noteOR_serialized->GetBufferSize(), IID_PPV_ARGS(&m_pNoteSameWidthRootSignatureOR));
+        if (FAILED(res))
+            return std::make_tuple(res, "CreateRootSignature (same width note OR)");
+
         // Create note pipeline
         auto note_pipeline_desc = rect_pipeline_desc;
         note_pipeline_desc.pRootSignature = m_pNoteRootSignature.Get();
@@ -370,6 +386,38 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
         res = m_pDevice->CreateGraphicsPipelineState(&same_width_note_pipeline_desc, IID_PPV_ARGS(&m_pNoteSameWidthPipelineState));
         if (FAILED(res))
             return std::make_tuple(res, "CreateGraphicsPipelineState (same width note)");
+        
+        auto noteOR_pipeline_desc = rect_pipeline_desc;
+        noteOR_pipeline_desc.pRootSignature = m_pNoteRootSignatureOR.Get();
+        noteOR_pipeline_desc.VS = {
+            .pShaderBytecode = g_pNoteVertexShader,
+            .BytecodeLength = sizeof(g_pNoteVertexShader),
+        };
+        noteOR_pipeline_desc.PS = {
+            .pShaderBytecode = g_pNotePixelShader,
+            .BytecodeLength = sizeof(g_pNotePixelShader),
+        };
+        noteOR_pipeline_desc.DepthStencilState = {
+            .DepthEnable = TRUE,
+            .DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL,
+            .DepthFunc = D3D12_COMPARISON_FUNC_LESS,
+        };
+        noteOR_pipeline_desc.InputLayout = {
+            .NumElements = 0,
+        };
+        res = m_pDevice->CreateGraphicsPipelineState(&noteOR_pipeline_desc, IID_PPV_ARGS(&m_pNotePipelineStateOR));
+        if (FAILED(res))
+            return std::make_tuple(res, "CreateGraphicsPipelineState (note OR)");
+
+        auto same_width_noteOR_pipeline_desc = noteOR_pipeline_desc;
+        same_width_noteOR_pipeline_desc.pRootSignature = m_pNoteSameWidthRootSignatureOR.Get();
+        same_width_noteOR_pipeline_desc.VS = {
+            .pShaderBytecode = g_pNoteVertexShaderSameWidth,
+            .BytecodeLength = sizeof(g_pNoteVertexShaderSameWidth),
+        };
+        res = m_pDevice->CreateGraphicsPipelineState(&same_width_noteOR_pipeline_desc, IID_PPV_ARGS(&m_pNoteSameWidthPipelineStateOR));
+        if (FAILED(res))
+            return std::make_tuple(res, "CreateGraphicsPipelineState (same width note OR)");
 
         // Create background root signature
         D3D12_DESCRIPTOR_RANGE descriptor_ranges[] = {
@@ -943,7 +991,7 @@ HRESULT D3D12Renderer::ClearAndBeginScene(DWORD color) {
     CD3DX12_CPU_DESCRIPTOR_HANDLE rtv(m_pRTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), m_uFrameIndex, m_uRTVDescriptorSize);
     CD3DX12_CPU_DESCRIPTOR_HANDLE dsv(m_pDSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
     float float_color[4] = { (float)((color >> 16) & 0xFF) / 255.0f, (float)((color >> 8) & 0xFF) / 255.0f, (float)(color & 0xFF) / 255.0f, 1.0f };
-    if (!Config::GetConfig().GetVideoSettings().bSameWidth) {
+    if (!Config::GetConfig().GetVideoSettings().bSameWidth || Config::GetConfig().GetVideoSettings().bOR) {
         m_pCommandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
     }
     m_pCommandList->ClearRenderTargetView(rtv, float_color, 0, nullptr);
@@ -990,10 +1038,20 @@ HRESULT D3D12Renderer::EndScene(bool draw_bg) {
         for (size_t i = 0; i < m_vNotesIntermediate.size(); i += RectsPerPass) {
             if (i == 0) {
                 if (Config::GetConfig().GetVideoSettings().bSameWidth) {
-                    SetPipeline(Pipeline::SameWidthNote);
+                    if (Config::GetConfig().GetVideoSettings().bOR) {
+                        SetPipeline(Pipeline::SameWidthNoteOR);
+                    }
+                    else {
+                        SetPipeline(Pipeline::SameWidthNote);
+                    }
                 }
                 else {
-                    SetPipeline(Pipeline::Note);
+                    if (Config::GetConfig().GetVideoSettings().bOR) {
+                        SetPipeline(Pipeline::NoteOR);
+                    }
+                    else {
+                        SetPipeline(Pipeline::Note);
+                    }
                 }
             }
 
@@ -1035,10 +1093,20 @@ HRESULT D3D12Renderer::EndScene(bool draw_bg) {
 
                 // Set up the state again
                 if (Config::GetConfig().GetVideoSettings().bSameWidth) {
-                    SetPipeline(Pipeline::SameWidthNote);
+                    if (Config::GetConfig().GetVideoSettings().bOR) {
+                        SetPipeline(Pipeline::SameWidthNoteOR);
+                    }
+                    else {
+                        SetPipeline(Pipeline::SameWidthNote);
+                    }
                 }
                 else {
-                    SetPipeline(Pipeline::Note);
+                    if (Config::GetConfig().GetVideoSettings().bOR) {
+                        SetPipeline(Pipeline::NoteOR);
+                    }
+                    else {
+                        SetPipeline(Pipeline::Note);
+                    }
                 }
                 SetupCommandList();
             }
@@ -1288,6 +1356,26 @@ void D3D12Renderer::SetPipeline(Pipeline pipeline) {
     case Pipeline::SameWidthNote:
         m_pCommandList->SetPipelineState(m_pNoteSameWidthPipelineState.Get());
         m_pCommandList->SetGraphicsRootSignature(m_pNoteSameWidthRootSignature.Get());
+        m_pCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        m_pCommandList->IASetVertexBuffers(0, 0, nullptr);
+        m_pCommandList->IASetIndexBuffer(&m_IndexBufferView);
+        m_pCommandList->SetGraphicsRootShaderResourceView(1, m_pFixedBuffer->GetGPUVirtualAddress());
+        m_pCommandList->SetGraphicsRootShaderResourceView(2, m_pTrackColorBuffer->GetGPUVirtualAddress());
+        m_pCommandList->SetGraphicsRootShaderResourceView(3, m_pNoteBuffers[m_uFrameIndex]->GetGPUVirtualAddress());
+        break;
+    case Pipeline::NoteOR:
+        m_pCommandList->SetPipelineState(m_pNotePipelineStateOR.Get());
+        m_pCommandList->SetGraphicsRootSignature(m_pNoteRootSignatureOR.Get());
+        m_pCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        m_pCommandList->IASetVertexBuffers(0, 0, nullptr);
+        m_pCommandList->IASetIndexBuffer(&m_IndexBufferView);
+        m_pCommandList->SetGraphicsRootShaderResourceView(1, m_pFixedBuffer->GetGPUVirtualAddress());
+        m_pCommandList->SetGraphicsRootShaderResourceView(2, m_pTrackColorBuffer->GetGPUVirtualAddress());
+        m_pCommandList->SetGraphicsRootShaderResourceView(3, m_pNoteBuffers[m_uFrameIndex]->GetGPUVirtualAddress());
+        break;
+    case Pipeline::SameWidthNoteOR:
+        m_pCommandList->SetPipelineState(m_pNoteSameWidthPipelineStateOR.Get());
+        m_pCommandList->SetGraphicsRootSignature(m_pNoteSameWidthRootSignatureOR.Get());
         m_pCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         m_pCommandList->IASetVertexBuffers(0, 0, nullptr);
         m_pCommandList->IASetIndexBuffer(&m_IndexBufferView);

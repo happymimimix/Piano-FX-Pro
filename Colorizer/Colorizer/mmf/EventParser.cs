@@ -89,7 +89,6 @@ namespace MIDIModificationFramework
                 byte channel = (byte)(command & 0b00001111);
                 byte note = Read();
                 byte vel = Read();
-                if (vel == 0) return new NoteOffEvent(delta, channel, note);
                 return new NoteOnEvent(delta, channel, note, vel);
             }
             else if (comm == 0b10000000)

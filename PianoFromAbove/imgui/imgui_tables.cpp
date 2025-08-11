@@ -2482,7 +2482,7 @@ void ImGui::TableMergeDrawChannels(ImGuiTable* table)
             MergeGroup* merge_group = &merge_groups[merge_group_n];
             if (merge_group->ChannelsCount == 0)
                 continue;
-            char buf[32];
+            char buf[1<<5];
             ImFormatString(buf, 32, "MG%d:%d", merge_group_n, merge_group->ChannelsCount);
             ImVec2 text_pos = merge_group->ClipRect.Min + ImVec2(4, 4);
             ImVec2 text_size = CalcTextSize(buf, NULL);

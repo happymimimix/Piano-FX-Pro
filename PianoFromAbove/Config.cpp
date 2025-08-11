@@ -163,6 +163,7 @@ void VideoSettings::LoadDefaultValues()
     bDumpFrames = false;
     bDebug = false;
     bDisableUI = false;
+    bOR = false;
 }
 
 void ControlsSettings::LoadDefaultValues()
@@ -172,6 +173,7 @@ void ControlsSettings::LoadDefaultValues()
     bAlwaysShowControls = false;
     bPhigros = false;
     sSplashMIDI = L"";
+    iVelocityThreshold = 0;
 }
 
 void PlaybackSettings::LoadDefaultValues()
@@ -315,6 +317,8 @@ void VideoSettings::LoadConfigValues(TiXmlElement* txRoot)
         bDebug = (iAttrVal != 0);
     if (txVideo->QueryIntAttribute("DisableUI", &iAttrVal) == TIXML_SUCCESS)
         bDisableUI = (iAttrVal != 0);
+    if (txVideo->QueryIntAttribute("RemoveOverlaps", &iAttrVal) == TIXML_SUCCESS)
+        bOR = (iAttrVal != 0);
 }
 
 void ControlsSettings::LoadConfigValues( TiXmlElement *txRoot )
@@ -332,6 +336,8 @@ void ControlsSettings::LoadConfigValues( TiXmlElement *txRoot )
     string sTempStr;
     txControls->QueryStringAttribute("SplashMIDI", &sTempStr);
     sSplashMIDI = Util::StringToWstring(sTempStr);
+    if (txControls->QueryIntAttribute("VelocityThreshold", &iAttrVal) == TIXML_SUCCESS)
+        iVelocityThreshold = static_cast<uint8_t>(max(0, min(iAttrVal, 127)));
 }
 
 void PlaybackSettings::LoadConfigValues( TiXmlElement *txRoot )
@@ -437,6 +443,7 @@ bool VideoSettings::SaveConfigValues( TiXmlElement *txRoot )
     txVideo->SetAttribute( "Debug", bDebug );
     txVideo->SetAttribute("DumpFrames", bDumpFrames);
     txVideo->SetAttribute("DisableUI", bDisableUI);
+    txVideo->SetAttribute("RemoveOverlaps", bOR);
     return true;
 }
 
@@ -449,6 +456,7 @@ bool ControlsSettings::SaveConfigValues( TiXmlElement *txRoot )
     txControls->SetAttribute("AlwaysShowControls", bAlwaysShowControls);
     txControls->SetAttribute("PhigrosMode", bPhigros);
     txControls->SetAttribute("SplashMIDI", Util::WstringToString(sSplashMIDI));
+    txControls->SetAttribute("VelocityThreshold", iVelocityThreshold);
     return true;
 }
 

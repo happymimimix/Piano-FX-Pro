@@ -228,6 +228,7 @@ public:
 
     //Accessors
     ChannelEventType GetChannelEventType() const { return static_cast<ChannelEventType>(m_iEventCode >> 4); }
+    void SetChannelEventType(ChannelEventType type) {m_iEventCode = (m_iEventCode & 0x0F) | (static_cast<unsigned char>(type) << 4);}
     unsigned char GetChannel() const { return m_cChannel % (1<<4); }
     unsigned char GetParam1() const { return m_cParam1 % (1<<7); }
     unsigned char GetParam2() const { return m_cParam2 % (1<<7); }

@@ -28,6 +28,8 @@ enum class Pipeline : uint8_t {
     Rect,
     Note,
     SameWidthNote,
+    NoteOR,
+    SameWidthNoteOR,
     Background,
 };
 
@@ -156,6 +158,10 @@ private:
     ComPtr<ID3D12PipelineState> m_pNotePipelineState;
     ComPtr<ID3D12RootSignature> m_pNoteSameWidthRootSignature;
     ComPtr<ID3D12PipelineState> m_pNoteSameWidthPipelineState;
+    ComPtr<ID3D12RootSignature> m_pNoteRootSignatureOR;
+    ComPtr<ID3D12PipelineState> m_pNotePipelineStateOR;
+    ComPtr<ID3D12RootSignature> m_pNoteSameWidthRootSignatureOR;
+    ComPtr<ID3D12PipelineState> m_pNoteSameWidthPipelineStateOR;
     ComPtr<ID3D12RootSignature> m_pBackgroundRootSignature;
     ComPtr<ID3D12PipelineState> m_pBackgroundPipelineState;
     ComPtr<ID3D12GraphicsCommandList> m_pCommandList;

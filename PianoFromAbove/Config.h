@@ -21,7 +21,7 @@
 #include "MainProcs.h"
 
 #define APPNAME "Piano From Above"
-#define APPNAMENOSPACES "PFA"
+#define APPNAMENOSPACES "PianoFromAbove"
 #define CLASSNAME TEXT("PFX")
 #define GFXCLASSNAME TEXT("PFXGFX")
 #define POSNCLASSNAME TEXT("PFXPOSN")
@@ -80,6 +80,7 @@ struct VideoSettings : public ISettings
     bool bDumpFrames;
     bool bDebug;
     bool bDisableUI;
+    bool bOR;
 };
 
 struct ControlsSettings : public ISettings
@@ -91,6 +92,7 @@ struct ControlsSettings : public ISettings
     double dFwdBackSecs, dSpeedUpPct;
     bool bAlwaysShowControls;
     bool bPhigros;
+    uint8_t iVelocityThreshold;
     wstring sSplashMIDI;
 };
 
