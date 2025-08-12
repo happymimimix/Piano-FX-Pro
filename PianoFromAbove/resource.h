@@ -125,7 +125,8 @@
 #define IDC_NSPEED                      1203
 #define IDC_TOPREBAR                    1204
 #define IDC_POSNCTRL                    1205
-#define IDC_TOPTOOLBAR                  1206
+#define IDC_POSNDELAY					1206
+#define IDC_TOPTOOLBAR                  1207
 
 #define IDB_BITMAP1                     1301
 #define IDB_BITMAP2                     1302

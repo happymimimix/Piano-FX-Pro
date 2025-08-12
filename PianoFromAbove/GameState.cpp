@@ -88,9 +88,6 @@ GameState::GameError IntroScreen::Init() {
 }
 
 GameState::GameError IntroScreen::Logic() {
-    // Start new ImGui frame
-    m_pRenderer->ImGuiStartFrame();
-
     return Success;
 }
 
@@ -227,8 +224,6 @@ SplashScreen::SplashScreen(HWND hWnd, D3D12Renderer* pRenderer, bool enableSplas
                 iSize = decompressed_size;
             }
             m_MIDI.ParseMIDI(pData, iSize);
-            free(pData);
-            pData = NULL;
             delete[] pData;
         }
         vector< MIDIEvent* > vEvents;
@@ -876,7 +871,7 @@ void MainScreen::SetChannelSettings(const vector< bool >& vMuted, const vector< 
     }
 }
 
-GameState::GameError MainScreen::MsgProc(HWND, UINT msg, WPARAM wParam, LPARAM lParam) {
+GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     // Not thread safe, blah
     static Config& config = Config::GetConfig();
     static PlaybackSettings& cPlayback = config.GetPlaybackSettings();
@@ -953,7 +948,10 @@ GameState::GameError MainScreen::MsgProc(HWND, UINT msg, WPARAM wParam, LPARAM l
     {
         long long llFirstTime = GetMinTime();
         long long llLastTime = GetMaxTime();
-        JumpTo(llFirstTime + ((llLastTime - llFirstTime) * lParam) / 1000);
+        if (JumpTarget == ~0) {
+            JumpTarget = llFirstTime + ((llLastTime - llFirstTime) * lParam) / 1000;
+            SetTimer(g_hWnd, IDC_POSNDELAY, nxtdelay, NULL); //Async JumpTo process
+        }
         break;
     }
     case WM_LBUTTONDOWN:
@@ -1010,6 +1008,18 @@ GameState::GameError MainScreen::MsgProc(HWND, UINT msg, WPARAM wParam, LPARAM l
 
         m_ptLastPos.x = x;
         m_ptLastPos.y = y;
+        return Success;
+    }
+    case WM_TIMER:
+    {
+        if (wParam == IDC_POSNDELAY) {
+            KillTimer(g_hWnd, IDC_POSNDELAY);
+            UINT start = GetTickCount();
+            JumpTo(JumpTarget, false);
+            UINT end = GetTickCount();
+            JumpTarget = ~0;
+            nxtdelay = max(1<<2, min(end - start, 1<<10));
+        }
         return Success;
     }
     }
@@ -1109,14 +1119,12 @@ GameState::GameError MainScreen::Logic(void) {
         }
     }
 
-    /*
     if (abs(llOldStartTime - m_llPrevTime) > 1e+6 / (m_dFPS / 4)) { // Handle time jump from cheat engine
         JumpTo(m_llStartTime, true);
     }
     else {
         m_llPrevTime = m_llStartTime;
     }
-    */
 
     long long iEventCount = m_vEvents.size();
     RenderGlobals();
@@ -1179,15 +1187,14 @@ GameState::GameError MainScreen::Logic(void) {
                         if (pEvent->GetParam2() > (cControls.iVelocityThreshold % (1<<7))) m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), static_cast<unsigned char>(cPlayback.GetVolume() > 1.0 ? static_cast<double>(INT8_MAX) - (static_cast<double>(INT8_MAX) - static_cast<double>(pEvent->GetParam2())) * (2.0 - cPlayback.GetVolume()) : static_cast<double>(pEvent->GetParam2()) * cPlayback.GetVolume()));
                     }
                     else {
-                        pEvent->SetChannelEventType(MIDIChannelEvent::NoteOn);
-                        m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), 0x00);
+                        m_OutDevice.PlayEvent((pEvent->GetEventCode() & 0x0F) | (MIDIChannelEvent::NoteOn << 4), pEvent->GetParam1(), 0x00);
                     }
                 }
                 if ((pOrigEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn || pOrigEvent->GetChannelEventType() == MIDIChannelEvent::NoteOff) && pOrigEvent->HasSister())
                 {
                     m_vThreadWork[pOrigEvent->GetParam1()].push_back({
                         .idx = pOrigEvent->GetSisterIdx(),
-                        .sister_idx = (pOrigEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0) ? (unsigned)m_iStartPos : ~0,
+                        .sister_idx = (pOrigEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pOrigEvent->GetParam2() > 0) ? (unsigned)m_iStartPos : ~0,
                         });
                 }
                 m_iStartPos--;
@@ -1233,8 +1240,7 @@ GameState::GameError MainScreen::Logic(void) {
                         if (pEvent->GetParam2() > (cControls.iVelocityThreshold % (1<<7))) m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), static_cast<unsigned char>(cPlayback.GetVolume() > 1.0 ? static_cast<double>(INT8_MAX) - (static_cast<double>(INT8_MAX) - static_cast<double>(pEvent->GetParam2())) * (2.0 - cPlayback.GetVolume()) : static_cast<double>(pEvent->GetParam2()) * cPlayback.GetVolume()));
                     }
                     else {
-                        pEvent->SetChannelEventType(MIDIChannelEvent::NoteOn);
-                        m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), 0x00);
+                        m_OutDevice.PlayEvent((pEvent->GetEventCode() & 0x0F) | (MIDIChannelEvent::NoteOn << 4), pEvent->GetParam1(), 0x00);
                     }
                 }
                 if ((pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn || pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOff) && pEvent->HasSister())

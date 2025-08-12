@@ -93,6 +93,11 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
     switch (msg)
     {
+    case WM_TIMER:
+    {
+        if (wParam == IDC_POSNDELAY) HandOffMsg(msg, wParam, lParam);
+        return 0;
+    }
     case WM_WINDOWPOSCHANGING:
         // Allow the window to be larger than the screen. 
         return 0;
@@ -516,34 +521,18 @@ LRESULT WINAPI BarProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 HWND CreateRebar(HWND hWndOwner)
 {
     // Create the Rebar. Just houses the toolbar.
-    HWND hWndRebar = CreateWindowEx(WS_EX_CONTROLPARENT, REBARCLASSNAME, NULL, WS_CHILD | WS_DLGFRAME | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CCS_NODIVIDER | RBS_VARHEIGHT, 0, 0, 0, 0, hWndOwner, (HMENU)IDC_TOPREBAR, g_hInstance, NULL);
+    HWND hWndRebar = CreateWindowEx(WS_EX_CONTROLPARENT, REBARCLASSNAME, NULL, WS_CHILD | WS_DLGFRAME | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CCS_NODIVIDER | RBS_VARHEIGHT, NULL, NULL, NULL, NULL, hWndOwner, (HMENU)IDC_TOPREBAR, g_hInstance, NULL);
     if (!hWndRebar) return NULL;
 
     // Create the system font
     HDC hDC = GetDC(hWndOwner);
-    HFONT hFont = CreateFont(
-        12, //FontHeight
-        0, //FontWidth
-        0, //Escapement
-        0, //Orientation
-        0, //FontWeight
-        0, //Italic
-        0, //Underline
-        0, //StrikeOut
-        1, //CharSet
-        0, //OutPrecision
-        0, //ClipPrecision
-        0, //Quality
-        0, //PitchAndFamily
-        L"Tahoma" //FaceName
-    );
     ReleaseDC(hWndOwner, hDC);
 
     // Create and load the button icons
     HIMAGELIST hIml = ImageList_LoadImage(g_hInstance, MAKEINTRESOURCE(IDB_MEDIAICONSSMALL), 1 << 4, (1 << 4) + (1 << 2), RGB(255, 255, 0), IMAGE_BITMAP, LR_CREATEDIBSECTION);
 
     // Create the toolbar. Houses custom controls too. Don't want multiple rebar brands because you lose too much control
-    HWND hWndToolbar = CreateWindowEx(WS_EX_CONTROLPARENT, TOOLBARCLASSNAME, NULL, WS_CHILD | WS_TABSTOP | CCS_NODIVIDER | CCS_NOPARENTALIGN | CCS_NORESIZE | TBSTYLE_FLAT | TBSTYLE_LIST | TBSTYLE_TOOLTIPS, 0, 0, 0, 0, hWndRebar, (HMENU)IDC_TOPTOOLBAR, g_hInstance, NULL);
+    HWND hWndToolbar = CreateWindowEx(WS_EX_CONTROLPARENT, TOOLBARCLASSNAME, NULL, WS_CHILD | WS_TABSTOP | CCS_NODIVIDER | CCS_NOPARENTALIGN | CCS_NORESIZE | TBSTYLE_FLAT | TBSTYLE_LIST | TBSTYLE_TOOLTIPS, NULL, NULL, NULL, NULL, hWndRebar, (HMENU)IDC_TOPTOOLBAR, g_hInstance, NULL);
     if (hWndToolbar == NULL)
         return NULL;
 
@@ -551,7 +540,7 @@ HWND CreateRebar(HWND hWndOwner)
 #define hWndSpeedPlaceholder 998
 #define hWndNSpeedPlaceholder 997
 
-    TBBUTTON tbButtons[1 << 4] =
+    TBBUTTON tbButtons[1<<4] =
     {
         { MAKELONG(0, 0), ID_PLAY_PLAY, TBSTATE_ENABLED, BTNS_BUTTON, {0}, 0, (INT_PTR)TEXT("Play") },
         { MAKELONG(1, 0), ID_PLAY_PAUSE, TBSTATE_ENABLED, BTNS_BUTTON, {0}, 0, (INT_PTR)TEXT("Pause") },
@@ -603,11 +592,6 @@ HWND CreateRebar(HWND hWndOwner)
     SendMessage(hWndNSpeed, TBM_SETLINESIZE, 0, 10);
 
     HWND hWndPosn = CreateWindowEx(0, POSNCLASSNAME, NULL, WS_CHILD | WS_VISIBLE, 0, 0, 0, 0, hWndRebar, (HMENU)IDC_POSNCTRL, g_hInstance, NULL);
-
-    // Set the font to the dialog font
-    SendMessage(hWndVolume, WM_SETFONT, (WPARAM)hFont, FALSE);
-    SendMessage(hWndSpeed, WM_SETFONT, (WPARAM)hFont, FALSE);
-    SendMessage(hWndNSpeed, WM_SETFONT, (WPARAM)hFont, FALSE);
 
     REBARBANDINFO rbbi;
     rbbi.cbSize = sizeof(REBARBANDINFO);

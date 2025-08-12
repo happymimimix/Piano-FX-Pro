@@ -39,7 +39,9 @@ inline long long MinimalTime;
 inline long long TotalTime;
 inline string TotalTimeFormatted;
 inline char Difficulty[1 << 10] = {};
-inline bool UpdateNotePos;
+inline bool UpdateNotePos = true;
+inline long long JumpTarget = ~0;
+inline UINT nxtdelay = 1<<6;
 
 //Abstract base class
 class GameState

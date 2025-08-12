@@ -2461,7 +2461,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
     ViewSettings& cView = config.GetViewSettings();
 
     // Create the application window
-    g_hWnd = CreateWindowEx(0, CLASSNAME, MainWindowTitle1 L" v" LVersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, cView.GetMainLeft(), cView.GetMainTop(), cView.GetMainWidth(), cView.GetMainHeight(), NULL, NULL, wc.hInstance, NULL);
+    g_hWnd = CreateWindowEx(NULL, CLASSNAME, MainWindowTitle1 L" v" LVersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, cView.GetMainLeft(), cView.GetMainTop(), cView.GetMainWidth(), cView.GetMainHeight(), NULL, NULL, wc.hInstance, NULL);
 
     if (!g_hWnd) return 1;
 
@@ -2475,7 +2475,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
     if (!g_hWndBar) return 1;
 
     // Create the graphics window
-    g_hWndGfx = CreateWindowEx(0, GFXCLASSNAME, NULL, WS_CHILD | WS_TABSTOP | WS_CLIPSIBLINGS, 0, 0, 0, 0, g_hWnd, NULL, wc.hInstance, NULL);
+    g_hWndGfx = CreateWindowEx(NULL, GFXCLASSNAME, NULL, WS_CHILD | WS_TABSTOP | WS_CLIPSIBLINGS, NULL, NULL, NULL, NULL, g_hWnd, NULL, wc.hInstance, NULL);
     if (!g_hWndGfx) return 1;
 
     HACCEL hAccel = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDA_MAINMENU));
