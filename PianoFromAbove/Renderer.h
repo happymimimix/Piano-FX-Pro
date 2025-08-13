@@ -124,7 +124,7 @@ private:
     bool UploadBackgroundBitmap();
 
     static constexpr unsigned FrameCount = 1<<1;
-    static constexpr unsigned RectsPerPass = 1<<(1<<4)<<4;
+    static constexpr unsigned RectsPerPass = 1<<(1<<4);
     static constexpr unsigned IndexBufferCount = RectsPerPass<<2|RectsPerPass<<1;
     static constexpr unsigned GenericUploadSize = sizeof(FixedSizeConstants) + MaxTrackColors * 16 * sizeof(TrackColor);
 

@@ -215,7 +215,6 @@ private:
     // Logic
     void UpdateState(int key, const thread_work_t& work);
     void UpdateStateBackwards(int key, const thread_work_t& work);
-    void UpdateStateReversed(int iPos, bool clear);
     void JumpTo(long long llStartTime, boolean loadingMode = false);
     void ApplyMarker(unsigned char* data, size_t size);
     void ApplyColor(MIDIMetaEvent* event);
@@ -282,7 +281,6 @@ private:
     long long m_llTimeSpan;  // Times of the start and end events of the current window
     long long m_llPrevTime;
     vector<int> m_vState[128];  // The notes that are on at time m_llStartTime.
-    vector<int> m_vStateReversed[128];  // The notes that are on at m_iEndPos.
     vector<thread_work_t> m_vThreadWork[128];
     int m_pNoteState[128]; // The last note that was turned on
     double m_dSpeed; // Speed multiplier

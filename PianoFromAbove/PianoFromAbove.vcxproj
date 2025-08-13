@@ -274,6 +274,7 @@
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -370,6 +371,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -466,6 +468,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -562,6 +565,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -658,6 +662,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -754,6 +759,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -850,6 +856,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -944,6 +951,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -1038,6 +1046,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -1080,15 +1089,15 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>Disabled</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;DEBUG;_WINDOWS;TIXML_USE_STL;DBG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/clang:-Ofast /clang:-msse4.2 %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <GuardSignedReturns>false</GuardSignedReturns>
@@ -1104,12 +1113,13 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
+      <OmitFramePointers>false</OmitFramePointers>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>false</EnableCOMDATFolding>
+      <OptimizeReferences>false</OptimizeReferences>
       <AdditionalDependencies>lzma.lib;winhttp.lib;freetype-x64.lib;libpng16-x64.lib;zlib-x64.lib;brotlicommon-x64.lib;brotlidec-x64.lib;bz2-x64.lib;dxguid.lib;dxgi.lib;d3d12.lib;Psapi.lib;Shlwapi.lib;Dwmapi.lib;Comctl32.lib;WinMM.lib;UxTheme.lib;Advapi32.lib;Msimg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <Version>
       </Version>

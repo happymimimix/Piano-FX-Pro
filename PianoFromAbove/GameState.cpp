@@ -380,10 +380,17 @@ GameState::GameError SplashScreen::Logic() {
     while (m_iStartPos < iEventCount && m_vEvents[m_iStartPos]->GetAbsMicroSec() <= m_llStartTime)
     {
         MIDIChannelEvent* pEvent = m_vEvents[m_iStartPos];
-        if (pEvent->GetChannelEventType() != MIDIChannelEvent::NoteOn)
+        if (pEvent->GetChannelEventType() != MIDIChannelEvent::NoteOn && pEvent->GetChannelEventType() != MIDIChannelEvent::NoteOff) {
             m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), pEvent->GetParam2());
-        else if (!m_bMute && !m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bMuted)
-            m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), static_cast<unsigned char>(cPlayback.GetVolume() > 1.0 ? static_cast<double>(INT8_MAX) - (static_cast<double>(INT8_MAX) - static_cast<double>(pEvent->GetParam2())) * (2.0 - cPlayback.GetVolume()) : static_cast<double>(pEvent->GetParam2()) * cPlayback.GetVolume()));
+        }
+        else if (!m_bMute && !m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bMuted) {
+            if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0) {
+                m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), static_cast<unsigned char>(m_dVolume > 1.0 ? static_cast<double>(INT8_MAX) - (static_cast<double>(INT8_MAX) - static_cast<double>(pEvent->GetParam2())) * (2.0 - m_dVolume) : static_cast<double>(pEvent->GetParam2()) * m_dVolume));
+            }
+            else {
+                m_OutDevice.PlayEvent((pEvent->GetEventCode() & 0x0F) | (MIDIChannelEvent::NoteOn << 4), pEvent->GetParam1(), 0x00);
+            }
+        }
         UpdateState(m_iStartPos);
         m_iStartPos++;
     }
@@ -416,7 +423,7 @@ int sse_bin_search(const std::vector<int>& data, int key) {
                 v = _mm_cmpeq_epi32(v, keys);
                 const uint16_t mask = _mm_movemask_epi8(v);
                 if (mask) {
-                    return b - 4 + __builtin_ctz(mask) / 4;
+                    return b - 4 + _tzcnt_u32(mask) / 4;
                 }
             }
         }
@@ -428,7 +435,7 @@ int sse_bin_search(const std::vector<int>& data, int key) {
                 v = _mm_cmpeq_epi32(v, keys);
                 const uint16_t mask = _mm_movemask_epi8(v);
                 if (mask) {
-                    return a + __builtin_ctz(mask) / 4;
+                    return a + _tzcnt_u32(mask) / 4;
                 }
             }
         }
@@ -655,8 +662,6 @@ MainScreen::MainScreen(wstring sMIDIFile, State eGameMode, HWND hWnd, D3D12Rende
     // Allocate
     m_vTrackSettings.resize(m_MIDI.GetInfo().iNumTracks);
     for (auto note_state : m_vState)
-        note_state.reserve(m_MIDI.GetInfo().iNumTracks * 16);
-    for (auto note_state : m_vStateReversed)
         note_state.reserve(m_MIDI.GetInfo().iNumTracks * 16);
 
     m_MIDI.PostProcess(m_vEvents, &m_vProgramChange, &m_vMetaEvents, &m_vNoteOns, &m_vTempo, &m_vSignature, &m_vMarkers, &m_vColors);
@@ -948,10 +953,9 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
     {
         long long llFirstTime = GetMinTime();
         long long llLastTime = GetMaxTime();
-        if (JumpTarget == ~0) {
-            JumpTarget = llFirstTime + ((llLastTime - llFirstTime) * lParam) / 1000;
-            SetTimer(g_hWnd, IDC_POSNDELAY, nxtdelay, NULL); //Async JumpTo process
-        }
+        bool StartTimer = (JumpTarget == ~0);
+        JumpTarget = llFirstTime + ((llLastTime - llFirstTime) * lParam) / 1000;
+        if (StartTimer) SetTimer(g_hWnd, IDC_POSNDELAY, nxtdelay, NULL); //Async JumpTo process
         break;
     }
     case WM_LBUTTONDOWN:
@@ -1014,11 +1018,13 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
     {
         if (wParam == IDC_POSNDELAY) {
             KillTimer(g_hWnd, IDC_POSNDELAY);
-            UINT start = GetTickCount();
-            JumpTo(JumpTarget, false);
-            UINT end = GetTickCount();
-            JumpTarget = ~0;
-            nxtdelay = max(1<<2, min(end - start, 1<<10));
+            if (JumpTarget != ~0) {
+                UINT start = GetTickCount();
+                JumpTo(JumpTarget, false);
+                JumpTarget = ~0;
+                UINT end = GetTickCount() + (1<<2);
+                nxtdelay = max(1 << 2, min(end - start, 1 << 10));
+            }
         }
         return Success;
     }
@@ -1049,6 +1055,7 @@ GameState::GameError MainScreen::Logic(void) {
     long long llTimeSpan = static_cast<long long>(3.0 * abs(dNSpeed) * 1000000);
     bool bPausedChanged = (bPaused != m_bPaused);
     bool bMuteChanged = (bMute != m_bMute);
+    uint8_t velthrshld = cControls.iVelocityThreshold % (1 << 7);
 
     // Set the state
     m_bTickMode = cVideo.bTickBased;
@@ -1087,7 +1094,7 @@ GameState::GameError MainScreen::Logic(void) {
     // Compute FPS every half a second
     m_llFPSTime += llRealElapsed;
     m_iFPSCount++;
-    if (m_llFPSTime >= 500000)
+    if (m_llFPSTime >= 100000)
     {
         m_dFPS = m_iFPSCount / (m_llFPSTime / 1000000.0);
         m_llFPSTime = m_iFPSCount = 0;
@@ -1166,35 +1173,47 @@ GameState::GameError MainScreen::Logic(void) {
                     pEvent = pEvent->GetSister(m_vEvents);
                 }
                 MIDIChannelEvent* pChannelEvent = reinterpret_cast<MIDIChannelEvent*>(pEvent);
+                unsigned char key = pEvent->GetParam1();
+                unsigned char vel = pEvent->GetParam2();
+                unsigned char keyog = pOrigEvent->GetParam1();
+                unsigned char velog = pOrigEvent->GetParam2();
 
                 if (pEvent->GetChannelEventType() != MIDIChannelEvent::NoteOn && pEvent->GetChannelEventType() != MIDIChannelEvent::NoteOff) {
                     if (pEvent->GetChannelEventType() == MIDIChannelEvent::ProgramChange && config.m_bPianoOverride) {
                         pEvent->SetParam1(0);
                     }
                     if (pEvent->GetChannelEventType() == MIDIChannelEvent::PitchBend) {
-                        m_pBendsValue[pEvent->GetChannel()] = ((pEvent->GetParam2() << 7) | pEvent->GetParam1()) - (1 << 13);
+                        m_pBendsValue[pEvent->GetChannel()] = ((vel << 7) | key) - (1 << 13);
+                        float NoteWidth = (m_pRenderer->GetBufferWidth() * abs(m_fZoomX) * abs(m_fTempZoomX)) / (m_iEndNote - m_iStartNote);
+                        float ShiftAmount = m_pBendsRange[pEvent->GetChannel()] == 0 ? 0 : m_pBendsValue[pEvent->GetChannel()] / ((1 << 13) / m_pBendsRange[pEvent->GetChannel()]);
+                        if (m_bFlipKeyboard) ShiftAmount *= -1;
+                        m_pBends[pEvent->GetChannel()] = NoteWidth * ShiftAmount;
                     }
                     if (pChannelEvent->GetChannelEventType() == MIDIChannelEvent::Controller) {
-                        if (pEvent->GetParam1() == 100) { Next_is_PBS[pEvent->GetChannel()] = (pEvent->GetParam2() == 0); }//[101] RPN LSB | 0:Pitch Bend Sensitivity
-                        if (pEvent->GetParam1() == 6 && Next_is_PBS[pEvent->GetChannel()]) {
-                            m_pBendsRange[pEvent->GetChannel()] = pEvent->GetParam2();
+                        if (key == 100) { Next_is_PBS[pEvent->GetChannel()] = (vel == 0); }//[101] RPN LSB | 0:Pitch Bend Sensitivity
+                        if (key == 6 && Next_is_PBS[pEvent->GetChannel()]) {
+                            m_pBendsRange[pEvent->GetChannel()] = vel;
+                            float NoteWidth = (m_pRenderer->GetBufferWidth() * abs(m_fZoomX) * abs(m_fTempZoomX)) / (m_iEndNote - m_iStartNote);
+                            float ShiftAmount = m_pBendsRange[pEvent->GetChannel()] == 0 ? 0 : m_pBendsValue[pEvent->GetChannel()] / ((1 << 13) / m_pBendsRange[pEvent->GetChannel()]);
+                            if (m_bFlipKeyboard) ShiftAmount *= -1;
+                            m_pBends[pEvent->GetChannel()] = NoteWidth * ShiftAmount;
                         }
                     }
-                    m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), pEvent->GetParam2());
+                    m_OutDevice.PlayEvent(pEvent->GetEventCode(), key, vel);
                 }
                 else if (!m_bMute && !m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bMuted) {
-                    if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0) {
-                        if (pEvent->GetParam2() > (cControls.iVelocityThreshold % (1<<7))) m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), static_cast<unsigned char>(cPlayback.GetVolume() > 1.0 ? static_cast<double>(INT8_MAX) - (static_cast<double>(INT8_MAX) - static_cast<double>(pEvent->GetParam2())) * (2.0 - cPlayback.GetVolume()) : static_cast<double>(pEvent->GetParam2()) * cPlayback.GetVolume()));
+                    if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && vel > 0) {
+                        if (vel > velthrshld) m_OutDevice.PlayEvent(pEvent->GetEventCode(), key, static_cast<unsigned char>(m_dVolume > 1.0 ? static_cast<double>(INT8_MAX) - (static_cast<double>(INT8_MAX) - static_cast<double>(vel)) * (2.0 - m_dVolume) : static_cast<double>(vel) * m_dVolume));
                     }
                     else {
-                        m_OutDevice.PlayEvent((pEvent->GetEventCode() & 0x0F) | (MIDIChannelEvent::NoteOn << 4), pEvent->GetParam1(), 0x00);
+                        m_OutDevice.PlayEvent((pEvent->GetEventCode() & 0x0F) | (MIDIChannelEvent::NoteOn << 4), key, 0x00);
                     }
                 }
                 if ((pOrigEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn || pOrigEvent->GetChannelEventType() == MIDIChannelEvent::NoteOff) && pOrigEvent->HasSister())
                 {
-                    m_vThreadWork[pOrigEvent->GetParam1()].push_back({
+                    m_vThreadWork[keyog].push_back({
                         .idx = pOrigEvent->GetSisterIdx(),
-                        .sister_idx = (pOrigEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pOrigEvent->GetParam2() > 0) ? (unsigned)m_iStartPos : ~0,
+                        .sister_idx = (pOrigEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && velog > 0) ? (unsigned)m_iStartPos : ~0,
                         });
                 }
                 m_iStartPos--;
@@ -1211,43 +1230,45 @@ GameState::GameError MainScreen::Logic(void) {
             {
                 MIDIChannelEvent* pEvent = m_vEvents[m_iStartPos];
                 MIDIChannelEvent* pChannelEvent = reinterpret_cast<MIDIChannelEvent*>(pEvent);
+                unsigned char key = pEvent->GetParam1();
+                unsigned char vel = pEvent->GetParam2();
 
                 if (pEvent->GetChannelEventType() != MIDIChannelEvent::NoteOn && pEvent->GetChannelEventType() != MIDIChannelEvent::NoteOff) {
                     if (pEvent->GetChannelEventType() == MIDIChannelEvent::ProgramChange && config.m_bPianoOverride) {
                         pEvent->SetParam1(0);
                     }
                     if (pEvent->GetChannelEventType() == MIDIChannelEvent::PitchBend) {
-                        m_pBendsValue[pEvent->GetChannel()] = ((pEvent->GetParam2() << 7) | pEvent->GetParam1()) - (1 << 13);
+                        m_pBendsValue[pEvent->GetChannel()] = ((vel << 7) | key) - (1 << 13);
                         float NoteWidth = (m_pRenderer->GetBufferWidth() * abs(m_fZoomX) * abs(m_fTempZoomX)) / (m_iEndNote - m_iStartNote);
                         float ShiftAmount = m_pBendsRange[pEvent->GetChannel()] == 0 ? 0 : m_pBendsValue[pEvent->GetChannel()] / ((1 << 13) / m_pBendsRange[pEvent->GetChannel()]);
                         if (m_bFlipKeyboard) ShiftAmount *= -1;
                         m_pBends[pEvent->GetChannel()] = NoteWidth * ShiftAmount;
                     }
                     if (pChannelEvent->GetChannelEventType() == MIDIChannelEvent::Controller) {
-                        if (pEvent->GetParam1() == 100) { Next_is_PBS[pEvent->GetChannel()] = (pEvent->GetParam2() == 0); }//[101] RPN LSB | 0:Pitch Bend Sensitivity
-                        if (pEvent->GetParam1() == 6 && Next_is_PBS[pEvent->GetChannel()]) {
-                            m_pBendsRange[pEvent->GetChannel()] = pEvent->GetParam2();
+                        if (key == 100) { Next_is_PBS[pEvent->GetChannel()] = (vel == 0); }//[101] RPN LSB | 0:Pitch Bend Sensitivity
+                        if (key == 6 && Next_is_PBS[pEvent->GetChannel()]) {
+                            m_pBendsRange[pEvent->GetChannel()] = vel;
                             float NoteWidth = (m_pRenderer->GetBufferWidth() * abs(m_fZoomX) * abs(m_fTempZoomX)) / (m_iEndNote - m_iStartNote);
                             float ShiftAmount = m_pBendsRange[pEvent->GetChannel()] == 0 ? 0 : m_pBendsValue[pEvent->GetChannel()] / ((1 << 13) / m_pBendsRange[pEvent->GetChannel()]);
                             if (m_bFlipKeyboard) ShiftAmount *= -1;
                             m_pBends[pEvent->GetChannel()] = NoteWidth * ShiftAmount;
                         }
                     }
-                    m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), pEvent->GetParam2());
+                    m_OutDevice.PlayEvent(pEvent->GetEventCode(), key, vel);
                 }
                 else if (!m_bMute && !m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bMuted) {
-                    if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0) {
-                        if (pEvent->GetParam2() > (cControls.iVelocityThreshold % (1<<7))) m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), static_cast<unsigned char>(cPlayback.GetVolume() > 1.0 ? static_cast<double>(INT8_MAX) - (static_cast<double>(INT8_MAX) - static_cast<double>(pEvent->GetParam2())) * (2.0 - cPlayback.GetVolume()) : static_cast<double>(pEvent->GetParam2()) * cPlayback.GetVolume()));
+                    if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && vel > 0) {
+                        if (vel > velthrshld) m_OutDevice.PlayEvent(pEvent->GetEventCode(), key, static_cast<unsigned char>(m_dVolume > 1.0 ? static_cast<double>(INT8_MAX) - (static_cast<double>(INT8_MAX) - static_cast<double>(vel)) * (2.0 - m_dVolume) : static_cast<double>(vel) * m_dVolume));
                     }
                     else {
-                        m_OutDevice.PlayEvent((pEvent->GetEventCode() & 0x0F) | (MIDIChannelEvent::NoteOn << 4), pEvent->GetParam1(), 0x00);
+                        m_OutDevice.PlayEvent((pEvent->GetEventCode() & 0x0F) | (MIDIChannelEvent::NoteOn << 4), key, 0x00);
                     }
                 }
                 if ((pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn || pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOff) && pEvent->HasSister())
                 {
-                    m_vThreadWork[pEvent->GetParam1()].push_back({
+                    m_vThreadWork[key].push_back({
                         .idx = (unsigned)m_iStartPos,
-                        .sister_idx = (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0) ? ~0 : pEvent->GetSisterIdx(),
+                        .sister_idx = (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && vel > 0) ? ~0 : pEvent->GetSisterIdx(),
                         });
                 }
                 m_iStartPos++;
@@ -1381,29 +1402,6 @@ void MainScreen::UpdateStateBackwards(int key, const thread_work_t& work) {
     }
 }
 
-void MainScreen::UpdateStateReversed(int iPos, bool clear) {
-    // Event data
-    MIDIChannelEvent* pEvent = m_vEvents[iPos];
-    if (!pEvent->HasSister()) return;
-
-    MIDIChannelEvent::ChannelEventType eEventType = pEvent->GetChannelEventType();
-    int iNote = pEvent->GetParam1();
-
-    int iSisterIdx = pEvent->GetSisterIdx();
-    auto& note_state = m_vStateReversed[iNote];
-
-    // Turn note on
-    if (eEventType == MIDIChannelEvent::NoteOn)
-        note_state.push_back(iPos);
-    else
-    {
-        // binary search
-        auto pos = sse_bin_search(note_state, iSisterIdx);
-        if (pos != -1)
-            note_state.erase(note_state.begin() + pos);
-    }
-}
-
 void MainScreen::JumpTo(long long llStartTime, boolean loadingMode) {
     // Kill the music!
     if (!loadingMode) m_OutDevice.AllNotesOff();
@@ -1458,7 +1456,8 @@ void MainScreen::JumpTo(long long llStartTime, boolean loadingMode) {
     for (auto& note_state : m_vState)
         note_state.clear();
     memset(m_pNoteState, -1, sizeof(m_pNoteState));
-    if (itMiddle != itBegin)
+
+    if (itMiddle != itBegin)//SLOWEST SECTION!!! 
     {
         // Need to scan down to the last note on event
         auto itPrev = itMiddle - 1;
@@ -2025,50 +2024,52 @@ void MainScreen::RenderNotes() {
     m_pRenderer->SplitRect();
 
     if (Config::GetConfig().GetVideoSettings().bOR) {
-        for (int i = iEndPos; i >= iStartPos; i--) {
-            MIDIChannelEvent* pEvent = m_vEvents[i];
-            if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn &&
-                pEvent->GetParam2() > 0 && pEvent->HasSister() &&
-                m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
-                RenderNote(pEvent);
-            }
-        }
         if (m_dNSpeed < 0) {
-            for (int i = m_iStartNote; i <= m_iEndNote; i++) {
-                for (vector< int >::reverse_iterator it = (m_vStateReversed[i]).rbegin(); it != (m_vStateReversed[i]).rend(); it++) {
-                    RenderNote(m_vEvents[*it]);
+            for (int i = iStartPos; i <= iEndPos; i++) {
+                MIDIChannelEvent* pEvent = m_vEvents[i];
+                if ((pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOff || (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() == 0)) && pEvent->HasSister() &&
+                    m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
+                    RenderNote(pEvent->GetSister(m_vEvents));
                 }
             }
         }
         else {
-            for (int i = m_iStartNote; i <= m_iEndNote; i++) {
-                for (vector< int >::reverse_iterator it = (m_vState[i]).rbegin(); it != (m_vState[i]).rend(); it++) {
-                    RenderNote(m_vEvents[*it]);
+            for (int i = iEndPos; i >= iStartPos; i--) {
+                MIDIChannelEvent* pEvent = m_vEvents[i];
+                if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0 && pEvent->HasSister() &&
+                    m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
+                    RenderNote(pEvent);
                 }
+            }
+        }
+        for (int i = m_iStartNote; i <= m_iEndNote; i++) {
+            for (vector< int >::reverse_iterator it = (m_vState[i]).rbegin(); it != (m_vState[i]).rend(); it++) {
+                RenderNote(m_vEvents[*it]);
             }
         }
     }
     else {
+        for (int i = m_iStartNote; i <= m_iEndNote; i++) {
+            for (vector< int >::iterator it = (m_vState[i]).begin(); it != (m_vState[i]).end(); it++) {
+                RenderNote(m_vEvents[*it]);
+            }
+        }
         if (m_dNSpeed < 0) {
-            for (int i = m_iStartNote; i <= m_iEndNote; i++) {
-                for (vector< int >::iterator it = (m_vStateReversed[i]).begin(); it != (m_vStateReversed[i]).end(); it++) {
-                    RenderNote(m_vEvents[*it]);
+            for (int i = iEndPos; i >= iStartPos; i--) {
+                MIDIChannelEvent* pEvent = m_vEvents[i];
+                if ((pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOff || (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() == 0)) && pEvent->HasSister() &&
+                    m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
+                    RenderNote(pEvent->GetSister(m_vEvents));
                 }
             }
         }
         else {
-            for (int i = m_iStartNote; i <= m_iEndNote; i++) {
-                for (vector< int >::iterator it = (m_vState[i]).begin(); it != (m_vState[i]).end(); it++) {
-                    RenderNote(m_vEvents[*it]);
+            for (int i = iStartPos; i <= iEndPos; i++) {
+                MIDIChannelEvent* pEvent = m_vEvents[i];
+                if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0 && pEvent->HasSister() &&
+                    m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
+                    RenderNote(pEvent);
                 }
-            }
-        }
-        for (int i = iStartPos; i <= iEndPos; i++) {
-            MIDIChannelEvent* pEvent = m_vEvents[i];
-            if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn &&
-                pEvent->GetParam2() > 0 && pEvent->HasSister() &&
-                m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
-                RenderNote(pEvent);
             }
         }
     }
