@@ -8,6 +8,7 @@
 //
 // Dialog
 //
+#pragma code_page(65001)
 
 IDD_PP1_VISUAL DIALOGEX 0,0,PropertyWindowW,PropertyWindowH
 STYLE DialogStyle
@@ -668,6 +669,7 @@ END
 //
 // Menu
 //
+#pragma code_page(65001)
 
 IDM_MAINMENU MENU
 BEGIN

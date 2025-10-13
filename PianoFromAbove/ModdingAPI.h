@@ -66,6 +66,9 @@ struct cppsrc_t {
         this->Document->Content.erase(this->Index, this->Length);
         this->Length = 0;
     }
+    void Close() {
+        this->Document->Save();
+    }
 };
 
 cppsrc_t LeftStrip(cppsrc_t Source, const wstring& pattern) {
@@ -136,4 +139,13 @@ cppsrc_t RegExprSearch(cppsrc_t Source, const wstring& pattern, long long index)
     result.Parent = make_shared<cppsrc_t>(Source);
 
     return result;
+}
+
+cppsrc_t OpenCppFile(wstring Path) {
+    srcfile_t SourceFile = {};
+    SourceFile.FilePath = Path;
+    SourceFile.Load();
+    cppsrc_t RootPointer = {};
+    RootPointer.Document = make_shared<srcfile_t>(SourceFile);
+    RootPointer.Length = SourceFile.Content.length();
 }
