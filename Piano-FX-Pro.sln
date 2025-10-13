@@ -11,6 +11,7 @@ Global
 		Chinese|x64 = Chinese|x64
 		Debug|x64 = Debug|x64
 		DoubleArinoglish|x64 = DoubleArinoglish|x64
+		DPRK|x64 = DPRK|x64
 		EnforceSoftwareRender|x64 = EnforceSoftwareRender|x64
 		Japanese|x64 = Japanese|x64
 		Korean|x64 = Korean|x64
@@ -27,6 +28,8 @@ Global
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Debug|x64.Build.0 = Debug|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.DoubleArinoglish|x64.ActiveCfg = DoubleArinoglish|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.DoubleArinoglish|x64.Build.0 = DoubleArinoglish|x64
+		{DD4C822F-844F-40BF-8113-129B04EDE199}.DPRK|x64.ActiveCfg = DPRK|x64
+		{DD4C822F-844F-40BF-8113-129B04EDE199}.DPRK|x64.Build.0 = DPRK|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.EnforceSoftwareRender|x64.ActiveCfg = EnforceSoftwareRender|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.EnforceSoftwareRender|x64.Build.0 = EnforceSoftwareRender|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Japanese|x64.ActiveCfg = Japanese|x64

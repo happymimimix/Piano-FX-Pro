@@ -13,6 +13,10 @@
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="DPRK|x64">
+      <Configuration>DPRK</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="EnforceSoftwareRender|x64">
       <Configuration>EnforceSoftwareRender</Configuration>
       <Platform>x64</Platform>
@@ -74,6 +78,14 @@
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Korean|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>ClangCL</PlatformToolset>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -144,6 +156,9 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Korean|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Russian|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -194,6 +209,14 @@
     <OutDir>$(SolutionDir)\Release\</OutDir>
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro-KOR</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)lzma\lib;$(ProjectDir)freetype\lib;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)\Release\</OutDir>
+    <IntDir>Release\</IntDir>
+    <TargetName>Piano-FX-Pro-KOP</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -543,6 +566,103 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;INCLUDE_FFMPEG;KOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalOptions>/clang:-Ofast /clang:-msse4.2 %(AdditionalOptions)</AdditionalOptions>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <GuardSignedReturns>false</GuardSignedReturns>
+      <OpenMPSupport>false</OpenMPSupport>
+      <WarningLevel>Level4</WarningLevel>
+      <CallingConvention>FastCall</CallingConvention>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>
+      </PrecompiledHeaderOutputFile>
+      <DiagnosticsFormat>Caret</DiagnosticsFormat>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <ShowIncludes>true</ShowIncludes>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>lzma.lib;winhttp.lib;freetype-x64.lib;libpng16-x64.lib;zlib-x64.lib;brotlicommon-x64.lib;brotlidec-x64.lib;bz2-x64.lib;dxguid.lib;dxgi.lib;d3d12.lib;Psapi.lib;Shlwapi.lib;Dwmapi.lib;Comctl32.lib;WinMM.lib;UxTheme.lib;Advapi32.lib;Msimg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <Version>
+      </Version>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>false</DataExecutionPrevention>
+      <AdditionalManifestDependencies>"type='Win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'";%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>cd /d "$(ProjectDir)"
+del .\PianoFromAbove.vcxproj.user /f /q
+del ..\Release /f /s /q
+rmdir ..\Release /s /q
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
+vmchk.exe
+IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
+:IncludeMods
+rem ToDo
+goto BuildContinue
+:NoMods
+powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. This compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
+:BuildContinue
+del .\vmchk.exe /f /q
+del .\vmchk.obj /f /q
+msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
+msbuild ..\Colorizer\Colorizer.sln -t:Clean -p:Configuration=Release /p:Platform=x64
+msbuild ..\PFXGDI\PFXGDI.sln -t:Clean -p:Configuration=Release /p:Platform=x86
+del .\Colorizer.exe /f /q
+del .\Colorizer.exe.h /f /q
+del .\PFXGDI.exe /f /q
+del .\PFXGDI.exe.h /f /q
+del .\Widths.h /f /q
+msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
+msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
+xxd -i Colorizer.exe &gt; Colorizer.exe.h
+xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\Language.h ^|.\tmp.exe ^&gt;.\Widths.h
+del .\tmp.exe /f /q
+del .\tmp.obj /f /q
+</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>cd /d "$(ProjectDir)"
+copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
+msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
+del .\PianoFromAbove.vcxproj.user /f /q
+del ..\.vs /f /s /q
+rmdir ..\.vs /s /q
+del .\Release /f /s /q
+rmdir .\Release /s /q
+del ..\Release /f /s /q
+rmdir ..\Release /s /q
+mkdir ..\Release
+move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
+</Command>
+    </PostBuildEvent>
+    <ResourceCompile>
+      <ShowProgress>true</ShowProgress>
+      <PreprocessorDefinitions>KOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;INCLUDE_FFMPEG;KOP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/clang:-Ofast /clang:-msse4.2 %(AdditionalOptions)</AdditionalOptions>
@@ -1160,6 +1280,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -1168,6 +1289,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
     <ClCompile Include="VMChecker.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">true</ExcludedFromBuild>
@@ -1206,6 +1328,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -1305,6 +1428,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
     <ClInclude Include="ModdingAPI.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">true</ExcludedFromBuild>
@@ -1395,6 +1519,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">Pixel</ShaderType>
@@ -1405,6 +1530,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">5.1</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">5.1</ShaderModel>
@@ -1415,6 +1541,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">g_pBackgroundPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">g_pBackgroundPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">g_pBackgroundPixelShader</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">g_pBackgroundPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">g_pBackgroundPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">g_pBackgroundPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">g_pBackgroundPixelShader</VariableName>
@@ -1425,6 +1552,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
@@ -1438,6 +1566,8 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">
+      </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">
       </ObjectFileOutput>
@@ -1457,6 +1587,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">Vertex</ShaderType>
@@ -1467,6 +1598,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">5.1</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">5.1</ShaderModel>
@@ -1477,6 +1609,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
@@ -1490,6 +1623,8 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">
+      </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">
       </ObjectFileOutput>
@@ -1507,6 +1642,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">g_pBackgroundVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">g_pBackgroundVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">g_pBackgroundVertexShader</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">g_pBackgroundVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">g_pBackgroundVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">g_pBackgroundVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">g_pBackgroundVertexShader</VariableName>
@@ -1533,6 +1669,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
@@ -1543,6 +1680,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">5.1</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">5.1</ShaderModel>
@@ -1553,6 +1691,8 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">
+      </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">
       </ObjectFileOutput>
@@ -1565,6 +1705,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">Vertex</ShaderType>
@@ -1572,6 +1713,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">g_pNoteVertexShaderSameWidth</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">g_pNoteVertexShaderSameWidth</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">g_pNoteVertexShaderSameWidth</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">g_pNoteVertexShaderSameWidth</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">g_pNoteVertexShaderSameWidth</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">g_pNoteVertexShaderSameWidth</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">g_pNoteVertexShaderSameWidth</VariableName>
@@ -1581,6 +1723,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">Pixel</ShaderType>
@@ -1591,6 +1734,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
@@ -1604,6 +1748,8 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">
+      </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">
       </ObjectFileOutput>
@@ -1621,6 +1767,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">g_pNotePixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">g_pNotePixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">g_pNotePixelShader</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">g_pNotePixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">g_pNotePixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">g_pNotePixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">g_pNotePixelShader</VariableName>
@@ -1631,6 +1778,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">5.1</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">5.1</ShaderModel>
@@ -1643,6 +1791,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">Vertex</ShaderType>
@@ -1653,6 +1802,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">g_pNoteVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">g_pNoteVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">g_pNoteVertexShader</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">g_pNoteVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">g_pNoteVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">g_pNoteVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">g_pNoteVertexShader</VariableName>
@@ -1666,6 +1816,8 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">
+      </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">
       </ObjectFileOutput>
@@ -1683,6 +1835,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
@@ -1693,6 +1846,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">5.1</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">5.1</ShaderModel>
@@ -1705,6 +1859,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">Pixel</ShaderType>
@@ -1715,6 +1870,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">g_pRectPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">g_pRectPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">g_pRectPixelShader</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">g_pRectPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">g_pRectPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">g_pRectPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">g_pRectPixelShader</VariableName>
@@ -1725,6 +1881,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
@@ -1739,6 +1896,8 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">
       </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">
+      </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">
@@ -1755,6 +1914,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">5.1</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">5.1</ShaderModel>
@@ -1767,6 +1927,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">Vertex</ShaderType>
@@ -1777,6 +1938,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">g_pRectVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">g_pRectVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">g_pRectVertexShader</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">g_pRectVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">g_pRectVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">g_pRectVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">g_pRectVertexShader</VariableName>
@@ -1787,6 +1949,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
@@ -1801,6 +1964,8 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">
       </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">
+      </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">
@@ -1817,6 +1982,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">5.1</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">5.1</ShaderModel>
