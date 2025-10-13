@@ -1458,7 +1458,7 @@ char* D3D12Renderer::Screenshot() {
     // Copy the staging buffer to system memory
     D3D12_RANGE staging_range = {
         .Begin = 0,
-        .End = m_ullScreenshotPitch * m_iBufferHeight,
+        .End = static_cast<size_t>(m_ullScreenshotPitch * m_iBufferHeight),
     };
     char* staging = nullptr;
     if (FAILED(m_pScreenshotStaging->Map(0, &staging_range, (void**)&staging)))

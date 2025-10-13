@@ -108,7 +108,7 @@ void CreateOverlayWindow() {
 }
 
 // Main function
-int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int nCmdShow) {
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLine, int nShowCmd) {
     CreateOverlayWindow();
     MSG msg;
     while (GetMessage(&msg, NULL, 0, 0)) {

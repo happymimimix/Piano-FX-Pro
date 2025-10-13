@@ -52,7 +52,7 @@
 #define StatisticsText32W 81 //Text: "ERROR: Score overflow! "
 #define ZoomMoveMsgW 619 //Text: "- Left-click and drag to move the screen\n- Right-click and drag to zoom horizontally\n- Click 'View -> Move And Zoom' again to apply changes\n- Click 'View -> Reset Move And Zoom' to revert changes"
 #define PropertyWindowTitleW 39 //Text: L"Preferences"
-#define Property1TitleW 18 //Text: "Visual"
+#define Property1TitleW 18 //Text: L"Visual"
 #define Property1Text1W 51 //Text: "Keys to display:"
 #define Property1Text2W 57 //Text: "Show all 128 keys"
 #define Property1Text3W 51 //Text: "Show song keys"

@@ -27,7 +27,7 @@
 static WNDPROC g_pPrevBarProc; // Have to override the toolbar proc to make controls transparent
 
 VOID SizeWindows(int iMainWidth, int iMainHeight);
-INT_PTR SetResolutionProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM) {
+INT_PTR CALLBACK SetResolutionProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM) {
     switch (msg) {
     case WM_INITDIALOG: {
         RECT rect = {};
@@ -861,7 +861,7 @@ VOID MoveThumbPosition(int iPositionNew, int& iPosition, HWND hWnd, RECT* rcChan
     }
 }
 
-INT_PTR WINAPI AboutProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM)
+INT_PTR CALLBACK AboutProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM)
 {
     switch (msg)
     {
@@ -1061,7 +1061,7 @@ VOID SetPlayPauseStop(BOOL bPlay, BOOL bPause, BOOL bStop)
     SendMessage(hWndToolbar, TB_PRESSBUTTON, ID_PLAY_STOP, bStop);
 }
 
-INT_PTR LoadingProc(HWND hwnd, UINT msg, WPARAM, LPARAM) {
+INT_PTR CALLBACK LoadingProc(HWND hwnd, UINT msg, WPARAM, LPARAM) {
     switch (msg) {
     case WM_INITDIALOG: {
         SetWindowTextW(hwnd, (LoadingText L" " + g_LoadingProgress.name).c_str());

@@ -53,7 +53,7 @@
 #define StatisticsText32 "ERROR: Score overflow! "
 #define ZoomMoveMsg "- Left-click and drag to move the screen\n- Right-click and drag to zoom horizontally\n- Click 'View -> Move And Zoom' again to apply changes\n- Click 'View -> Reset Move And Zoom' to revert changes"
 #define PropertyWindowTitle L"Preferences"
-#define Property1Title "Visual"
+#define Property1Title L"Visual"
 #define Property1Text1 "Keys to display:"
 #define Property1Text2 "Show all 128 keys"
 #define Property1Text3 "Show song keys"
