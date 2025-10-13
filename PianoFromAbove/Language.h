@@ -1,4 +1,4 @@
-﻿#define AboutText1 L"Piano-FX Pro v4.2 | Forked from Piano From Above v1.1.0\n\nContributors list: \nHappy_mimimix(25 %) <-Funny special effects && Final optimization\nanon64(5 %) <-Color events support\nKhangaroo(30 %) <-Performance boost\nBrianPantano(40 %) <-Main program"
+﻿#define AboutText1 "Piano-FX Pro v4.2 | Forked from Piano From Above v1.1.0\n\nContributors list: \nHappy_mimimix(25 %) <-Funny special effects && Final optimization\nanon64(5 %) <-Color events support\nKhangaroo(30 %) <-Performance boost\nBrianPantano(40 %) <-Main program"
 #ifdef ENG
 #define MainWindowTitle1 L"Piano-FX Pro"
 #define MainWindowTitle2 L"Developed by: happy_mimimix"
