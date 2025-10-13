@@ -316,11 +316,20 @@
 del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
+xcopy "$(ProjectDir)" "$(ProjectDir)..\Backup" /c /e /v /r /y /k /i /g /h /o /b
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
 vmchk.exe
 IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 :IncludeMods
-rem ToDo
+cd /d "$(ProjectDir)Mods\"
+for %%i in (*.cpp) do (
+@echo.Injecting: %%i
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
+.\tmp.exe
+del .\tmp.exe /f /q
+del .\tmp.obj /f /q
+)
+cd /d "$(ProjectDir)"
 goto BuildContinue
 :NoMods
 powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. This compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
@@ -358,6 +367,10 @@ del ..\Release /f /s /q
 rmdir ..\Release /s /q
 mkdir ..\Release
 move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
+del "$(ProjectDir)" /f /s /q
+rmdir "$(ProjectDir)" /s /q
+mkdir "$(ProjectDir)"
+xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
 </Command>
     </PostBuildEvent>
     <ResourceCompile>
@@ -413,11 +426,20 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
 del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
+xcopy "$(ProjectDir)" "$(ProjectDir)..\Backup" /c /e /v /r /y /k /i /g /h /o /b
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
 vmchk.exe
 IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 :IncludeMods
-rem ToDo
+cd /d "$(ProjectDir)Mods\"
+for %%i in (*.cpp) do (
+@echo.Injecting: %%i
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
+.\tmp.exe
+del .\tmp.exe /f /q
+del .\tmp.obj /f /q
+)
+cd /d "$(ProjectDir)"
 goto BuildContinue
 :NoMods
 powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. This compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
@@ -455,6 +477,10 @@ del ..\Release /f /s /q
 rmdir ..\Release /s /q
 mkdir ..\Release
 move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
+del "$(ProjectDir)" /f /s /q
+rmdir "$(ProjectDir)" /s /q
+mkdir "$(ProjectDir)"
+xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
 </Command>
     </PostBuildEvent>
     <ResourceCompile>
@@ -510,11 +536,20 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
 del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
+xcopy "$(ProjectDir)" "$(ProjectDir)..\Backup" /c /e /v /r /y /k /i /g /h /o /b
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
 vmchk.exe
 IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 :IncludeMods
-rem ToDo
+cd /d "$(ProjectDir)Mods\"
+for %%i in (*.cpp) do (
+@echo.Injecting: %%i
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
+.\tmp.exe
+del .\tmp.exe /f /q
+del .\tmp.obj /f /q
+)
+cd /d "$(ProjectDir)"
 goto BuildContinue
 :NoMods
 powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. This compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
@@ -552,6 +587,10 @@ del ..\Release /f /s /q
 rmdir ..\Release /s /q
 mkdir ..\Release
 move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
+del "$(ProjectDir)" /f /s /q
+rmdir "$(ProjectDir)" /s /q
+mkdir "$(ProjectDir)"
+xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
 </Command>
     </PostBuildEvent>
     <ResourceCompile>
@@ -607,11 +646,20 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
 del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
+xcopy "$(ProjectDir)" "$(ProjectDir)..\Backup" /c /e /v /r /y /k /i /g /h /o /b
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
 vmchk.exe
 IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 :IncludeMods
-rem ToDo
+cd /d "$(ProjectDir)Mods\"
+for %%i in (*.cpp) do (
+@echo.Injecting: %%i
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
+.\tmp.exe
+del .\tmp.exe /f /q
+del .\tmp.obj /f /q
+)
+cd /d "$(ProjectDir)"
 goto BuildContinue
 :NoMods
 powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. This compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
@@ -649,6 +697,10 @@ del ..\Release /f /s /q
 rmdir ..\Release /s /q
 mkdir ..\Release
 move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
+del "$(ProjectDir)" /f /s /q
+rmdir "$(ProjectDir)" /s /q
+mkdir "$(ProjectDir)"
+xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
 </Command>
     </PostBuildEvent>
     <ResourceCompile>
@@ -704,11 +756,20 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
 del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
+xcopy "$(ProjectDir)" "$(ProjectDir)..\Backup" /c /e /v /r /y /k /i /g /h /o /b
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
 vmchk.exe
 IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 :IncludeMods
-rem ToDo
+cd /d "$(ProjectDir)Mods\"
+for %%i in (*.cpp) do (
+@echo.Injecting: %%i
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
+.\tmp.exe
+del .\tmp.exe /f /q
+del .\tmp.obj /f /q
+)
+cd /d "$(ProjectDir)"
 goto BuildContinue
 :NoMods
 powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. This compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
@@ -746,6 +807,10 @@ del ..\Release /f /s /q
 rmdir ..\Release /s /q
 mkdir ..\Release
 move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
+del "$(ProjectDir)" /f /s /q
+rmdir "$(ProjectDir)" /s /q
+mkdir "$(ProjectDir)"
+xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
 </Command>
     </PostBuildEvent>
     <ResourceCompile>
@@ -801,11 +866,20 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
 del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
+xcopy "$(ProjectDir)" "$(ProjectDir)..\Backup" /c /e /v /r /y /k /i /g /h /o /b
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
 vmchk.exe
 IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 :IncludeMods
-rem ToDo
+cd /d "$(ProjectDir)Mods\"
+for %%i in (*.cpp) do (
+@echo.Injecting: %%i
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
+.\tmp.exe
+del .\tmp.exe /f /q
+del .\tmp.obj /f /q
+)
+cd /d "$(ProjectDir)"
 goto BuildContinue
 :NoMods
 powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. This compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
@@ -843,6 +917,10 @@ del ..\Release /f /s /q
 rmdir ..\Release /s /q
 mkdir ..\Release
 move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
+del "$(ProjectDir)" /f /s /q
+rmdir "$(ProjectDir)" /s /q
+mkdir "$(ProjectDir)"
+xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
 </Command>
     </PostBuildEvent>
     <ResourceCompile>
@@ -898,11 +976,20 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
 del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
+xcopy "$(ProjectDir)" "$(ProjectDir)..\Backup" /c /e /v /r /y /k /i /g /h /o /b
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
 vmchk.exe
 IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 :IncludeMods
-rem ToDo
+cd /d "$(ProjectDir)Mods\"
+for %%i in (*.cpp) do (
+@echo.Injecting: %%i
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
+.\tmp.exe
+del .\tmp.exe /f /q
+del .\tmp.obj /f /q
+)
+cd /d "$(ProjectDir)"
 goto BuildContinue
 :NoMods
 powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. This compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
@@ -940,6 +1027,10 @@ del ..\Release /f /s /q
 rmdir ..\Release /s /q
 mkdir ..\Release
 move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
+del "$(ProjectDir)" /f /s /q
+rmdir "$(ProjectDir)" /s /q
+mkdir "$(ProjectDir)"
+xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
 </Command>
     </PostBuildEvent>
     <ResourceCompile>
@@ -995,11 +1086,20 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
 del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
+xcopy "$(ProjectDir)" "$(ProjectDir)..\Backup" /c /e /v /r /y /k /i /g /h /o /b
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
 vmchk.exe
 IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 :IncludeMods
-rem ToDo
+cd /d "$(ProjectDir)Mods\"
+for %%i in (*.cpp) do (
+@echo.Injecting: %%i
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
+.\tmp.exe
+del .\tmp.exe /f /q
+del .\tmp.obj /f /q
+)
+cd /d "$(ProjectDir)"
 goto BuildContinue
 :NoMods
 powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. This compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
@@ -1037,6 +1137,10 @@ del ..\Release /f /s /q
 rmdir ..\Release /s /q
 mkdir ..\Release
 move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
+del "$(ProjectDir)" /f /s /q
+rmdir "$(ProjectDir)" /s /q
+mkdir "$(ProjectDir)"
+xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
 </Command>
     </PostBuildEvent>
     <ResourceCompile>
@@ -1090,11 +1194,20 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
 del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
+xcopy "$(ProjectDir)" "$(ProjectDir)..\Backup" /c /e /v /r /y /k /i /g /h /o /b
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
 vmchk.exe
 IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 :IncludeMods
-rem ToDo
+cd /d "$(ProjectDir)Mods\"
+for %%i in (*.cpp) do (
+@echo.Injecting: %%i
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
+.\tmp.exe
+del .\tmp.exe /f /q
+del .\tmp.obj /f /q
+)
+cd /d "$(ProjectDir)"
 goto BuildContinue
 :NoMods
 powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. This compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
@@ -1132,6 +1245,10 @@ del ..\Release /f /s /q
 rmdir ..\Release /s /q
 mkdir ..\Release
 move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
+del "$(ProjectDir)" /f /s /q
+rmdir "$(ProjectDir)" /s /q
+mkdir "$(ProjectDir)"
+xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
 </Command>
     </PostBuildEvent>
     <ResourceCompile>
@@ -1182,11 +1299,20 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+xcopy "$(ProjectDir)" "$(ProjectDir)..\Backup" /c /e /v /r /y /k /i /g /h /o /b
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
 vmchk.exe
 IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 :IncludeMods
-rem ToDo
+cd /d "$(ProjectDir)Mods\"
+for %%i in (*.cpp) do (
+@echo.Injecting: %%i
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
+.\tmp.exe
+del .\tmp.exe /f /q
+del .\tmp.obj /f /q
+)
+cd /d "$(ProjectDir)"
 goto BuildContinue
 :NoMods
 powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. This compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
@@ -1196,8 +1322,11 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
 </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>del "$(ProjectDir)" /f /s /q
+rmdir "$(ProjectDir)" /s /q
+mkdir "$(ProjectDir)"
+xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
+</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <ShowProgress>true</ShowProgress>
@@ -1249,11 +1378,20 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+xcopy "$(ProjectDir)" "$(ProjectDir)..\Backup" /c /e /v /r /y /k /i /g /h /o /b
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
 vmchk.exe
 IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 :IncludeMods
-rem ToDo
+cd /d "$(ProjectDir)Mods\"
+for %%i in (*.cpp) do (
+@echo.Injecting: %%i
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
+.\tmp.exe
+del .\tmp.exe /f /q
+del .\tmp.obj /f /q
+)
+cd /d "$(ProjectDir)"
 goto BuildContinue
 :NoMods
 powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. This compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
@@ -1263,8 +1401,11 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
 </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>del "$(ProjectDir)" /f /s /q
+rmdir "$(ProjectDir)" /s /q
+mkdir "$(ProjectDir)"
+xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
+</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <ShowProgress>true</ShowProgress>
