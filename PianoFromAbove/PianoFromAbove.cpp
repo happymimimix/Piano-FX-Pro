@@ -2257,7 +2257,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += "SetHideStatistics(0)\n";
                 Code += "SetRemoveOverlaps(0)\n";
                 Code += "SetLimitFPS(1)\n";
-                Code += "SetVelocityThreshold(0)\n";
+                Code += "SetVelocityThreshold(1)\n";
                 Code += "SetCaption(\"Welcome to Piano-FX Pro\")\n";
                 Code += "-- If you feel the default difficulty is inappropriate, change it with the following code: \n";
                 Code += "SetDifficultyText(\"IN Lv.12\")\n";

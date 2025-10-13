@@ -294,6 +294,13 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         std::vector<wchar_t> filename;
         filename.resize(DragQueryFile(drop, 0, NULL, 0) + 1);
         DragQueryFile(drop, 0, filename.data(), filename.size());
+        if (cPlayback.GetPlayMode()) { //Close the current file first before opening another one! 
+            cPlayback.SetPlayMode(GameState::Intro, true);
+            cPlayback.SetPlayable(false, true);
+            cPlayback.SetPosition(0);
+            SetWindowText(g_hWnd, MainWindowTitle1 L" v" LVersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7);
+            HandOffMsg(WM_COMMAND, ID_CHANGESTATE, (LPARAM)new IntroScreen(NULL, NULL));
+        }
         PlayFile(filename.data());
         return 0;
     }
@@ -1080,6 +1087,9 @@ INT_PTR LoadingProc(HWND hwnd, UINT msg, WPARAM, LPARAM) {
             break;
         case MIDILoadingProgress::Stage::SortEvents:
             desc = LoadingStage5;
+            break;
+        case MIDILoadingProgress::Stage::NCTable:
+            desc = LoadingStage6;
             break;
         case MIDILoadingProgress::Stage::Done:
             EndDialog(hwnd, 0);

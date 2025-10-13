@@ -13,6 +13,7 @@
 #include <ppl.h>
 #include <dwmapi.h>
 #include <d3d9types.h>
+#include <numeric>
 
 #include "Globals.h"
 #include "GameState.h"
@@ -237,6 +238,7 @@ SplashScreen::SplashScreen(HWND hWnd, D3D12Renderer* pRenderer, bool enableSplas
             m_vState[i].reserve(128);
     }
     InitState();
+    UpdateNotePos = true;
 }
 
 void SplashScreen::InitNotes(const vector< MIDIEvent* >& vEvents) {
@@ -257,7 +259,6 @@ void SplashScreen::InitState() {
     m_iEndPos = -1;
     m_llStartTime = m_MIDI.GetInfo().llFirstNote - 1000000;
     m_bMute = cPlayback.GetMute();
-    UpdateNotePos = true;
 
     SetChannelSettings(vector< bool >(), vector< bool >(),
         vector< unsigned >(cVisual.colors, cVisual.colors + sizeof(cVisual.colors) / sizeof(cVisual.colors[0])));
@@ -275,6 +276,7 @@ void SplashScreen::InitState() {
 }
 
 GameState::GameError SplashScreen::Init() {
+    UpdateNotePos = true;
     return Success;
 }
 
@@ -664,11 +666,40 @@ MainScreen::MainScreen(wstring sMIDIFile, State eGameMode, HWND hWnd, D3D12Rende
     for (auto note_state : m_vState)
         note_state.reserve(m_MIDI.GetInfo().iNumTracks * 16);
 
-    m_MIDI.PostProcess(m_vEvents, &m_vProgramChange, &m_vMetaEvents, &m_vNoteOns, &m_vTempo, &m_vSignature, &m_vMarkers, &m_vColors);
+    m_MIDI.PostProcess(m_vEvents, &m_vMetaEvents, &m_vTempo, &m_vSignature, &m_vMarkers, &m_vColors);
+
+    g_LoadingProgress.stage = MIDILoadingProgress::Stage::NCTable;
+    g_LoadingProgress.progress = 0;
+    g_LoadingProgress.max = m_vEvents.size();
+    if (m_vNCTable) {
+        delete[] m_vNCTable;
+        m_vNCTable = nullptr;
+    }
+    long long iMaxMS = m_MIDI.GetInfo().llTotalMicroSecs / MS;
+    m_vNCTable = new long[iMaxMS + static_cast<signed long long>(1LL)]();
+    int iNC = 0;
+    long long iLastMS = -1;
+    for (auto pEvent : m_vEvents) {
+        if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0) {
+            iNC++;
+            if (m_vNCTable) {
+                long long iThisMS = pEvent->GetAbsMicroSec() / MS;
+                if (iLastMS >= 0 && iThisMS > iLastMS) {
+                    fill(m_vNCTable + iLastMS + 1LL, m_vNCTable + iThisMS, m_vNCTable[min(max(iLastMS, 0LL), iMaxMS)]);
+                }
+                m_vNCTable[min(max(iThisMS, 0LL), iMaxMS)] = iNC;
+                iLastMS = iThisMS;
+            }
+        }
+        g_LoadingProgress.progress++;
+    }
+    fill(m_vNCTable + iLastMS + 1LL, m_vNCTable + iMaxMS + 1LL, m_vNCTable[iLastMS]);
+
 
     // Initialize
     InitColors();
     InitState();
+    UpdateNotePos = true;
 
     g_LoadingProgress.stage = MIDILoadingProgress::Stage::Done;
 }
@@ -715,11 +746,10 @@ void MainScreen::InitState() {
     m_llTimeSpan = static_cast<long long>(3.0 * abs(m_dNSpeed) * 1000000);
     IsLastFrameReversed = m_dSpeed < 0;
     IsReversedStateInitialized = false;
-    UpdateNotePos = true;
 
     resolution = m_MIDI.GetInfo().iDivision;
     TotalTime = m_MIDI.GetInfo().llTotalMicroSecs + 250000;
-    TotalNC = (m_MIDI.GetInfo().iNoteCount);
+    TotalNC = m_MIDI.GetInfo().iNoteCount;
     if (TotalNC < 100000) { strcpy(Difficulty, "EZ Lv.1"); }
     else if (TotalNC < 200000) { strcpy(Difficulty, "EZ Lv.2"); }
     else if (TotalNC < 400000) { strcpy(Difficulty, "EZ Lv.3"); }
@@ -739,9 +769,6 @@ void MainScreen::InitState() {
     else if (TotalNC < 200000000) { strcpy(Difficulty, "AT Lv.17"); }
     else if (TotalNC < 400000000) { strcpy(Difficulty, "AT Lv.18"); }
     else { strcpy(Difficulty, "SP Lv.?"); }
-
-    // m_Timer will be initialized *later*
-    m_RealTimer.Init(false);
 
     m_bDumpFrames = cVideo.bDumpFrames;
     if (m_bDumpFrames) {
@@ -765,6 +792,7 @@ void MainScreen::InitState() {
 
 // Called immediately before changing to this state
 GameState::GameError MainScreen::Init() {
+    UpdateNotePos = true;
     static Config& config = Config::GetConfig();
     static const AudioSettings& cAudio = config.GetAudioSettings();
     if (cAudio.bKDMAPI) {
@@ -1087,12 +1115,10 @@ GameState::GameError MainScreen::Logic(void) {
     long long llMaxTime = GetMaxTime();
     long long llMinTime = GetMinTime();
     long long llElapsed = m_Timer.GetMicroSecs();
-    long long llRealElapsed = m_RealTimer.GetMicroSecs();
     m_Timer.Start();
-    m_RealTimer.Start();
 
-    // Compute FPS every half a second
-    m_llFPSTime += llRealElapsed;
+    // Compute FPS
+    m_llFPSTime += llElapsed;
     m_iFPSCount++;
     if (m_llFPSTime >= 100000)
     {
@@ -1600,7 +1626,6 @@ void MainScreen::ApplyMarker(unsigned char* data, size_t size) {
 void MainScreen::AdvanceIterators(long long llTime, bool bIsJump) {
     if (bIsJump)
     {
-        m_itNextProgramChange = upper_bound(m_vProgramChange.begin(), m_vProgramChange.end(), pair< long long, int >(llTime, m_vEvents.size()));
         m_itNextTempo = upper_bound(m_vTempo.begin(), m_vTempo.end(), pair< long long, int >(llTime, m_vMetaEvents.size()));
         MIDIMetaEvent* pPrevious = GetPrevious(m_itNextTempo, m_vTempo, 3);
         if (pPrevious)
@@ -1652,7 +1677,6 @@ void MainScreen::AdvanceIterators(long long llTime, bool bIsJump) {
     else
     {
         if (m_dSpeed < 0) {
-            m_itNextProgramChange = upper_bound(m_vProgramChange.begin(), m_vProgramChange.end(), pair< long long, int >(llTime, m_vEvents.size()));
             m_itNextTempo = upper_bound(m_vTempo.begin(), m_vTempo.end(), pair< long long, int >(llTime, m_vMetaEvents.size()));
             MIDIMetaEvent* pPrevious = GetPrevious(m_itNextTempo, m_vTempo, 3);
             if (pPrevious)
@@ -1701,7 +1725,6 @@ void MainScreen::AdvanceIterators(long long llTime, bool bIsJump) {
             }
         }
         else {
-            while (m_itNextProgramChange != m_vProgramChange.end() && m_itNextProgramChange->first <= llTime) ++m_itNextProgramChange;
             for (; m_itNextTempo != m_vTempo.end() && m_itNextTempo->first <= llTime; ++m_itNextTempo)
             {
                 MIDIMetaEvent* pEvent = m_vMetaEvents[m_itNextTempo->second];
@@ -2327,7 +2350,7 @@ void MainScreen::RenderText() {
 
     int Lines = 10; //Basic info
     if (cVideo.bDebug) {
-        Lines += 9; //Debug info
+        Lines += 10; //Debug info
     }
     if (cControls.bPhigros) {
         Lines += 4; //Score and level
@@ -2414,53 +2437,35 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
     auto tsec = (TotalTime % 60000000) / 1000000;
     auto tcs = (TotalTime % 1000000) / 100000;
     auto tempo = 60000000.0 / m_iMicroSecsPerBeat;
-
+    long long iMaxMS = m_MIDI.GetInfo().llTotalMicroSecs / MS;
     int cur_line = 0;
 
     if (!cVideo.bDisableUI) {
         m_pRenderer->GetDrawList()->AddRectFilled(ImVec2(prcStatus->left, prcStatus->top), ImVec2(prcStatus->right, prcStatus->bottom), 0x80000000);
     }
-    m_llPolyphony = 0;
-
-    concurrency::parallel_for(size_t(0), size_t(128), [&](size_t i) {
-        for (auto elem : m_vState[i]) {
-            if (elem != -1) {
-                m_llPolyphony++;
-            }
-        }
-        });
 
     llStartTimeFormatted = std::to_string(abs(m_llStartTime));
-
     for (int i = llStartTimeFormatted.length() - 3; i > 0; i -= 3)
         llStartTimeFormatted.insert(i, " ");
-
     if (m_llStartTime < 0)
         llStartTimeFormatted.insert(0, "-");
 
     TotalTimeFormatted = std::to_string(TotalTime);
-
     for (int i = TotalTimeFormatted.length() - 3; i > 0; i -= 3)
         TotalTimeFormatted.insert(i, " ");
 
-    polyphony = m_llPolyphony.load();
-
+    polyphony = transform_reduce(begin(m_vState),end(m_vState),0,plus<>(),[](const vector<int>& state){return state.size();});
     polyFormatted = std::to_string(polyphony);
-
     for (int i = polyFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
         polyFormatted.insert(i, ",");
 
-    nps = std::distance(upper_bound(m_vNoteOns.begin(), m_vNoteOns.end(), pair< long long, int >(m_llStartTime - 1000000, m_vEvents.size())), upper_bound(m_vNoteOns.begin(), m_vNoteOns.end(), pair< long long, int >(m_llStartTime, m_vEvents.size())));
-
+    nps = m_vNCTable[min(max(m_llStartTime / MS, 0LL), iMaxMS)] - m_vNCTable[min(max((m_llStartTime - S) / MS, 0LL), iMaxMS)];
     npsFormatted = std::to_string(nps);
-
     for (int i = npsFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
         npsFormatted.insert(i, ",");
-
-    passed = std::distance(m_vNoteOns.begin(), upper_bound(m_vNoteOns.begin(), m_vNoteOns.end(), pair< long long, int >(m_llStartTime, m_vEvents.size())));
-
+    
+    passed = m_vNCTable[min(max(m_llStartTime / MS, 0LL), iMaxMS)];
     passedFormatted = std::to_string(passed);
-
     for (int i = passedFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
         passedFormatted.insert(i, ",");
 
@@ -2525,24 +2530,25 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         RenderStatusLine(cur_line++, StatisticsText21, "%f", cView.GetZoomX() * m_fTempZoomX);
         RenderStatusLine(cur_line++, StatisticsText22, "%d*%d", width, height);
         RenderStatusLine(cur_line++, StatisticsText23, "%d~%d", m_bFlipKeyboard ? m_iEndNote : m_iStartNote, m_bFlipKeyboard ? m_iStartNote : m_iEndNote);
+        RenderStatusLine(cur_line++, StatisticsText24, "%d", cControls.iVelocityThreshold);
     }
     if (cControls.bPhigros) {
-        RenderStatusLine(cur_line++, StatisticsText24, "%07.0f", (passed == static_cast<long long>(TotalNC) ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(TotalNC) * 1000000)));
-        RenderStatusLine(cur_line++, StatisticsText25, Difficulty);
-        RenderStatusLine(cur_line++, StatisticsText26, StatisticsText27);
+        RenderStatusLine(cur_line++, StatisticsText25, "%07.0f", (passed == static_cast<long long>(TotalNC) ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(TotalNC) * 1000000)));
+        RenderStatusLine(cur_line++, StatisticsText26, Difficulty);
+        RenderStatusLine(cur_line++, StatisticsText27, StatisticsText28);
         if (static_cast<float>(passed == TotalNC ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(TotalNC) * 1000000)) == static_cast<float>(1000000)) {
-            RenderStatusLine(cur_line++, StatisticsText28, "");
+            RenderStatusLine(cur_line++, StatisticsText29, "");
         }
         else if (static_cast<float>(passed == TotalNC ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(TotalNC) * 1000000)) < static_cast<float>(1000000)) {
             if (!cPlayback.GetPaused()) {
-                RenderStatusLine(cur_line++, StatisticsText29, "");
+                RenderStatusLine(cur_line++, StatisticsText30, "");
             }
             else {
-                RenderStatusLine(cur_line++, StatisticsText30, "");
+                RenderStatusLine(cur_line++, StatisticsText31, "");
             }
         }
         else if (static_cast<float>(passed == TotalNC ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(TotalNC) * 1000000)) > static_cast<float>(1000000)) {
-            RenderStatusLine(cur_line++, StatisticsText31, "");
+            RenderStatusLine(cur_line++, StatisticsText32, "");
         }
     }
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);

@@ -90,7 +90,9 @@ void Tab2::SubViewBtn4::Open() {
     AnimationTarget1.AddItem(L"HideStatistics");
     AnimationTarget1.AddItem(L"RemoveOverlaps");
     AnimationTarget1.AddItem(L"LimitFPS");
+    AnimationTarget2.AddItem(L"VelocityThreshold");
     AnimationTarget1.AddItem(L"Caption");
+    AnimationTarget1.AddItem(L"DifficultyText");
     AnimationTarget1.SetSelection(0);
     AnimationTarget2.Create(24, 18, 21, 2);
     AnimationTarget2.AddItem(L"Volume");
@@ -101,8 +103,7 @@ void Tab2::SubViewBtn4::Open() {
     AnimationTarget2.AddItem(L"Zoom");
     AnimationTarget2.AddItem(L"StartKey");
     AnimationTarget2.AddItem(L"EndKey");
-    AnimationTarget2.AddItem(L"Width");
-    AnimationTarget2.AddItem(L"Height");
+    AnimationTarget2.AddItem(L"VelocityThreshold");
     AnimationTarget2.SetSelection(0);
     TimingUnit.Create(60, 18, 13, 2);
     TimingUnit.AddItem(L"Microseconds");

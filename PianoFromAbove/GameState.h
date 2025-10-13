@@ -22,12 +22,13 @@ using namespace std;
 
 inline long long m_llStartTime;
 inline int m_iStartTick;
+inline long* m_vNCTable = nullptr;
 inline string llStartTimeFormatted;
-inline size_t polyphony;
+inline long polyphony;
 inline string polyFormatted;
-inline size_t nps;
+inline long nps;
 inline string npsFormatted;
-inline size_t passed;
+inline long passed;
 inline string passedFormatted;
 inline uint8_t FrameCount = 0;
 inline int width = -1;
@@ -42,6 +43,8 @@ inline char Difficulty[1 << 10] = {};
 inline bool UpdateNotePos = true;
 inline long long JumpTarget = ~0;
 inline UINT nxtdelay = 1<<6;
+inline static const signed long long MS = 1e+3;
+inline static const signed long long S = 1e+6;
 
 //Abstract base class
 class GameState
@@ -250,14 +253,10 @@ private:
     MIDI m_MIDI; // The song to display
     vector< MIDIChannelEvent* > m_vEvents; // The channel events of the song
     vector< MIDIMetaEvent* > m_vMetaEvents; // The meta events of the song
-    eventvec_t m_vNoteOns; // Map: note->time->Event pos. Used for fast(er) random access to the song.
-    eventvec_t m_vNonNotes; // Tracked for jumping
-    eventvec_t m_vProgramChange; // Tracked so we don't jump over them during random access
     eventvec_t m_vTempo; // Tracked for drawing measure lines
     eventvec_t m_vSignature; // Measure lines again
     eventvec_t m_vMarkers; // Tracked for section names in some longer MIDIs
     eventvec_t m_vColors; // Tracked for section names in some longer MIDIs
-    eventvec_t::const_iterator m_itNextProgramChange;
     eventvec_t::const_iterator m_itNextTempo;
     eventvec_t::const_iterator m_itNextSignature;
     eventvec_t::const_iterator m_itNextMarker;
@@ -269,7 +268,6 @@ private:
     unsigned char* m_pMarkerData = nullptr; // Used for refreshing marker data when changing encoding on the fly
     size_t m_iMarkerSize = 0;
     int m_iCurEncoding;
-    std::atomic<size_t> m_llPolyphony;
 
     // color events and bend range and such
     bool Next_is_PBS[16] = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
@@ -289,7 +287,6 @@ private:
     double m_dNSpeed; // Note Speed multiplier
     bool m_bPaused; // Paused state
     Timer m_Timer; // Frame timers
-    Timer m_RealTimer;
     bool m_bMute;
     double m_dVolume;
     bool m_bTickMode = false;

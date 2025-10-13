@@ -300,7 +300,7 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 rem ToDo
 goto BuildContinue
 :NoMods
-powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety.`n`nThis compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
+powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. This compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
 :BuildContinue
 del .\vmchk.exe /f /q
 del .\vmchk.obj /f /q
@@ -397,7 +397,7 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 rem ToDo
 goto BuildContinue
 :NoMods
-powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety.`n`nThis compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
+powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. This compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
 :BuildContinue
 del .\vmchk.exe /f /q
 del .\vmchk.obj /f /q
@@ -494,7 +494,7 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 rem ToDo
 goto BuildContinue
 :NoMods
-powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety.`n`nThis compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
+powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. This compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
 :BuildContinue
 del .\vmchk.exe /f /q
 del .\vmchk.obj /f /q
@@ -591,7 +591,7 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 rem ToDo
 goto BuildContinue
 :NoMods
-powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety.`n`nThis compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
+powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. This compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
 :BuildContinue
 del .\vmchk.exe /f /q
 del .\vmchk.obj /f /q
@@ -688,7 +688,7 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 rem ToDo
 goto BuildContinue
 :NoMods
-powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety.`n`nThis compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
+powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. This compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
 :BuildContinue
 del .\vmchk.exe /f /q
 del .\vmchk.obj /f /q
@@ -785,7 +785,7 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 rem ToDo
 goto BuildContinue
 :NoMods
-powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety.`n`nThis compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
+powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. This compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
 :BuildContinue
 del .\vmchk.exe /f /q
 del .\vmchk.obj /f /q
@@ -882,7 +882,7 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 rem ToDo
 goto BuildContinue
 :NoMods
-powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety.`n`nThis compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
+powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. This compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
 :BuildContinue
 del .\vmchk.exe /f /q
 del .\vmchk.obj /f /q
@@ -977,7 +977,7 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 rem ToDo
 goto BuildContinue
 :NoMods
-powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety.`n`nThis compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
+powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. This compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
 :BuildContinue
 del .\vmchk.exe /f /q
 del .\vmchk.obj /f /q
@@ -1069,7 +1069,7 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 rem ToDo
 goto BuildContinue
 :NoMods
-powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety.`n`nThis compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
+powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. This compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
 :BuildContinue
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
 start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\Language.h ^|.\tmp.exe ^&gt;.\Widths.h
@@ -1136,7 +1136,7 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 rem ToDo
 goto BuildContinue
 :NoMods
-powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety.`n`nThis compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
+powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. This compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
 :BuildContinue
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
 start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\Language.h ^|.\tmp.exe ^&gt;.\Widths.h
