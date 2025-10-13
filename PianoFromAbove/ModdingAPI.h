@@ -141,6 +141,66 @@ cppsrc_t RegExprSearch(cppsrc_t Source, const wstring& pattern, long long index)
     return result;
 }
 
+static char BraceOpposite(char ch) noexcept {
+    switch (ch) {
+    case '(':
+        return ')';
+    case ')':
+        return '(';
+    case '[':
+        return ']';
+    case ']':
+        return '[';
+    case '{':
+        return '}';
+    case '}':
+        return '{';
+    case '<':
+        return '>';
+    case '>':
+        return '<';
+    default:
+        return '\0';
+    }
+}
+
+size_t BraceMatch(const wstring& text, size_t index) {
+    const wchar_t chBrace = text[index];
+    const wchar_t chSeek = BraceOpposite(chBrace);
+    if (chSeek == L'\0')
+        return wstring::npos;
+
+    // Determine search direction
+    int direction = -1;
+    if (chBrace == L'(' || chBrace == L'[' || chBrace == L'{' || chBrace == L'<')
+        direction = 1;
+
+    int depth = 1;
+    size_t pos = index;
+
+    while (true) {
+        if (direction > 0) {
+            pos++;
+            if (pos >= text.size()) break;
+        }
+        else {
+            if (pos <= 0) break;
+            pos--;
+        }
+
+        wchar_t chAt = text[pos];
+        if (chAt == chBrace)
+            ++depth;
+        else if (chAt == chSeek)
+            --depth;
+
+        if (depth == 0)
+            return pos;
+    }
+
+    return wstring::npos;
+}
+
 cppsrc_t OpenCppFile(wstring Path) {
     srcfile_t SourceFile = {};
     SourceFile.FilePath = Path;
