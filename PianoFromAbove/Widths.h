@@ -591,7 +591,7 @@
 #else
 #define MainWindowTitle7W 0 //Text: L""
 #endif
-#define WelcomeTextW 120 //Text: L"Piano-FX Pro에 오신 것을 환영합니다"
+#define WelcomeTextW 113 //Text: L"Piano-FX Pro 오신 것을 환영합니다"
 #define StartupStage1TextW 32 //Text: L"준비 중..."
 #define StartupStage2TextW 81 //Text: L"시작 MIDI 불러오는 중..."
 #define StartupStage3TextW 39 //Text: L"시작합니다!"
@@ -1026,7 +1026,7 @@
 #else
 #define MainWindowTitle7W 0 //Text: L""
 #endif
-#define WelcomeTextW 111 //Text: L"Piano-FX Pro에 열렬히 환영합니다"
+#define WelcomeTextW 103 //Text: L"Piano-FX Pro 열렬히 환영합니다"
 #define StartupStage1TextW 69 //Text: L"준비하고 있습니다..."
 #define StartupStage2TextW 88 //Text: L"기동 MIDI 불러들이는 중..."
 #define StartupStage3TextW 39 //Text: L"기동합니다!"
@@ -1157,5 +1157,5 @@
 #define MenuText24W 39 //Text: "위치 초기화"
 #define MenuText25W 15 //Text: "설정"
 #define MenuText26W 15 //Text: "정보"
-#define MenuText27W 80 //Text: "피아노 FX 스튜디오 열기"
+#define MenuText27W 76 //Text: "Piano-FX 스튜디오 열기"
 #endif
