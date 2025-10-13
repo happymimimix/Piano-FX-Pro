@@ -71,32 +71,6 @@ struct cppsrc_t {
     }
 };
 
-cppsrc_t LeftStrip(cppsrc_t Source, const wstring& pattern) {
-    cppsrc_t match = RegExprSearch(Source, pattern, 1);
-
-    // Create result object
-    cppsrc_t result;
-    result.Document = Source.Document;
-    result.Index = match.Index + match.Length;
-    result.Length = Source.Index + Source.Length - result.Index;
-    result.Parent = make_shared<cppsrc_t>(Source);
-
-    return result;
-}
-
-cppsrc_t RightStrip(cppsrc_t Source, const wstring& pattern) {
-    cppsrc_t match = RegExprSearch(Source, pattern, -1);
-
-    // Create result object
-    cppsrc_t result;
-    result.Document = Source.Document;
-    result.Index = Source.Index;
-    result.Length = match.Index - Source.Index;
-    result.Parent = make_shared<cppsrc_t>(Source);
-
-    return result;
-}
-
 cppsrc_t RegExprSearch(cppsrc_t Source, const wstring& pattern, long long index) {
     if (index == 0) {
         throw invalid_argument("Index cannot be zero");
@@ -136,6 +110,32 @@ cppsrc_t RegExprSearch(cppsrc_t Source, const wstring& pattern, long long index)
     result.Document = Source.Document;
     result.Index = Source.Index + match.position();
     result.Length = match.length();
+    result.Parent = make_shared<cppsrc_t>(Source);
+
+    return result;
+}
+
+cppsrc_t LeftStrip(cppsrc_t Source, const wstring& pattern) {
+    cppsrc_t match = RegExprSearch(Source, pattern, 1);
+
+    // Create result object
+    cppsrc_t result;
+    result.Document = Source.Document;
+    result.Index = match.Index + match.Length;
+    result.Length = Source.Index + Source.Length - result.Index;
+    result.Parent = make_shared<cppsrc_t>(Source);
+
+    return result;
+}
+
+cppsrc_t RightStrip(cppsrc_t Source, const wstring& pattern) {
+    cppsrc_t match = RegExprSearch(Source, pattern, -1);
+
+    // Create result object
+    cppsrc_t result;
+    result.Document = Source.Document;
+    result.Index = Source.Index;
+    result.Length = match.Index - Source.Index;
     result.Parent = make_shared<cppsrc_t>(Source);
 
     return result;
@@ -208,4 +208,5 @@ cppsrc_t OpenCppFile(wstring Path) {
     cppsrc_t RootPointer = {};
     RootPointer.Document = make_shared<srcfile_t>(SourceFile);
     RootPointer.Length = SourceFile.Content.length();
+    return RootPointer;
 }

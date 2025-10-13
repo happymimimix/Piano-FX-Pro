@@ -316,6 +316,8 @@
 del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
+del "$(ProjectDir)..\Backup" /f /s /q
+rmdir "$(ProjectDir)..\Backup" /s /q
 xcopy "$(ProjectDir)" "$(ProjectDir)..\Backup" /c /e /v /r /y /k /i /g /h /o /b
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
 vmchk.exe
@@ -324,7 +326,7 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 cd /d "$(ProjectDir)Mods\"
 for %%i in (*.cpp) do (
 @echo.Injecting: %%i
-clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
+clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
 .\tmp.exe
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
@@ -371,6 +373,8 @@ del "$(ProjectDir)" /f /s /q
 rmdir "$(ProjectDir)" /s /q
 mkdir "$(ProjectDir)"
 xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
+del "$(ProjectDir)..\Backup" /f /s /q
+rmdir "$(ProjectDir)..\Backup" /s /q
 </Command>
     </PostBuildEvent>
     <ResourceCompile>
@@ -426,6 +430,8 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
 del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
+del "$(ProjectDir)..\Backup" /f /s /q
+rmdir "$(ProjectDir)..\Backup" /s /q
 xcopy "$(ProjectDir)" "$(ProjectDir)..\Backup" /c /e /v /r /y /k /i /g /h /o /b
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
 vmchk.exe
@@ -434,7 +440,7 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 cd /d "$(ProjectDir)Mods\"
 for %%i in (*.cpp) do (
 @echo.Injecting: %%i
-clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
+clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
 .\tmp.exe
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
@@ -481,6 +487,8 @@ del "$(ProjectDir)" /f /s /q
 rmdir "$(ProjectDir)" /s /q
 mkdir "$(ProjectDir)"
 xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
+del "$(ProjectDir)..\Backup" /f /s /q
+rmdir "$(ProjectDir)..\Backup" /s /q
 </Command>
     </PostBuildEvent>
     <ResourceCompile>
@@ -536,6 +544,8 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
 del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
+del "$(ProjectDir)..\Backup" /f /s /q
+rmdir "$(ProjectDir)..\Backup" /s /q
 xcopy "$(ProjectDir)" "$(ProjectDir)..\Backup" /c /e /v /r /y /k /i /g /h /o /b
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
 vmchk.exe
@@ -544,7 +554,7 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 cd /d "$(ProjectDir)Mods\"
 for %%i in (*.cpp) do (
 @echo.Injecting: %%i
-clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
+clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
 .\tmp.exe
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
@@ -591,6 +601,8 @@ del "$(ProjectDir)" /f /s /q
 rmdir "$(ProjectDir)" /s /q
 mkdir "$(ProjectDir)"
 xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
+del "$(ProjectDir)..\Backup" /f /s /q
+rmdir "$(ProjectDir)..\Backup" /s /q
 </Command>
     </PostBuildEvent>
     <ResourceCompile>
@@ -646,6 +658,8 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
 del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
+del "$(ProjectDir)..\Backup" /f /s /q
+rmdir "$(ProjectDir)..\Backup" /s /q
 xcopy "$(ProjectDir)" "$(ProjectDir)..\Backup" /c /e /v /r /y /k /i /g /h /o /b
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
 vmchk.exe
@@ -654,7 +668,7 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 cd /d "$(ProjectDir)Mods\"
 for %%i in (*.cpp) do (
 @echo.Injecting: %%i
-clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
+clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
 .\tmp.exe
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
@@ -701,6 +715,8 @@ del "$(ProjectDir)" /f /s /q
 rmdir "$(ProjectDir)" /s /q
 mkdir "$(ProjectDir)"
 xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
+del "$(ProjectDir)..\Backup" /f /s /q
+rmdir "$(ProjectDir)..\Backup" /s /q
 </Command>
     </PostBuildEvent>
     <ResourceCompile>
@@ -756,6 +772,8 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
 del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
+del "$(ProjectDir)..\Backup" /f /s /q
+rmdir "$(ProjectDir)..\Backup" /s /q
 xcopy "$(ProjectDir)" "$(ProjectDir)..\Backup" /c /e /v /r /y /k /i /g /h /o /b
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
 vmchk.exe
@@ -764,7 +782,7 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 cd /d "$(ProjectDir)Mods\"
 for %%i in (*.cpp) do (
 @echo.Injecting: %%i
-clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
+clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
 .\tmp.exe
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
@@ -811,6 +829,8 @@ del "$(ProjectDir)" /f /s /q
 rmdir "$(ProjectDir)" /s /q
 mkdir "$(ProjectDir)"
 xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
+del "$(ProjectDir)..\Backup" /f /s /q
+rmdir "$(ProjectDir)..\Backup" /s /q
 </Command>
     </PostBuildEvent>
     <ResourceCompile>
@@ -866,6 +886,8 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
 del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
+del "$(ProjectDir)..\Backup" /f /s /q
+rmdir "$(ProjectDir)..\Backup" /s /q
 xcopy "$(ProjectDir)" "$(ProjectDir)..\Backup" /c /e /v /r /y /k /i /g /h /o /b
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
 vmchk.exe
@@ -874,7 +896,7 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 cd /d "$(ProjectDir)Mods\"
 for %%i in (*.cpp) do (
 @echo.Injecting: %%i
-clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
+clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
 .\tmp.exe
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
@@ -921,6 +943,8 @@ del "$(ProjectDir)" /f /s /q
 rmdir "$(ProjectDir)" /s /q
 mkdir "$(ProjectDir)"
 xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
+del "$(ProjectDir)..\Backup" /f /s /q
+rmdir "$(ProjectDir)..\Backup" /s /q
 </Command>
     </PostBuildEvent>
     <ResourceCompile>
@@ -976,6 +1000,8 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
 del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
+del "$(ProjectDir)..\Backup" /f /s /q
+rmdir "$(ProjectDir)..\Backup" /s /q
 xcopy "$(ProjectDir)" "$(ProjectDir)..\Backup" /c /e /v /r /y /k /i /g /h /o /b
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
 vmchk.exe
@@ -984,7 +1010,7 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 cd /d "$(ProjectDir)Mods\"
 for %%i in (*.cpp) do (
 @echo.Injecting: %%i
-clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
+clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
 .\tmp.exe
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
@@ -1031,6 +1057,8 @@ del "$(ProjectDir)" /f /s /q
 rmdir "$(ProjectDir)" /s /q
 mkdir "$(ProjectDir)"
 xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
+del "$(ProjectDir)..\Backup" /f /s /q
+rmdir "$(ProjectDir)..\Backup" /s /q
 </Command>
     </PostBuildEvent>
     <ResourceCompile>
@@ -1086,6 +1114,8 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
 del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
+del "$(ProjectDir)..\Backup" /f /s /q
+rmdir "$(ProjectDir)..\Backup" /s /q
 xcopy "$(ProjectDir)" "$(ProjectDir)..\Backup" /c /e /v /r /y /k /i /g /h /o /b
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
 vmchk.exe
@@ -1094,7 +1124,7 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 cd /d "$(ProjectDir)Mods\"
 for %%i in (*.cpp) do (
 @echo.Injecting: %%i
-clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
+clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
 .\tmp.exe
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
@@ -1141,6 +1171,8 @@ del "$(ProjectDir)" /f /s /q
 rmdir "$(ProjectDir)" /s /q
 mkdir "$(ProjectDir)"
 xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
+del "$(ProjectDir)..\Backup" /f /s /q
+rmdir "$(ProjectDir)..\Backup" /s /q
 </Command>
     </PostBuildEvent>
     <ResourceCompile>
@@ -1194,6 +1226,8 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
 del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
+del "$(ProjectDir)..\Backup" /f /s /q
+rmdir "$(ProjectDir)..\Backup" /s /q
 xcopy "$(ProjectDir)" "$(ProjectDir)..\Backup" /c /e /v /r /y /k /i /g /h /o /b
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
 vmchk.exe
@@ -1202,7 +1236,7 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 cd /d "$(ProjectDir)Mods\"
 for %%i in (*.cpp) do (
 @echo.Injecting: %%i
-clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
+clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
 .\tmp.exe
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
@@ -1249,6 +1283,8 @@ del "$(ProjectDir)" /f /s /q
 rmdir "$(ProjectDir)" /s /q
 mkdir "$(ProjectDir)"
 xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
+del "$(ProjectDir)..\Backup" /f /s /q
+rmdir "$(ProjectDir)..\Backup" /s /q
 </Command>
     </PostBuildEvent>
     <ResourceCompile>
@@ -1299,6 +1335,8 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+del "$(ProjectDir)..\Backup" /f /s /q
+rmdir "$(ProjectDir)..\Backup" /s /q
 xcopy "$(ProjectDir)" "$(ProjectDir)..\Backup" /c /e /v /r /y /k /i /g /h /o /b
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
 vmchk.exe
@@ -1307,7 +1345,7 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 cd /d "$(ProjectDir)Mods\"
 for %%i in (*.cpp) do (
 @echo.Injecting: %%i
-clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
+clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
 .\tmp.exe
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
@@ -1378,6 +1416,8 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+del "$(ProjectDir)..\Backup" /f /s /q
+rmdir "$(ProjectDir)..\Backup" /s /q
 xcopy "$(ProjectDir)" "$(ProjectDir)..\Backup" /c /e /v /r /y /k /i /g /h /o /b
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
 vmchk.exe
@@ -1386,7 +1426,7 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 cd /d "$(ProjectDir)Mods\"
 for %%i in (*.cpp) do (
 @echo.Injecting: %%i
-clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
+clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
 .\tmp.exe
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
