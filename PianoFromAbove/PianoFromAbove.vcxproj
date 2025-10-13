@@ -326,8 +326,8 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 cd /d "$(ProjectDir)Mods\"
 for %%i in (*.cpp) do (
 @echo.Injecting: %%i
-clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
-.\tmp.exe
+clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj "%%~dpni.cpp" &gt; "%%~dpni.log"
+.\tmp.exe &gt;&gt; "%%~dpni.log"
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 )
@@ -440,8 +440,8 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 cd /d "$(ProjectDir)Mods\"
 for %%i in (*.cpp) do (
 @echo.Injecting: %%i
-clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
-.\tmp.exe
+clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj "%%~dpni.cpp" &gt; "%%~dpni.log"
+.\tmp.exe &gt;&gt; "%%~dpni.log"
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 )
@@ -554,8 +554,8 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 cd /d "$(ProjectDir)Mods\"
 for %%i in (*.cpp) do (
 @echo.Injecting: %%i
-clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
-.\tmp.exe
+clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj "%%~dpni.cpp" &gt; "%%~dpni.log"
+.\tmp.exe &gt;&gt; "%%~dpni.log"
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 )
@@ -668,8 +668,8 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 cd /d "$(ProjectDir)Mods\"
 for %%i in (*.cpp) do (
 @echo.Injecting: %%i
-clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
-.\tmp.exe
+clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj "%%~dpni.cpp" &gt; "%%~dpni.log"
+.\tmp.exe &gt;&gt; "%%~dpni.log"
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 )
@@ -782,8 +782,8 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 cd /d "$(ProjectDir)Mods\"
 for %%i in (*.cpp) do (
 @echo.Injecting: %%i
-clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
-.\tmp.exe
+clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj "%%~dpni.cpp" &gt; "%%~dpni.log"
+.\tmp.exe &gt;&gt; "%%~dpni.log"
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 )
@@ -896,8 +896,8 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 cd /d "$(ProjectDir)Mods\"
 for %%i in (*.cpp) do (
 @echo.Injecting: %%i
-clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
-.\tmp.exe
+clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj "%%~dpni.cpp" &gt; "%%~dpni.log"
+.\tmp.exe &gt;&gt; "%%~dpni.log"
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 )
@@ -1010,8 +1010,8 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 cd /d "$(ProjectDir)Mods\"
 for %%i in (*.cpp) do (
 @echo.Injecting: %%i
-clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
-.\tmp.exe
+clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj "%%~dpni.cpp" &gt; "%%~dpni.log"
+.\tmp.exe &gt;&gt; "%%~dpni.log"
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 )
@@ -1124,8 +1124,8 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 cd /d "$(ProjectDir)Mods\"
 for %%i in (*.cpp) do (
 @echo.Injecting: %%i
-clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
-.\tmp.exe
+clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj "%%~dpni.cpp" &gt; "%%~dpni.log"
+.\tmp.exe &gt;&gt; "%%~dpni.log"
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 )
@@ -1236,8 +1236,8 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 cd /d "$(ProjectDir)Mods\"
 for %%i in (*.cpp) do (
 @echo.Injecting: %%i
-clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
-.\tmp.exe
+clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj "%%~dpni.cpp" &gt; "%%~dpni.log"
+.\tmp.exe &gt;&gt; "%%~dpni.log"
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 )
@@ -1345,8 +1345,8 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 cd /d "$(ProjectDir)Mods\"
 for %%i in (*.cpp) do (
 @echo.Injecting: %%i
-clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
-.\tmp.exe
+clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj "%%~dpni.cpp" &gt; "%%~dpni.log"
+.\tmp.exe &gt;&gt; "%%~dpni.log"
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 )
@@ -1426,8 +1426,8 @@ IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
 cd /d "$(ProjectDir)Mods\"
 for %%i in (*.cpp) do (
 @echo.Injecting: %%i
-clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj %%i
-.\tmp.exe
+clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj "%%~dpni.cpp" &gt; "%%~dpni.log"
+.\tmp.exe &gt;&gt; "%%~dpni.log"
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 )
