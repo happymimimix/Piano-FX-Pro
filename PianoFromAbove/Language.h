@@ -730,7 +730,7 @@
 #define MenuText24 "위치 초기화"
 #define MenuText25 "설정"
 #define MenuText26 "정보"
-#define MenuText27 "피아노 FX 스튜디오 열기"
+#define MenuText27 "특수 효과 에디터"
 #endif
 #ifdef RUS
 #define MainWindowTitle1 L"Piano-FX Pro"
@@ -1169,5 +1169,5 @@
 #define MenuText24 "위치 초기화"
 #define MenuText25 "설정"
 #define MenuText26 "정보"
-#define MenuText27 "Piano-FX 스튜디오 열기"
+#define MenuText27 "특수효과 편집기"
 #endif
