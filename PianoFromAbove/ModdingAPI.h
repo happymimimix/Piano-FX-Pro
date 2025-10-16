@@ -8,21 +8,55 @@
 #include <regex>
 using namespace std;
 
+wstring ProgramDIR() {
+    wchar_t szFilePath[MAX_PATH + 1] = {};
+    GetModuleFileNameW(NULL, szFilePath, MAX_PATH);
+    (wcsrchr(szFilePath, '\\'))[0] = 0;
+    return szFilePath;
+}
+
+wstring A2W(const string& str)
+{
+    wstring wstr;
+    size_t size;
+    wstr.resize(str.length());
+    mbstowcs_s(&size, &wstr[0], wstr.size() + 1, str.c_str(), str.size());
+    return wstr;
+}
+
+string W2A(const wstring& wstr)
+{
+    string str;
+    size_t size;
+    str.resize(wstr.length());
+    wcstombs_s(&size, &str[0], str.size() + 1, wstr.c_str(), wstr.size());
+    return str;
+}
+
 struct srcfile_t {
     wstring FilePath = L"";
     wstring Content = L"";
     void Load() {
         wifstream file(this->FilePath, ios::binary); //Do not make the unnecessary CRLF to LF and LF to CRLF conversion!!! 
         file.imbue(locale("en_US.UTF-8"));
+        if (!file.is_open()) {
+            throw runtime_error("Failed to open file.");
+        }
         wstringstream buffer;
         buffer << file.rdbuf();
         this->Content = buffer.str();
+        wcout << L"Loaded: " << this->FilePath << endl;
+        wcout << this->Content;
         file.close();
     }
     void Save() {
         wofstream file(this->FilePath, ios::binary); //Do not make the unnecessary CRLF to LF and LF to CRLF conversion!!! 
         file.imbue(locale("en_US.UTF-8"));
+        if (!file.is_open()) {
+            throw runtime_error("Failed to open file.");
+        }
         file << this->Content;
+        wcout << L"Saved: " << this->FilePath << endl;
         file.close();
     }
 };
@@ -203,7 +237,9 @@ size_t BraceMatch(const wstring& text, size_t index) {
 
 cppsrc_t OpenCppFile(wstring Path) {
     srcfile_t SourceFile = {};
-    SourceFile.FilePath = Path;
+    SourceFile.FilePath = ProgramDIR();
+    SourceFile.FilePath += L"\\";
+    SourceFile.FilePath += Path;
     SourceFile.Load();
     cppsrc_t RootPointer = {};
     RootPointer.Document = make_shared<srcfile_t>(SourceFile);
