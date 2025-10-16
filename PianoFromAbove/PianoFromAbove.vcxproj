@@ -835,7 +835,7 @@ rmdir "$(ProjectDir)..\Backup" /s /q
     </PostBuildEvent>
     <ResourceCompile>
       <ShowProgress>true</ShowProgress>
-      <PreprocessorDefinitions>KOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>KOP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">
