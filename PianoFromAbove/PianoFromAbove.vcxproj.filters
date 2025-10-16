@@ -608,7 +608,7 @@
       <Filter>Resource Files</Filter>
     </ClCompile>
     <ClCompile Include="VMChecker.cpp">
-      <Filter>Resource Files</Filter>
+      <Filter>Source Files\ModdingRelated</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

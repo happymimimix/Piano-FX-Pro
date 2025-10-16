@@ -1044,7 +1044,7 @@
 #define OpenFileTitle L"연주할 파일을 선택하십시오: "
 #define OpenSplashFileTitle L"기동 화면 MIDI 선택: "
 #define OpenBackgroundFileTitle L"배경화상 선택: "
-#define DigitSeparate 3
+#define DigitSeparate 4
 #define StatisticsText1 "Piano-FX Pro (조선말)"
 #define StatisticsText2 "제작자: happy_mimimix"
 #define StatisticsText3 "시간:"
