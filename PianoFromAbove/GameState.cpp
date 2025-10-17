@@ -1878,23 +1878,25 @@ GameState::GameError MainScreen::Render()
         // Write to pipe
         WriteFile(m_hVideoPipe, frame, static_cast<DWORD>(m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4), nullptr, nullptr);
     }
-    //Don't let BitBlt capture a blank screen! 
-    HDC hdcGFX = GetDC(g_hWndGfx);
-    HDC hdcMem = CreateCompatibleDC(hdcGFX);
-    HBITMAP hBitmap = CreateCompatibleBitmap(hdcGFX, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight());
-    SelectObject(hdcMem, hBitmap);
-    BITMAPINFO bmpInfo = {};
-    bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    bmpInfo.bmiHeader.biWidth = m_pRenderer->GetBufferWidth();
-    bmpInfo.bmiHeader.biHeight = -m_pRenderer->GetBufferHeight();
-    bmpInfo.bmiHeader.biPlanes = 1;
-    bmpInfo.bmiHeader.biBitCount = 32;
-    bmpInfo.bmiHeader.biCompression = BI_RGB;
-    SetDIBits(hdcMem, hBitmap, 0, m_pRenderer->GetBufferHeight(), frame, &bmpInfo, DIB_RGB_COLORS);
-    BitBlt(hdcGFX, 0, 0, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(), hdcMem, 0, 0, SRCCOPY);
-    DeleteObject(hBitmap);
-    DeleteDC(hdcMem);
-    ReleaseDC(g_hWndGfx, hdcGFX);
+    if (!m_bDumpFrames) { //Stop wasting time on GDI shit when rendering to video. 
+        //Don't let BitBlt capture a blank screen! 
+        HDC hdcGFX = GetDC(g_hWndGfx);
+        HDC hdcMem = CreateCompatibleDC(hdcGFX);
+        HBITMAP hBitmap = CreateCompatibleBitmap(hdcGFX, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight());
+        SelectObject(hdcMem, hBitmap);
+        BITMAPINFO bmpInfo = {};
+        bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+        bmpInfo.bmiHeader.biWidth = m_pRenderer->GetBufferWidth();
+        bmpInfo.bmiHeader.biHeight = -m_pRenderer->GetBufferHeight();
+        bmpInfo.bmiHeader.biPlanes = 1;
+        bmpInfo.bmiHeader.biBitCount = 32;
+        bmpInfo.bmiHeader.biCompression = BI_RGB;
+        SetDIBits(hdcMem, hBitmap, 0, m_pRenderer->GetBufferHeight(), frame, &bmpInfo, DIB_RGB_COLORS);
+        BitBlt(hdcGFX, 0, 0, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(), hdcMem, 0, 0, SRCCOPY);
+        DeleteObject(hBitmap);
+        DeleteDC(hdcMem);
+        ReleaseDC(g_hWndGfx, hdcGFX);
+    }
 
     return Success;
 }
