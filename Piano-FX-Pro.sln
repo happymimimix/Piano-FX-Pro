@@ -13,6 +13,7 @@ Global
 		DoubleArinoglish|x64 = DoubleArinoglish|x64
 		DPRK|x64 = DPRK|x64
 		EnforceSoftwareRender|x64 = EnforceSoftwareRender|x64
+		Hiragana|x64 = Hiragana|x64
 		Japanese|x64 = Japanese|x64
 		Korean|x64 = Korean|x64
 		NoOptimization|x64 = NoOptimization|x64
@@ -32,6 +33,8 @@ Global
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.DPRK|x64.Build.0 = DPRK|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.EnforceSoftwareRender|x64.ActiveCfg = EnforceSoftwareRender|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.EnforceSoftwareRender|x64.Build.0 = EnforceSoftwareRender|x64
+		{DD4C822F-844F-40BF-8113-129B04EDE199}.Hiragana|x64.ActiveCfg = Hiragana|x64
+		{DD4C822F-844F-40BF-8113-129B04EDE199}.Hiragana|x64.Build.0 = Hiragana|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Japanese|x64.ActiveCfg = Japanese|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Japanese|x64.Build.0 = Japanese|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Korean|x64.ActiveCfg = Korean|x64

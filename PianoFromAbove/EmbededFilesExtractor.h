@@ -1,6 +1,8 @@
 #include <PFXSTUDIO_Global_Imports.h>
+#ifdef INCLUDE_FFMPEG
 #include <Colorizer.exe.h>
 #include <PFXGDI.exe.h>
+#endif
 
 string ProgramDIR() {
     char szFilePath[MAX_PATH + 1] = {};
@@ -10,6 +12,7 @@ string ProgramDIR() {
 }
 
 void ExtractEmbededFiles() {
+#ifdef INCLUDE_FFMPEG
     string ColorizerPath = ProgramDIR() + "\\Colorizer.exe";
     if (!filesystem::exists(ColorizerPath)) {
         ofstream ColorizerFile(ColorizerPath, ios::binary);
@@ -22,4 +25,5 @@ void ExtractEmbededFiles() {
         PFXGDIFile.write(reinterpret_cast<const char*>(PFXGDI_exe), PFXGDI_exe_len);
         PFXGDIFile.close();
     }
+#endif
 }

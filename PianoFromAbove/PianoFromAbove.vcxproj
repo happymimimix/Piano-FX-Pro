@@ -21,6 +21,10 @@
       <Configuration>EnforceSoftwareRender</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Hiragana|x64">
+      <Configuration>Hiragana</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Japanese|x64">
       <Configuration>Japanese</Configuration>
       <Platform>x64</Platform>
@@ -117,6 +121,14 @@
     <PlatformToolset>ClangCL</PlatformToolset>
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>ClangCL</PlatformToolset>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -166,6 +178,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'" Label="PropertySheets">
@@ -241,6 +256,14 @@
     <OutDir>$(SolutionDir)\Release\</OutDir>
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro-JPN</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)lzma\lib;$(ProjectDir)freetype\lib;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)\Release\</OutDir>
+    <IntDir>Release\</IntDir>
+    <TargetName>Piano-FX-Pro-HRG</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -1180,6 +1203,120 @@ rmdir "$(ProjectDir)..\Backup" /s /q
       <PreprocessorDefinitions>JPN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;INCLUDE_FFMPEG;HRG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalOptions>/clang:-Ofast /clang:-msse4.2 %(AdditionalOptions)</AdditionalOptions>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <GuardSignedReturns>false</GuardSignedReturns>
+      <OpenMPSupport>false</OpenMPSupport>
+      <WarningLevel>Level4</WarningLevel>
+      <CallingConvention>FastCall</CallingConvention>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>
+      </PrecompiledHeaderOutputFile>
+      <DiagnosticsFormat>Caret</DiagnosticsFormat>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <ShowIncludes>true</ShowIncludes>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>lzma.lib;winhttp.lib;freetype-x64.lib;libpng16-x64.lib;zlib-x64.lib;brotlicommon-x64.lib;brotlidec-x64.lib;bz2-x64.lib;dxguid.lib;dxgi.lib;d3d12.lib;Psapi.lib;Shlwapi.lib;Dwmapi.lib;Comctl32.lib;WinMM.lib;UxTheme.lib;Advapi32.lib;Msimg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <Version>
+      </Version>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>false</DataExecutionPrevention>
+      <AdditionalManifestDependencies>"type='Win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'";%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>cd /d "$(ProjectDir)"
+del .\PianoFromAbove.vcxproj.user /f /q
+del ..\Release /f /s /q
+rmdir ..\Release /s /q
+del "$(ProjectDir)..\Backup" /f /s /q
+rmdir "$(ProjectDir)..\Backup" /s /q
+xcopy "$(ProjectDir)" "$(ProjectDir)..\Backup" /c /e /v /r /y /k /i /g /h /o /b
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\vmchk.exe /Fo.\vmchk.obj .\VMChecker.cpp
+vmchk.exe
+IF "%errorlevel%" EQU "1" (goto IncludeMods) ELSE (goto NoMods)
+:IncludeMods
+cd /d "$(ProjectDir)Mods\"
+for %%i in (*.cpp) do (
+@echo.Injecting: %%i
+clang-cl /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj "%%~dpni.cpp" &gt; "%%~dpni.log"
+.\tmp.exe &gt;&gt; "%%~dpni.log"
+del .\tmp.exe /f /q
+del .\tmp.obj /f /q
+)
+cd /d "$(ProjectDir)"
+goto BuildContinue
+:NoMods
+powershell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Due to the special nature of the mod system used in this software, please complete the compilation of this project in a virtual machine to ensure safety. This compilation will not include any mods, only the main program will be compiled.', 'Error', 'OK', 'Error')"
+:BuildContinue
+del .\vmchk.exe /f /q
+del .\vmchk.obj /f /q
+msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
+msbuild ..\Colorizer\Colorizer.sln -t:Clean -p:Configuration=Release /p:Platform=x64
+msbuild ..\PFXGDI\PFXGDI.sln -t:Clean -p:Configuration=Release /p:Platform=x86
+del .\Colorizer.exe /f /q
+del .\Colorizer.exe.h /f /q
+del .\PFXGDI.exe /f /q
+del .\PFXGDI.exe.h /f /q
+del .\Widths.h /f /q
+msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
+msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
+xxd -i Colorizer.exe &gt; Colorizer.exe.h
+xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\Language.h ^|.\tmp.exe ^&gt;.\Widths.h
+del .\tmp.exe /f /q
+del .\tmp.obj /f /q
+</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>cd /d "$(ProjectDir)"
+copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
+msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
+del .\PianoFromAbove.vcxproj.user /f /q
+del ..\.vs /f /s /q
+rmdir ..\.vs /s /q
+del .\Release /f /s /q
+rmdir .\Release /s /q
+del ..\Release /f /s /q
+rmdir ..\Release /s /q
+mkdir ..\Release
+move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
+del "$(ProjectDir)" /f /s /q
+rmdir "$(ProjectDir)" /s /q
+mkdir "$(ProjectDir)"
+xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
+del "$(ProjectDir)..\Backup" /f /s /q
+rmdir "$(ProjectDir)..\Backup" /s /q
+</Command>
+    </PostBuildEvent>
+    <ResourceCompile>
+      <ShowProgress>true</ShowProgress>
+      <PreprocessorDefinitions>HRG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -1458,6 +1595,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">true</ExcludedFromBuild>
@@ -1472,6 +1610,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">true</ExcludedFromBuild>
@@ -1506,6 +1645,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
     <ClInclude Include="DebugLanguageOverride.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">true</ExcludedFromBuild>
@@ -1611,6 +1751,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">true</ExcludedFromBuild>
@@ -1704,6 +1845,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">Pixel</ShaderType>
@@ -1715,6 +1857,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">5.1</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">5.1</ShaderModel>
@@ -1726,6 +1869,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">g_pBackgroundPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">g_pBackgroundPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">g_pBackgroundPixelShader</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">g_pBackgroundPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">g_pBackgroundPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_pBackgroundPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">g_pBackgroundPixelShader</VariableName>
@@ -1737,6 +1881,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
@@ -1756,6 +1901,8 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">
       </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">
+      </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -1772,6 +1919,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">Vertex</ShaderType>
@@ -1783,6 +1931,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">5.1</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">5.1</ShaderModel>
@@ -1794,6 +1943,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
@@ -1813,6 +1963,8 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">
       </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">
+      </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -1827,6 +1979,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">g_pBackgroundVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">g_pBackgroundVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">g_pBackgroundVertexShader</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">g_pBackgroundVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">g_pBackgroundVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_pBackgroundVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">g_pBackgroundVertexShader</VariableName>
@@ -1854,6 +2007,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">g_pNoteVertexShaderSameWidth</VariableName>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">
       </ObjectFileOutput>
@@ -1865,6 +2019,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">5.1</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">5.1</ShaderModel>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">
@@ -1881,6 +2036,8 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">
       </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">
+      </ObjectFileOutput>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">Vertex</ShaderType>
@@ -1890,6 +2047,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">Vertex</ShaderType>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">g_pNoteVertexShaderSameWidth</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">g_pNoteVertexShaderSameWidth</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">g_pNoteVertexShaderSameWidth</VariableName>
@@ -1898,6 +2056,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">g_pNoteVertexShaderSameWidth</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">g_pNoteVertexShaderSameWidth</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">g_pNoteVertexShaderSameWidth</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">g_pNoteVertexShaderSameWidth</VariableName>
     </FxCompile>
     <FxCompile Include="note_ps.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
@@ -1908,6 +2067,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">Pixel</ShaderType>
@@ -1919,6 +2079,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
@@ -1938,6 +2099,8 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">
       </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">
+      </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -1952,6 +2115,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">g_pNotePixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">g_pNotePixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">g_pNotePixelShader</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">g_pNotePixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">g_pNotePixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_pNotePixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">g_pNotePixelShader</VariableName>
@@ -1963,6 +2127,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">5.1</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">5.1</ShaderModel>
@@ -1976,6 +2141,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">Vertex</ShaderType>
@@ -1987,6 +2153,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">g_pNoteVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">g_pNoteVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">g_pNoteVertexShader</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">g_pNoteVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">g_pNoteVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_pNoteVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">g_pNoteVertexShader</VariableName>
@@ -2006,6 +2173,8 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">
       </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">
+      </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -2020,6 +2189,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
@@ -2031,6 +2201,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">5.1</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">5.1</ShaderModel>
@@ -2044,6 +2215,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">Pixel</ShaderType>
@@ -2055,6 +2227,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">g_pRectPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">g_pRectPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">g_pRectPixelShader</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">g_pRectPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">g_pRectPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_pRectPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">g_pRectPixelShader</VariableName>
@@ -2066,6 +2239,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
@@ -2085,6 +2259,8 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">
       </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">
+      </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -2099,6 +2275,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">5.1</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">5.1</ShaderModel>
@@ -2112,6 +2289,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">Vertex</ShaderType>
@@ -2123,6 +2301,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">g_pRectVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">g_pRectVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">g_pRectVertexShader</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">g_pRectVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">g_pRectVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_pRectVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">g_pRectVertexShader</VariableName>
@@ -2134,6 +2313,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
@@ -2153,6 +2333,8 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">
       </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">
+      </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -2167,6 +2349,7 @@ xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">5.1</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">5.1</ShaderModel>
