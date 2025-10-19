@@ -1205,7 +1205,7 @@
 #define StatisticsText25W 27 //Text: "スコア:"
 #define StatisticsText26W 27 //Text: "レベル:"
 #define StatisticsText27W 59 //Text: "じどうえんそう:"
-#define StatisticsText28W 56 //Text: "ゆうこうかずみ"
+#define StatisticsText28W 58 //Text: "ゆうこうかずみ "
 #define StatisticsText29W 50 //Text: "フルコンボ!!! "
 #define StatisticsText30W 114 //Text: "デモンストレーションちゅう... "
 #define StatisticsText31W 82 //Text: "いちじていしちゅう... "

@@ -659,7 +659,7 @@ void MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
                 sister->SetSisterIdx(vChannelEvents.size());
                 sister->SetPassDone(true);
                 if ( pChannelEvent->GetChannelEventType() == MIDIChannelEvent::NoteOff ||
-                   ( pChannelEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pChannelEvent->GetParam2() > 0) ) {
+                   ( pChannelEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pChannelEvent->GetParam2() == 0) ) {
                     sister->SetLength(llTime - sister->GetAbsMicroSec());
                 }
             }
