@@ -90,7 +90,7 @@ void Tab2::SubViewBtn4::Open() {
     AnimationTarget1.AddItem(L"HideStatistics");
     AnimationTarget1.AddItem(L"RemoveOverlaps");
     AnimationTarget1.AddItem(L"LimitFPS");
-    AnimationTarget2.AddItem(L"VelocityThreshold");
+    AnimationTarget1.AddItem(L"VelocityThreshold");
     AnimationTarget1.AddItem(L"Caption");
     AnimationTarget1.AddItem(L"DifficultyText");
     AnimationTarget1.SetSelection(0);

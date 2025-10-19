@@ -1497,10 +1497,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
 </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>del "$(ProjectDir)" /f /s /q
-rmdir "$(ProjectDir)" /s /q
-mkdir "$(ProjectDir)"
-xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
+      <Command>xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
 </Command>
     </PostBuildEvent>
     <ResourceCompile>
@@ -1578,10 +1575,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
 </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>del "$(ProjectDir)" /f /s /q
-rmdir "$(ProjectDir)" /s /q
-mkdir "$(ProjectDir)"
-xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
+      <Command>xcopy "$(ProjectDir)..\Backup" "$(ProjectDir)" /c /e /v /r /y /k /i /g /h /o /b
 </Command>
     </PostBuildEvent>
     <ResourceCompile>

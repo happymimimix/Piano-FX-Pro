@@ -101,9 +101,26 @@ GameState::GameError IntroScreen::Render() {
     int G = (iColor >> 8) & 0xFF;
     int B = (iColor >> 16) & 0xFF;
     m_pRenderer->ClearAndBeginScene(D3DCOLOR_XRGB(R, G, B));
-
-    // Clear out the ImGui draw list
+    auto draw_list = m_pRenderer->GetDrawList();
     m_pRenderer->BeginText();
+    uint16_t TextSize = 1 << 5;
+    string MyTradeMark = StatisticsText1;
+    MyTradeMark += " v";
+    MyTradeMark += VersionString;
+    draw_list->AddText(
+        NULL,
+        TextSize,
+        ImVec2(12, 12),
+        0xFF404040,
+        MyTradeMark.c_str()
+    );
+    draw_list->AddText(
+        NULL,
+        TextSize,
+        ImVec2(10, 10),
+        0xFFFFFFFF,
+        MyTradeMark.c_str()
+    );
     m_pRenderer->EndText();
 
     // Present the backbuffer contents to the display
@@ -482,6 +499,27 @@ GameState::GameError SplashScreen::Render() {
     int B = (iColor >> 16) & 0xFF;
     m_pRenderer->ClearAndBeginScene(D3DCOLOR_XRGB(R, G, B));
     RenderNotes();
+    auto draw_list = m_pRenderer->GetDrawList();
+    m_pRenderer->BeginText();
+    uint16_t TextSize = 1 << 5;
+    string MyTradeMark = StatisticsText1;
+    MyTradeMark += " v";
+    MyTradeMark += VersionString;
+    draw_list->AddText(
+        NULL,
+        TextSize,
+        ImVec2(12, 12),
+        0xFF404040,
+        MyTradeMark.c_str()
+    );
+    draw_list->AddText(
+        NULL,
+        TextSize,
+        ImVec2(10, 10),
+        0xFFFFFFFF,
+        MyTradeMark.c_str()
+    );
+    m_pRenderer->EndText();
 
     // Present the backbuffer contents to the display
     m_pRenderer->EndSplashScene();

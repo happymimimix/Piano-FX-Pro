@@ -1218,7 +1218,7 @@
 #define StatisticsText25 "スコア:"
 #define StatisticsText26 "レベル:"
 #define StatisticsText27 "じどうえんそう:"
-#define StatisticsText28 "ゆうこうかずみ"
+#define StatisticsText28 "ゆうこうかずみ "
 #define StatisticsText29 "フルコンボ!!! "
 #define StatisticsText30 "デモンストレーションちゅう... "
 #define StatisticsText31 "いちじていしちゅう... "
