@@ -607,9 +607,6 @@
     <ClCompile Include="TextWidthCalculator.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
-    <ClCompile Include="VMChecker.cpp">
-      <Filter>Source Files\ModdingRelated</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Images\mediaiconssmall.bmp">

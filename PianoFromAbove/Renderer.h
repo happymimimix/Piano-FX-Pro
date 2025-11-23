@@ -83,12 +83,10 @@ public:
     HRESULT Present();
     HRESULT BeginText();
     HRESULT EndText();
-    HRESULT DrawRect( float x, float y, float cx, float cy, DWORD color );
-    HRESULT DrawRect( float x, float y, float cx, float cy,
-                      DWORD c1, DWORD c2, DWORD c3, DWORD c4 );
-    HRESULT DrawSkew( float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, DWORD color );
-    HRESULT DrawSkew( float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4,
-                       DWORD c1, DWORD c2, DWORD c3, DWORD c4 );
+    HRESULT DrawRect( float x, float y, float cx, float cy, DWORD color, float flipcenter = 0.0f, bool flip = false );
+    HRESULT DrawRect( float x, float y, float cx, float cy, DWORD c1, DWORD c2, DWORD c3, DWORD c4, float flipcenter = 0.0f, bool flip = false);
+    HRESULT DrawSkew( float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, DWORD color, float flipcenter = 0.0f, bool flip = false);
+    HRESULT DrawSkew( float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, DWORD c1, DWORD c2, DWORD c3, DWORD c4, float flipcenter = 0.0f, bool flip = false);
 
     bool GetLimitFPS() const { return m_bLimitFPS; }
     HRESULT SetLimitFPS( bool bLimitFPS );

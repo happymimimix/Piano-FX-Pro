@@ -402,7 +402,7 @@ GameState::GameError SplashScreen::Logic() {
         if (pEvent->GetChannelEventType() != MIDIChannelEvent::NoteOn && pEvent->GetChannelEventType() != MIDIChannelEvent::NoteOff) {
             m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), pEvent->GetParam2());
         }
-        else if (!m_bMute && !m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bMuted) {
+        else if (!m_bMute && !m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bMuted && pEvent->HasSister()) {
             if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0) {
                 m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), static_cast<unsigned char>(m_dVolume > 1.0 ? static_cast<double>(INT8_MAX) - (static_cast<double>(INT8_MAX) - static_cast<double>(pEvent->GetParam2())) * (2.0 - m_dVolume) : static_cast<double>(pEvent->GetParam2()) * m_dVolume));
             }
@@ -1239,7 +1239,6 @@ GameState::GameError MainScreen::Logic(void) {
                 MIDIChannelEvent* pChannelEvent = reinterpret_cast<MIDIChannelEvent*>(pEvent);
                 unsigned char key = pEvent->GetParam1();
                 unsigned char vel = pEvent->GetParam2();
-                unsigned char keyog = pOrigEvent->GetParam1();
                 unsigned char velog = pOrigEvent->GetParam2();
 
                 if (pEvent->GetChannelEventType() != MIDIChannelEvent::NoteOn && pEvent->GetChannelEventType() != MIDIChannelEvent::NoteOff) {
@@ -1265,17 +1264,17 @@ GameState::GameError MainScreen::Logic(void) {
                     }
                     m_OutDevice.PlayEvent(pEvent->GetEventCode(), key, vel);
                 }
-                else if (!m_bMute && !m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bMuted) {
+                else if (!m_bMute && !m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bMuted && pEvent->HasSister()) {
                     if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && vel > 0) {
                         if (vel > velthrshld) m_OutDevice.PlayEvent(pEvent->GetEventCode(), key, static_cast<unsigned char>(m_dVolume > 1.0 ? static_cast<double>(INT8_MAX) - (static_cast<double>(INT8_MAX) - static_cast<double>(vel)) * (2.0 - m_dVolume) : static_cast<double>(vel) * m_dVolume));
                     }
-                    else {
+                    else if (pEvent->GetSister(m_vEvents)->GetParam2() > velthrshld) {
                         m_OutDevice.PlayEvent((pEvent->GetEventCode() & 0x0F) | (MIDIChannelEvent::NoteOn << 4), key, 0x00);
                     }
                 }
                 if ((pOrigEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn || pOrigEvent->GetChannelEventType() == MIDIChannelEvent::NoteOff) && pOrigEvent->HasSister())
                 {
-                    m_vThreadWork[keyog].push_back({
+                    m_vThreadWork[key].push_back({
                         .idx = pOrigEvent->GetSisterIdx(),
                         .sister_idx = (pOrigEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && velog > 0) ? (unsigned)m_iStartPos : ~0,
                         });
@@ -1320,11 +1319,11 @@ GameState::GameError MainScreen::Logic(void) {
                     }
                     m_OutDevice.PlayEvent(pEvent->GetEventCode(), key, vel);
                 }
-                else if (!m_bMute && !m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bMuted) {
+                else if (!m_bMute && !m_vTrackSettings[pEvent->GetTrack()].aChannels[pEvent->GetChannel()].bMuted && pEvent->HasSister()) {
                     if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && vel > 0) {
                         if (vel > velthrshld) m_OutDevice.PlayEvent(pEvent->GetEventCode(), key, static_cast<unsigned char>(m_dVolume > 1.0 ? static_cast<double>(INT8_MAX) - (static_cast<double>(INT8_MAX) - static_cast<double>(vel)) * (2.0 - m_dVolume) : static_cast<double>(vel) * m_dVolume));
                     }
-                    else {
+                    else if (pEvent->GetSister(m_vEvents)->GetParam2() > velthrshld) {
                         m_OutDevice.PlayEvent((pEvent->GetEventCode() & 0x0F) | (MIDIChannelEvent::NoteOn << 4), key, 0x00);
                     }
                 }
@@ -2272,16 +2271,13 @@ void MainScreen::RenderKeys() {
     for (int i = (m_bFlipKeyboard ? m_iEndNote : m_iStartNote); m_bFlipKeyboard ? (i >= m_iStartNote) : (i <= m_iEndNote); i += (m_bFlipKeyboard ? -1 : 1))
         if (!MIDI::IsSharp(i))
         {
-            if (m_pNoteState[i] == -1)
-            {
-                m_pRenderer->DrawRect(fCurX + fKeyGap1, fCurY, m_fWhiteCX - fKeyGap, fTopCY + fNearCY,
-                    m_csKBWhite.iDarkRGB, m_csKBWhite.iDarkRGB, m_csKBWhite.iPrimaryRGB, m_csKBWhite.iPrimaryRGB);
-                m_pRenderer->DrawRect(fCurX + fKeyGap1, fCurY + fTopCY, m_fWhiteCX - fKeyGap, fNearCY,
-                    m_csKBWhite.iDarkRGB, m_csKBWhite.iDarkRGB, m_csKBWhite.iVeryDarkRGB, m_csKBWhite.iVeryDarkRGB);
-                m_pRenderer->DrawRect(fCurX + fKeyGap1, fCurY + fTopCY, m_fWhiteCX - fKeyGap, 2.0f,
-                    m_csKBBackground.iDarkRGB, m_csKBBackground.iDarkRGB, m_csKBWhite.iVeryDarkRGB, m_csKBWhite.iVeryDarkRGB);
-            }
-            else
+			m_pRenderer->DrawRect(fCurX + fKeyGap1, fCurY, m_fWhiteCX - fKeyGap, fTopCY + fNearCY,
+				m_csKBWhite.iDarkRGB, m_csKBWhite.iDarkRGB, m_csKBWhite.iPrimaryRGB, m_csKBWhite.iPrimaryRGB);
+			m_pRenderer->DrawRect(fCurX + fKeyGap1, fCurY + fTopCY, m_fWhiteCX - fKeyGap, fNearCY,
+				m_csKBWhite.iDarkRGB, m_csKBWhite.iDarkRGB, m_csKBWhite.iVeryDarkRGB, m_csKBWhite.iVeryDarkRGB);
+			m_pRenderer->DrawRect(fCurX + fKeyGap1, fCurY + fTopCY, m_fWhiteCX - fKeyGap, 2.0f,
+				m_csKBBackground.iDarkRGB, m_csKBBackground.iDarkRGB, m_csKBWhite.iVeryDarkRGB, m_csKBWhite.iVeryDarkRGB);
+            if (m_pNoteState[i] != -1)
             {
                 const MIDIChannelEvent* pEvent = m_vEvents[m_pNoteState[i]];
                 const int iTrack = pEvent->GetTrack();
@@ -2301,7 +2297,7 @@ void MainScreen::RenderKeys() {
     // Draw the sharps
     float fSharpTop = SharpRatio * 0.7f;
     fCurX = m_fNotesX + (MIDI::IsSharp(m_bFlipKeyboard ? m_iEndNote : m_iStartNote) ? m_fWhiteCX * SharpRatio / 2.0f : 0.0f);
-    fCurY = m_fZoomX * m_fTempZoomX < 0 ? fKeysY + fKeysCY - fSharpCY - fTransitionCY - fRedCY - fSpacerCY : fKeysY + fTransitionCY + fRedCY + fSpacerCY;
+    fCurY = m_fZoomX * m_fTempZoomX < 0 ? fKeysY : fKeysY + fTransitionCY + fRedCY + fSpacerCY;
     for (int i = (m_bFlipKeyboard ? m_iEndNote : m_iStartNote); m_bFlipKeyboard ? (i >= m_iStartNote) : (i <= m_iEndNote); i += (m_bFlipKeyboard ? -1 : 1))
         if (!MIDI::IsSharp(i))
             fCurX += m_fWhiteCX;
@@ -2317,33 +2313,30 @@ void MainScreen::RenderKeys() {
             const float fSharpTopX1 = x + m_fWhiteCX * (SharpRatio - fSharpTop) / 2.0f;
             const float fSharpTopX2 = fSharpTopX1 + m_fWhiteCX * fSharpTop;
 
-            if (m_pNoteState[i] == -1)
-            {
-                m_pRenderer->DrawSkew(fSharpTopX1, fCurY + fSharpCY - fNearCY,
-                    fSharpTopX2, fCurY + fSharpCY - fNearCY,
-                    x + cx, fCurY + fSharpCY, x, fCurY + fSharpCY,
-                    m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iVeryDarkRGB, m_csKBSharp.iVeryDarkRGB);
-                m_pRenderer->DrawSkew(fSharpTopX1, fCurY - fNearCY,
-                    fSharpTopX1, fCurY + fSharpCY - fNearCY,
-                    x, fCurY + fSharpCY, x, fCurY,
-                    m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iVeryDarkRGB, m_csKBSharp.iVeryDarkRGB);
-                m_pRenderer->DrawSkew(fSharpTopX2, fCurY + fSharpCY - fNearCY,
-                    fSharpTopX2, fCurY - fNearCY,
-                    x + cx, fCurY, x + cx, fCurY + fSharpCY,
-                    m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iVeryDarkRGB, m_csKBSharp.iVeryDarkRGB);
-                m_pRenderer->DrawRect(fSharpTopX1, fCurY - fNearCY, fSharpTopX2 - fSharpTopX1, fSharpCY, m_csKBSharp.iVeryDarkRGB);
-                m_pRenderer->DrawSkew(fSharpTopX1, fCurY - fNearCY,
-                    fSharpTopX2, fCurY - fNearCY,
-                    fSharpTopX2, fCurY - fNearCY + fSharpCY * 0.45f,
-                    fSharpTopX1, fCurY - fNearCY + fSharpCY * 0.35f,
-                    m_csKBSharp.iDarkRGB, m_csKBSharp.iDarkRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB);
-                m_pRenderer->DrawSkew(fSharpTopX1, fCurY - fNearCY + fSharpCY * 0.35f,
-                    fSharpTopX2, fCurY - fNearCY + fSharpCY * 0.45f,
-                    fSharpTopX2, fCurY - fNearCY + fSharpCY * 0.65f,
-                    fSharpTopX1, fCurY - fNearCY + fSharpCY * 0.55f,
-                    m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iVeryDarkRGB, m_csKBSharp.iVeryDarkRGB);
-            }
-            else
+			m_pRenderer->DrawSkew(fSharpTopX1, fCurY + fSharpCY - fNearCY,
+				fSharpTopX2, fCurY + fSharpCY - fNearCY,
+				x + cx, fCurY + fSharpCY, x, fCurY + fSharpCY,
+				m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iVeryDarkRGB, m_csKBSharp.iVeryDarkRGB);
+			m_pRenderer->DrawSkew(fSharpTopX1, fCurY - fNearCY,
+				fSharpTopX1, fCurY + fSharpCY - fNearCY,
+				x, fCurY + fSharpCY, x, fCurY,
+				m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iVeryDarkRGB, m_csKBSharp.iVeryDarkRGB);
+			m_pRenderer->DrawSkew(fSharpTopX2, fCurY + fSharpCY - fNearCY,
+				fSharpTopX2, fCurY - fNearCY,
+				x + cx, fCurY, x + cx, fCurY + fSharpCY,
+				m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iVeryDarkRGB, m_csKBSharp.iVeryDarkRGB);
+			m_pRenderer->DrawRect(fSharpTopX1, fCurY - fNearCY, fSharpTopX2 - fSharpTopX1, fSharpCY, m_csKBSharp.iVeryDarkRGB);
+			m_pRenderer->DrawSkew(fSharpTopX1, fCurY - fNearCY,
+				fSharpTopX2, fCurY - fNearCY,
+				fSharpTopX2, fCurY - fNearCY + fSharpCY * 0.45f,
+				fSharpTopX1, fCurY - fNearCY + fSharpCY * 0.35f,
+				m_csKBSharp.iDarkRGB, m_csKBSharp.iDarkRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB);
+			m_pRenderer->DrawSkew(fSharpTopX1, fCurY - fNearCY + fSharpCY * 0.35f,
+				fSharpTopX2, fCurY - fNearCY + fSharpCY * 0.45f,
+				fSharpTopX2, fCurY - fNearCY + fSharpCY * 0.65f,
+				fSharpTopX1, fCurY - fNearCY + fSharpCY * 0.55f,
+				m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iVeryDarkRGB, m_csKBSharp.iVeryDarkRGB);
+            if (m_pNoteState[i] != -1)
             {
                 const MIDIChannelEvent* pEvent = m_vEvents[m_pNoteState[i]];
                 const int iTrack = pEvent->GetTrack();

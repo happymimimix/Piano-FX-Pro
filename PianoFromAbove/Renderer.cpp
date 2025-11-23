@@ -1269,25 +1269,25 @@ HRESULT D3D12Renderer::EndText() {
     return S_OK;
 }
 
-HRESULT D3D12Renderer::DrawRect(float x, float y, float cx, float cy, DWORD color) {
-    return DrawRect(x, y, cx, cy, color, color, color, color);
+HRESULT D3D12Renderer::DrawRect(float x, float y, float cx, float cy, DWORD color, float flipcenter, bool flip) {
+    return DrawRect(x, y, cx, cy, color, color, color, color, flipcenter, flip);
 }
 
-HRESULT D3D12Renderer::DrawRect(float x, float y, float cx, float cy, DWORD c1, DWORD c2, DWORD c3, DWORD c4) {
+HRESULT D3D12Renderer::DrawRect(float x, float y, float cx, float cy, DWORD c1, DWORD c2, DWORD c3, DWORD c4, float flipcenter, bool flip) {
     m_vRectsIntermediate.insert(m_vRectsIntermediate.end(), {
-        {x,      y,      c1},
-        {x + cx, y,      c2},
+        {x, y, c1},
+        {x + cx, y, c2},
         {x + cx, y + cy, c3},
-        {x,      y + cy, c4},
+        {x, y + cy, c4},
         });
     return S_OK;
 }
 
-HRESULT D3D12Renderer::DrawSkew(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, DWORD color) {
-    return DrawSkew(x1, y1, x2, y2, x3, y3, x4, y4, color, color, color, color);
+HRESULT D3D12Renderer::DrawSkew(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, DWORD color, float flipcenter, bool flip) {
+    return DrawSkew(x1, y1, x2, y2, x3, y3, x4, y4, color, color, color, color, flipcenter, flip);
 }
 
-HRESULT D3D12Renderer::DrawSkew(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, DWORD c1, DWORD c2, DWORD c3, DWORD c4) {
+HRESULT D3D12Renderer::DrawSkew(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, DWORD c1, DWORD c2, DWORD c3, DWORD c4, float flipcenter, bool flip) {
     m_vRectsIntermediate.insert(m_vRectsIntermediate.end(), {
         {x1, y1, c1},
         {x2, y2, c2},
