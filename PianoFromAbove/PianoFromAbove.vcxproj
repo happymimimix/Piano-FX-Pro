@@ -352,7 +352,7 @@ msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
 xxd -i Colorizer.exe &gt; Colorizer.exe.h
 xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\Language.h ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.h ^|.\tmp.exe ^&gt;.\Widths.h
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 </Command>
@@ -438,7 +438,7 @@ msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
 xxd -i Colorizer.exe &gt; Colorizer.exe.h
 xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\Language.h ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.h ^|.\tmp.exe ^&gt;.\Widths.h
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 </Command>
@@ -524,7 +524,7 @@ msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
 xxd -i Colorizer.exe &gt; Colorizer.exe.h
 xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\Language.h ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.h ^|.\tmp.exe ^&gt;.\Widths.h
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 </Command>
@@ -610,7 +610,7 @@ msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
 xxd -i Colorizer.exe &gt; Colorizer.exe.h
 xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\Language.h ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.h ^|.\tmp.exe ^&gt;.\Widths.h
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 </Command>
@@ -696,7 +696,7 @@ msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
 xxd -i Colorizer.exe &gt; Colorizer.exe.h
 xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\Language.h ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.h ^|.\tmp.exe ^&gt;.\Widths.h
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 </Command>
@@ -782,7 +782,7 @@ msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
 xxd -i Colorizer.exe &gt; Colorizer.exe.h
 xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\Language.h ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.h ^|.\tmp.exe ^&gt;.\Widths.h
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 </Command>
@@ -868,7 +868,7 @@ msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
 xxd -i Colorizer.exe &gt; Colorizer.exe.h
 xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\Language.h ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.h ^|.\tmp.exe ^&gt;.\Widths.h
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 </Command>
@@ -954,7 +954,7 @@ msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
 xxd -i Colorizer.exe &gt; Colorizer.exe.h
 xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\Language.h ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.h ^|.\tmp.exe ^&gt;.\Widths.h
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 </Command>
@@ -1040,7 +1040,7 @@ msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
 xxd -i Colorizer.exe &gt; Colorizer.exe.h
 xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\Language.h ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.h ^|.\tmp.exe ^&gt;.\Widths.h
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 </Command>
@@ -1124,7 +1124,7 @@ msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
 xxd -i Colorizer.exe &gt; Colorizer.exe.h
 xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\Language.h ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.h ^|.\tmp.exe ^&gt;.\Widths.h
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 </Command>
@@ -1193,7 +1193,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\Language.h ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.h ^|.\tmp.exe ^&gt;.\Widths.h
 </Command>
     </PreBuildEvent>
     <PostBuildEvent>
@@ -1251,7 +1251,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\Language.h ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.h ^|.\tmp.exe ^&gt;.\Widths.h
 </Command>
     </PreBuildEvent>
     <PostBuildEvent>
@@ -1385,7 +1385,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
     <ClInclude Include="imgui\imstb_rectpack.h" />
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
-    <ClInclude Include="Language.h" />
+    <ClInclude Include="LanguagePacks.h" />
     <ClInclude Include="LuaCode.h" />
     <ClInclude Include="lzma.h" />
     <ClInclude Include="lzma\base.h" />
@@ -1465,7 +1465,32 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
     <ClInclude Include="Widths.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="PianoFromAbove.rc" />
+    <ResourceCompile Include="PianoFromAbove.rc">
+      <Culture Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">0x0411</Culture>
+      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</SuppressStartupBanner>
+      <Culture Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">0x0411</Culture>
+      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">false</SuppressStartupBanner>
+      <Culture Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">0x0411</Culture>
+      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">false</SuppressStartupBanner>
+      <Culture Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">0x0411</Culture>
+      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">false</SuppressStartupBanner>
+      <Culture Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">0x0411</Culture>
+      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">false</SuppressStartupBanner>
+      <Culture Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">0x0411</Culture>
+      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">false</SuppressStartupBanner>
+      <Culture Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">0x0411</Culture>
+      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">false</SuppressStartupBanner>
+      <Culture Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">0x0411</Culture>
+      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">false</SuppressStartupBanner>
+      <Culture Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">0x0411</Culture>
+      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='EnforceSoftwareRender|x64'">false</SuppressStartupBanner>
+      <Culture Condition="'$(Configuration)|$(Platform)'=='Release|x64'">0x0411</Culture>
+      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</SuppressStartupBanner>
+      <Culture Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">0x0411</Culture>
+      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">false</SuppressStartupBanner>
+      <Culture Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">0x0411</Culture>
+      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">false</SuppressStartupBanner>
+    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Config.cpp" />
@@ -1493,7 +1518,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
     <None Include="Images\chase.mid.xz" />
     <None Include="Images\PFA Icon.ico" />
     <None Include="Images\mediaiconssmall.bmp" />
-    <None Include="common.hlsli" />
+    <None Include="common.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="background_ps.hlsl">

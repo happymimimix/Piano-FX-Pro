@@ -30,19 +30,15 @@ inline long nps;
 inline string npsFormatted;
 inline long passed;
 inline string passedFormatted;
-inline uint8_t FrameCount = 0;
 inline int width = -1;
 inline int height = -1;
 inline uint16_t resolution = -1;
 inline char CheatEngineCaption[(1<<7)*(1<<10)] = {};
 inline size_t TotalNC;
-inline long long MinimalTime;
 inline long long TotalTime;
 inline string TotalTimeFormatted;
 inline char Difficulty[1 << 10] = {};
 inline bool UpdateNotePos = true;
-inline long long JumpTarget = ~0;
-inline UINT nxtdelay = 1<<6;
 inline static const signed long long MS = 1e+3;
 inline static const signed long long S = 1e+6;
 
@@ -290,11 +286,14 @@ private:
     bool m_bMute;
     double m_dVolume;
     bool m_bTickMode = false;
+    UINT nxtdelay = 1 << 6;
+    long long JumpTarget = ~0;
 
     // FPS variables
     int m_iFPSCount;
     long long m_llFPSTime;
     double m_dFPS;
+    uint8_t FrameCount = 0;
 
     // Devices
     MIDIOutDevice m_OutDevice;
@@ -311,6 +310,7 @@ private:
     float m_pBendsValue[16] = {};
     std::wstring m_sCurBackground;
     bool m_bBackgroundLoaded;
+    bool m_bRemoveOverlaps;
 
     float m_fZoomX, m_fOffsetX, m_fOffsetY;
     float m_fTempZoomX, m_fTempOffsetX, m_fTempOffsetY;
@@ -326,6 +326,8 @@ private:
     int m_iAllWhiteKeys; // Number of white keys are on the screen
     float m_fWhiteCX; // Width of the white keys
     long long m_llRndStartTime; // Rounded start time to make stuff drop at the same time
+    bool m_bSameWidth;
+    bool m_bMapVel;
     
     // Frame dumping stuff
     bool m_bDumpFrames = false;

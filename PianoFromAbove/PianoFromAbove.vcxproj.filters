@@ -501,7 +501,7 @@
     <ClInclude Include="Widths.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
-    <ClInclude Include="Language.h">
+    <ClInclude Include="LanguagePacks.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
     <ClInclude Include="DebugLanguageOverride.h">
@@ -516,11 +516,6 @@
     <ClInclude Include="ModdingAPI.h">
       <Filter>Source Files\ModdingRelated</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="PianoFromAbove.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tinyxml\tinystr.cpp">
@@ -615,7 +610,7 @@
     <None Include="Images\PFA Icon.ico">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="common.hlsli">
+    <None Include="common.hlsl">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="Images\chase.mid.xz">
@@ -644,5 +639,10 @@
     <FxCompile Include="note_vs_samewidth.hlsl">
       <Filter>Resource Files</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="PianoFromAbove.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

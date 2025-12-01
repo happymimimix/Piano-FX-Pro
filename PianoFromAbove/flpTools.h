@@ -15,7 +15,7 @@ void Make_FL_Event(vector<uint8_t>& FLdt_Data, uint8_t Value, vector<uint8_t> Da
         Data.resize(4, 0); // Fill the rest of the space with 0 if the data length is shorter than what we expect. 
         FLdt_Data.insert(FLdt_Data.end(), Data.begin(), Data.begin() + 4);
     }
-    else { // text
+    else { // variable size
         size_t DataSize = Data.size();
         while (DataSize >= 0x80) {
             FLdt_Data.push_back(static_cast<uint8_t>((DataSize & 0x7F) | 0x80));
@@ -80,7 +80,7 @@ void CreateKnob(uint8_t* ParameterList, uint8_t KnobID, uint32_t ControllerID, u
         ParameterList[Offset] = Byte;
         Offset++;
     }
-    size_t DataSize = ShortName.size();
+    DataSize = ShortName.size();
     while (DataSize >= 0x80) {
         ParameterList[Offset] = static_cast<uint8_t>((DataSize & 0x7F) | 0x80);
         DataSize >>= 7;
@@ -134,11 +134,7 @@ void CreateFLP(wstring Path, uint16_t PPQ) {
     Make_FL_Event(FLdt_Data, 67, vector<uint8_t>{0x01}); //Selected Pattern: 01
     Make_FL_Event(FLdt_Data, 28, vector<uint8_t>{0x00}); //Is Registered
 
-    uint8_t ID_Plugin_New[24];
-    for (uint8_t i = 0; i < 24; i++) ID_Plugin_New[i] = 0;
-    ID_Plugin_New[8] = 2;
-    ID_Plugin_New[16] = 16;
-    uint8_t ID_Plugin_Parameters[4096];
+    uint8_t ID_Plugin_Parameters[1547];
     for (uint16_t i = 0; i < 4096; i++) ID_Plugin_Parameters[i] = 0;
     ID_Plugin_Parameters[0] = 4;
     for (uint8_t i = 8; i < 20; ++i) ID_Plugin_Parameters[i] = 255;
@@ -308,7 +304,6 @@ void CreateFLP(wstring Path, uint16_t PPQ) {
         Make_FL_Event(FLdt_Data, 64, ToBytes(static_cast<uint16_t>(Channel), 2));
         Make_FL_Event(FLdt_Data, 21, vector<uint8_t>{0x02});
         Make_FL_Event(FLdt_Data, 201, vector<uint8_t>{'M', 0, 'I', 0, 'D', 0, 'I', 0, ' ', 0, 'O', 0, 'u', 0, 't', 0, 0, 0});
-        Make_FL_Event(FLdt_Data, 212, vector<uint8_t>(ID_Plugin_New, ID_Plugin_New + 24));
         wstring TrackName = L"MIDI Out -> Ch";
         TrackName += to_wstring(Channel >= 9 ? Channel + 2 : Channel + 1);
         TrackName += (wchar_t)0x0000;
@@ -330,7 +325,6 @@ void CreateFLP(wstring Path, uint16_t PPQ) {
         Make_FL_Event(FLdt_Data, 64, ToBytes(static_cast<uint16_t>(Channel), 2));
         Make_FL_Event(FLdt_Data, 21, vector<uint8_t>{0x02});
         Make_FL_Event(FLdt_Data, 201, vector<uint8_t>{'M', 0, 'I', 0, 'D', 0, 'I', 0, ' ', 0, 'O', 0, 'u', 0, 't', 0, 0, 0});
-        Make_FL_Event(FLdt_Data, 212, vector<uint8_t>(ID_Plugin_New, ID_Plugin_New + 24));
         wstring TrackName = L"MIDI Out -> Any";
         TrackName += (wchar_t)0x0000;
         Make_FL_Event(FLdt_Data, 192, vector<uint8_t>(reinterpret_cast<const uint8_t*>(TrackName.data()), reinterpret_cast<const uint8_t*>(TrackName.data() + TrackName.size())));

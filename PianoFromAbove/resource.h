@@ -55,10 +55,10 @@
 #define IDC_TICKBASED                   501
 #define IDC_PITCHBENDS                  502
 #define IDC_SAMEWIDTH                   503
-#define IDC_MARKERS                     504
-#define IDC_MARKERENC                   505
-#define IDC_LIMITFPS                    506
-#define IDC_FFMPEG                      507
+#define IDC_MAPVEL						504
+#define IDC_MARKERS                     505
+#define IDC_MARKERENC                   506
+#define IDC_LIMITFPS                    507
 #define IDC_DEBUG						508
 #define IDC_DISABLEUI                   509
 #define IDC_OR		                    510
@@ -74,6 +74,7 @@
 #define IDC_SPLASHRESET                 609
 #define IDC_VELSTRSHLD                  610
 #define IDC_VELSTRSHLDSPIN              611
+#define IDC_FFMPEG                      612
 
 #define IDC_FILE                        801
 #define IDC_FOLDER                      802

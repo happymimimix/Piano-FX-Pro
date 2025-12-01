@@ -22,7 +22,7 @@
 
 #include "MainProcs.h"
 #include "resource.h"
-#include "Language.h"
+#include "LanguagePacks.h"
 
 #include "Config.h"
 #include "GameState.h"
@@ -2562,7 +2562,7 @@ DWORD WINAPI GameThread(LPVOID lpParameter)
     pGameState->SetHWnd(g_hWndGfx);
     pGameState->SetRenderer(pRenderer);
     pGameState->Init();
-    GameState::GameError ge;
+    GameState::GameError ErrorLevel;
 
     wchar_t buf[1 << 10] = {};
     _snwprintf_s(buf, 1 << 10, MainWindowTitle1 L" v" LVersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle6 MainWindowTitle7);
@@ -2575,8 +2575,8 @@ DWORD WINAPI GameThread(LPVOID lpParameter)
         while (g_MsgQueue.Pop(msg))
             pGameState->MsgProc(msg.hwnd, msg.message, msg.wParam, msg.lParam);
 
-        if ((ge = GameState::ChangeState(pGameState->NextState(), &pGameState)) != GameState::Success)
-            PostMessage(g_hWnd, WM_COMMAND, ID_GAMEERROR, ge);
+        if ((ErrorLevel = GameState::ChangeState(pGameState->NextState(), &pGameState)) != GameState::Success)
+            PostMessage(g_hWnd, WM_COMMAND, ID_GAMEERROR, ErrorLevel);
         pGameState->Logic();
         pGameState->Render();
     }

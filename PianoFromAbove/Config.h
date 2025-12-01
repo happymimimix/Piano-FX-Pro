@@ -74,10 +74,10 @@ struct VideoSettings : public ISettings
     bool bTickBased;
     bool bVisualizePitchBends;
     bool bSameWidth;
+    bool bMapVel;
     bool bShowMarkers;
     enum MarkerEncoding : uint8_t { CP1252, CP437, CP82, CP886, CP932, CP936, UTF8 } eMarkerEncoding;
     bool bLimitFPS;
-    bool bDumpFrames;
     bool bDebug;
     bool bDisableUI;
     bool bOR;
@@ -94,6 +94,7 @@ struct ControlsSettings : public ISettings
     bool bPhigros;
     uint8_t iVelocityThreshold;
     wstring sSplashMIDI;
+    bool bDumpFrames;
 };
 
 class PlaybackSettings : public ISettings

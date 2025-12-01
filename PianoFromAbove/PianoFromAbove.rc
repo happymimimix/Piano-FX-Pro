@@ -1,7 +1,7 @@
 #pragma code_page(65001)
 #include "resource.h"
 #include "matrices.h"
-#include "Language.h"
+#include "LanguagePacks.h"
 #include "afxres.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -309,32 +309,32 @@ BEGIN
 					Property3Text4W + BoxSpacing,
 					ContentHeight
 
-	CONTROL         Property3Text5,IDC_MARKERS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+	CONTROL         Property3Text5,IDC_MAPVEL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
 					dMargin,
 					qMargin + qContentHeight,
 					Property3Text5W + BoxSpacing,
 					ContentHeight
 
-	LTEXT           Property3Text6,-1,
+	CONTROL         Property3Text6,IDC_MARKERS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
 					dMargin,
 					qMargin + iContentHeight + hMargin,
-					Property3Text6W,
+					Property3Text6W + BoxSpacing,
+					ContentHeight
+
+	LTEXT           Property3Text7,-1,
+					dMargin,
+					iMargin + xContentHeight,
+					Property3Text7W,
 					FontSize
 	
 	COMBOBOX        IDC_MARKERENC,
-					dMargin + Property3Text6W,
-					qMargin + iContentHeight,
+					dMargin + Property3Text7W,
+					iMargin + xContentHeight + mhMargin,
 					MarkerEncodingW,
 					ContentHeight + Margin,
 					CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
 
-	CONTROL         Property3Text7,IDC_LIMITFPS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-					dMargin,
-					iMargin + xContentHeight,
-					Property3Text7W + BoxSpacing,
-					ContentHeight
-
-	CONTROL         Property3Text8,IDC_FFMPEG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+	CONTROL         Property3Text8,IDC_LIMITFPS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
 					dMargin,
 					iMargin + pContentHeight + hMargin,
 					Property3Text8W + BoxSpacing,
@@ -465,6 +465,12 @@ BEGIN
 					ES_NUMBER | ES_AUTOHSCROLL
 
 	CONTROL         "", IDC_VELSTRSHLDSPIN,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,0,0,0,0
+	
+	CONTROL         Property4Text10,IDC_FFMPEG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+					dMargin,
+					pContentHeight + cMargin + Margin,
+					Property3Text8W + BoxSpacing,
+					ContentHeight
 
 END
 

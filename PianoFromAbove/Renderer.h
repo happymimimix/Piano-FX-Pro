@@ -43,6 +43,8 @@ struct NoteData {
     uint8_t key;
     uint8_t channel;
     uint16_t track;
+    uint8_t alpha;
+    char velmappingenabled;
     float pos;
     float length;
 };

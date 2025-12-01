@@ -19,7 +19,7 @@
 #include "GameState.h"
 #include "Config.h"
 #include "resource.h"
-#include "Language.h"
+#include "LanguagePacks.h"
 #include "ConfigProcs.h"
 #include "lzma.h"
 
@@ -651,15 +651,12 @@ void SplashScreen::RenderNote(MIDIChannelEvent* pNote) {
     }
 
     // Visualize!
-    int iAlpha1 = static_cast<int>(0xFF * (m_fNotesCY - y) / m_fNotesCY);
-    iAlpha1 = max(iAlpha1, 0);
-    int iAlpha2 = min(iAlpha1, 0xFF);
-    iAlpha1 <<= 24;
-    iAlpha2 <<= 24;
-    m_pRenderer->DrawRect(x, y - cy, cx, cy, csTrack.iVeryDarkRGB | iAlpha1);
+    uint32_t iAlpha = min(max(static_cast<int>(0xFF * (m_fNotesCY - y) / m_fNotesCY), 0x00), 0xFF);
+    iAlpha <<= 24;
+    m_pRenderer->DrawRect(x, y - cy, cx, cy, csTrack.iVeryDarkRGB & 0x00FFFFFF | iAlpha);
     m_pRenderer->DrawRect(x + fDeflate, y - cy + fDeflate,
         cx - fDeflate * 2.0f, cy - fDeflate * 2.0f,
-        csTrack.iPrimaryRGB | iAlpha1, csTrack.iDarkRGB | iAlpha1, csTrack.iDarkRGB | iAlpha2, csTrack.iPrimaryRGB | iAlpha2);
+        csTrack.iPrimaryRGB & 0x00FFFFFF | iAlpha, csTrack.iDarkRGB & 0x00FFFFFF | iAlpha, csTrack.iDarkRGB & 0x00FFFFFF | iAlpha, csTrack.iPrimaryRGB & 0x00FFFFFF | iAlpha);
 }
 
 void SplashScreen::GenNoteXTable() {
@@ -748,10 +745,10 @@ void MainScreen::InitColors() {
     static const VisualSettings& cVisual = config.GetVisualSettings();
 
     m_csBackground.SetColor(cVisual.iBkgColor, 0.7f, 1.3f);
-    m_csKBBackground.SetColor(0x00999999, 0.4f, 0.0f);
+    m_csKBBackground.SetColor(0x00999999 | (cVisual.iBkgColor & 0xFF000000), 0.4f, 0.0f);
     m_csKBRed.SetColor(cVisual.iBarColor, 0.5f);
-    m_csKBWhite.SetColor(0x00FFFFFF, 0.8f, 0.6f);
-    m_csKBSharp.SetColor(0x00404040, 0.5f, 0.0f);
+    m_csKBWhite.SetColor(0x00FFFFFF | (cVisual.iBarColor & 0xFF000000), 0.8f, 0.6f);
+    m_csKBSharp.SetColor(0x00404040 | (cVisual.iBarColor & 0xFF000000), 0.5f, 0.0f);
 }
 
 // Init state vars. Only those which validate the date.
@@ -760,6 +757,7 @@ void MainScreen::InitState() {
     static const PlaybackSettings& cPlayback = config.GetPlaybackSettings();
     static const ViewSettings& cView = config.GetViewSettings();
     static const VideoSettings& cVideo = config.GetVideoSettings();
+    static const ControlsSettings& cControls = config.GetControlsSettings();
 
     m_eGameMode = Practice;
     m_iStartPos = 0;
@@ -808,7 +806,7 @@ void MainScreen::InitState() {
     else if (TotalNC < 400000000) { strcpy(Difficulty, "AT Lv.18"); }
     else { strcpy(Difficulty, "SP Lv.?"); }
 
-    m_bDumpFrames = cVideo.bDumpFrames;
+    m_bDumpFrames = cControls.bDumpFrames;
     if (m_bDumpFrames) {
         RECT rect = {};
         GetWindowRect(g_hWndGfx, &rect);
@@ -1138,9 +1136,25 @@ GameState::GameError MainScreen::Logic(void) {
     m_fZoomX = cView.GetZoomX();
     if (!m_bZoomMove) m_bTrackPos = m_bTrackZoom = false;
     m_eKeysShown = cVisual.eKeysShown;
-    m_iStartNote = max(0, min(127, min(cVisual.iFirstKey, cVisual.iLastKey)));
-    m_iEndNote = max(0, min(127, max(cVisual.iFirstKey, cVisual.iLastKey)));
+    if (m_eKeysShown == VisualSettings::All)
+    {
+        m_iStartNote = 0;
+        m_iEndNote = 127;
+    }
+    else if (m_eKeysShown == VisualSettings::Song)
+    {
+        const MIDI::MIDIInfo& mInfo = m_MIDI.GetInfo();
+        m_iStartNote = mInfo.iMinNote;
+        m_iEndNote = mInfo.iMaxNote;
+    }
+    else {
+        m_iStartNote = max(0, min(127, min(cVisual.iFirstKey, cVisual.iLastKey)));
+        m_iEndNote = max(0, min(127, max(cVisual.iFirstKey, cVisual.iLastKey)));
+    }
     m_bFlipKeyboard = cVisual.iFirstKey > cVisual.iLastKey && cVisual.eKeysShown != 0 && cVisual.eKeysShown != 1;
+    m_bSameWidth = cVideo.bSameWidth;
+    m_bRemoveOverlaps = cVideo.bOR;
+    m_bMapVel = cVideo.bMapVel;
     m_pRenderer->SetLimitFPS(cVideo.bLimitFPS);
     if (cVisual.iBkgColor != m_csBackground.iOrigBGR) m_csBackground.SetColor(cVisual.iBkgColor, 0.7f, 1.3f);
 
@@ -1941,19 +1955,6 @@ GameState::GameError MainScreen::Render()
 // These used to be created as local variables inside each Render* function, but too much copying of code :/
 // Depends on m_llStartTime, m_llTimeSpan, m_eKeysShown, m_iStartNote, m_iEndNote
 void MainScreen::RenderGlobals() {
-    // Midi info
-    const MIDI::MIDIInfo& mInfo = m_MIDI.GetInfo();
-    if (m_eKeysShown == VisualSettings::All)
-    {
-        m_iStartNote = 0;
-        m_iEndNote = 127;
-    }
-    else if (m_eKeysShown == VisualSettings::Song)
-    {
-        m_iStartNote = mInfo.iMinNote;
-        m_iEndNote = mInfo.iMaxNote;
-    }
-
     // Screen X info
     m_fNotesX = m_fOffsetX + m_fTempOffsetX;
     m_fNotesCX = m_pRenderer->GetBufferWidth() * abs(m_fZoomX) * abs(m_fTempZoomX);
@@ -2138,9 +2139,10 @@ void MainScreen::RenderNotes() {
 }
 
 void MainScreen::RenderNote(const MIDIChannelEvent* pNote) {
-    int iNote = pNote->GetParam1();
-    int iTrack = pNote->GetTrack();
-    int iChannel = pNote->GetChannel();
+    uint8_t iNote = pNote->GetParam1();
+    uint8_t iVel = m_bMapVel ? pNote->GetParam2() ^ 0x7F : 0x00;
+    uint16_t iTrack = pNote->GetTrack();
+    uint8_t iChannel = pNote->GetChannel();
     long long llNoteStart = pNote->GetAbsMicroSec();
     long long llNoteEnd = llNoteStart + pNote->GetLength();
     if (m_bTickMode) {
@@ -2149,9 +2151,11 @@ void MainScreen::RenderNote(const MIDIChannelEvent* pNote) {
     }
     m_pRenderer->PushNoteData(
         NoteData{
-            .key = (uint8_t)iNote,
-            .channel = (uint8_t)iChannel,
-            .track = (uint16_t)iTrack,
+            .key = iNote,
+            .channel = iChannel,
+            .track = iTrack,
+            .alpha = iVel,
+            .velmappingenabled = m_bMapVel,
             .pos = static_cast<float>((m_dNSpeed < 0) != (m_fZoomX * m_fTempZoomX < 0) ? -(llNoteStart - m_llRndStartTime) - (llNoteEnd - llNoteStart) + (m_fZoomX * m_fTempZoomX < 0 ? m_llTimeSpan : 0) : llNoteStart - m_llRndStartTime + (m_fZoomX * m_fTempZoomX < 0 ? m_llTimeSpan : 0)),
             .length = static_cast<float>(llNoteEnd - llNoteStart),
         }
@@ -2168,7 +2172,7 @@ void MainScreen::GenNoteXTable() {
     }
     if (m_bFlipKeyboard) {
         for (int i = m_iStartNote; i <= m_iEndNote; i++) {
-            if (Config::GetConfig().GetVideoSettings().bSameWidth) {
+            if (m_bSameWidth) {
                 float fStartNote = m_iStartNote;
                 float fEndNote = m_iEndNote;
                 float KeyCount = i - (m_iStartNote - 1);
@@ -2196,7 +2200,7 @@ void MainScreen::GenNoteXTable() {
     }
     else {
         for (int i = m_iStartNote; i <= m_iEndNote; i++) {
-            if (Config::GetConfig().GetVideoSettings().bSameWidth) {
+            if (m_bSameWidth) {
                 float fStartNote = m_iStartNote;
                 float fEndNote = m_iEndNote;
                 float KeyCount = i - m_iStartNote;
@@ -2271,22 +2275,58 @@ void MainScreen::RenderKeys() {
     for (int i = (m_bFlipKeyboard ? m_iEndNote : m_iStartNote); m_bFlipKeyboard ? (i >= m_iStartNote) : (i <= m_iEndNote); i += (m_bFlipKeyboard ? -1 : 1))
         if (!MIDI::IsSharp(i))
         {
-			m_pRenderer->DrawRect(fCurX + fKeyGap1, fCurY, m_fWhiteCX - fKeyGap, fTopCY + fNearCY,
-				m_csKBWhite.iDarkRGB, m_csKBWhite.iDarkRGB, m_csKBWhite.iPrimaryRGB, m_csKBWhite.iPrimaryRGB);
-			m_pRenderer->DrawRect(fCurX + fKeyGap1, fCurY + fTopCY, m_fWhiteCX - fKeyGap, fNearCY,
-				m_csKBWhite.iDarkRGB, m_csKBWhite.iDarkRGB, m_csKBWhite.iVeryDarkRGB, m_csKBWhite.iVeryDarkRGB);
-			m_pRenderer->DrawRect(fCurX + fKeyGap1, fCurY + fTopCY, m_fWhiteCX - fKeyGap, 2.0f,
-				m_csKBBackground.iDarkRGB, m_csKBBackground.iDarkRGB, m_csKBWhite.iVeryDarkRGB, m_csKBWhite.iVeryDarkRGB);
-            if (m_pNoteState[i] != -1)
+            if (m_pNoteState[i] == -1)
             {
-                const MIDIChannelEvent* pEvent = m_vEvents[m_pNoteState[i]];
-                const int iTrack = pEvent->GetTrack();
-                const int iChannel = pEvent->GetChannel();
+                m_pRenderer->DrawRect(fCurX + fKeyGap1, fCurY, m_fWhiteCX - fKeyGap, fTopCY + fNearCY,
+                    m_csKBWhite.iDarkRGB, m_csKBWhite.iDarkRGB, m_csKBWhite.iPrimaryRGB, m_csKBWhite.iPrimaryRGB);
+                m_pRenderer->DrawRect(fCurX + fKeyGap1, fCurY + fTopCY, m_fWhiteCX - fKeyGap, fNearCY,
+                    m_csKBWhite.iDarkRGB, m_csKBWhite.iDarkRGB, m_csKBWhite.iVeryDarkRGB, m_csKBWhite.iVeryDarkRGB);
+                m_pRenderer->DrawRect(fCurX + fKeyGap1, fCurY + fTopCY, m_fWhiteCX - fKeyGap, 2.0f,
+                    m_csKBBackground.iDarkRGB, m_csKBBackground.iDarkRGB, m_csKBWhite.iVeryDarkRGB, m_csKBWhite.iVeryDarkRGB);
+            }
+            else {
+                // Draw one layer of blank keys first
+                ChannelSettings csKBWhite = m_csKBWhite;
+                bool layer1drawn = false;
 
-                ChannelSettings& csKBWhite = m_vTrackSettings[iTrack].aChannels[iChannel];
-                m_pRenderer->DrawRect(fCurX + fKeyGap1, fCurY, m_fWhiteCX - fKeyGap, fTopCY + fNearCY - 2.0f,
-                    csKBWhite.iDarkRGB, csKBWhite.iDarkRGB, csKBWhite.iPrimaryRGB, csKBWhite.iPrimaryRGB);
-                m_pRenderer->DrawRect(fCurX + fKeyGap1, fCurY + fTopCY + fNearCY - 2.0f, m_fWhiteCX - fKeyGap, 2.0f, csKBWhite.iDarkRGB);
+                // Skip the loop so no overlapping notes are being drawn
+                if (m_bRemoveOverlaps) {
+                    goto skiploopa;
+                }
+
+                for (size_t OverlapCount = 0; OverlapCount < m_vState[i].size(); OverlapCount++) {
+                skiploopa:
+                    const MIDIChannelEvent* pEvent = m_vEvents[m_bRemoveOverlaps ? m_pNoteState[i] : m_vState[i][OverlapCount]];
+                    const int iTrack = pEvent->GetTrack();
+                    const int iChannel = pEvent->GetChannel();
+
+                    nxtlayera:
+                    if (layer1drawn) {
+                        // Start drawing colored keys
+                        csKBWhite = m_vTrackSettings[iTrack].aChannels[iChannel];
+                        if (m_bMapVel) {
+                            csKBWhite.iPrimaryRGB = csKBWhite.iPrimaryRGB & 0x00FFFFFF | ((pEvent->GetParam2() ^ 0x7F) << 24);
+                            csKBWhite.iDarkRGB = csKBWhite.iDarkRGB & 0x00FFFFFF | ((pEvent->GetParam2() ^ 0x7F) << 24);
+                            csKBWhite.iVeryDarkRGB = csKBWhite.iVeryDarkRGB & 0x00FFFFFF | ((pEvent->GetParam2() ^ 0x7F) << 24);
+                        }
+                    }
+                    m_pRenderer->DrawRect(fCurX + fKeyGap1, fCurY, m_fWhiteCX - fKeyGap, fTopCY + fNearCY - 2.0f,
+                        csKBWhite.iDarkRGB, csKBWhite.iDarkRGB, csKBWhite.iPrimaryRGB, csKBWhite.iPrimaryRGB);
+                    m_pRenderer->DrawRect(fCurX + fKeyGap1, fCurY + fTopCY + fNearCY - 2.0f, m_fWhiteCX - fKeyGap, 2.0f, csKBWhite.iDarkRGB);
+
+                    if (!layer1drawn) {
+                        // Finished drawing blank keys
+                        layer1drawn = true;
+                        goto nxtlayera;
+                    }
+
+                    if (m_bRemoveOverlaps) {
+                        // End the loop now
+                        goto skipa;
+                    }
+                }
+                skipa:
+                ;  //Expected statement? Fine, I'll give you a statement. Say hello to THE SEMICOLON! 
             }
             m_pRenderer->DrawRect(floor(fCurX + fKeyGap1 + m_fWhiteCX - fKeyGap + 0.5f), fCurY, fKeyGap, fTopCY + fNearCY,
                 m_csKBBackground.iVeryDarkRGB, m_csKBBackground.iPrimaryRGB, m_csKBBackground.iPrimaryRGB, m_csKBBackground.iVeryDarkRGB);
@@ -2313,61 +2353,97 @@ void MainScreen::RenderKeys() {
             const float fSharpTopX1 = x + m_fWhiteCX * (SharpRatio - fSharpTop) / 2.0f;
             const float fSharpTopX2 = fSharpTopX1 + m_fWhiteCX * fSharpTop;
 
-			m_pRenderer->DrawSkew(fSharpTopX1, fCurY + fSharpCY - fNearCY,
-				fSharpTopX2, fCurY + fSharpCY - fNearCY,
-				x + cx, fCurY + fSharpCY, x, fCurY + fSharpCY,
-				m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iVeryDarkRGB, m_csKBSharp.iVeryDarkRGB);
-			m_pRenderer->DrawSkew(fSharpTopX1, fCurY - fNearCY,
-				fSharpTopX1, fCurY + fSharpCY - fNearCY,
-				x, fCurY + fSharpCY, x, fCurY,
-				m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iVeryDarkRGB, m_csKBSharp.iVeryDarkRGB);
-			m_pRenderer->DrawSkew(fSharpTopX2, fCurY + fSharpCY - fNearCY,
-				fSharpTopX2, fCurY - fNearCY,
-				x + cx, fCurY, x + cx, fCurY + fSharpCY,
-				m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iVeryDarkRGB, m_csKBSharp.iVeryDarkRGB);
-			m_pRenderer->DrawRect(fSharpTopX1, fCurY - fNearCY, fSharpTopX2 - fSharpTopX1, fSharpCY, m_csKBSharp.iVeryDarkRGB);
-			m_pRenderer->DrawSkew(fSharpTopX1, fCurY - fNearCY,
-				fSharpTopX2, fCurY - fNearCY,
-				fSharpTopX2, fCurY - fNearCY + fSharpCY * 0.45f,
-				fSharpTopX1, fCurY - fNearCY + fSharpCY * 0.35f,
-				m_csKBSharp.iDarkRGB, m_csKBSharp.iDarkRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB);
-			m_pRenderer->DrawSkew(fSharpTopX1, fCurY - fNearCY + fSharpCY * 0.35f,
-				fSharpTopX2, fCurY - fNearCY + fSharpCY * 0.45f,
-				fSharpTopX2, fCurY - fNearCY + fSharpCY * 0.65f,
-				fSharpTopX1, fCurY - fNearCY + fSharpCY * 0.55f,
-				m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iVeryDarkRGB, m_csKBSharp.iVeryDarkRGB);
-            if (m_pNoteState[i] != -1)
-            {
-                const MIDIChannelEvent* pEvent = m_vEvents[m_pNoteState[i]];
-                const int iTrack = pEvent->GetTrack();
-                const int iChannel = pEvent->GetChannel();
-
+            if (m_pNoteState[i] == -1) {
+                m_pRenderer->DrawSkew(fSharpTopX1, fCurY + fSharpCY - fNearCY,
+                    fSharpTopX2, fCurY + fSharpCY - fNearCY,
+                    x + cx, fCurY + fSharpCY, x, fCurY + fSharpCY,
+                    m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iVeryDarkRGB, m_csKBSharp.iVeryDarkRGB);
+                m_pRenderer->DrawSkew(fSharpTopX1, fCurY - fNearCY,
+                    fSharpTopX1, fCurY + fSharpCY - fNearCY,
+                    x, fCurY + fSharpCY, x, fCurY,
+                    m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iVeryDarkRGB, m_csKBSharp.iVeryDarkRGB);
+                m_pRenderer->DrawSkew(fSharpTopX2, fCurY + fSharpCY - fNearCY,
+                    fSharpTopX2, fCurY - fNearCY,
+                    x + cx, fCurY, x + cx, fCurY + fSharpCY,
+                    m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iVeryDarkRGB, m_csKBSharp.iVeryDarkRGB);
+                m_pRenderer->DrawRect(fSharpTopX1, fCurY - fNearCY, fSharpTopX2 - fSharpTopX1, fSharpCY, m_csKBSharp.iVeryDarkRGB);
+                m_pRenderer->DrawSkew(fSharpTopX1, fCurY - fNearCY,
+                    fSharpTopX2, fCurY - fNearCY,
+                    fSharpTopX2, fCurY - fNearCY + fSharpCY * 0.45f,
+                    fSharpTopX1, fCurY - fNearCY + fSharpCY * 0.35f,
+                    m_csKBSharp.iDarkRGB, m_csKBSharp.iDarkRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB);
+                m_pRenderer->DrawSkew(fSharpTopX1, fCurY - fNearCY + fSharpCY * 0.35f,
+                    fSharpTopX2, fCurY - fNearCY + fSharpCY * 0.45f,
+                    fSharpTopX2, fCurY - fNearCY + fSharpCY * 0.65f,
+                    fSharpTopX1, fCurY - fNearCY + fSharpCY * 0.55f,
+                    m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iVeryDarkRGB, m_csKBSharp.iVeryDarkRGB);
+            }
+            else {
                 const float fNewNear = fNearCY * 0.25f;
 
-                const ChannelSettings& csKBSharp = m_vTrackSettings[iTrack].aChannels[iChannel];
-                m_pRenderer->DrawSkew(fSharpTopX1, fCurY + fSharpCY - fNewNear,
-                    fSharpTopX2, fCurY + fSharpCY - fNewNear,
-                    x + cx, fCurY + fSharpCY, x, fCurY + fSharpCY,
-                    csKBSharp.iPrimaryRGB, csKBSharp.iPrimaryRGB, csKBSharp.iDarkRGB, csKBSharp.iDarkRGB);
-                m_pRenderer->DrawSkew(fSharpTopX1, fCurY - fNewNear,
-                    fSharpTopX1, fCurY + fSharpCY - fNewNear,
-                    x, fCurY + fSharpCY, x, fCurY,
-                    csKBSharp.iPrimaryRGB, csKBSharp.iPrimaryRGB, csKBSharp.iDarkRGB, csKBSharp.iDarkRGB);
-                m_pRenderer->DrawSkew(fSharpTopX2, fCurY + fSharpCY - fNewNear,
-                    fSharpTopX2, fCurY - fNewNear,
-                    x + cx, fCurY, x + cx, fCurY + fSharpCY,
-                    csKBSharp.iPrimaryRGB, csKBSharp.iPrimaryRGB, csKBSharp.iDarkRGB, csKBSharp.iDarkRGB);
-                m_pRenderer->DrawRect(fSharpTopX1, fCurY - fNewNear, fSharpTopX2 - fSharpTopX1, fSharpCY, csKBSharp.iDarkRGB);
-                m_pRenderer->DrawSkew(fSharpTopX1, fCurY - fNewNear,
-                    fSharpTopX2, fCurY - fNewNear,
-                    fSharpTopX2, fCurY - fNewNear + fSharpCY * 0.35f,
-                    fSharpTopX1, fCurY - fNewNear + fSharpCY * 0.25f,
-                    csKBSharp.iPrimaryRGB, csKBSharp.iPrimaryRGB, csKBSharp.iPrimaryRGB, csKBSharp.iPrimaryRGB);
-                m_pRenderer->DrawSkew(fSharpTopX1, fCurY - fNewNear + fSharpCY * 0.25f,
-                    fSharpTopX2, fCurY - fNewNear + fSharpCY * 0.35f,
-                    fSharpTopX2, fCurY - fNewNear + fSharpCY * 0.75f,
-                    fSharpTopX1, fCurY - fNewNear + fSharpCY * 0.65f,
-                    csKBSharp.iPrimaryRGB, csKBSharp.iPrimaryRGB, csKBSharp.iDarkRGB, csKBSharp.iDarkRGB);
+                // Draw one layer of blank keys first
+                ChannelSettings csKBSharp = m_csKBSharp;
+                bool layer1drawn = false;
+
+                // Skip the loop so no overlapping notes are being drawn
+                if (m_bRemoveOverlaps) {
+                    goto skiploopb;
+                }
+
+                for (size_t OverlapCount = 0; OverlapCount < m_vState[i].size(); OverlapCount++) {
+                    skiploopb:
+                    const MIDIChannelEvent* pEvent = m_vEvents[m_bRemoveOverlaps ? m_pNoteState[i] : m_vState[i][OverlapCount]];
+                    const int iTrack = pEvent->GetTrack();
+                    const int iChannel = pEvent->GetChannel();
+
+                    nxtlayerb:
+                    if (layer1drawn) {
+                        // Start drawing colored keys
+                        csKBSharp = m_vTrackSettings[iTrack].aChannels[iChannel];
+                        if (m_bMapVel) {
+                            csKBSharp.iPrimaryRGB = csKBSharp.iPrimaryRGB & 0x00FFFFFF | ((pEvent->GetParam2() ^ 0x7F) << 24);
+                            csKBSharp.iDarkRGB = csKBSharp.iDarkRGB & 0x00FFFFFF | ((pEvent->GetParam2() ^ 0x7F) << 24);
+                            csKBSharp.iVeryDarkRGB = csKBSharp.iVeryDarkRGB & 0x00FFFFFF | ((pEvent->GetParam2() ^ 0x7F) << 24);
+                        }
+                    }
+
+                    m_pRenderer->DrawSkew(fSharpTopX1, fCurY + fSharpCY - fNewNear,
+                        fSharpTopX2, fCurY + fSharpCY - fNewNear,
+                        x + cx, fCurY + fSharpCY, x, fCurY + fSharpCY,
+                        csKBSharp.iPrimaryRGB, csKBSharp.iPrimaryRGB, csKBSharp.iDarkRGB, csKBSharp.iDarkRGB);
+                    m_pRenderer->DrawSkew(fSharpTopX1, fCurY - fNewNear,
+                        fSharpTopX1, fCurY + fSharpCY - fNewNear,
+                        x, fCurY + fSharpCY, x, fCurY,
+                        csKBSharp.iPrimaryRGB, csKBSharp.iPrimaryRGB, csKBSharp.iDarkRGB, csKBSharp.iDarkRGB);
+                    m_pRenderer->DrawSkew(fSharpTopX2, fCurY + fSharpCY - fNewNear,
+                        fSharpTopX2, fCurY - fNewNear,
+                        x + cx, fCurY, x + cx, fCurY + fSharpCY,
+                        csKBSharp.iPrimaryRGB, csKBSharp.iPrimaryRGB, csKBSharp.iDarkRGB, csKBSharp.iDarkRGB);
+                    m_pRenderer->DrawRect(fSharpTopX1, fCurY - fNewNear, fSharpTopX2 - fSharpTopX1, fSharpCY, csKBSharp.iDarkRGB);
+                    m_pRenderer->DrawSkew(fSharpTopX1, fCurY - fNewNear,
+                        fSharpTopX2, fCurY - fNewNear,
+                        fSharpTopX2, fCurY - fNewNear + fSharpCY * 0.35f,
+                        fSharpTopX1, fCurY - fNewNear + fSharpCY * 0.25f,
+                        csKBSharp.iPrimaryRGB, csKBSharp.iPrimaryRGB, csKBSharp.iPrimaryRGB, csKBSharp.iPrimaryRGB);
+                    m_pRenderer->DrawSkew(fSharpTopX1, fCurY - fNewNear + fSharpCY * 0.25f,
+                        fSharpTopX2, fCurY - fNewNear + fSharpCY * 0.35f,
+                        fSharpTopX2, fCurY - fNewNear + fSharpCY * 0.75f,
+                        fSharpTopX1, fCurY - fNewNear + fSharpCY * 0.65f,
+                        csKBSharp.iPrimaryRGB, csKBSharp.iPrimaryRGB, csKBSharp.iDarkRGB, csKBSharp.iDarkRGB);
+
+                    if (!layer1drawn) {
+                        // Finished drawing blank keys
+                        layer1drawn = true;
+                        goto nxtlayerb;
+                    }
+
+                    if (m_bRemoveOverlaps) {
+                        // End the loop now
+                        goto skipb;
+                    }
+                }
+                skipb:
+                ;  //Expected statement? Fine, I'll give you a statement. Say hello to THE SEMICOLON! 
             }
         }
 }
@@ -2388,7 +2464,7 @@ void MainScreen::RenderText() {
     if (cControls.bPhigros) {
         Lines += 4; //Score and level
     }
-    if (cVideo.bDumpFrames) {
+    if (cControls.bDumpFrames) {
         if (cVideo.bDebug) {
             Lines += 1; //Playback speed
         }
@@ -2401,7 +2477,7 @@ void MainScreen::RenderText() {
             Lines += 1; //Playback speed
         }
     }
-    if (cVideo.bDumpFrames) {
+    if (cControls.bDumpFrames) {
         Lines -= 1; //Don't show FPS when exporting videos
     }
 
@@ -2513,7 +2589,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
     if (cVideo.bDebug) {
         RenderStatusLine(cur_line++, StatisticsText5, llStartTimeFormatted.c_str());
     }
-    if (!cVideo.bDumpFrames) {
+    if (!cControls.bDumpFrames) {
         RenderStatusLine(cur_line++, StatisticsText6, "%.2lf", m_dFPS);
     }
     RenderStatusLine(cur_line++, StatisticsText7, "%.3lf bpm", tempo);
@@ -2536,7 +2612,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
             RenderStatusLine(cur_line++, StatisticsText15, "%.0lf%%", cPlayback.GetVolume() * 100);
         }
     }
-    if (cVideo.bDumpFrames) {
+    if (cControls.bDumpFrames) {
         if (cVideo.bDebug) {
             RenderStatusLine(cur_line++, StatisticsText17, "%.0lf%%", cPlayback.GetSpeed() * 100);
         }

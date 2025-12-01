@@ -19,7 +19,7 @@
 #include "ConfigProcs.h"
 #include "Globals.h"
 #include "resource.h"
-#include "Language.h"
+#include "LanguagePacks.h"
 
 #include "GameState.h"
 #include "Config.h"
@@ -1128,8 +1128,9 @@ BOOL PlayFile(const wstring& sFile)
 {
     Config& config = Config::GetConfig();
     PlaybackSettings& cPlayback = config.GetPlaybackSettings();
-    ViewSettings& cView = config.GetViewSettings();
-    const VideoSettings& cVideo = config.GetVideoSettings();
+    static ViewSettings& cView = config.GetViewSettings();
+    static const VideoSettings& cVideo = config.GetVideoSettings();
+    static const ControlsSettings& cControls = config.GetControlsSettings();
 
     const GameState::State ePlayMode = GameState::Practice;
 
@@ -1164,7 +1165,7 @@ BOOL PlayFile(const wstring& sFile)
     cPlayback.SetPosition(0);
     cView.SetZoomMove(false);
     TCHAR sTitle[1 << 10];
-    if (cVideo.bDumpFrames) {
+    if (cControls.bDumpFrames) {
         _stprintf_s(sTitle, MainWindowTitle1 L" v" LVersionString L" | " MainWindowTitle2 L" | " MainWindowTitle4 L"%ws" MainWindowTitle7, sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
     }
     else {
