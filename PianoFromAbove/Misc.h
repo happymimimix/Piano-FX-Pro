@@ -10,12 +10,10 @@
 #pragma once
 
 #include <string>
+#include "Globals.h"
 using namespace std;
 
-#define VersionString "4.2"
-#define LVersionString L"4.2"
-static string RVersionString = VersionString;
-static wstring RLVersionString = LVersionString;
+#define VersionString L"4.2"
 
 template <typename T>
 string GetAddress(const T& Variable) {
@@ -85,12 +83,12 @@ private:
 class Util
 {
 public:
-    static wchar_t* StringToWstring( const string &s );
-    static char* WstringToString( const wstring &s );
-    static void ParseLongHex( const string &sText, string &sVal );
-    static unsigned RandColor();
-    static void RGBtoHSV( int R, int G, int B, int &H, int &S, int &V );
-    static void HSVtoRGB( int H, int S, int V, int &R, int &G, int &B );
+    static wchar_t* StringToWstring(const string& s);
+    static char* WstringToString(const wstring& s);
+    static void ParseLongHex(const string& sText, string& sVal);
+    static color_t RandColor();
+    static void RGBtoHSV(color_t R, color_t G, color_t B, color_t& H, color_t& S, color_t& V);
+    static void HSVtoRGB(color_t H, color_t S, color_t V, color_t& R, color_t& G, color_t& B);
 private:
     static char m_sBuf[16384];
     static wchar_t m_wsBuf[16384];
@@ -106,10 +104,10 @@ class TSQueue
 {
 public:
     TSQueue() : m_iWrite(0), m_iRead(0) { }
-    bool Push( const T &tElement );
-    bool Pop( T &tElement );
+    bool Push(const T& tElement);
+    bool Pop(T& tElement);
 
-    void ForcePush( const T &tElement ) { while ( !Push( tElement) ); }
+    void ForcePush(const T& tElement) { while (!Push(tElement)); }
 
 private:
     static const int QueueSize = 1024;
@@ -119,12 +117,12 @@ private:
 };
 
 template< class T >
-bool TSQueue<T>::Push( const T &tElement )
+bool TSQueue<T>::Push(const T& tElement)
 {
-    int iNextElement = ( m_iWrite + 1 ) % QueueSize;
+    int iNextElement = (m_iWrite + 1) % QueueSize;
 
     // Is the queue full?
-    if ( iNextElement == m_iRead ) return false;
+    if (iNextElement == m_iRead) return false;
 
     // Push the element. Order of execution is very important.
     m_tQueue[m_iWrite] = tElement;
@@ -134,15 +132,45 @@ bool TSQueue<T>::Push( const T &tElement )
 }
 
 template< class T >
-bool TSQueue<T>::Pop( T &tElement )
+bool TSQueue<T>::Pop(T& tElement)
 {
     // Is the queue empty?
-    if ( m_iWrite == m_iRead ) return false;
+    if (m_iWrite == m_iRead) return false;
 
     // Compute where to read. Read. Update read pointer. Order very important.
-    int iNextElement = ( m_iRead + 1 ) % QueueSize;
+    int iNextElement = (m_iRead + 1) % QueueSize;
     tElement = m_tQueue[m_iRead];
     m_iRead = iNextElement;
 
     return true;
+}
+
+inline string WStringToUtf8(const wstring& wstr)
+{
+    if (wstr.empty()) return {};
+
+    size_t size_needed = WideCharToMultiByte(
+        CP_UTF8,
+        0,
+        wstr.data(),
+        (int)wstr.size(),
+        nullptr,
+        0,
+        nullptr,
+        nullptr
+    );
+
+    string result(size_needed, 0);
+    WideCharToMultiByte(
+        CP_UTF8,
+        0,
+        wstr.data(),
+        (int)wstr.size(),
+        &result[0],
+        size_needed,
+        nullptr,
+        nullptr
+    );
+
+    return result;
 }

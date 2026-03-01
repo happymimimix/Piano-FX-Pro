@@ -33,19 +33,19 @@ class ISettings
 {
 public:
     virtual void LoadDefaultValues() = 0;
-    virtual void LoadConfigValues( TiXmlElement *txRoot ) = 0;
-    virtual bool SaveConfigValues( TiXmlElement *txRoot ) = 0;
+    virtual void LoadConfigValues(TiXmlElement* txRoot) = 0;
+    virtual bool SaveConfigValues(TiXmlElement* txRoot) = 0;
 };
 
 struct VisualSettings : public ISettings
 {
     void LoadDefaultValues();
     void LoadDefaultColors();
-    void LoadConfigValues( TiXmlElement *txRoot );
-    bool SaveConfigValues( TiXmlElement *txRoot );
+    void LoadConfigValues(TiXmlElement* txRoot);
+    bool SaveConfigValues(TiXmlElement* txRoot);
 
     enum KeysShown : uint8_t { All, Song, Custom } eKeysShown;
-    int iFirstKey, iLastKey;
+    unsigned char iFirstKey, iLastKey;
     unsigned int colors[16], iBkgColor;
     int iBarColor;
     bool bRandomizeColor;
@@ -55,12 +55,12 @@ struct VisualSettings : public ISettings
 struct AudioSettings : public ISettings
 {
     void LoadDefaultValues();
-    void LoadConfigValues( TiXmlElement *txRoot );
-    bool SaveConfigValues( TiXmlElement *txRoot );
+    void LoadConfigValues(TiXmlElement* txRoot);
+    bool SaveConfigValues(TiXmlElement* txRoot);
 
     void LoadMIDIDevices();
     vector< wstring > vMIDIOutDevices;
-    int iOutDevice;
+    UINT iOutDevice;
     wstring sDesiredOut;
     bool bKDMAPI;
 };
@@ -68,8 +68,8 @@ struct AudioSettings : public ISettings
 struct VideoSettings : public ISettings
 {
     void LoadDefaultValues();
-    void LoadConfigValues( TiXmlElement *txRoot );
-    bool SaveConfigValues( TiXmlElement *txRoot );
+    void LoadConfigValues(TiXmlElement* txRoot);
+    bool SaveConfigValues(TiXmlElement* txRoot);
 
     bool bTickBased;
     bool bVisualizePitchBends;
@@ -86,8 +86,8 @@ struct VideoSettings : public ISettings
 struct ControlsSettings : public ISettings
 {
     void LoadDefaultValues();
-    void LoadConfigValues( TiXmlElement *txRoot );
-    bool SaveConfigValues( TiXmlElement *txRoot );
+    void LoadConfigValues(TiXmlElement* txRoot);
+    bool SaveConfigValues(TiXmlElement* txRoot);
 
     double dFwdBackSecs, dSpeedUpPct;
     bool bAlwaysShowControls;
@@ -101,22 +101,22 @@ class PlaybackSettings : public ISettings
 {
 public:
     void LoadDefaultValues();
-    void LoadConfigValues( TiXmlElement *txRoot );
-    bool SaveConfigValues( TiXmlElement *txRoot );
+    void LoadConfigValues(TiXmlElement* txRoot);
+    bool SaveConfigValues(TiXmlElement* txRoot);
 
-    void ToggleMute( bool bUpdateGUI = false ) { SetMute( !m_bMute, bUpdateGUI ); }
-    void TogglePaused( bool bUpdateGUI = false ) { SetPaused( !m_bPaused, bUpdateGUI ); }
-    void SetPosition( int iPosition ) { ::SetPosition( iPosition ); }
+    void ToggleMute(bool bUpdateGUI = false) { SetMute(!m_bMute, bUpdateGUI); }
+    void TogglePaused(bool bUpdateGUI = false) { SetPaused(!m_bPaused, bUpdateGUI); }
+    void SetPosition(int iPosition) { ::SetPosition(iPosition); }
 
     // Set accessors. A bit more advanced because they optionally update the GUI
-    void SetPlayMode( GameState::State ePlayMode, bool bUpdateGUI = false ) { if ( bUpdateGUI ) ::SetPlayMode( ePlayMode ); m_ePlayMode = ePlayMode; }
-    void SetPlayable( bool bPlayable, bool bUpdateGUI = false ) { if ( bUpdateGUI ) ::SetPlayable( bPlayable ); m_bPlayable = bPlayable; }
-    void SetPaused( bool bPaused, bool bUpdateGUI = false ) { if ( bUpdateGUI ) ::SetPlayPauseStop( !bPaused, bPaused, false ); m_bPaused = bPaused; }
-    void SetStopped( bool bUpdateGUI = false ) { if ( bUpdateGUI ) ::SetPlayPauseStop( false, false, true ); m_bPaused = true; }
-    void SetSpeed( double dSpeed, bool bUpdateGUI = false ) { if ( bUpdateGUI ) ::SetSpeed( dSpeed ); m_dSpeed = dSpeed; }
-    void SetNSpeed( double dNSpeed, bool bUpdateGUI = false ) { dNSpeed = max(min(dNSpeed, 10.0), 0.005); if ( bUpdateGUI ) ::SetNSpeed( dNSpeed ); m_dNSpeed = dNSpeed; }
-    void SetVolume( double dVolume, bool bUpdateGUI = false ) { if ( bUpdateGUI ) ::SetVolume( dVolume ); m_dVolume = max(min(dVolume, 2.0), 0.0); }
-    void SetMute( bool bMute, bool bUpdateGUI = false ) { if ( bUpdateGUI ) ::SetMute( bMute ); m_bMute = bMute; }
+    void SetPlayMode(GameState::State ePlayMode, bool bUpdateGUI = false) { if (bUpdateGUI) ::SetPlayMode(ePlayMode); m_ePlayMode = ePlayMode; }
+    void SetPlayable(bool bPlayable, bool bUpdateGUI = false) { if (bUpdateGUI) ::SetPlayable(bPlayable); m_bPlayable = bPlayable; }
+    void SetPaused(bool bPaused, bool bUpdateGUI = false) { if (bUpdateGUI) ::SetPlayPauseStop(!bPaused, bPaused, false); m_bPaused = bPaused; }
+    void SetStopped(bool bUpdateGUI = false) { if (bUpdateGUI) ::SetPlayPauseStop(false, false, true); m_bPaused = true; }
+    void SetSpeed(double dSpeed, bool bUpdateGUI = false) { if (bUpdateGUI) ::SetSpeed(dSpeed); m_dSpeed = dSpeed; }
+    void SetNSpeed(double dNSpeed, bool bUpdateGUI = false) { dNSpeed = max(min(dNSpeed, 10.0), 0.005); if (bUpdateGUI) ::SetNSpeed(dNSpeed); m_dNSpeed = dNSpeed; }
+    void SetVolume(double dVolume, bool bUpdateGUI = false) { if (bUpdateGUI) ::SetVolume(dVolume); m_dVolume = max(min(dVolume, 2.0), 0.0); }
+    void SetMute(bool bMute, bool bUpdateGUI = false) { if (bUpdateGUI) ::SetMute(bMute); m_bMute = bMute; }
 
     // Get accessors. Simple.
     GameState::State GetPlayMode() const { return m_ePlayMode; }
@@ -143,24 +143,24 @@ class ViewSettings : public ISettings
 {
 public:
     void LoadDefaultValues();
-    void LoadConfigValues( TiXmlElement *txRoot );
-    bool SaveConfigValues( TiXmlElement *txRoot );
+    void LoadConfigValues(TiXmlElement* txRoot);
+    bool SaveConfigValues(TiXmlElement* txRoot);
 
-    void ToggleControls( bool bUpdateGUI = false ) { SetControls( !m_bControls, bUpdateGUI ); }
-    void ToggleKeyboard( bool bUpdateGUI = false ) { SetKeyboard( !m_bKeyboard, bUpdateGUI ); }
-    void ToggleOnTop( bool bUpdateGUI = false ) { SetOnTop( !m_bOnTop, bUpdateGUI ); }
-    void ToggleFullScreen( bool bUpdateGUI = false ) { SetFullScreen( !m_bFullScreen, bUpdateGUI ); }
+    void ToggleControls(bool bUpdateGUI = false) { SetControls(!m_bControls, bUpdateGUI); }
+    void ToggleKeyboard(bool bUpdateGUI = false) { SetKeyboard(!m_bKeyboard, bUpdateGUI); }
+    void ToggleOnTop(bool bUpdateGUI = false) { SetOnTop(!m_bOnTop, bUpdateGUI); }
+    void ToggleFullScreen(bool bUpdateGUI = false) { SetFullScreen(!m_bFullScreen, bUpdateGUI); }
 
-    void SetMainPos( int iMainLeft, int iMainTop ) { m_iMainLeft = iMainLeft; m_iMainTop = iMainTop; }
-    void SetMainSize( int iMainWidth, int iMainHeight ) { m_iMainWidth = iMainWidth; m_iMainHeight = iMainHeight; }
-    void SetOffsetX( float fOffsetX ) { m_fOffsetX = fOffsetX; }
-    void SetOffsetY( float fOffsetY ) { m_fOffsetY = fOffsetY; }
-    void SetZoomX( float fZoomX ) { m_fZoomX = fZoomX; }
-    void SetControls( bool bControls, bool bUpdateGUI = false ) { m_bControls = bControls; if ( bUpdateGUI ) ::ShowControls( bControls ); }
-    void SetKeyboard( bool bKeyboard, bool bUpdateGUI = false ) { m_bKeyboard = bKeyboard; if ( bUpdateGUI ) ::ShowKeyboard( bKeyboard ); }
-    void SetOnTop( bool bOnTop, bool bUpdateGUI = false ) { m_bOnTop = bOnTop; if ( bUpdateGUI ) ::SetOnTop( bOnTop ); }
-    void SetFullScreen( bool bFullScreen, bool bUpdateGUI = false ) { m_bFullScreen = bFullScreen; if ( bUpdateGUI ) ::SetFullScreen( bFullScreen ); }
-    void SetZoomMove( bool bZoomMove ) { m_bZoomMove = bZoomMove; ::SetZoomMove(bZoomMove); }
+    void SetMainPos(int iMainLeft, int iMainTop) { m_iMainLeft = iMainLeft; m_iMainTop = iMainTop; }
+    void SetMainSize(int iMainWidth, int iMainHeight) { m_iMainWidth = iMainWidth; m_iMainHeight = iMainHeight; }
+    void SetOffsetX(float fOffsetX) { m_fOffsetX = fOffsetX; }
+    void SetOffsetY(float fOffsetY) { m_fOffsetY = fOffsetY; }
+    void SetZoomX(float fZoomX) { m_fZoomX = fZoomX; }
+    void SetControls(bool bControls, bool bUpdateGUI = false) { m_bControls = bControls; if (bUpdateGUI) ::ShowControls(bControls); }
+    void SetKeyboard(bool bKeyboard, bool bUpdateGUI = false) { m_bKeyboard = bKeyboard; if (bUpdateGUI) ::ShowKeyboard(bKeyboard); }
+    void SetOnTop(bool bOnTop, bool bUpdateGUI = false) { m_bOnTop = bOnTop; if (bUpdateGUI) ::SetOnTop(bOnTop); }
+    void SetFullScreen(bool bFullScreen, bool bUpdateGUI = false) { m_bFullScreen = bFullScreen; if (bUpdateGUI) ::SetFullScreen(bFullScreen); }
+    void SetZoomMove(bool bZoomMove) { m_bZoomMove = bZoomMove; ::SetZoomMove(bZoomMove); }
 
     int GetMainLeft() const { return m_iMainLeft == -32000 ? CW_USEDEFAULT : m_iMainLeft; }
     int GetMainTop() const { return m_iMainTop == -32000 ? CW_USEDEFAULT : m_iMainTop; }
@@ -189,15 +189,15 @@ class Config : public ISettings
 {
 public:
     // Singleton
-    static Config &GetConfig();
+    static Config& GetConfig();
     static string GetFolder();
 
     // Interface
     void LoadDefaultValues();
     void LoadConfigValues();
-    void LoadConfigValues( TiXmlElement *txRoot );
+    void LoadConfigValues(TiXmlElement* txRoot);
     bool SaveConfigValues();
-    bool SaveConfigValues( TiXmlElement *txRoot );
+    bool SaveConfigValues(TiXmlElement* txRoot);
 
     void LoadMIDIDevices() { m_AudioSettings.LoadMIDIDevices(); }
 
@@ -208,10 +208,10 @@ public:
     PlaybackSettings& GetPlaybackSettings() { return m_PlaybackSettings; }
     ViewSettings& GetViewSettings() { return m_ViewSettings; }
 
-    void SetVisualSettings(const VisualSettings &VisualSettings) { m_VisualSettings = VisualSettings; }
-    void SetAudioSettings(const AudioSettings &audioSettings) { m_AudioSettings = audioSettings; }
-    void SetVideoSettings(const VideoSettings &videoSettings) { m_VideoSettings = videoSettings; }
-    void SetControlsSettings(const ControlsSettings &ControlsSettings) { m_ControlsSettings = ControlsSettings; }
+    void SetVisualSettings(const VisualSettings& VisualSettings) { m_VisualSettings = VisualSettings; }
+    void SetAudioSettings(const AudioSettings& audioSettings) { m_AudioSettings = audioSettings; }
+    void SetVideoSettings(const VideoSettings& videoSettings) { m_VideoSettings = videoSettings; }
+    void SetControlsSettings(const ControlsSettings& ControlsSettings) { m_ControlsSettings = ControlsSettings; }
 
     bool m_bManualTimer = false;
     bool m_bPianoOverride = false;
@@ -220,8 +220,8 @@ private:
     // Singleton
     Config();
     ~Config() {}
-    Config( const Config& );
-    Config &operator=( const Config& );
+    Config(const Config&);
+    Config& operator=(const Config&);
 
     VisualSettings m_VisualSettings;
     AudioSettings m_AudioSettings;

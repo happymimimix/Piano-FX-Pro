@@ -516,6 +516,9 @@
     <ClInclude Include="ModdingAPI.h">
       <Filter>Source Files\ModdingRelated</Filter>
     </ClInclude>
+    <ClInclude Include="LanguagePacks.hpp">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tinyxml\tinystr.cpp">

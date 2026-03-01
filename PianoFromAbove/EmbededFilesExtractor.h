@@ -4,22 +4,22 @@
 #include <PFXGDI.exe.h>
 #endif
 
-string ProgramDIR() {
-    char szFilePath[MAX_PATH + 1] = {};
-    GetModuleFileNameA(NULL, szFilePath, MAX_PATH);
-    (strrchr(szFilePath, '\\'))[0] = 0;
+wstring ProgramDIR() {
+    wchar_t szFilePath[MAX_PATH + 1] = {};
+    GetModuleFileNameW(NULL, szFilePath, MAX_PATH);
+    (wcsrchr(szFilePath, '\\'))[0] = 0;
     return szFilePath;
 }
 
 void ExtractEmbededFiles() {
 #ifdef INCLUDE_FFMPEG
-    string ColorizerPath = ProgramDIR() + "\\Colorizer.exe";
+    wstring ColorizerPath = ProgramDIR() + L"\\Colorizer.exe";
     if (!filesystem::exists(ColorizerPath)) {
         ofstream ColorizerFile(ColorizerPath, ios::binary);
         ColorizerFile.write(reinterpret_cast<const char*>(Colorizer_exe), Colorizer_exe_len);
         ColorizerFile.close();
     }
-    string PFXGDIPath = ProgramDIR() + "\\PFXGDI.exe";
+    wstring PFXGDIPath = ProgramDIR() + L"\\PFXGDI.exe";
     if (!filesystem::exists(PFXGDIPath)) {
         ofstream PFXGDIFile(PFXGDIPath, ios::binary);
         PFXGDIFile.write(reinterpret_cast<const char*>(PFXGDI_exe), PFXGDI_exe_len);

@@ -19,7 +19,7 @@
 #include "ConfigProcs.h"
 #include "Globals.h"
 #include "resource.h"
-#include "LanguagePacks.h"
+#include "LanguagePacks.hpp"
 
 #include "GameState.h"
 #include "Config.h"
@@ -44,7 +44,7 @@ INT_PTR CALLBACK SetResolutionProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM) {
         return true;
     }
     case WM_COMMAND: {
-        int iId = LOWORD(wparam);
+        win32_t iId = LOWORD(wparam);
         switch (iId) {
         case IDOK: {
             char buf[1 << 10] = {};
@@ -103,7 +103,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         return 0;
     case WM_COMMAND:
     {
-        int iId = LOWORD(wParam);
+        win32_t iId = LOWORD(wParam);
         switch (iId)
         {
         case IDOK:
@@ -128,7 +128,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                     cPlayback.SetPlayMode(GameState::Intro, true);
                     cPlayback.SetPlayable(false, true);
                     cPlayback.SetPosition(0);
-                    SetWindowText(g_hWnd, MainWindowTitle1 L" v" LVersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7);
+                    SetWindowText(g_hWnd, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7);
                     HandOffMsg(WM_COMMAND, ID_CHANGESTATE, (LPARAM)new IntroScreen(NULL, NULL));
                 }
                 PlayFile(sFilename);
@@ -141,7 +141,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             cPlayback.SetPlayMode(GameState::Intro, true);
             cPlayback.SetPlayable(false, true);
             cPlayback.SetPosition(0);
-            SetWindowText(g_hWnd, MainWindowTitle1 L" v" LVersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7);
+            SetWindowText(g_hWnd, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7);
             HandOffMsg(WM_COMMAND, ID_CHANGESTATE, (LPARAM)new IntroScreen(NULL, NULL));
             return 0;
         }
@@ -219,15 +219,15 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             MessageBoxW(hWnd, GameState::Errors[lParam].c_str(), L"Error", MB_OK | MB_ICONEXCLAMATION);
             return 0;
         case ID_STUDIO:
-            char ProgramPath[MAX_PATH + 1] = {};
-            GetModuleFileNameA(NULL, ProgramPath, MAX_PATH);
-            string Command = "start \"Piano-FX Studio v";
+            wchar_t ProgramPath[MAX_PATH + 1] = {};
+            GetModuleFileNameW(NULL, ProgramPath, MAX_PATH);
+            wstring Command = L"start \"Piano-FX Studio v";
             Command += VersionString;
-            Command += "\" \"";
+            Command += L"\" \"";
             Command += ProgramPath;
-            Command += "\" ";
-            Command += "OPEN PFXSTUDIO";
-            system(Command.c_str());
+            Command += L"\" ";
+            Command += L"OPEN PFXSTUDIO";
+            _wsystem(Command.c_str());
             return 0;
         }
         break;
@@ -298,7 +298,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             cPlayback.SetPlayMode(GameState::Intro, true);
             cPlayback.SetPlayable(false, true);
             cPlayback.SetPosition(0);
-            SetWindowText(g_hWnd, MainWindowTitle1 L" v" LVersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7);
+            SetWindowText(g_hWnd, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7);
             HandOffMsg(WM_COMMAND, ID_CHANGESTATE, (LPARAM)new IntroScreen(NULL, NULL));
         }
         PlayFile(filename.data());
@@ -378,7 +378,7 @@ LRESULT WINAPI GfxProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_CAPTURECHANGED:
         bTrackR = bTrackL = false;
         return 0;
-    // Send me everything except the tab character
+        // Send me everything except the tab character
     case WM_GETDLGCODE:
     {
         LRESULT lr = DLGC_WANTARROWS | DLGC_WANTCHARS;
@@ -547,7 +547,7 @@ HWND CreateRebar(HWND hWndOwner)
 #define hWndSpeedPlaceholder 998
 #define hWndNSpeedPlaceholder 997
 
-    TBBUTTON tbButtons[1<<4] =
+    TBBUTTON tbButtons[1 << 4] =
     {
         { MAKELONG(0, 0), ID_PLAY_PLAY, TBSTATE_ENABLED, BTNS_BUTTON, {0}, 0, (INT_PTR)TEXT("Play") },
         { MAKELONG(1, 0), ID_PLAY_PAUSE, TBSTATE_ENABLED, BTNS_BUTTON, {0}, 0, (INT_PTR)TEXT("Pause") },
@@ -885,7 +885,7 @@ INT_PTR CALLBACK AboutProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM)
     }
     case WM_COMMAND:
     {
-        int iId = LOWORD(wParam);
+        win32_t iId = LOWORD(wParam);
         switch (iId)
         {
         case IDOK: case IDCANCEL:
@@ -1129,7 +1129,6 @@ BOOL PlayFile(const wstring& sFile)
     Config& config = Config::GetConfig();
     PlaybackSettings& cPlayback = config.GetPlaybackSettings();
     static ViewSettings& cView = config.GetViewSettings();
-    static const VideoSettings& cVideo = config.GetVideoSettings();
     static const ControlsSettings& cControls = config.GetControlsSettings();
 
     const GameState::State ePlayMode = GameState::Practice;
@@ -1166,10 +1165,10 @@ BOOL PlayFile(const wstring& sFile)
     cView.SetZoomMove(false);
     TCHAR sTitle[1 << 10];
     if (cControls.bDumpFrames) {
-        _stprintf_s(sTitle, MainWindowTitle1 L" v" LVersionString L" | " MainWindowTitle2 L" | " MainWindowTitle4 L"%ws" MainWindowTitle7, sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
+        _stprintf_s(sTitle, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle4 L"%ws" MainWindowTitle7, sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
     }
     else {
-        _stprintf_s(sTitle, MainWindowTitle1 L" v" LVersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 L"%ws" MainWindowTitle7, sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
+        _stprintf_s(sTitle, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 L"%ws" MainWindowTitle7, sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
     }
     SetWindowText(g_hWnd, sTitle);
 

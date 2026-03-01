@@ -43,11 +43,10 @@ struct NoteData {
     uint8_t key;
     uint8_t channel;
     uint16_t track;
-    uint8_t alpha;
-    char velmappingenabled;
     float pos;
     float length;
 };
+static_assert(sizeof(NoteData) == 12);
 
 struct TrackColor {
     DWORD primary;
@@ -65,33 +64,39 @@ struct RootConstants {
 };
 static_assert(sizeof(RootConstants) % 4 == 0);
 
-constexpr uint16_t MaxTrackColors = 0xFFFF; //Theoretic maximum number of tracks possible in MIDI format
 struct FixedSizeConstants {
     float note_x[128];
     float bends[16];
 };
+
+#ifdef LIMIT_COLORS
+constexpr unsigned long MaxTrackColors = 1 << 8; //Limit track color for faster rendering
+#else
+constexpr unsigned long MaxTrackColors = 1 << 16; //Theoretic maximum number of tracks possible in MIDI format
+#endif
+constexpr unsigned long MaxChannelColors = 1 << 4; //Theoretic maximum number of channels possible in MIDI format
 
 class D3D12Renderer {
 public:
     D3D12Renderer();
     ~D3D12Renderer();
 
-    std::tuple<HRESULT, const char*> Init( HWND hWnd, bool bLimitFPS );
+    std::tuple<HRESULT, const char*> Init(HWND hWnd, bool bLimitFPS);
     HRESULT ResetDeviceIfNeeded();
     HRESULT ResetDevice();
-    HRESULT ClearAndBeginScene( DWORD color );
+    HRESULT ClearAndBeginScene(DWORD color);
     HRESULT EndScene(bool draw_bg = false);
     HRESULT EndSplashScene();
     HRESULT Present();
     HRESULT BeginText();
     HRESULT EndText();
-    HRESULT DrawRect( float x, float y, float cx, float cy, DWORD color, float flipcenter = 0.0f, bool flip = false );
-    HRESULT DrawRect( float x, float y, float cx, float cy, DWORD c1, DWORD c2, DWORD c3, DWORD c4, float flipcenter = 0.0f, bool flip = false);
-    HRESULT DrawSkew( float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, DWORD color, float flipcenter = 0.0f, bool flip = false);
-    HRESULT DrawSkew( float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, DWORD c1, DWORD c2, DWORD c3, DWORD c4, float flipcenter = 0.0f, bool flip = false);
+    HRESULT DrawRect(float x, float y, float cx, float cy, DWORD color, float flipcenter = 0.0f, bool flip = false);
+    HRESULT DrawRect(float x, float y, float cx, float cy, DWORD c1, DWORD c2, DWORD c3, DWORD c4, float flipcenter = 0.0f, bool flip = false);
+    HRESULT DrawSkew(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, DWORD color, float flipcenter = 0.0f, bool flip = false);
+    HRESULT DrawSkew(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, DWORD c1, DWORD c2, DWORD c3, DWORD c4, float flipcenter = 0.0f, bool flip = false);
 
     bool GetLimitFPS() const { return m_bLimitFPS; }
-    HRESULT SetLimitFPS( bool bLimitFPS );
+    HRESULT SetLimitFPS(bool bLimitFPS);
 
     int GetBufferWidth() const { return m_iBufferWidth; }
     int GetBufferHeight() const { return m_iBufferHeight; }
@@ -99,6 +104,8 @@ public:
     HRESULT WaitForGPU();
     std::wstring GetAdapterName();
     void SetPipeline(Pipeline pipeline);
+    __forceinline void AutoSetNotePipeline(bool inloop = false);
+    __forceinline void AutoSetRectPipeline(bool inloop = false);
 
     RootConstants& GetRootConstants() { return m_RootConstants; };
     FixedSizeConstants& GetFixedSizeConstants() { return m_FixedConstants; };
@@ -123,9 +130,10 @@ private:
     void SetupCommandList();
     bool UploadBackgroundBitmap();
 
-    static constexpr unsigned FrameCount = 1<<1;
-    static constexpr unsigned RectsPerPass = 1<<(1<<4);
-    static constexpr unsigned IndexBufferCount = RectsPerPass<<2|RectsPerPass<<1;
+    static constexpr unsigned FrameCount = 1 << 2;
+    static constexpr unsigned RectsPerPass = 1 << (1 << 4);
+    static constexpr unsigned NotesPerPass = 1 << (1 << 4) << 4;
+    static constexpr unsigned IndexBufferCount = max(RectsPerPass, NotesPerPass) * 6;
     static constexpr unsigned GenericUploadSize = sizeof(FixedSizeConstants) + MaxTrackColors * 16 * sizeof(TrackColor);
 
     static ComPtr<IWICImagingFactory> s_pWICFactory;
@@ -178,8 +186,8 @@ private:
     RootConstants m_RootConstants = {};
     FixedSizeConstants m_FixedConstants = {};
     FixedSizeConstants m_OldFixedConstants = {};
-    TrackColor m_TrackColors[MaxTrackColors * 16] = {};
-    TrackColor m_OldTrackColors[MaxTrackColors * 16] = {};
+    TrackColor m_TrackColors[MaxTrackColors * MaxChannelColors] = {};
+    TrackColor m_OldTrackColors[MaxTrackColors * MaxChannelColors] = {};
 
     UINT m_uFrameIndex = 0;
     UINT64 m_pFenceValues[FrameCount] = {};

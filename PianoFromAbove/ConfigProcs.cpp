@@ -17,7 +17,7 @@
 #include "MainProcs.h"
 #include "Globals.h"
 #include "resource.h"
-#include "LanguagePacks.h"
+#include "LanguagePacks.hpp"
 #include "imgui/Fonts.h"
 #include "imgui/imguiCompressedFont2GDI.h"
 #include "GameState.h"
@@ -73,7 +73,7 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         HWND hWndFirstKey = GetDlgItem(hWnd, IDC_FIRSTKEY);
         HWND hWndLastKey = GetDlgItem(hWnd, IDC_LASTKEY);
         // Enumerate the keys
-        for (int i = 0; i < 128; i++)
+        for (unsigned char i = 0; i < 128; i++)
         {
             SendMessage(hWndFirstKey, CB_ADDSTRING, i, (LPARAM)MIDI::NoteName(i).c_str());
             SendMessage(hWndLastKey, CB_ADDSTRING, i, (LPARAM)MIDI::NoteName(i).c_str());
@@ -84,11 +84,10 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         SendMessage(hWndFirstKey, CB_SETCURSEL, cVisual.iFirstKey, 0);
         SendMessage(hWndLastKey, CB_SETCURSEL, cVisual.iLastKey, 0);
         CheckDlgButton(hWnd, IDC_RANDOMIZE, cVisual.bRandomizeColor);
-        for (int i = 0; i < IDC_COLOR16 - IDC_COLOR1 + 1; i++)
+        for (unsigned char i = 0; i < IDC_COLOR16 - IDC_COLOR1 + 1; i++) {
             EnableWindow(GetDlgItem(hWnd, IDC_COLOR1 + i), !IsDlgButtonChecked(hWnd, IDC_RANDOMIZE));
-        // Colors
-        for (int i = 0; i < IDC_COLOR16 - IDC_COLOR1 + 1; i++)
             SetWindowLongPtr(GetDlgItem(hWnd, IDC_COLOR1 + i), GWLP_USERDATA, cVisual.colors[i] & 0x00FFFFFF);
+        }
         SetWindowLongPtr(GetDlgItem(hWnd, IDC_BKGCOLOR), GWLP_USERDATA, cVisual.iBkgColor & 0x00FFFFFF);
         SetWindowLongPtr(GetDlgItem(hWnd, IDC_BARCOLOR), GWLP_USERDATA, cVisual.iBarColor & 0x00FFFFFF);
         SetDlgItemTextW(hWnd, IDC_BACKGROUND, cVisual.sBackground.c_str());
@@ -117,7 +116,7 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     }
     case WM_COMMAND:
     {
-        int iId = LOWORD(wParam);
+        win32_t iId = LOWORD(wParam);
         Changed(hWnd);
         switch (iId)
         {
@@ -161,7 +160,7 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         }
         case IDC_RANDOMIZE:
         {
-            for (int i = 0; i < IDC_COLOR16 - IDC_COLOR1 + 1; i++)
+            for (unsigned char i = 0; i < IDC_COLOR16 - IDC_COLOR1 + 1; i++)
                 EnableWindow(GetDlgItem(hWnd, IDC_COLOR1 + i), !IsDlgButtonChecked(hWnd, IDC_RANDOMIZE));
             //InvalidateRect(hWnd, nullptr, FALSE);
             return TRUE;
@@ -170,17 +169,17 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         {
             VisualSettings cVisual = Config::GetConfig().GetVisualSettings();
             cVisual.LoadDefaultColors();
-            for (int i = 0; i < IDC_COLOR16 - IDC_COLOR1 + 1; i++)
+            for (unsigned char i = 0; i < IDC_COLOR16 - IDC_COLOR1 + 1; i++)
                 SetWindowLongPtr(GetDlgItem(hWnd, IDC_COLOR1 + i), GWLP_USERDATA, cVisual.colors[i] & 0x00FFFFFF);
             SetWindowLongPtr(GetDlgItem(hWnd, IDC_BKGCOLOR), GWLP_USERDATA, cVisual.iBkgColor & 0x00FFFFFF);
             SetWindowLongPtr(GetDlgItem(hWnd, IDC_BARCOLOR), GWLP_USERDATA, cVisual.iBarColor & 0x00FFFFFF);
             InvalidateRect(hWnd, nullptr, FALSE);
             return TRUE;
         }
-        case IDC_BACKGROUNDBROWSE: 
+        case IDC_BACKGROUNDBROWSE:
         {
             OPENFILENAME ofn = {};
-            TCHAR sFilename[1<<10] = { 0 };
+            TCHAR sFilename[1 << 10] = { 0 };
             ofn.lStructSize = sizeof(OPENFILENAME);
             ofn.hwndOwner = hWnd;
             ofn.lpstrFilter = TEXT("Image files\0*.png;*.jpg;*.jpeg\0");
@@ -192,7 +191,7 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 SetDlgItemTextW(hWnd, IDC_BACKGROUND, sFilename);
             return TRUE;
         }
-        case IDC_BACKGROUNDRESET: 
+        case IDC_BACKGROUNDRESET:
         {
             Changed(hWnd);
             SetDlgItemTextW(hWnd, IDC_BACKGROUND, L"");
@@ -218,10 +217,10 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 IsDlgButtonChecked(hWnd, IDC_SHOWSONGKEYS) ? cVisual.Song :
                 IsDlgButtonChecked(hWnd, IDC_SHOWCUSTOMKEYS) ? cVisual.Custom :
                 cVisual.All);
-            cVisual.iFirstKey = (int)SendMessage(GetDlgItem(hWnd, IDC_FIRSTKEY), CB_GETCURSEL, 0, 0);
-            cVisual.iLastKey = (int)SendMessage(GetDlgItem(hWnd, IDC_LASTKEY), CB_GETCURSEL, 0, 0);
+            cVisual.iFirstKey = (unsigned char)SendMessage(GetDlgItem(hWnd, IDC_FIRSTKEY), CB_GETCURSEL, 0, 0);
+            cVisual.iLastKey = (unsigned char)SendMessage(GetDlgItem(hWnd, IDC_LASTKEY), CB_GETCURSEL, 0, 0);
             cVisual.bRandomizeColor = IsDlgButtonChecked(hWnd, IDC_RANDOMIZE);
-            for (int i = 0; i < IDC_COLOR16 - IDC_COLOR1 + 1; i++)
+            for (unsigned char i = 0; i < IDC_COLOR16 - IDC_COLOR1 + 1; i++)
                 cVisual.colors[i] = (int)GetWindowLongPtr(GetDlgItem(hWnd, IDC_COLOR1 + i), GWLP_USERDATA) & 0x00FFFFFF | (cVisual.colors[i] & 0xFF000000);
             cVisual.iBkgColor = (int)GetWindowLongPtr(GetDlgItem(hWnd, IDC_BKGCOLOR), GWLP_USERDATA) & 0x00FFFFFF | (cVisual.iBkgColor & 0xFF000000);
             cVisual.iBarColor = (int)GetWindowLongPtr(GetDlgItem(hWnd, IDC_BARCOLOR), GWLP_USERDATA) & 0x00FFFFFF | (cVisual.iBarColor & 0xFF000000);
@@ -267,8 +266,8 @@ INT_PTR WINAPI AudioProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     }
     case WM_COMMAND:
     {
-        int iId = LOWORD(wParam);
-        int iCode = HIWORD(wParam);
+        win32_t iId = LOWORD(wParam);
+        win32_t iCode = HIWORD(wParam);
         if (iCode == LBN_SELCHANGE || (iId == IDC_KDMAPI && iCode == BN_CLICKED))
             Changed(hWnd);
         break;
@@ -286,7 +285,7 @@ INT_PTR WINAPI AudioProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             AudioSettings cAudio = config.GetAudioSettings();
 
             // Get the values
-            cAudio.iOutDevice = (int)SendDlgItemMessage(hWnd, IDC_MIDIOUT, LB_GETCURSEL, 0, 0);
+            cAudio.iOutDevice = (UINT)SendDlgItemMessage(hWnd, IDC_MIDIOUT, LB_GETCURSEL, 0, 0);
             cAudio.bKDMAPI = IsDlgButtonChecked(hWnd, IDC_KDMAPI);
             cAudio.sDesiredOut = cAudio.vMIDIOutDevices[cAudio.iOutDevice];
 
@@ -403,7 +402,7 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         HWND hWndVelStrshld = GetDlgItem(hWnd, IDC_VELSTRSHLD);
         HWND hWndVelStrshldSpin = GetDlgItem(hWnd, IDC_VELSTRSHLDSPIN);
         // Edit boxes
-        TCHAR buf[1<<10];
+        TCHAR buf[1 << 10];
         _stprintf_s(buf, TEXT("%g"), cControls.dFwdBackSecs);
         SetWindowText(hWndFwdBack, buf);
         _stprintf_s(buf, TEXT("%g"), cControls.dSpeedUpPct);
@@ -419,13 +418,13 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         return TRUE;
     }
     case WM_COMMAND: {
-        int iId = LOWORD(wParam);
+        win32_t iId = LOWORD(wParam);
         Changed(hWnd);
         switch (iId)
         {
         case IDC_SPLASHBROWSE: {
             OPENFILENAME ofn = {};
-            TCHAR sFilename[1<<10] = { 0 };
+            TCHAR sFilename[1 << 10] = { 0 };
             ofn.lStructSize = sizeof(OPENFILENAME);
             ofn.hwndOwner = hWnd;
             ofn.lpstrFilter = TEXT("MIDI Files (*.mid, *.mid.xz)\0*.mid;*.xz\0");
@@ -456,7 +455,7 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             {
             case IDC_LRARROWSSPIN:
             {
-                TCHAR buf[1<<5];
+                TCHAR buf[1 << 5];
                 LPNMUPDOWN lpnmud = (LPNMUPDOWN)lParam;
                 HWND hWndFwdBack = GetDlgItem(hWnd, IDC_LRARROWS);
                 double dOldVal = 0;
@@ -471,7 +470,7 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             }
             case IDC_UDARROWSSPIN:
             {
-                TCHAR buf[1<<5];
+                TCHAR buf[1 << 5];
                 LPNMUPDOWN lpnmud = (LPNMUPDOWN)lParam;
                 HWND hWndSpeedPct = GetDlgItem(hWnd, IDC_UDARROWS);
                 double dOldVal = 0;
@@ -494,7 +493,7 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             ControlsSettings cControls = config.GetControlsSettings();
 
             // Edit boxes
-            TCHAR buf[1<<10];
+            TCHAR buf[1 << 10];
             double dEditVal = 0;
             int iEditVal = 0;
 
@@ -634,11 +633,11 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         lvi.mask = LVIF_TEXT;
         lvi.pszText = buf;
 
-        int iPos = 0;
+        size_t iPos = 0;
         for (uint16_t i = 0; i < mInfo.iNumTracks; i++)
         {
             const MIDITrack::MIDITrackInfo& mTrackInfo = vTracks[i]->GetInfo();
-            for (int j = 0; j < 16; j++)
+            for (unsigned char j = 0; j < 16; j++)
                 if (mTrackInfo.aNoteCount[j] > 0)
                 {
                     lvi.iSubItem = 0;
@@ -824,7 +823,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     }
     case WM_COMMAND:
     {
-        int iId = LOWORD(wParam);
+        win32_t iId = LOWORD(wParam);
         switch (iId)
         {
         case IDOK:

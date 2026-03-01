@@ -208,8 +208,8 @@ void AudioSettings::LoadMIDIDevices()
     wstring oldOutDev(iOutDevice >= 0 ? vMIDIOutDevices[iOutDevice] : L"");
     iOutDevice = -1;
     vMIDIOutDevices.clear();
-    int iNumOutDevs = midiOutGetNumDevs();
-    for (int i = 0; i < iNumOutDevs; i++)
+    UINT iNumOutDevs = midiOutGetNumDevs();
+    for (UINT i = 0; i < iNumOutDevs; i++)
     {
         MIDIOUTCAPS moc;
         midiOutGetDevCaps(i, &moc, sizeof(MIDIOUTCAPS));
@@ -237,8 +237,10 @@ void VisualSettings::LoadConfigValues(TiXmlElement* txRoot)
     int iAttrVal;
     if (txVisual->QueryIntAttribute("KeysShown", &iAttrVal) == TIXML_SUCCESS)
         eKeysShown = static_cast<KeysShown>(max(KeysShown::All, min(iAttrVal, KeysShown::Custom)));
-    txVisual->QueryIntAttribute("FirstKey", &iFirstKey);
-    txVisual->QueryIntAttribute("LastKey", &iLastKey);
+    if (txVisual->QueryIntAttribute("FirstKey", &iAttrVal) == TIXML_SUCCESS)
+        iFirstKey = static_cast<unsigned char>(iAttrVal);
+    if (txVisual->QueryIntAttribute("LastKey", &iAttrVal) == TIXML_SUCCESS)
+        iLastKey = static_cast<unsigned char>(iAttrVal);
 
     //Colors
     int r, g, b, a = 0;
@@ -285,7 +287,7 @@ void AudioSettings::LoadConfigValues(TiXmlElement* txRoot)
         sDesiredOut = Util::StringToWstring(sMIDIOutDevice);
         for (size_t i = 0; i < vMIDIOutDevices.size(); i++)
             if (vMIDIOutDevices[i] == sDesiredOut)
-                iOutDevice = (int)i;
+                iOutDevice = i;
     }
 
     int iAttrVal;
@@ -309,9 +311,8 @@ void VideoSettings::LoadConfigValues(TiXmlElement* txRoot)
         bMapVel = (iAttrVal != 0);
     if (txVideo->QueryIntAttribute("ShowMarkers", &iAttrVal) == TIXML_SUCCESS)
         bShowMarkers = (iAttrVal != 0);
-    int tmpMarkerEncoding;
-    txVideo->QueryIntAttribute("MarkerEncoding", &tmpMarkerEncoding);
-    eMarkerEncoding = static_cast<MarkerEncoding>(max(MarkerEncoding::CP1252, min(tmpMarkerEncoding, MarkerEncoding::UTF8)));
+    txVideo->QueryIntAttribute("MarkerEncoding", &iAttrVal);
+    eMarkerEncoding = static_cast<MarkerEncoding>(max(MarkerEncoding::CP1252, min(iAttrVal, MarkerEncoding::UTF8)));
     if (txVideo->QueryIntAttribute("LimitFPS", &iAttrVal) == TIXML_SUCCESS)
         bLimitFPS = (iAttrVal != 0);
     if (txVideo->QueryIntAttribute("Debug", &iAttrVal) == TIXML_SUCCESS)

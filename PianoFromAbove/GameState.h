@@ -20,27 +20,28 @@ using namespace std;
 #include "MIDI.h"
 #include "Misc.h"
 
-inline long long m_llStartTime;
-inline int m_iStartTick;
-inline long* m_vNCTable = nullptr;
+inline mms_t m_llStartTime;
+inline mms_t m_llRndStartTime;
+inline tick_t m_iStartTick;
+inline idx_t* m_vNCTable = nullptr;
 inline string llStartTimeFormatted;
-inline long polyphony;
+inline idx_t polyphony;
 inline string polyFormatted;
-inline long nps;
+inline idx_t nps;
 inline string npsFormatted;
-inline long passed;
+inline idx_t passed;
 inline string passedFormatted;
-inline int width = -1;
-inline int height = -1;
+inline idx_t TotalNC;
+inline win32_t width = -1;
+inline win32_t height = -1;
 inline uint16_t resolution = -1;
-inline char CheatEngineCaption[(1<<7)*(1<<10)] = {};
-inline size_t TotalNC;
-inline long long TotalTime;
+inline char CheatEngineCaption[(1 << 7) * (1 << 10)] = {};
+inline mms_t TotalTime;
 inline string TotalTimeFormatted;
 inline char Difficulty[1 << 10] = {};
 inline bool UpdateNotePos = true;
-inline static const signed long long MS = 1e+3;
-inline static const signed long long S = 1e+6;
+inline static const mms_t MS = 1e+3;
+inline static const mms_t S = 1e+6;
 
 //Abstract base class
 class GameState
@@ -51,11 +52,11 @@ public:
 
     //Static methods
     static const wstring Errors[];
-    static GameError ChangeState( GameState *pNextState, GameState **pDestObj );
+    static GameError ChangeState(GameState* pNextState, GameState** pDestObj);
 
     //Constructors
-    GameState( HWND hWnd, D3D12Renderer *pRenderer ) : m_hWnd( hWnd ), m_pRenderer( pRenderer ), m_pNextState( NULL ) {};
-    virtual ~GameState( void ) {};
+    GameState(HWND hWnd, D3D12Renderer* pRenderer) : m_hWnd(hWnd), m_pRenderer(pRenderer), m_pNextState(NULL) {};
+    virtual ~GameState(void) {};
 
     // Initialize after all other game states have been deleted
     virtual GameError Init() = 0;
@@ -70,64 +71,61 @@ public:
     virtual GameError Render() = 0;
 
     //Null for same state, 
-    GameState *NextState() { return m_pNextState; };
+    GameState* NextState() { return m_pNextState; };
 
-    void SetHWnd( HWND hWnd ) { m_hWnd = hWnd; }
-    void SetRenderer( D3D12Renderer *pRenderer ) { m_pRenderer = pRenderer; }
+    void SetHWnd(HWND hWnd) { m_hWnd = hWnd; }
+    void SetRenderer(D3D12Renderer* pRenderer) { m_pRenderer = pRenderer; }
 
 protected:
     //Windows info
     HWND m_hWnd;
 
     //Rendering device
-    D3D12Renderer *m_pRenderer;
+    D3D12Renderer* m_pRenderer;
 
-    GameState *m_pNextState;
-
-    static const int QueueSize = 50;
+    GameState* m_pNextState;
 };
 
 struct ChannelSettings
 {
-    ChannelSettings() { bHidden = bMuted = false; SetColor( 0x00000000 ); }
+    ChannelSettings() { bHidden = bMuted = false; SetColor(0x00000000); }
     void SetColor();
-    void SetColor( unsigned int iColor, double dDark = 0.5, double dVeryDark = 0.2 );
+    void SetColor(color_t iColor, double dDark = 0.5, double dVeryDark = 0.2);
 
     bool bHidden, bMuted;
-    unsigned int iPrimaryRGB, iDarkRGB, iVeryDarkRGB, iOrigBGR;
+    color_t iPrimaryRGB, iDarkRGB, iVeryDarkRGB, iOrigBGR;
 };
 struct TrackSettings { ChannelSettings aChannels[16]; };
 
 class SplashScreen : public GameState
 {
 public:
-    SplashScreen( HWND hWnd, D3D12Renderer *pRenderer, bool enableSplash = true);
+    SplashScreen(HWND hWnd, D3D12Renderer* pRenderer, bool enableSplash = true);
 
-    GameError MsgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
+    GameError MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     GameError Init();
     GameError Logic();
     GameError Render();
 
 private:
-    void InitNotes( const vector< MIDIEvent* > &vEvents );
+    void InitNotes(const vector< MIDIEvent* >& vEvents);
     void InitState();
-    void ColorChannel( int iTrack, int iChannel, unsigned int iColor, bool bRandom = false );
-    void SetChannelSettings( const vector< bool > &vMuted, const vector< bool > &vHidden, const vector< unsigned > &vColor );
+    void ColorChannel(track_t iTrack, chan_t iChannel, color_t iColor, bool bRandom = false);
+    void SetChannelSettings(const vector<bool>& vMuted, const vector<bool>& vHidden, const vector<color_t>& vColor);
 
-    void UpdateState( int iPos );
+    void UpdateState(idx_t iPos);
 
     void RenderGlobals();
     void RenderNotes();
     void RenderNote(MIDIChannelEvent* pNote);
-    float GetNoteX( int iNote );
+    float GetNoteX(key_t iNote);
     void GenNoteXTable();
 
     // MIDI info
     MIDI m_MIDI; // The song to display
     vector< MIDIChannelEvent* > m_vEvents; // The channel events of the song
-    int m_iStartPos;
-    int m_iEndPos;
-    vector<int> m_vState[128];  // The notes that are on at time m_llStartTime.
+    idx_t m_iStartPos, m_iEndPos;
+    vector<idx_t> m_vState[128];  // The notes that are on at time m_llStartTime.
     Timer m_Timer; // Frame timers
     double m_dVolume;
     bool m_bMute;
@@ -139,11 +137,10 @@ private:
     vector< TrackSettings > m_vTrackSettings;
 
     // Computed in RenderGlobal
-    uint8_t m_iStartNote, m_iEndNote; // Start and end notes of the songs
+    key_t m_iStartNote, m_iEndNote; // Start and end notes of the songs
     float m_fNotesX, m_fNotesY, m_fNotesCX, m_fNotesCY; // Notes position
-    uint8_t m_iAllWhiteKeys; // Number of white keys are on the screen
+    key_t m_iAllWhiteKeys; // Number of white keys are on the screen
     float m_fWhiteCX; // Width of the white keys
-    long long m_llRndStartTime; // Rounded start time to make stuff drop at the same time
 
     float notex_table[128];
 };
@@ -151,9 +148,9 @@ private:
 class IntroScreen : public GameState
 {
 public:
-    IntroScreen( HWND hWnd, D3D12Renderer *pRenderer ) : GameState( hWnd, pRenderer ) {}
+    IntroScreen(HWND hWnd, D3D12Renderer* pRenderer) : GameState(hWnd, pRenderer) {}
 
-    GameError MsgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
+    GameError MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     GameError Init();
     GameError Logic();
     GameError Render();
@@ -174,8 +171,8 @@ public:
 };
 
 typedef struct {
-    unsigned idx;
-    unsigned sister_idx;
+    idx_t idx;
+    idx_t sister_idx;
 } thread_work_t;
 
 class MainScreen : public GameState
@@ -183,28 +180,32 @@ class MainScreen : public GameState
 public:
     static const float KBPercent;
 
-    MainScreen( wstring sMIDIFile, State eGameMode, HWND hWnd, D3D12Renderer *pRenderer );
+    MainScreen(wstring sMIDIFile, State eGameMode, HWND hWnd, D3D12Renderer* pRenderer);
 
     // GameState functions
-    GameError MsgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
+    GameError MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     GameError Init();
-    GameError Logic( void );
-    GameError Render( void );
+    GameError Logic(void);
+    GameError Render(void);
 
     // Info
     bool IsValid() const { return m_MIDI.IsValid(); }
     const MIDI& GetMIDI() const { return m_MIDI; }
 
     // Settings
-    void ToggleMuted( int iTrack, int iChannel ) { m_vTrackSettings[iTrack].aChannels[iChannel].bMuted =
-                                                  !m_vTrackSettings[iTrack].aChannels[iChannel].bMuted; }
-    void ToggleHidden( int iTrack, int iChannel ) { m_vTrackSettings[iTrack].aChannels[iChannel].bHidden =
-                                                   !m_vTrackSettings[iTrack].aChannels[iChannel].bHidden; }
-    void MuteChannel( int iTrack, int iChannel, bool bMuted ) { m_vTrackSettings[iTrack].aChannels[iChannel].bMuted = bMuted; }
-    void HideChannel( int iTrack, int iChannel, bool bHidden ) { m_vTrackSettings[iTrack].aChannels[iChannel].bHidden = bHidden; }
-    void ColorChannel( int iTrack, int iChannel, unsigned int iColor, bool bRandom = false );
-    ChannelSettings* GetChannelSettings( int iChannel );
-    void SetChannelSettings( const vector< bool > &vMuted, const vector< bool > &vHidden, const vector< unsigned > &vColor );
+    void ToggleMuted(track_t iTrack, chan_t iChannel) {
+        m_vTrackSettings[iTrack].aChannels[iChannel].bMuted =
+            !m_vTrackSettings[iTrack].aChannels[iChannel].bMuted;
+    }
+    void ToggleHidden(track_t iTrack, chan_t iChannel) {
+        m_vTrackSettings[iTrack].aChannels[iChannel].bHidden =
+            !m_vTrackSettings[iTrack].aChannels[iChannel].bHidden;
+    }
+    void MuteChannel(track_t iTrack, chan_t iChannel, bool bMuted) { m_vTrackSettings[iTrack].aChannels[iChannel].bMuted = bMuted; }
+    void HideChannel(track_t iTrack, chan_t iChannel, bool bHidden) { m_vTrackSettings[iTrack].aChannels[iChannel].bHidden = bHidden; }
+    void ColorChannel(track_t iTrack, chan_t iChannel, color_t iColor, bool bRandom = false);
+    ChannelSettings* GetChannelSettings(TnC_t iChannel);
+    void SetChannelSettings(const vector<bool>& vMuted, const vector<bool>& vHidden, const vector<color_t>& vColor);
 
 private:
     // Initialization
@@ -212,22 +213,21 @@ private:
     void InitState();
 
     // Logic
-    void UpdateState(int key, const thread_work_t& work);
-    void UpdateStateBackwards(int key, const thread_work_t& work);
-    void JumpTo(long long llStartTime, boolean loadingMode = false);
-    void ApplyMarker(unsigned char* data, size_t size);
+    void UpdateState(key_t key, const thread_work_t& work);
+    void UpdateStateBackwards(key_t key, const thread_work_t& work);
+    void JumpTo(mms_t llStartTime, boolean loadingMode = false);
+    void ApplyMarker(unsigned char* data, msgln_t size);
     void ApplyColor(MIDIMetaEvent* event);
-    void AdvanceIterators( long long llTime, bool bIsJump );
-    MIDIMetaEvent* GetPrevious( eventvec_t::const_iterator &itCurrent,
-                                const eventvec_t &vEventMap, int iDataLen );
+    void AdvanceIterators(mms_t llTime, bool bIsJump);
+    MIDIMetaEvent* GetPrevious(eventvec_t::const_iterator& itCurrent, const eventvec_t& vEventMap, msgln_t iDataLen);
 
     // MIDI helpers
-    int GetCurrentTick( long long llStartTime );
-    int GetCurrentTick( long long llStartTime, int iLastTempoTick, long long llLastTempoTime, int iMicroSecsPerBeat );
-    long long GetTickTime( int iTick );
-    long long GetTickTime( int iTick, int iLastTempoTick, long long llLastTempoTime, int iMicroSecsPerBeat );
-    int GetBeat( int iTick, int iBeatType, int iLastTempoTick );
-    int GetBeatTick( int iTick, int iBeatType, int iLastTempoTick );
+    long GetCurrentTick(long long llStartTime);
+    long GetCurrentTick(long long llStartTime, long iLastTempoTick, long long llLastTempoTime, long iMicroSecsPerBeat);
+    long long GetTickTime(long iTick);
+    long long GetTickTime(long iTick, long iLastTempoTick, long long llLastTempoTime, long iMicroSecsPerBeat);
+    long GetBeat(long iTick, long iBeatType, long iLastTempoTick);
+    long GetBeatTick(long iTick, long iBeatType, long iLastTempoTick);
     long long GetMinTime() const { return m_MIDI.GetInfo().llFirstNote - 3000000; }
     long long GetMaxTime() const { return m_MIDI.GetInfo().llTotalMicroSecs + 500000; }
 
@@ -237,18 +237,18 @@ private:
     void RenderNotes();
     void RenderNote(const MIDIChannelEvent* pNote);
     void GenNoteXTable();
-    float GetNoteX( int iNote );
+    float GetNoteX(unsigned char iNote);
     void RenderKeys();
     void RenderText();
-    void RenderStatusLine(int line, const char* left, const char* format, ...);
-    void RenderStatus( LPRECT prcPos );
+    void RenderStatusLine(unsigned char line, const char* left, const char* format, ...);
+    void RenderStatus(LPRECT prcPos);
     void RenderMarker(const char* str);
     void RenderMessage(LPRECT prcMsg, const char* sMsg);
 
     // MIDI info
     MIDI m_MIDI; // The song to display
-    vector< MIDIChannelEvent* > m_vEvents; // The channel events of the song
-    vector< MIDIMetaEvent* > m_vMetaEvents; // The meta events of the song
+    vector<MIDIChannelEvent*> m_vEvents; // The channel events of the song
+    vector<MIDIMetaEvent*> m_vMetaEvents; // The meta events of the song
     eventvec_t m_vTempo; // Tracked for drawing measure lines
     eventvec_t m_vSignature; // Measure lines again
     eventvec_t m_vMarkers; // Tracked for section names in some longer MIDIs
@@ -257,26 +257,28 @@ private:
     eventvec_t::const_iterator m_itNextSignature;
     eventvec_t::const_iterator m_itNextMarker;
     eventvec_t::const_iterator m_itNextColor;
-    uint32_t m_iMicroSecsPerBeat, m_iLastTempoTick; // Tempo
-    long long m_llLastTempoTime; // Tempo
-    int m_CurBeat, m_iBeatsPerMeasure, m_iBeatType, m_iClocksPerMet, m_iLastSignatureTick; // Time signature
-    std::string m_sMarker; // Current marker to display on the screen
+    bpm_t m_iMicroSecsPerBeat; // Tempo
+    tick_t m_iLastTempoTick; // Tempo
+    mms_t m_llLastTempoTime; // Tempo
+    bpm_t m_CurBeat, m_iBeatsPerMeasure, m_iBeatType, m_iClocksPerMet; // Time signature
+    tick_t m_iLastSignatureTick;
+    string m_sMarker; // Current marker to display on the screen
     unsigned char* m_pMarkerData = nullptr; // Used for refreshing marker data when changing encoding on the fly
-    size_t m_iMarkerSize = 0;
-    int m_iCurEncoding;
+    msgln_t m_iMarkerSize = 0;
+    uint8_t m_iCurEncoding;
 
     // color events and bend range and such
-    bool Next_is_PBS[16] = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
-    short m_pBendsRange[16] = { 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12 };
+    bool Next_is_PBS[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+    short m_pBendsRange[16] = {12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12};
 
     // Playback
     State m_eGameMode;
-    long long m_iStartPos, m_iEndPos, m_iPrevStartPos; // Postions of the start and end events that occur in the current window
-    long long m_llTimeSpan;  // Times of the start and end events of the current window
-    long long m_llPrevTime;
-    vector<int> m_vState[128];  // The notes that are on at time m_llStartTime.
+    idx_t m_iStartPos, m_iEndPos, m_iPrevStartPos; // Postions of the start and end events that occur in the current window
+    mms_t m_llTimeSpan;  // Times of the start and end events of the current window
+    mms_t m_llPrevTime;
+    vector<idx_t> m_vState[128];  // The notes that are on at time m_llStartTime.
     vector<thread_work_t> m_vThreadWork[128];
-    int m_pNoteState[128]; // The last note that was turned on
+    idx_t m_pNoteState[128]; // The last note that was turned on
     double m_dSpeed; // Speed multiplier
     bool IsLastFrameReversed = false;
     bool IsReversedStateInitialized = false;
@@ -287,11 +289,11 @@ private:
     double m_dVolume;
     bool m_bTickMode = false;
     UINT nxtdelay = 1 << 6;
-    long long JumpTarget = ~0;
+    mms_t JumpTarget = ~0;
 
     // FPS variables
-    int m_iFPSCount;
-    long long m_llFPSTime;
+    short m_iFPSCount;
+    mms_t m_llFPSTime;
     double m_dFPS;
     uint8_t FrameCount = 0;
 
@@ -302,13 +304,13 @@ private:
     static const float SharpRatio;
     static const float KeyRatio;
     bool m_bShowKB;
-    int m_eKeysShown;
+    uint8_t m_eKeysShown;
     ChannelSettings m_csBackground;
     ChannelSettings m_csKBRed, m_csKBWhite, m_csKBSharp, m_csKBBackground;
-    vector< TrackSettings > m_vTrackSettings;
+    vector<TrackSettings> m_vTrackSettings;
     float m_pBends[16] = {};
     float m_pBendsValue[16] = {};
-    std::wstring m_sCurBackground;
+    wstring m_sCurBackground;
     bool m_bBackgroundLoaded;
     bool m_bRemoveOverlaps;
 
@@ -320,18 +322,17 @@ private:
     float notex_table[128];
 
     // Computed in RenderGlobal
-    int m_iStartNote, m_iEndNote; // Start and end notes of the songs
+    key_t m_iStartNote, m_iEndNote; // Start and end notes of the songs
+    key_t m_iAllWhiteKeys; // Number of white keys are on the screen
     bool m_bFlipKeyboard;
     float m_fNotesX, m_fNotesY, m_fNotesCX, m_fNotesCY; // Notes position
-    int m_iAllWhiteKeys; // Number of white keys are on the screen
     float m_fWhiteCX; // Width of the white keys
-    long long m_llRndStartTime; // Rounded start time to make stuff drop at the same time
     bool m_bSameWidth;
     bool m_bMapVel;
-    
+
     // Frame dumping stuff
     bool m_bDumpFrames = false;
-    std::vector<unsigned char> m_vImageData;
+    vector<unsigned char> m_vImageData;
     HANDLE m_hVideoPipe;
 
     // Debug assertion fail workaround

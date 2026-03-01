@@ -22,7 +22,7 @@
 
 #include "MainProcs.h"
 #include "resource.h"
-#include "LanguagePacks.h"
+#include "LanguagePacks.hpp"
 
 #include "Config.h"
 #include "GameState.h"
@@ -2138,6 +2138,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += DefineMemoryAddress("Zoom", cView.GetZoomXAddress());
                 Code += DefineMemoryAddress("UpdateNotePos", GetAddress(UpdateNotePos));
                 Code += DefineMemoryAddress("SameWidth", GetAddress(cVideo.bSameWidth));
+                Code += DefineMemoryAddress("VelocityMapping", GetAddress(cVideo.bMapVel));
                 Code += DefineMemoryAddress("StartKey", GetAddress(cVisual.iFirstKey));
                 Code += DefineMemoryAddress("EndKey", GetAddress(cVisual.iLastKey));
                 Code += DefineMemoryAddress("KeyMode", GetAddress(cVisual.eKeysShown));
@@ -2155,7 +2156,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += DefineMemoryAddress("VelocityThreshold", GetAddress(cControls.iVelocityThreshold));
                 Code += DefineMemoryAddress("Caption", GetAddress(CheatEngineCaption));
                 Code += DefineMemoryAddress("DifficultyText", GetAddress(Difficulty));
-                Code += "-- Custom Variable Definitions: (Version: " + RVersionString + ")\n";
+                Code += "-- Custom Variable Definitions: (Version: " + WStringToUtf8(VersionString) + ")\n";
                 Code += "\n";
                 Code += "-- Function Definitions: (DO NOT CHANGE!)\n";
                 Code += InitializeVariables();
@@ -2183,8 +2184,9 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += GettersAndSetters("OffsetY", "Float", false, "History", false, true);
                 Code += GettersAndSetters("Zoom", "Float", false, "History", false, true);
                 Code += GettersAndSetters("SameWidth", "ShortInteger", false, "History", false, true);
-                Code += GettersAndSetters("StartKey", "Integer", false, "History", true, true);
-                Code += GettersAndSetters("EndKey", "Integer", false, "History", true, true);
+                Code += GettersAndSetters("VelocityMapping", "ShortInteger", false, "History", false, true);
+                Code += GettersAndSetters("StartKey", "ShortInteger", false, "History", false, true);
+                Code += GettersAndSetters("EndKey", "ShortInteger", false, "History", false, true);
                 Code += GettersAndSetters("KeyMode", "ShortInteger", false, "History", false, true);
                 Code += GettersAndSetters("Width", "Integer", true, "History", true, true);
                 Code += GettersAndSetters("Height", "Integer", true, "History", true, true);
@@ -2248,6 +2250,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += "SetOffsetY(0.00)\n";
                 Code += "SetZoom(0.00)\n";
                 Code += "SetSameWidth(1)\n";
+                Code += "SetVelocityMapping(0)\n";
                 Code += "SetPaused(0)\n";
                 Code += "SetKeyboard(1)\n";
                 Code += "SetVisualizePitchBends(1)\n";
@@ -2461,7 +2464,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
     ViewSettings& cView = config.GetViewSettings();
 
     // Create the application window
-    g_hWnd = CreateWindowEx(NULL, CLASSNAME, MainWindowTitle1 L" v" LVersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, cView.GetMainLeft(), cView.GetMainTop(), cView.GetMainWidth(), cView.GetMainHeight(), NULL, NULL, wc.hInstance, NULL);
+    g_hWnd = CreateWindowEx(NULL, CLASSNAME, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, cView.GetMainLeft(), cView.GetMainTop(), cView.GetMainWidth(), cView.GetMainHeight(), NULL, NULL, wc.hInstance, NULL);
 
     if (!g_hWnd) return 1;
 
@@ -2565,7 +2568,7 @@ DWORD WINAPI GameThread(LPVOID lpParameter)
     GameState::GameError ErrorLevel;
 
     wchar_t buf[1 << 10] = {};
-    _snwprintf_s(buf, 1 << 10, MainWindowTitle1 L" v" LVersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle6 MainWindowTitle7);
+    _snwprintf_s(buf, 1 << 10, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle6 MainWindowTitle7);
     SetWindowTextW(g_hWnd, buf);
 
     // Event, logic, render...
