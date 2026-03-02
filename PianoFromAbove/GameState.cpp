@@ -261,7 +261,7 @@ SplashScreen::SplashScreen(HWND hWnd, D3D12Renderer* pRenderer, bool enableSplas
         m_MIDI.PostProcess(m_vEvents);
 
         // Allocate
-        m_vTrackSettings.resize(m_MIDI.GetInfo().iNumTracks % MaxTrackColors);
+        m_vTrackSettings.resize(min(m_MIDI.GetInfo().iNumTracks, MaxTrackColors));
         for (key_t i = 0; i < 128; i++)
             m_vState[i].reserve(1<<10);
     }
@@ -316,17 +316,27 @@ void SplashScreen::ColorChannel(track_t iTrack, chan_t iChannel, color_t iColor,
 
 void SplashScreen::SetChannelSettings(const vector<bool>&, const vector<bool>&, const vector<color_t>& vColor) {
     const MIDI::MIDIInfo& mInfo = m_MIDI.GetInfo();
-    const vector< MIDITrack* >& vTracks = m_MIDI.GetTracks();
+    const vector<MIDITrack*>& vTracks = m_MIDI.GetTracks();
 
     static Config& config = Config::GetConfig();
     static const VisualSettings& cVisual = config.GetVisualSettings();
 
+    bool IsEmpty[MaxTrackColors][16];
+    memset(IsEmpty, true, sizeof(IsEmpty));
+    for (track_t i = 0; i < mInfo.iNumTracks; i++) {
+        const MIDITrack::MIDITrackInfo& info = vTracks[i]->GetInfo();
+        for (chan_t j = 0; j < MaxChannelColors; j++) {
+            if (info.aNoteCount[j] > 0) {
+                IsEmpty[i % MaxTrackColors][j] = false;
+            }
+        }
+    }
+
     idx_t iPos = 0;
     for (track_t i = 0; i < min(mInfo.iNumTracks,MaxTrackColors); i++)
     {
-        const MIDITrack::MIDITrackInfo& mTrackInfo = vTracks[i]->GetInfo();
         for (chan_t j = 0; j < MaxChannelColors; j++)
-            if (mTrackInfo.aNoteCount[j] > 0)
+            if (!IsEmpty[i][j])
             {
                 if (cVisual.bRandomizeColor) {
                     ColorChannel(i, j, 0, true);
@@ -659,7 +669,7 @@ MainScreen::MainScreen(wstring sMIDIFile, State eGameMode, HWND hWnd, D3D12Rende
     m_vEvents.reserve(m_MIDI.GetInfo().iEventCount);
 
     // Allocate
-    m_vTrackSettings.resize(m_MIDI.GetInfo().iNumTracks % MaxTrackColors);
+    m_vTrackSettings.resize(min(m_MIDI.GetInfo().iNumTracks, MaxTrackColors));
     for (key_t i = 0; i < 128; i++)
         m_vState[i].reserve(1 << 10);
 
@@ -856,36 +866,30 @@ void ChannelSettings::SetColor(color_t iColor, double dDark, double dVeryDark) {
     this->iVeryDarkRGB = (A << 24) | (vdR << 16) | (vdG << 8) | (vdB << 0);
 }
 
-ChannelSettings* MainScreen::GetChannelSettings(TnC_t iTrack) {
-    const MIDI::MIDIInfo& mInfo = m_MIDI.GetInfo();
-    const vector< MIDITrack* >& vTracks = m_MIDI.GetTracks();
-
-    idx_t iPos = 0;
-    for (track_t i = 0; i < min(mInfo.iNumTracks,MaxTrackColors); i++)
-    {
-        const MIDITrack::MIDITrackInfo& mTrackInfo = vTracks[i]->GetInfo();
-        for (chan_t j = 0; j < MaxChannelColors; j++)
-            if (mTrackInfo.aNoteCount[j] > 0)
-            {
-                if (iPos == iTrack) return &m_vTrackSettings[i].aChannels[j];
-                iPos++;
-            }
-    }
-    return NULL;
-}
-
 void MainScreen::SetChannelSettings(const vector<bool>& vMuted, const vector<bool>& vHidden, const vector<color_t>& vColor) {
+    const MIDI::MIDIInfo& mInfo = m_MIDI.GetInfo();
     const vector<MIDITrack*>& vTracks = m_MIDI.GetTracks();
 
     bool bMuted = vMuted.size() > 0;
     bool bHidden = vHidden.size() > 0;
     bool bColor = vColor.size() > 0;
 
+    bool IsEmpty[MaxTrackColors][16];
+    memset(IsEmpty, true, sizeof(IsEmpty));
+    for (track_t i = 0; i < mInfo.iNumTracks; i++) {
+        const MIDITrack::MIDITrackInfo& info = vTracks[i]->GetInfo();
+        for (chan_t j = 0; j < MaxChannelColors; j++) {
+            if (info.aNoteCount[j] > 0) {
+                IsEmpty[i % MaxTrackColors][j] = false;
+            }
+        }
+    }
+
     idx_t iPos = 0;
-    for (track_t i = 0; i < min(vTracks.size(), MaxTrackColors); i++) {
+    for (track_t i = 0; i < min(mInfo.iNumTracks, MaxTrackColors); i++) {
         const MIDITrack::MIDITrackInfo& mTrackInfo = vTracks[i]->GetInfo();
         for (chan_t j = 0; j < MaxChannelColors; j++) {
-            if (mTrackInfo.aNoteCount[j] > 0) {
+            if (!IsEmpty[i][j]) {
                 MuteChannel(i, j, bMuted ? vMuted[min(iPos, vMuted.size() - 1)] : false);
                 HideChannel(i, j, bHidden ? vHidden[min(iPos, vHidden.size() - 1)] : false);
                 if (bColor) {

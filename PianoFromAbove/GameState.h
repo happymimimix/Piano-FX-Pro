@@ -196,7 +196,6 @@ public:
     void MuteChannel(track_t iTrack, chan_t iChannel, bool bMuted) { m_vTrackSettings[iTrack].aChannels[iChannel].bMuted = bMuted; }
     void HideChannel(track_t iTrack, chan_t iChannel, bool bHidden) { m_vTrackSettings[iTrack].aChannels[iChannel].bHidden = bHidden; }
     void ColorChannel(track_t iTrack, chan_t iChannel, color_t iColor, bool bRandom = false);
-    ChannelSettings* GetChannelSettings(TnC_t iChannel);
     void SetChannelSettings(const vector<bool>& vMuted, const vector<bool>& vHidden, const vector<color_t>& vColor);
 
 private:

@@ -12,7 +12,7 @@
 #include <string>
 using namespace std;
 
-#define VersionString L"4.2"
+#define VersionString L"4.3"
 
 // Type definitions... 
 typedef signed long mtk_t; // Midi tick timing type

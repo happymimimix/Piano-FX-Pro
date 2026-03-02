@@ -128,7 +128,7 @@ public:
     };
 
     const MIDIInfo& GetInfo() const { return m_Info; }
-    const vector< MIDITrack* >& GetTracks() const { return m_vTracks; }
+    const vector<MIDITrack*>& GetTracks() const { return m_vTracks; }
 
 private:
     struct EventPool {
