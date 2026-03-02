@@ -22,7 +22,7 @@ using namespace std;
 
 inline mms_t m_llStartTime;
 inline mms_t m_llRndStartTime;
-inline tick_t m_iStartTick;
+inline mtk_t m_iStartTick;
 inline idx_t* m_vNCTable = nullptr;
 inline string llStartTimeFormatted;
 inline idx_t polyphony;
@@ -222,12 +222,12 @@ private:
     MIDIMetaEvent* GetPrevious(eventvec_t::const_iterator& itCurrent, const eventvec_t& vEventMap, msgln_t iDataLen);
 
     // MIDI helpers
-    tick_t GetCurrentTick(mms_t llStartTime);
-    tick_t GetCurrentTick(mms_t llStartTime, tick_t iLastTempoTick, mms_t llLastTempoTime, bpm_t iMicroSecsPerBeat);
-    mms_t GetTickTime(tick_t iTick);
-    mms_t GetTickTime(tick_t iTick, tick_t iLastTempoTick, mms_t llLastTempoTime, bpm_t iMicroSecsPerBeat);
-    bpm_t GetBeat(tick_t iTick, bpm_t iBeatType, tick_t iLastTempoTick);
-    tick_t GetBeatTick(tick_t iTick, bpm_t iBeatType, tick_t iLastTempoTick);
+    mtk_t GetCurrentTick(mms_t llStartTime);
+    mtk_t GetCurrentTick(mms_t llStartTime, mtk_t iLastTempoTick, mms_t llLastTempoTime, bpm_t iMicroSecsPerBeat);
+    mms_t GetTickTime(mtk_t iTick);
+    mms_t GetTickTime(mtk_t iTick, mtk_t iLastTempoTick, mms_t llLastTempoTime, bpm_t iMicroSecsPerBeat);
+    bpm_t GetBeat(mtk_t iTick, bpm_t iBeatType, mtk_t iLastTempoTick);
+    mtk_t GetBeatTick(mtk_t iTick, bpm_t iBeatType, mtk_t iLastTempoTick);
     mms_t GetMinTime() const { return m_MIDI.GetInfo().llFirstNote - 3000000; }
     mms_t GetMaxTime() const { return m_MIDI.GetInfo().llTotalMicroSecs + 500000; }
 
@@ -258,10 +258,10 @@ private:
     eventvec_t::const_iterator m_itNextMarker;
     eventvec_t::const_iterator m_itNextColor;
     bpm_t m_iMicroSecsPerBeat; // Tempo
-    tick_t m_iLastTempoTick; // Tempo
+    mtk_t m_iLastTempoTick; // Tempo
     mms_t m_llLastTempoTime; // Tempo
     bpm_t m_CurBeat, m_iBeatsPerMeasure, m_iBeatType, m_iClocksPerMet; // Time signature
-    tick_t m_iLastSignatureTick;
+    mtk_t m_iLastSignatureTick;
     string m_sMarker; // Current marker to display on the screen
     unsigned char* m_pMarkerData = nullptr; // Used for refreshing marker data when changing encoding on the fly
     msgln_t m_iMarkerSize = 0;

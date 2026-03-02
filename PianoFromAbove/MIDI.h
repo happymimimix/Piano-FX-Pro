@@ -47,7 +47,7 @@ public:
     bpm_t GetTicksPerSecond() const { return m_iTicksPerSecond; }
     bpm_t GetMicroSecsPerBeat() const { return m_iMicroSecsPerBeat; }
 
-    tick_t* m_pTrackTime;
+    mtk_t* m_pTrackTime;
 
 private:
     // Where are we in the file?
@@ -59,7 +59,7 @@ private:
     bpm_t m_iTicksPerBeat, m_iMicroSecsPerBeat, m_iTicksPerSecond; // For SMPTE division
 
     // Position variables
-    tick_t m_iCurrTick;
+    mtk_t m_iCurrTick;
     mms_t m_iCurrMicroSec;
 };
 
@@ -209,12 +209,12 @@ public:
     EventType GetEventType() const { return (EventType)m_eEventType; }
     msg_t GetEventCode() const { return m_iEventCode; }
     track_t GetTrack() const { return m_iTrack; }
-    tick_t GetAbsT() const { return m_iAbsT; }
+    mtk_t GetAbsT() const { return m_iAbsT; }
     mms_t GetAbsMicroSec() const { return m_llAbsMicroSec; }
     void SetAbsMicroSec(mms_t llAbsMicroSec) { m_llAbsMicroSec = llAbsMicroSec; };
 
     mms_t m_llAbsMicroSec;
-    tick_t m_iAbsT;
+    mtk_t m_iAbsT;
     track_t m_iTrack;
     msg_t m_eEventType;
     msg_t m_iEventCode;

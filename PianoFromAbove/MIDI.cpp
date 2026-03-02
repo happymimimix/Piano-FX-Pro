@@ -30,7 +30,7 @@ MIDIPos::MIDIPos(MIDI& midi) : m_MIDI(midi)
     // Init track positions
     idx_t iTracks = m_MIDI.m_vTracks.size();
     idx_t iTracksRounded = (iTracks + 8) & ~7; // Need to round up to 32 bytes, each int is 4 bytes
-    m_pTrackTime = (tick_t*)_aligned_malloc(iTracksRounded * sizeof(tick_t), 32);
+    m_pTrackTime = (mtk_t*)_aligned_malloc(iTracksRounded * sizeof(mtk_t), 32);
     for (idx_t i = 0; i < iTracks; i++)
         m_vTrackPos.push_back(0);
     for (idx_t i = 0; i < iTracksRounded; i++)
@@ -119,7 +119,7 @@ idx_t MIDIPos::GetNextEvent(mms_t iMicroSecs, MIDIEvent** pOutEvent)
     MIDIEvent* pMinEvent = m_MIDI.m_vTracks[iMinPos]->m_vEvents[m_vTrackPos[iMinPos]];
 
     // Make sure the event doesn't occur after the requested time window
-    tick_t iMaxTickAllowed = m_iCurrTick;
+    mtk_t iMaxTickAllowed = m_iCurrTick;
     if (m_bIsStandard) {
         if (m_iMicroSecsPerBeat != 0)
             iMaxTickAllowed += (static_cast<mms_t>(m_iTicksPerBeat) * (m_iCurrMicroSec + iMicroSecs)) / m_iMicroSecsPerBeat;
@@ -132,7 +132,7 @@ idx_t MIDIPos::GetNextEvent(mms_t iMicroSecs, MIDIEvent** pOutEvent)
     {
         // How many micro seconds did we just process?
         *pOutEvent = pMinEvent;
-        tick_t iSpan = pMinEvent->GetAbsT() - m_iCurrTick;
+        mtk_t iSpan = pMinEvent->GetAbsT() - m_iCurrTick;
         if (m_bIsStandard)
             iSpan = (static_cast<mms_t>(m_iMicroSecsPerBeat) * iSpan) / m_iTicksPerBeat - m_iCurrMicroSec;
         else
@@ -612,7 +612,7 @@ void MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
     bpm_t iTicksPerBeat = midiPos.GetTicksPerBeat();
     bpm_t iTicksPerSecond = midiPos.GetTicksPerSecond();
     bpm_t iMicroSecsPerBeat = midiPos.GetMicroSecsPerBeat();
-    tick_t iLastTempoTick = 0;
+    mtk_t iLastTempoTick = 0;
     mms_t llLastTempoTime = 0;
     idx_t iSimultaneous = 0;
 
@@ -633,7 +633,7 @@ void MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
     for (midiPos.GetNextEvent(-1, &pEvent); pEvent; midiPos.GetNextEvent(-1, &pEvent))
     {
         // Compute the exact time (off by at most a micro second... I don't feel like rounding)
-        tick_t iTick = pEvent->GetAbsT();
+        mtk_t iTick = pEvent->GetAbsT();
         if (bIsStandard)
             llTime = llLastTempoTime + (static_cast<mms_t>(iMicroSecsPerBeat) * (iTick - iLastTempoTick)) / iTicksPerBeat;
         else

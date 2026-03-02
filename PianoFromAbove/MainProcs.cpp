@@ -26,14 +26,14 @@
 
 static WNDPROC g_pPrevBarProc; // Have to override the toolbar proc to make controls transparent
 
-VOID SizeWindows(int iMainWidth, int iMainHeight);
+VOID SizeWindows(win32_t iMainWidth, win32_t iMainHeight);
 INT_PTR CALLBACK SetResolutionProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM) {
     switch (msg) {
     case WM_INITDIALOG: {
         RECT rect = {};
         GetWindowRect(g_hWndGfx, &rect);
-        int width = rect.right - rect.left;
-        int height = rect.bottom - rect.top;
+        win32_t width = rect.right - rect.left;
+        win32_t height = rect.bottom - rect.top;
         char buf[1 << 10] = {};
 
         _snprintf_s(buf, sizeof(buf), "%d", width);
@@ -49,9 +49,9 @@ INT_PTR CALLBACK SetResolutionProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM) {
         case IDOK: {
             char buf[1 << 10] = {};
             GetWindowTextA(GetDlgItem(hwnd, IDC_WIDTH), buf, sizeof(buf));
-            int width = atoi(buf);
+            win32_t width = atoi(buf);
             GetWindowTextA(GetDlgItem(hwnd, IDC_HEIGHT), buf, sizeof(buf));
-            int height = atoi(buf);
+            win32_t height = atoi(buf);
 
             if (Config::GetConfig().GetViewSettings().GetControls()) {
                 RECT rcBarDlg;
@@ -62,8 +62,6 @@ INT_PTR CALLBACK SetResolutionProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM) {
             RECT adjusted = { 0, 0, width, height };
             AdjustWindowRectEx(&adjusted, GetWindowLongA(g_hWnd, GWL_STYLE), TRUE, GetWindowLongA(g_hWnd, GWL_EXSTYLE));
             SetWindowPos(g_hWnd, NULL, 0, 0, adjusted.right - adjusted.left, adjusted.bottom - adjusted.top, SWP_NOMOVE);
-
-            [[clang::fallthrough]];
         }
         case IDCANCEL: {
             EndDialog(hwnd, iId);
@@ -315,11 +313,11 @@ HMENU GetMainMenu()
     return hMenu;
 }
 
-VOID SizeWindows(int iMainWidth, int iMainHeight)
+VOID SizeWindows(win32_t iMainWidth, win32_t iMainHeight)
 {
     static const ViewSettings& cView = Config::GetConfig().GetViewSettings();
     static const ControlsSettings& cControls = Config::GetConfig().GetControlsSettings();
-    int iBarHeight = 0, iLibWidth = 0;
+    win32_t iBarHeight = 0, iLibWidth = 0;
     UINT swpFlags = SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOOWNERZORDER;
 
     if (!iMainWidth || !iMainHeight)
@@ -350,7 +348,7 @@ LRESULT WINAPI GfxProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     static const ViewSettings& cView = Config::GetConfig().GetViewSettings();
     static const ControlsSettings& cControls = Config::GetConfig().GetControlsSettings();
     static bool bShowBar;
-    static int iBarHeight;
+    static win32_t iBarHeight;
 
     static bool bTrack = false, bTrackL = false, bTrackR = false;
 
@@ -395,8 +393,8 @@ LRESULT WINAPI GfxProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             bTrack = true;
         }
 
-        short iXPos = LOWORD(lParam);
-        short iYPos = HIWORD(lParam);
+        win32_t iXPos = LOWORD(lParam);
+        win32_t iYPos = HIWORD(lParam);
         POINT pt = { iXPos, iYPos };
         ClientToScreen(hWnd, &pt);
         CheckActivity(TRUE, &pt);
@@ -443,8 +441,8 @@ VOID CopyMenuState(HMENU hMenuSrc, HMENU hMenuDest)
     MENUITEMINFO mii;
     mii.cbSize = sizeof(MENUITEMINFO);
     mii.fMask = MIIM_STATE | MIIM_CHECKMARKS | MIIM_ID;
-    int iCount = GetMenuItemCount(hMenuSrc);
-    for (int i = 0; i < iCount; i++)
+    win32_t iCount = GetMenuItemCount(hMenuSrc);
+    for (win32_t i = 0; i < iCount; i++)
         if (GetMenuItemInfo(hMenuSrc, i, TRUE, &mii))
             SetMenuItemInfo(hMenuDest, mii.wID, FALSE, &mii);
 }
@@ -459,13 +457,13 @@ LRESULT WINAPI BarProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         // WM_HSCROLL doesn't percolate up, so got to handle it here
     case WM_HSCROLL:
     {
-        int iCode = LOWORD(wParam);
+        win32_t iCode = LOWORD(wParam);
         if (iCode == TB_LINEUP || iCode == TB_LINEDOWN || iCode == TB_PAGEUP ||
             iCode == TB_PAGEDOWN || iCode == TB_THUMBTRACK || iCode == TB_THUMBPOSITION)
         {
             HWND hWndTrackbar = (HWND)lParam;
-            int iPos = (iCode == TB_THUMBTRACK || iCode == TB_THUMBPOSITION ? HIWORD(wParam) : (int)SendMessage(hWndTrackbar, TBM_GETPOS, 0, 0));
-            int iId = GetDlgCtrlID(hWndTrackbar);
+            win32_t iPos = (iCode == TB_THUMBTRACK || iCode == TB_THUMBPOSITION ? HIWORD(wParam) : (int)SendMessage(hWndTrackbar, TBM_GETPOS, 0, 0));
+            win32_t iId = GetDlgCtrlID(hWndTrackbar);
             switch (iId)
             {
             case IDC_VOLUME:
@@ -513,8 +511,8 @@ LRESULT WINAPI BarProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     }
     case WM_MOUSEMOVE:
     {
-        short iXPos = LOWORD(lParam);
-        short iYPos = HIWORD(lParam);
+        win32_t iXPos = LOWORD(lParam);
+        win32_t iYPos = HIWORD(lParam);
         POINT pt = { iXPos, iYPos };
         ClientToScreen(hWnd, &pt);
         CheckActivity(TRUE, &pt);
@@ -663,7 +661,7 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     // Bad design. Will need to be moved into a struct if we need more than 1 in a program
     static BOOL bEnabled = TRUE, bTracking = FALSE;
-    static int iPosition = 0;
+    static win32_t iPosition = 0;
     static HIMAGELIST hIml = NULL;
     static HBITMAP hBackbuffer = NULL;
     static HBITMAP hBackground = NULL;
@@ -767,7 +765,7 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
         if (PtInRect(&rcChannel, pt) || PtInRect(&rcThumb, pt))
         {
-            int iPositionNew = GetThumbPosition((SHORT)pt.x, &rcChannel);
+            win32_t iPositionNew = GetThumbPosition((SHORT)pt.x, &rcChannel);
             MoveThumbPosition(iPositionNew, iPosition, hWnd, &rcChannel, &rcThumb);
             bTracking = TRUE;
             SetCapture(hWnd);
@@ -785,12 +783,12 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
         if (!bTracking) return 0;
 
-        short iXPos = LOWORD(lParam);
+        win32_t iXPos = LOWORD(lParam);
         RECT rcChannel, rcThumbOld;
         GetChannelRect(hWnd, &rcChannel);
         GetThumbRect(hWnd, iPosition, &rcChannel, &rcThumbOld);
 
-        int iPositionNew = GetThumbPosition(iXPos, &rcChannel);
+        win32_t iPositionNew = GetThumbPosition(iXPos, &rcChannel);
         MoveThumbPosition(iPositionNew, iPosition, hWnd, &rcChannel, &rcThumbOld);
         return 0;
     }
@@ -799,7 +797,7 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         RECT rcChannel, rcThumbOld;
         GetChannelRect(hWnd, &rcChannel);
         GetThumbRect(hWnd, iPosition, &rcChannel, &rcThumbOld);
-        int iPositionNew = max(min((int)lParam, 1000), 0);
+        win32_t iPositionNew = max(min((int)lParam, 1000), 0);
         MoveThumbPosition(iPositionNew, iPosition, hWnd, &rcChannel, &rcThumbOld, FALSE);
         return 0;
     }
@@ -815,7 +813,7 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 VOID GetChannelRect(HWND hWnd, RECT* rcChannel)
 {
-    static const int iSize = 7;
+    static const win32_t iSize = 7;
 
     GetClientRect(hWnd, rcChannel);
     InflateRect(rcChannel, -iSize, -(rcChannel->bottom - rcChannel->top - iSize) / 2);
@@ -826,22 +824,22 @@ VOID GetChannelRect(HWND hWnd, RECT* rcChannel)
 
 VOID GetThumbRect(HWND, int iPosition, const RECT* rcChannel, RECT* rcThumb)
 {
-    int iSize = rcChannel->bottom - rcChannel->top;
-    int iPixel = (2 * iPosition * (rcChannel->right - rcChannel->left - 1) + 1000) / (2 * 1000);
+    win32_t iSize = rcChannel->bottom - rcChannel->top;
+    win32_t iPixel = (2 * iPosition * (rcChannel->right - rcChannel->left - 1) + 1000) / (2 * 1000);
     rcThumb->left = rcChannel->left + iPixel - iSize / 2 - 3;
     rcThumb->top = rcChannel->top - 4;
     rcThumb->right = rcThumb->left + iSize + 6;
     rcThumb->bottom = rcThumb->top + iSize + 8;
 }
 
-INT GetThumbPosition(short iXPos, RECT* rcChannel)
+INT GetThumbPosition(win32_t iXPos, RECT* rcChannel)
 {
-    int iPositionNew = (2 * 1000 * (iXPos - rcChannel->left) + rcChannel->right - rcChannel->left) / (2 * (rcChannel->right - rcChannel->left));
+    win32_t iPositionNew = (2 * 1000 * (iXPos - rcChannel->left) + rcChannel->right - rcChannel->left) / (2 * (rcChannel->right - rcChannel->left));
     iPositionNew = max(min(iPositionNew, 1000), 0);
     return iPositionNew;
 }
 
-VOID MoveThumbPosition(int iPositionNew, int& iPosition, HWND hWnd, RECT* rcChannel, RECT* rcThumbOld, BOOL bUpdateGame)
+VOID MoveThumbPosition(win32_t iPositionNew, win32_t& iPosition, HWND hWnd, RECT* rcChannel, RECT* rcThumbOld, BOOL bUpdateGame)
 {
     RECT rcThumbNew, rcInvalid;
     GetThumbRect(hWnd, iPositionNew, rcChannel, &rcThumbNew);
@@ -1027,24 +1025,24 @@ VOID SetPlayMode(INT ePlayMode)
     HMENU hMenu = GetMainMenu();
     BOOL bPractice = (ePlayMode == GameState::Practice);
 
-    int iPlayButtons[] = { ID_PLAY_PLAY, ID_PLAY_PAUSE, ID_PLAY_STOP };
-    for (size_t i = 0; i < sizeof(iPlayButtons) / sizeof(int); i++)
+    win32_t iPlayButtons[] = { ID_PLAY_PLAY, ID_PLAY_PAUSE, ID_PLAY_STOP };
+    for (win32_t i = 0; i < sizeof(iPlayButtons) / sizeof(win32_t); i++)
         SendMessage(hWndToolbar, TB_ENABLEBUTTON, iPlayButtons[i], bPractice);
-    int iPracticeButtons[] = { ID_PLAY_SKIPFWD, ID_PLAY_SKIPBACK };
-    for (size_t i = 0; i < sizeof(iPracticeButtons) / sizeof(int); i++)
+    win32_t iPracticeButtons[] = { ID_PLAY_SKIPFWD, ID_PLAY_SKIPBACK };
+    for (win32_t i = 0; i < sizeof(iPracticeButtons) / sizeof(win32_t); i++)
         SendMessage(hWndToolbar, TB_ENABLEBUTTON, iPracticeButtons[i], bPractice);
 
     SendMessage(hWndToolbar, TB_PRESSBUTTON, ID_PLAY_PLAY, TRUE);
     SetZoomMove(FALSE);
 
-    int iMenuItems[][6] = { { 1, ePlayMode, ID_FILE_CLOSEFILE },
+    win32_t iMenuItems[][6] = { { 1, ePlayMode, ID_FILE_CLOSEFILE },
                             { 4, bPractice, ID_PLAY_PLAYPAUSE, ID_PLAY_STOP, ID_VIEW_MOVEANDZOOM, ID_VIEW_RESETMOVEANDZOOM },
                             { 2, bPractice, ID_PLAY_SKIPFWD, ID_PLAY_SKIPBACK },
                             { 3, true, ID_PLAY_INCREASERATE, ID_PLAY_DECREASERATE, ID_PLAY_RESETRATE } };
-    for (size_t i = 0; i < sizeof(iMenuItems) / sizeof(iMenuItems[0]); i++)
+    for (win32_t i = 0; i < sizeof(iMenuItems) / sizeof(iMenuItems[0]); i++)
     {
         UINT uEnable = (iMenuItems[i][1] ? MF_ENABLED : MF_GRAYED);
-        for (int j = 0; j < iMenuItems[i][0]; j++)
+        for (win32_t j = 0; j < iMenuItems[i][0]; j++)
             EnableMenuItem(hMenu, iMenuItems[i][j + 2], MF_BYCOMMAND | uEnable);
     }
 
@@ -1139,12 +1137,12 @@ BOOL PlayFile(const wstring& sFile)
     g_LoadingProgress.name = sFile;
     g_LoadingProgress.progress = 0;
     g_LoadingProgress.max = 1;
-    auto thread = thread([&]() {
+    auto gamethread = thread([&]() {
         pGameState = new MainScreen(sFile, ePlayMode, NULL, NULL);
         g_LoadingProgress.stage = MIDILoadingProgress::Done;
         });
     DialogBox(NULL, MAKEINTRESOURCE(IDD_LOADING), g_hWnd, LoadingProc);
-    thread.join();
+    gamethread.join();
     if (!pGameState->IsValid())
     {
         MessageBox(g_hWnd, (L"Was not able to load " + sFile).c_str(), TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);

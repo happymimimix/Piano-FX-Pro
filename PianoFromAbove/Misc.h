@@ -15,26 +15,26 @@ using namespace std;
 #define VersionString L"4.2"
 
 // Type definitions... 
-typedef signed long tick_t;
-typedef signed long long mms_t;
-typedef unsigned char key_t;
-typedef uint16_t track_t;
-typedef uint8_t chan_t;
-typedef uint32_t TnC_t;
-typedef uint8_t msg_t;
-typedef uint32_t msgln_t;
+typedef signed long mtk_t; // Midi tick timing type
+typedef signed long long mms_t; // Midi microsecond timing type
+typedef unsigned char key_t; // Midi note key and velocity type
+typedef uint16_t track_t; // Midi track id type
+typedef uint8_t chan_t; // Midi channel id type
+typedef uint32_t TnC_t; // Any code that does `track * 16 + channel` must use this type
+typedef uint8_t msg_t; // Midi message type
+typedef uint32_t msgln_t; // Midi message length type (always 32bit unsigned)
 #ifdef LONG_INTEGER
 static_assert(sizeof(void*) == 8, "Extended addressing is not supported in 32bit! ");
-typedef size_t idx_t;
-typedef intptr_t sidx_t;
+typedef size_t idx_t; // Array indexing type
+typedef intptr_t sidx_t; // Array indexing type (signed)
 #else
-typedef uint32_t idx_t;
-typedef int32_t sidx_t;
+typedef uint32_t idx_t; // Array indexing type
+typedef int32_t sidx_t; // Array indexing type (signed)
 #endif
-constexpr idx_t IDX_MAX = static_cast<idx_t>(-1);
-typedef uint32_t color_t;
-typedef uint32_t bpm_t;
-typedef DWORD win32_t;
+constexpr idx_t IDX_MAX = static_cast<idx_t>(-1); // Maximum array size
+typedef uint32_t color_t; // Color type
+typedef uint32_t bpm_t; // Anything that has something to do with tempo, beat, and measure
+typedef signed int win32_t; // Classic signed 32bit integer used for interfacing with Win32 API (should not appear in any game logic)
 
 template <typename T>
 string GetAddress(const T& Variable) {

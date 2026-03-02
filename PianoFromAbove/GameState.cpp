@@ -1766,29 +1766,29 @@ MIDIMetaEvent* MainScreen::GetPrevious(eventvec_t::const_iterator& itCurrent, co
 }
 
 // Gets the tick corresponding to llStartTime using current tempo
-tick_t MainScreen::GetCurrentTick(mms_t llStartTime) {
+mtk_t MainScreen::GetCurrentTick(mms_t llStartTime) {
     return GetCurrentTick(llStartTime, m_iLastTempoTick, m_llLastTempoTime, m_iMicroSecsPerBeat);
 }
 
-tick_t MainScreen::GetCurrentTick(mms_t llStartTime, tick_t iLastTempoTick, mms_t llLastTempoTime, bpm_t iMicroSecsPerBeat)
+mtk_t MainScreen::GetCurrentTick(mms_t llStartTime, mtk_t iLastTempoTick, mms_t llLastTempoTime, bpm_t iMicroSecsPerBeat)
 {
     uint16_t iDivision = m_MIDI.GetInfo().iDivision;
     if (!(iDivision & 0x8000))
     {
         if (llStartTime >= llLastTempoTime)
-            return iLastTempoTick + static_cast<tick_t>((iDivision * (llStartTime - llLastTempoTime)) / iMicroSecsPerBeat);
+            return iLastTempoTick + static_cast<mtk_t>((iDivision * (llStartTime - llLastTempoTime)) / iMicroSecsPerBeat);
         else
-            return iLastTempoTick - static_cast<tick_t>((iDivision * (llLastTempoTime - llStartTime) + 1) / iMicroSecsPerBeat) - 1;
+            return iLastTempoTick - static_cast<mtk_t>((iDivision * (llLastTempoTime - llStartTime) + 1) / iMicroSecsPerBeat) - 1;
     }
     return -1;
 }
 
 // Gets the time corresponding to the tick
-mms_t MainScreen::GetTickTime(tick_t iTick) {
+mms_t MainScreen::GetTickTime(mtk_t iTick) {
     return GetTickTime(iTick, m_iLastTempoTick, m_llLastTempoTime, m_iMicroSecsPerBeat);
 }
 
-mms_t MainScreen::GetTickTime(tick_t iTick, tick_t iLastTempoTick, mms_t llLastTempoTime, bpm_t iMicroSecsPerBeat) {
+mms_t MainScreen::GetTickTime(mtk_t iTick, mtk_t iLastTempoTick, mms_t llLastTempoTime, bpm_t iMicroSecsPerBeat) {
     uint16_t iDivision = m_MIDI.GetInfo().iDivision;
     if (!(iDivision & 0x8000))
         return llLastTempoTime + (static_cast<long long>(iMicroSecsPerBeat) * (iTick - iLastTempoTick)) / iDivision;
@@ -1798,9 +1798,9 @@ mms_t MainScreen::GetTickTime(tick_t iTick, tick_t iLastTempoTick, mms_t llLastT
 }
 
 // Rounds up to the nearest beat
-bpm_t MainScreen::GetBeat(tick_t iTick, bpm_t iBeatType, tick_t iLastSignatureTick) {
+bpm_t MainScreen::GetBeat(mtk_t iTick, bpm_t iBeatType, mtk_t iLastSignatureTick) {
     uint16_t iDivision = m_MIDI.GetInfo().iDivision;
-    tick_t iTickOffset = iTick - iLastSignatureTick;
+    mtk_t iTickOffset = iTick - iLastSignatureTick;
     if (!(iDivision & 0x8000))
     {
         m_CurBeat = (iTickOffset * iBeatType) / (iDivision * 4);
@@ -1815,7 +1815,7 @@ bpm_t MainScreen::GetBeat(tick_t iTick, bpm_t iBeatType, tick_t iLastSignatureTi
 }
 
 // Rounds up to the nearest beat
-tick_t MainScreen::GetBeatTick(tick_t iTick, bpm_t iBeatType, tick_t iLastSignatureTick) {
+mtk_t MainScreen::GetBeatTick(mtk_t iTick, bpm_t iBeatType, mtk_t iLastSignatureTick) {
     uint16_t iDivision = m_MIDI.GetInfo().iDivision;
     if (!(iDivision & 0x8000))
         return iLastSignatureTick + (GetBeat(iTick, iBeatType, iLastSignatureTick) * iDivision * 4) / iBeatType;
@@ -1947,7 +1947,7 @@ void MainScreen::RenderLines() {
     if (!(iDivision & 0x8000))
     {
         // Copy time state vars
-        tick_t iCurrTick = m_iStartTick - 1;
+        mtk_t iCurrTick = m_iStartTick - 1;
         mms_t llEndTime = (m_bTickMode ? m_iStartTick : m_llStartTime) + m_llTimeSpan;
 
         // Copy tempo state vars
@@ -1957,14 +1957,14 @@ void MainScreen::RenderLines() {
         eventvec_t::const_iterator itNextTempo = m_itNextTempo;
 
         // Copy signature state vars
-        tick_t iLastSignatureTick = m_iLastSignatureTick;
+        mtk_t iLastSignatureTick = m_iLastSignatureTick;
         bpm_t iBeatsPerMeasure = m_iBeatsPerMeasure;
         bpm_t iBeatType = m_iBeatType;
         eventvec_t::const_iterator itNextSignature = m_itNextSignature;
 
         // Compute initial next beat tick and next beat time
         mms_t llNextBeatTime = 0;
-        tick_t iNextBeatTick = 0;
+        mtk_t iNextBeatTick = 0;
         do
         {
             iNextBeatTick = GetBeatTick(iCurrTick + 1, iBeatType, iLastSignatureTick);

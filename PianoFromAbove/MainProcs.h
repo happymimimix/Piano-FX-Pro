@@ -17,7 +17,7 @@ using namespace std;
 // Message handlers for the main windows
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 HMENU GetMainMenu();
-VOID SizeWindows(int iMainWidth, int iMainHeight);
+VOID SizeWindows(win32_t iMainWidth, win32_t iMainHeight);
 
 LRESULT WINAPI GfxProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 VOID CopyMenuState(HMENU hMenuSrc, HMENU hMenuDest);
@@ -28,9 +28,9 @@ VOID DrawSliderChannel(LPNMCUSTOMDRAW lpnmcd, HWND hWndOwner);
 
 LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 VOID GetChannelRect(HWND hWnd, RECT* rcChannel);
-VOID GetThumbRect(HWND hWnd, int iPosition, const RECT* rcChannel, RECT* rcThumb);
+VOID GetThumbRect(HWND hWnd, win32_t iPosition, const RECT* rcChannel, RECT* rcThumb);
 INT GetThumbPosition(short iXPos, RECT* rcChannel);
-VOID MoveThumbPosition(int iPositionNew, int& iPosition, HWND hWnd, RECT* rcChannel, RECT* rcThumbOld, BOOL bUpdateGame = TRUE);
+VOID MoveThumbPosition(win32_t iPositionNew, win32_t& iPosition, HWND hWnd, RECT* rcChannel, RECT* rcThumbOld, BOOL bUpdateGame = TRUE);
 
 INT_PTR WINAPI AboutProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
