@@ -321,7 +321,8 @@ void SplashScreen::SetChannelSettings(const vector<bool>&, const vector<bool>&, 
     static Config& config = Config::GetConfig();
     static const VisualSettings& cVisual = config.GetVisualSettings();
 
-    bool IsEmpty[MaxTrackColors][16];
+#ifdef LIMIT_COLORS
+    static bool IsEmpty[MaxTrackColors][16];
     memset(IsEmpty, true, sizeof(IsEmpty));
     for (track_t i = 0; i < mInfo.iNumTracks; i++) {
         const MIDITrack::MIDITrackInfo& info = vTracks[i]->GetInfo();
@@ -331,12 +332,18 @@ void SplashScreen::SetChannelSettings(const vector<bool>&, const vector<bool>&, 
             }
         }
     }
+#endif
 
     idx_t iPos = 0;
-    for (track_t i = 0; i < min(mInfo.iNumTracks,MaxTrackColors); i++)
+    for (track_t i = 0; i < min(mInfo.iNumTracks, MaxTrackColors); i++)
     {
-        for (chan_t j = 0; j < MaxChannelColors; j++)
+        const MIDITrack::MIDITrackInfo& mTrackInfo = vTracks[i]->GetInfo();
+        for (chan_t j = 0; j < MaxChannelColors; j++) {
+#ifdef LIMIT_COLORS
             if (!IsEmpty[i][j])
+#else
+            if (mTrackInfo.aNoteCount[j] > 0)
+#endif
             {
                 if (cVisual.bRandomizeColor) {
                     ColorChannel(i, j, 0, true);
@@ -346,6 +353,7 @@ void SplashScreen::SetChannelSettings(const vector<bool>&, const vector<bool>&, 
                 }
                 iPos++;
             }
+        }
     }
 }
 
@@ -874,7 +882,8 @@ void MainScreen::SetChannelSettings(const vector<bool>& vMuted, const vector<boo
     bool bHidden = vHidden.size() > 0;
     bool bColor = vColor.size() > 0;
 
-    bool IsEmpty[MaxTrackColors][16];
+#ifdef LIMIT_COLORS
+    static bool IsEmpty[MaxTrackColors][16];
     memset(IsEmpty, true, sizeof(IsEmpty));
     for (track_t i = 0; i < mInfo.iNumTracks; i++) {
         const MIDITrack::MIDITrackInfo& info = vTracks[i]->GetInfo();
@@ -884,12 +893,17 @@ void MainScreen::SetChannelSettings(const vector<bool>& vMuted, const vector<boo
             }
         }
     }
+#endif
 
     idx_t iPos = 0;
     for (track_t i = 0; i < min(mInfo.iNumTracks, MaxTrackColors); i++) {
         const MIDITrack::MIDITrackInfo& mTrackInfo = vTracks[i]->GetInfo();
         for (chan_t j = 0; j < MaxChannelColors; j++) {
-            if (!IsEmpty[i][j]) {
+#ifdef LIMIT_COLORS
+            if (!IsEmpty[i][j]){
+#else
+            if (mTrackInfo.aNoteCount[j] > 0){
+#endif
                 MuteChannel(i, j, bMuted ? vMuted[min(iPos, vMuted.size() - 1)] : false);
                 HideChannel(i, j, bHidden ? vHidden[min(iPos, vHidden.size() - 1)] : false);
                 if (bColor) {

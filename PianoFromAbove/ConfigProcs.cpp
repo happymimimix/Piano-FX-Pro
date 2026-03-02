@@ -629,7 +629,8 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         }
 
         // Set rows of the list view
-        bool IsEmpty[MaxTrackColors][16];
+#ifdef LIMIT_COLORS
+        static bool IsEmpty[MaxTrackColors][16];
         memset(IsEmpty, true, sizeof(IsEmpty));
         for (track_t i = 0; i < mInfo.iNumTracks; i++) {
             const MIDITrack::MIDITrackInfo& info = vTracks[i]->GetInfo();
@@ -639,6 +640,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 }
             }
         }
+#endif
 
         LVITEM lvi = {};
         lvi.mask = LVIF_TEXT;
@@ -648,8 +650,11 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         for (track_t i = 0; i < min(mInfo.iNumTracks, MaxTrackColors); i++) {
             const MIDITrack::MIDITrackInfo& mTrackInfo = vTracks[i]->GetInfo();
             for (chan_t j = 0; j < MaxChannelColors; j++) {
-                if (!IsEmpty[i][j])
-                {
+#ifdef LIMIT_COLORS
+                if (!IsEmpty[i][j]) {
+#else
+                if (mTrackInfo.aNoteCount[j] > 0) {
+#endif
                     lvi.iSubItem = 0;
                     _stprintf_s(buf, TEXT("%d"), iPos + 1);
                     lvi.iItem = (win32_t)SendMessage(hWndTracks, LVM_INSERTITEM, 0, (LPARAM)&lvi);
