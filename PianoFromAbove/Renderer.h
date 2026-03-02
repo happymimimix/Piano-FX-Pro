@@ -70,9 +70,9 @@ struct FixedSizeConstants {
 };
 
 #ifdef LIMIT_COLORS
-constexpr unsigned long MaxTrackColors = 1 << 8; //Limit track color for faster rendering
+constexpr unsigned long MaxTrackColors = 0x00FF; //Limit track color for faster rendering
 #else
-constexpr unsigned long MaxTrackColors = 1 << 16; //Theoretic maximum number of tracks possible in MIDI format
+constexpr unsigned long MaxTrackColors = 0xFFFF; //Theoretic maximum number of tracks possible in MIDI format
 #endif
 constexpr unsigned long MaxChannelColors = 1 << 4; //Theoretic maximum number of channels possible in MIDI format
 

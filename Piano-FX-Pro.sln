@@ -12,7 +12,6 @@ Global
 		Debug|x64 = Debug|x64
 		DoubleArinoglish|x64 = DoubleArinoglish|x64
 		DPRK|x64 = DPRK|x64
-		EnforceSoftwareRender|x64 = EnforceSoftwareRender|x64
 		Hiragana|x64 = Hiragana|x64
 		Japanese|x64 = Japanese|x64
 		Korean|x64 = Korean|x64
@@ -20,20 +19,19 @@ Global
 		NoOptimization|x64 = NoOptimization|x64
 		Release|x64 = Release|x64
 		Russian|x64 = Russian|x64
+		SoftwareRender|x64 = SoftwareRender|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Arinoglish|x64.ActiveCfg = Arinoglish|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Arinoglish|x64.Build.0 = Arinoglish|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Chinese|x64.ActiveCfg = Chinese|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Chinese|x64.Build.0 = Chinese|x64
-		{DD4C822F-844F-40BF-8113-129B04EDE199}.Debug|x64.ActiveCfg = NoOptimization|x64
-		{DD4C822F-844F-40BF-8113-129B04EDE199}.Debug|x64.Build.0 = NoOptimization|x64
+		{DD4C822F-844F-40BF-8113-129B04EDE199}.Debug|x64.ActiveCfg = Debug|x64
+		{DD4C822F-844F-40BF-8113-129B04EDE199}.Debug|x64.Build.0 = Debug|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.DoubleArinoglish|x64.ActiveCfg = DoubleArinoglish|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.DoubleArinoglish|x64.Build.0 = DoubleArinoglish|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.DPRK|x64.ActiveCfg = DPRK|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.DPRK|x64.Build.0 = DPRK|x64
-		{DD4C822F-844F-40BF-8113-129B04EDE199}.EnforceSoftwareRender|x64.ActiveCfg = EnforceSoftwareRender|x64
-		{DD4C822F-844F-40BF-8113-129B04EDE199}.EnforceSoftwareRender|x64.Build.0 = EnforceSoftwareRender|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Hiragana|x64.ActiveCfg = Hiragana|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Hiragana|x64.Build.0 = Hiragana|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Japanese|x64.ActiveCfg = Japanese|x64
@@ -48,6 +46,8 @@ Global
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Release|x64.Build.0 = Release|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Russian|x64.ActiveCfg = Russian|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Russian|x64.Build.0 = Russian|x64
+		{DD4C822F-844F-40BF-8113-129B04EDE199}.SoftwareRender|x64.ActiveCfg = Hiragana|x64
+		{DD4C822F-844F-40BF-8113-129B04EDE199}.SoftwareRender|x64.Build.0 = Hiragana|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -18,10 +18,10 @@ del .\Piano-FX-Pro-DRN.exe /f /q
 del .\Piano-FX-Pro-HRG.exe /f /q
 "%~dp1msbuild.exe" .\Piano-FX-Pro.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
 copy .\Release\Piano-FX-Pro.exe .\Piano-FX-Pro.exe /v /y
-"%~dp1msbuild.exe" .\Piano-FX-Pro.sln -t:Rebuild -p:Configuration=EnforceSoftwareRender /p:Platform=x64
-copy .\Release\Piano-FX-Pro-SoftwareRendered.exe .\Piano-FX-Pro-SoftwareRendered.exe /v /y
-"%~dp1msbuild.exe" .\Piano-FX-Pro.sln -t:Rebuild -p:Configuration=LongInteger /p:Platform=x64
-copy .\Release\Piano-FX-Pro-ExtendedAddressing.exe .\Piano-FX-Pro-ExtendedAddressing.exe /v /y
+"%~dp1msbuild.exe" .\Piano-FX-Pro.sln -t:Rebuild -p:Configuration=SoftwareRender /p:Platform=x64
+copy .\Release\Piano-FX-Pro-EnforcedSoftwareRendering.exe .\Piano-FX-Pro-EnforcedSoftwareRendering.exe /v /y
+"%~dp1msbuild.exe" .\Piano-FX-Pro.sln -t:Rebuild -p:Configuration=LimitedColor /p:Platform=x64
+copy .\Release\Piano-FX-Pro-LimitedTrackColoring.exe .\Piano-FX-Pro-LimitedTrackColoring.exe /v /y
 "%~dp1msbuild.exe" .\Piano-FX-Pro.sln -t:Rebuild -p:Configuration=Chinese /p:Platform=x64
 copy .\Release\Piano-FX-Pro-CHN.exe .\Piano-FX-Pro-CHN.exe /v /y
 "%~dp1msbuild.exe" .\Piano-FX-Pro.sln -t:Rebuild -p:Configuration=Japanese /p:Platform=x64

@@ -10,15 +10,10 @@
 #else
 #define MainWindowTitle7W 0 //Text: L""
 #endif
-#ifdef LONG_INTEGER
-#define MainWindowTitle8W 77 //Text: L"  (Extended Addressing)"
+#ifdef LIMIT_COLORS
+#define MainWindowTitle8W 79 //Text: L"  (Limited Track Coloring)"
 #else
 #define MainWindowTitle8W 0 //Text: L""
-#endif
-#ifdef LIMIT_COLORS
-#define MainWindowTitle9W 79 //Text: L"  (Limited Track Coloring)"
-#else
-#define MainWindowTitle9W 0 //Text: L""
 #endif
 #define WelcomeTextW 80 //Text: L"Welcome to Piano-FX Pro"
 #define StartupStage1TextW 39 //Text: L"Preparing..."
