@@ -113,7 +113,7 @@ private:
     void ColorChannel(track_t iTrack, chan_t iChannel, color_t iColor, bool bRandom = false);
     void SetChannelSettings(const vector<bool>& vMuted, const vector<bool>& vHidden, const vector<color_t>& vColor);
 
-    void UpdateState(idx_t iPos);
+    void UpdateState(sidx_t iPos);
 
     void RenderGlobals();
     void RenderNotes();
@@ -124,8 +124,8 @@ private:
     // MIDI info
     MIDI m_MIDI; // The song to display
     vector< MIDIChannelEvent* > m_vEvents; // The channel events of the song
-    idx_t m_iStartPos, m_iEndPos;
-    vector<idx_t> m_vState[128];  // The notes that are on at time m_llStartTime.
+    sidx_t m_iStartPos, m_iEndPos;
+    vector<sidx_t> m_vState[128];  // The notes that are on at time m_llStartTime.
     Timer m_Timer; // Frame timers
     double m_dVolume;
     bool m_bMute;
@@ -133,8 +133,8 @@ private:
     MIDIOutDevice m_OutDevice;
 
     static const float SharpRatio;
-    static const long long TimeSpan = 500000;
-    vector< TrackSettings > m_vTrackSettings;
+    static const mms_t TimeSpan = 500000;
+    vector<TrackSettings> m_vTrackSettings;
 
     // Computed in RenderGlobal
     key_t m_iStartNote, m_iEndNote; // Start and end notes of the songs
@@ -171,8 +171,8 @@ public:
 };
 
 typedef struct {
-    idx_t idx;
-    idx_t sister_idx;
+    sidx_t idx;
+    sidx_t sister_idx;
 } thread_work_t;
 
 class MainScreen : public GameState
@@ -273,12 +273,12 @@ private:
 
     // Playback
     State m_eGameMode;
-    idx_t m_iStartPos, m_iEndPos, m_iPrevStartPos; // Postions of the start and end events that occur in the current window
+    sidx_t m_iStartPos, m_iEndPos, m_iPrevStartPos; // Postions of the start and end events that occur in the current window
     mms_t m_llTimeSpan;  // Times of the start and end events of the current window
     mms_t m_llPrevTime;
-    vector<idx_t> m_vState[128];  // The notes that are on at time m_llStartTime.
+    vector<sidx_t> m_vState[128];  // The notes that are on at time m_llStartTime.
     vector<thread_work_t> m_vThreadWork[128];
-    idx_t m_pNoteState[128]; // The last note that was turned on
+    sidx_t m_pNoteState[128]; // The last note that was turned on
     double m_dSpeed; // Speed multiplier
     bool IsLastFrameReversed = false;
     bool IsReversedStateInitialized = false;

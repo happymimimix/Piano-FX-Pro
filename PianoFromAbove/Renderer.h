@@ -98,8 +98,8 @@ public:
     bool GetLimitFPS() const { return m_bLimitFPS; }
     HRESULT SetLimitFPS(bool bLimitFPS);
 
-    int GetBufferWidth() const { return m_iBufferWidth; }
-    int GetBufferHeight() const { return m_iBufferHeight; }
+    win32_t GetBufferWidth() const { return m_iBufferWidth; }
+    win32_t GetBufferHeight() const { return m_iBufferHeight; }
 
     HRESULT WaitForGPU();
     wstring GetAdapterName();
@@ -113,7 +113,7 @@ public:
 
     inline void PushNoteData(NoteData data) { m_vNotesIntermediate.push_back(data); };
     idx_t GetRenderedNotesCount() { return m_vNotesIntermediate.size(); };
-    void SplitRect() { m_iRectSplit = (int)m_vRectsIntermediate.size(); }
+    void SplitRect() { m_iRectSplit = m_vRectsIntermediate.size(); }
 
     char* Screenshot();
     bool LoadBackgroundBitmap(wstring path);
@@ -138,8 +138,8 @@ private:
 
     static ComPtr<IWICImagingFactory> s_pWICFactory;
 
-    int m_iBufferWidth = 0;
-    int m_iBufferHeight = 0;
+    win32_t m_iBufferWidth = 0;
+    win32_t m_iBufferHeight = 0;
     bool m_bLimitFPS = false;
 
     HWND m_hWnd = NULL;
@@ -202,7 +202,7 @@ private:
 
     vector<RectVertex> m_vRectsIntermediate;
     vector<NoteData> m_vNotesIntermediate;
-    int m_iRectSplit = -1;
+    sidx_t m_iRectSplit = -1;
 
     ImDrawList* m_pDrawList;
 };

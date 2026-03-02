@@ -17,7 +17,6 @@ Global
 		Japanese|x64 = Japanese|x64
 		Korean|x64 = Korean|x64
 		LimitedColor|x64 = LimitedColor|x64
-		LongInteger|x64 = LongInteger|x64
 		NoOptimization|x64 = NoOptimization|x64
 		Release|x64 = Release|x64
 		Russian|x64 = Russian|x64
@@ -27,8 +26,8 @@ Global
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Arinoglish|x64.Build.0 = Arinoglish|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Chinese|x64.ActiveCfg = Chinese|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Chinese|x64.Build.0 = Chinese|x64
-		{DD4C822F-844F-40BF-8113-129B04EDE199}.Debug|x64.ActiveCfg = Debug|x64
-		{DD4C822F-844F-40BF-8113-129B04EDE199}.Debug|x64.Build.0 = Debug|x64
+		{DD4C822F-844F-40BF-8113-129B04EDE199}.Debug|x64.ActiveCfg = NoOptimization|x64
+		{DD4C822F-844F-40BF-8113-129B04EDE199}.Debug|x64.Build.0 = NoOptimization|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.DoubleArinoglish|x64.ActiveCfg = DoubleArinoglish|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.DoubleArinoglish|x64.Build.0 = DoubleArinoglish|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.DPRK|x64.ActiveCfg = DPRK|x64
@@ -43,8 +42,6 @@ Global
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Korean|x64.Build.0 = Korean|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.LimitedColor|x64.ActiveCfg = LimitedColor|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.LimitedColor|x64.Build.0 = LimitedColor|x64
-		{DD4C822F-844F-40BF-8113-129B04EDE199}.LongInteger|x64.ActiveCfg = LongInteger|x64
-		{DD4C822F-844F-40BF-8113-129B04EDE199}.LongInteger|x64.Build.0 = LongInteger|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.NoOptimization|x64.ActiveCfg = NoOptimization|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.NoOptimization|x64.Build.0 = NoOptimization|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Release|x64.ActiveCfg = Release|x64

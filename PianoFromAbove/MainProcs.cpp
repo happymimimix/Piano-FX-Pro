@@ -822,7 +822,7 @@ VOID GetChannelRect(HWND hWnd, RECT* rcChannel)
         rcChannel->bottom--;
 }
 
-VOID GetThumbRect(HWND, int iPosition, const RECT* rcChannel, RECT* rcThumb)
+VOID GetThumbRect(HWND hWnd, win32_t iPosition, const RECT* rcChannel, RECT* rcThumb)
 {
     win32_t iSize = rcChannel->bottom - rcChannel->top;
     win32_t iPixel = (2 * iPosition * (rcChannel->right - rcChannel->left - 1) + 1000) / (2 * 1000);

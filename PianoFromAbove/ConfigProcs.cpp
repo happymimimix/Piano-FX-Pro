@@ -600,7 +600,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         vMuted.resize(mInfo.iNumChannels);
         vHidden.resize(mInfo.iNumChannels);
         vColors.resize(mInfo.iNumChannels);
-        for (size_t i = 0; i < mInfo.iNumChannels; i++)
+        for (chan_t i = 0; i < mInfo.iNumChannels; i++)
         {
             vMuted[i] = vHidden[i] = false;
             if (cVisual.bRandomizeColor) {
@@ -620,7 +620,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
         LVCOLUMN lvc = {};
         lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT;
-        for (size_t i = 0; i < sizeof(aFmt) / sizeof(win32_t); i++)
+        for (win32_t i = 0; i < sizeof(aFmt) / sizeof(win32_t); i++)
         {
             lvc.fmt = aFmt[i];
             lvc.cx = aCx[i];

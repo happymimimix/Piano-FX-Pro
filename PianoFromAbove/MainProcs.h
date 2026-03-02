@@ -12,6 +12,7 @@
 #include <Windows.h>
 #include <CommCtrl.h>
 #include <string>
+#include "Misc.h"
 using namespace std;
 
 // Message handlers for the main windows
@@ -29,7 +30,7 @@ VOID DrawSliderChannel(LPNMCUSTOMDRAW lpnmcd, HWND hWndOwner);
 LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 VOID GetChannelRect(HWND hWnd, RECT* rcChannel);
 VOID GetThumbRect(HWND hWnd, win32_t iPosition, const RECT* rcChannel, RECT* rcThumb);
-INT GetThumbPosition(short iXPos, RECT* rcChannel);
+INT GetThumbPosition(win32_t iXPos, RECT* rcChannel);
 VOID MoveThumbPosition(win32_t iPositionNew, win32_t& iPosition, HWND hWnd, RECT* rcChannel, RECT* rcThumbOld, BOOL bUpdateGame = TRUE);
 
 INT_PTR WINAPI AboutProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

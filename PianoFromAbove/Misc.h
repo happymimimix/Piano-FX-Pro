@@ -23,14 +23,8 @@ typedef uint8_t chan_t; // Midi channel id type
 typedef uint32_t TnC_t; // Any code that does `track * 16 + channel` must use this type
 typedef uint8_t msg_t; // Midi message type
 typedef uint32_t msgln_t; // Midi message length type (always 32bit unsigned)
-#ifdef LONG_INTEGER
-static_assert(sizeof(void*) == 8, "Extended addressing is not supported in 32bit! ");
-typedef size_t idx_t; // Array indexing type
-typedef intptr_t sidx_t; // Array indexing type (signed)
-#else
 typedef uint32_t idx_t; // Array indexing type
-typedef int32_t sidx_t; // Array indexing type (signed)
-#endif
+typedef int64_t sidx_t; // Array indexing type (signed)
 constexpr idx_t IDX_MAX = static_cast<idx_t>(-1); // Maximum array size
 typedef uint32_t color_t; // Color type
 typedef uint32_t bpm_t; // Anything that has something to do with tempo, beat, and measure
@@ -46,7 +40,7 @@ string GetAddress(const T& Variable) {
     return sout.str();
 }
 
-string IntSizeToCE(uint8_t Size) {
+inline string IntSizeToCE(uint8_t Size) {
     if (Size == 1) {
         return "ShortInteger";
     }
@@ -62,7 +56,7 @@ string IntSizeToCE(uint8_t Size) {
     return "Bytes";
 }
 
-string FloatSizeToCE(uint8_t Size) {
+inline string FloatSizeToCE(uint8_t Size) {
     if (Size == 4) {
         return "Float";
     }
@@ -87,36 +81,36 @@ public:
 
     // Gets the timer's time
     double GetSecs();
-    long long GetMicroSecs();
-    long long GetTicks();
-    long long GetTicksPerSec() { return m_llTicksPerSec; }
+    mms_t GetMicroSecs();
+    mms_t GetTicks();
+    mms_t GetTicksPerSec() { return m_llTicksPerSec; }
 
     // Status accessors
     bool IsStarted() { return m_bStarted; }
     bool IsPaused() { return m_bPaused; }
 
     // Manual timer stuff
-    void AddManualTime(long long time);
-    void SetFrameRate(unsigned rate);
+    void AddManualTime(mms_t time);
+    void SetFrameRate(mms_t rate);
     void IncrementFrame();
     bool m_bManualTimer;
     double m_dFramerate;
 
 private:
-    static const long long m_llPrecisionLimit = 1000000000ll;
-    static const long long m_llPrecisionThrottle = 1000ll;
+    static const mms_t m_llPrecisionLimit = 1000000000ll;
+    static const mms_t m_llPrecisionThrottle = 1000ll;
 
     // Timer stuff
-    long long GetRawTicks();
-    long long m_llStartTicks;
-    long long m_llTicksPerSec;
+    mms_t GetRawTicks();
+    mms_t m_llStartTicks;
+    mms_t m_llTicksPerSec;
 
     // More manual timer stuff
-    long long m_llManualTicks;
-    long long m_llManualTicksPerFrame;
+    mms_t m_llManualTicks;
+    mms_t m_llManualTicksPerFrame;
 
     // Ticks stored when the timer was paused
-    long long m_llPausedTicks;
+    mms_t m_llPausedTicks;
 
     // Timer status
     bool m_bStarted;
@@ -157,10 +151,10 @@ public:
     void ForcePush(const T& tElement) { while (!Push(tElement)); }
 
 private:
-    static const int QueueSize = 1024;
+    static const win32_t QueueSize = 1 << 16;
     T m_tQueue[QueueSize]; // Does this need to be volatile? Unsure. Doesn't work with MSG if volatile.
-    volatile int m_iWrite;
-    volatile int m_iRead;
+    volatile win32_t m_iWrite;
+    volatile win32_t m_iRead;
 };
 
 template< class T >

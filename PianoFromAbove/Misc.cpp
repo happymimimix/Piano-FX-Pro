@@ -76,7 +76,7 @@ void Timer::Unpause()
 }
 
 // Elapsed ticks since start
-long long Timer::GetTicks()
+mms_t Timer::GetTicks()
 {
     if (m_bStarted)
     {
@@ -91,7 +91,7 @@ long long Timer::GetTicks()
 
 // Elapsed micro seconds since start
 // Assuming 3,000,000 ticks/sec this will overflow in 35 days
-long long Timer::GetMicroSecs()
+mms_t Timer::GetMicroSecs()
 {
     return (GetTicks() * 1000000LL) / m_llTicksPerSec;
 }
@@ -102,7 +102,7 @@ double Timer::GetSecs()
 }
 
 // Private. Hits the API for the tick count.
-long long Timer::GetRawTicks()
+mms_t Timer::GetRawTicks()
 {
     if (m_bManualTimer)
         return m_llManualTicks;
@@ -110,14 +110,14 @@ long long Timer::GetRawTicks()
         return timeGetTime();
 }
 
-void Timer::AddManualTime(long long time)
+void Timer::AddManualTime(mms_t time)
 {
     m_llManualTicks += time;
 }
 
-void Timer::SetFrameRate(unsigned rate)
+void Timer::SetFrameRate(mms_t rate)
 {
-    m_llTicksPerSec = (long long)rate * 100;
+    m_llTicksPerSec = rate * 100;
     m_dFramerate = rate;
 }
 
@@ -151,14 +151,14 @@ char* Util::WstringToString(const wstring& s)
 
 void Util::ParseLongHex(const string& sText, string& sVal)
 {
-    int iLen = ((int)sText.length() + 1) / 2;
+    size_t iLen = (sText.length() + 1) / 2;
     sVal.clear();
     sVal.resize(iLen);
 
-    int iStart = sText.length() % 2;
-    for (int i = iStart; i < iLen; i++)
+    size_t iStart = sText.length() % 2;
+    for (size_t i = iStart; i < iLen; i++)
     {
-        int byte = 0;
+        size_t byte = 0;
         if (sscanf_s(sText.c_str() + 2 * i - iStart, "%2X", &byte) > 0)
             sVal[sVal.length() - 1 - i] = byte;
     }
@@ -166,7 +166,7 @@ void Util::ParseLongHex(const string& sText, string& sVal)
     if (iStart == 1)
     {
         char buf[3] = { '0', sText[0] };
-        int byte = 0;
+        size_t byte = 0;
         if (sscanf_s(buf, "%2X", &byte) > 0)
             sVal[sVal.length() - 1] = byte;
     }

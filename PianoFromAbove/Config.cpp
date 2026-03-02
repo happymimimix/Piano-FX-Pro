@@ -136,8 +136,8 @@ void VisualSettings::LoadDefaultColors()
     iBkgColor = 0x007F7F00;
     iBarColor = 0x000000FF;
     color_t R, G, B = 0, S = 80, V = 100;
-    color_t iColors = sizeof(colors) / sizeof(colors[0]);
-    for (int i = 10, count = 0; count < iColors; i = (i + 7) % iColors, count++)
+    chan_t iColors = sizeof(colors) / sizeof(colors[0]);
+    for (chan_t i = 10, count = 0; count < iColors; i = (i + 7) % iColors, count++)
     {
         Util::HSVtoRGB(360 * i / iColors, S, V, R, G, B);
         colors[count] = RGB(R, G, B);

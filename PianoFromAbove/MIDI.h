@@ -118,12 +118,13 @@ public:
 
         wstring sFilename;
         uint16_t iFormatType;
-        uint16_t iNumTracks, iNumChannels;
+        track_t iNumTracks;
+        chan_t iNumChannels;
         uint16_t iDivision;
-        unsigned char iMinNote, iMaxNote;
+        key_t iMinNote, iMaxNote;
         idx_t iNoteCount, iEventCount;
-        long iTotalTicks, iTotalBeats;
-        long long llTotalMicroSecs, llFirstNote;
+        mtk_t iTotalTicks, iTotalBeats;
+        mms_t llTotalMicroSecs, llFirstNote;
     };
 
     const MIDIInfo& GetInfo() const { return m_Info; }
@@ -139,7 +140,7 @@ private:
     static wstring aNoteNames[KEYS + 1];
     static Note aNoteVal[KEYS];
     static bool aIsSharp[KEYS];
-    static unsigned char aWhiteCount[KEYS + 1];
+    static key_t aWhiteCount[KEYS + 1];
 
     MIDIInfo m_Info;
     vector<MIDITrack*> m_vTracks;
@@ -174,14 +175,15 @@ public:
         }
         void AddEventInfo(const MIDIEvent& mTrack);
 
-        uint16_t iSequenceNumber;
+        track_t iSequenceNumber;
         string sSequenceName;
-        unsigned char iMinNote, iMaxNote;
+        key_t iMinNote, iMaxNote;
         idx_t iNoteCount, iEventCount;
-        long iTotalTicks;
-        long long llTotalMicroSecs;
+        mtk_t iTotalTicks;
+        mms_t llTotalMicroSecs;
         idx_t aNoteCount[16];
-        unsigned char aProgram[16], iNumChannels;
+        msg_t aProgram[16];
+        chan_t iNumChannels;
     };
     const MIDITrackInfo& GetInfo() const { return m_TrackInfo; }
     void ClearEvents() { m_vEvents.clear(); m_vEvents.shrink_to_fit(); }
@@ -200,7 +202,7 @@ class MIDIEvent
 public:
     //Event types
     enum EventType { ChannelEvent, MetaEvent, SysExEvent, RunningStatus };
-    static EventType DecodeEventType(int iEventCode);
+    static EventType DecodeEventType(msg_t iEventCode);
 
     //Parsing functions that load data into the instance
     static uint32_t MakeNextEvent(MIDI& midi, const unsigned char* pcData, msgln_t iMaxSize, track_t iTrack, MIDIEvent** pOutEvent);
@@ -233,9 +235,9 @@ public:
     //Accessors
     ChannelEventType GetChannelEventType() const { return static_cast<ChannelEventType>(m_iEventCode >> 4); }
     void SetChannelEventType(ChannelEventType type) { m_iEventCode = (m_iEventCode & 0x0F) | (static_cast<msg_t>(type) << 4); }
-    msg_t GetChannel() const { return m_cChannel & 0x0F; }
-    msg_t GetParam1() const { return m_cParam1 & 0x7F; }
-    msg_t GetParam2() const { return m_cParam2 & 0x7F; }
+    chan_t GetChannel() const { return m_cChannel & 0x0F; }
+    key_t GetParam1() const { return m_cParam1 & 0x7F; }
+    key_t GetParam2() const { return m_cParam2 & 0x7F; }
     MIDIChannelEvent* GetSister(const vector<MIDIChannelEvent*>& events) const {
         return m_iSisterIdx == IDX_MAX ? nullptr : events[m_iSisterIdx];
     }
@@ -244,15 +246,15 @@ public:
     }
     idx_t GetSisterIdx() const { return m_iSisterIdx; }
     idx_t GetSimultaneous() const { return m_iSimultaneous; }
-    idx_t GetLength() const { return m_uLength; }
+    mtk_t GetLength() const { return m_uLength; }
     bool GetPassDone() const { return m_bPassDone; }
 
-    void SetChannel(unsigned char channel) { m_cChannel = channel; }
-    void SetParam1(unsigned char param1) { m_cParam1 = param1; }
-    void SetParam2(unsigned char param2) { m_cParam2 = param2; }
+    void SetChannel(chan_t channel) { m_cChannel = channel; }
+    void SetParam1(key_t param1) { m_cParam1 = param1; }
+    void SetParam2(key_t param2) { m_cParam2 = param2; }
     void SetSisterIdx(idx_t iSisterIdx) { m_iSisterIdx = iSisterIdx; }
     void SetSimultaneous(idx_t iSimultaneous) { m_iSimultaneous = iSimultaneous; }
-    void SetLength(idx_t length) { m_uLength = length; }
+    void SetLength(mtk_t length) { m_uLength = length; }
     void SetPassDone(bool done) { m_bPassDone = done; }
 
     bool HasSister() const { return m_iSisterIdx != IDX_MAX; }
@@ -260,7 +262,7 @@ public:
 private:
     idx_t m_iSisterIdx;
     idx_t m_iSimultaneous;
-    idx_t m_uLength;
+    mtk_t m_uLength;
     bool m_bPassDone;
     chan_t m_cChannel;
     key_t m_cParam1;

@@ -154,22 +154,22 @@ GameState::GameError IntroScreen::Render() {
 // SplashScreen GameState object
 //-----------------------------------------------------------------------------
 
-void InsertSorted(vector<idx_t>& vec, idx_t value) {
+void InsertSorted(vector<sidx_t>& vec, sidx_t value) {
     auto it = lower_bound(vec.begin(), vec.end(), value);
     vec.insert(it, value);
 }
 
-idx_t LocateElement(const vector<idx_t>& vec, idx_t value) {
+sidx_t LocateElement(const vector<sidx_t>& vec, sidx_t value) {
     auto it = lower_bound(vec.begin(), vec.end(), value);
     if (it != vec.end() && *it == value) return it - vec.begin();
-    return IDX_MAX;
+    return -1;
 }
 
 SplashScreen::SplashScreen(HWND hWnd, D3D12Renderer* pRenderer, bool enableSplash) : GameState(hWnd, pRenderer) {
     if (enableSplash) {
         HRSRC hResInfo = FindResource(NULL, MAKEINTRESOURCE(IDR_SPLASHMIDI), TEXT("MIDI"));
         HGLOBAL hRes = LoadResource(NULL, hResInfo);
-        unsigned int iSize = SizeofResource(NULL, hResInfo);
+        win32_t iSize = SizeofResource(NULL, hResInfo);
         unsigned char* pData = (unsigned char*)LockResource(hRes);
 
         Config& config = Config::GetConfig();
@@ -262,8 +262,8 @@ SplashScreen::SplashScreen(HWND hWnd, D3D12Renderer* pRenderer, bool enableSplas
 
         // Allocate
         m_vTrackSettings.resize(m_MIDI.GetInfo().iNumTracks);
-        for (unsigned char i = 0; i < 128; i++)
-            m_vState[i].reserve(128);
+        for (key_t i = 0; i < 128; i++)
+            m_vState[i].reserve(1<<10);
     }
     InitState();
     UpdateNotePos = true;
@@ -425,14 +425,14 @@ GameState::GameError SplashScreen::Logic() {
     return Success;
 }
 
-void SplashScreen::UpdateState(idx_t iPos) {
+void SplashScreen::UpdateState(sidx_t iPos) {
     // Event data
     MIDIChannelEvent* pEvent = m_vEvents[iPos];
     if (!pEvent->HasSister()) return;
 
     MIDIChannelEvent::ChannelEventType eEventType = pEvent->GetChannelEventType();
-    unsigned char iNote = pEvent->GetParam1();
-    unsigned char iVelocity = pEvent->GetParam2();
+    key_t iNote = pEvent->GetParam1();
+    key_t iVelocity = pEvent->GetParam2();
 
     idx_t iSisterIdx = pEvent->GetSisterIdx();
     auto& note_state = m_vState[iNote];
@@ -443,8 +443,8 @@ void SplashScreen::UpdateState(idx_t iPos) {
     else
     {
         // binary search
-        idx_t pos = LocateElement(note_state, iSisterIdx);
-        if (pos != IDX_MAX)
+        sidx_t pos = LocateElement(note_state, iSisterIdx);
+        if (pos != -1)
             note_state.erase(note_state.begin() + pos);
     }
 }
@@ -455,7 +455,7 @@ GameState::GameError SplashScreen::Render() {
     if (FAILED(m_pRenderer->ResetDeviceIfNeeded())) return DirectXError;
 
     // Clear the backbuffer to a blue color
-    unsigned int iColor = Config::GetConfig().GetVisualSettings().iBkgColor;
+    color_t iColor = Config::GetConfig().GetVisualSettings().iBkgColor;
     int R = (iColor >> 0) & 0xFF;
     int G = (iColor >> 8) & 0xFF;
     int B = (iColor >> 16) & 0xFF;
@@ -543,12 +543,12 @@ void SplashScreen::RenderNotes() {
 
     for (key_t i = m_iStartNote; i <= m_iEndNote; i++) {
         if (!MIDI::IsSharp(i)) {
-            for (vector<idx_t>::iterator it = (m_vState[i]).begin(); it != (m_vState[i]).end(); it++) {
+            for (vector<sidx_t>::iterator it = (m_vState[i]).begin(); it != (m_vState[i]).end(); it++) {
                 RenderNote(m_vEvents[*it]);
             }
         }
     }
-    for (idx_t i = m_iStartPos; i <= m_iEndPos; i++) {
+    for (sidx_t i = m_iStartPos; i <= m_iEndPos; i++) {
         MIDIChannelEvent* pEvent = m_vEvents[i];
         if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn &&
             pEvent->GetParam2() > 0 && pEvent->HasSister() &&
@@ -559,12 +559,12 @@ void SplashScreen::RenderNotes() {
     }
     for (key_t i = m_iStartNote; i <= m_iEndNote; i++) {
         if (MIDI::IsSharp(i)) {
-            for (vector<idx_t>::iterator it = (m_vState[i]).begin(); it != (m_vState[i]).end(); it++) {
+            for (vector<sidx_t>::iterator it = (m_vState[i]).begin(); it != (m_vState[i]).end(); it++) {
                 RenderNote(m_vEvents[*it]);
             }
         }
     }
-    for (idx_t i = m_iStartPos; i <= m_iEndPos; i++) {
+    for (sidx_t i = m_iStartPos; i <= m_iEndPos; i++) {
         MIDIChannelEvent* pEvent = m_vEvents[i];
         if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn &&
             pEvent->GetParam2() > 0 && pEvent->HasSister() &&
@@ -623,8 +623,8 @@ void SplashScreen::RenderNote(MIDIChannelEvent* pNote) {
 
 void SplashScreen::GenNoteXTable() {
     UpdateNotePos = false;
-    for (unsigned char i = m_iStartNote; i <= m_iEndNote; i++) {
-        unsigned char iWhiteKeys = MIDI::WhiteCount(m_iStartNote, i);
+    for (key_t i = m_iStartNote; i <= m_iEndNote; i++) {
+        key_t iWhiteKeys = MIDI::WhiteCount(m_iStartNote, i);
         float fStartX = (MIDI::IsSharp(m_iStartNote) - MIDI::IsSharp(i)) * SharpRatio / 2.0f;
         if (MIDI::IsSharp(i))
         {
@@ -636,7 +636,7 @@ void SplashScreen::GenNoteXTable() {
     }
 }
 
-float SplashScreen::GetNoteX(unsigned char iNote) {
+float SplashScreen::GetNoteX(key_t iNote) {
     return notex_table[iNote];
 }
 
@@ -660,8 +660,8 @@ MainScreen::MainScreen(wstring sMIDIFile, State eGameMode, HWND hWnd, D3D12Rende
 
     // Allocate
     m_vTrackSettings.resize(m_MIDI.GetInfo().iNumTracks);
-    for (auto note_state : m_vState)
-        note_state.reserve(m_MIDI.GetInfo().iNumTracks * 16);
+    for (key_t i = 0; i < 128; i++)
+        m_vState[i].reserve(1 << 10);
 
     m_MIDI.PostProcess(m_vEvents, &m_vMetaEvents, &m_vTempo, &m_vSignature, &m_vMarkers, &m_vColors);
 
@@ -924,10 +924,10 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
             cPlayback.SetStopped(true);
             return Success;
         case ID_PLAY_SKIPFWD:
-            JumpTo(static_cast<long long>(m_llStartTime + cControls.dFwdBackSecs * 1000000));
+            JumpTo(static_cast<mms_t>(m_llStartTime + cControls.dFwdBackSecs * 1000000));
             return Success;
         case ID_PLAY_SKIPBACK:
-            JumpTo(static_cast<long long>(m_llStartTime - cControls.dFwdBackSecs * 1000000));
+            JumpTo(static_cast<mms_t>(m_llStartTime - cControls.dFwdBackSecs * 1000000));
             return Success;
         case ID_VIEW_RESETDEVICE:
             UpdateNotePos = true;
@@ -1076,7 +1076,7 @@ GameState::GameError MainScreen::Logic(void) {
     double dSpeed = cPlayback.GetSpeed();
     double dNSpeed = cPlayback.GetNSpeed();
     bool bMute = cPlayback.GetMute();
-    mms_t llTimeSpan = static_cast<long long>(3.0 * abs(dNSpeed) * 1000000);
+    mms_t llTimeSpan = static_cast<mms_t>(3.0 * abs(dNSpeed) * 1000000);
     bool bPausedChanged = (bPaused != m_bPaused);
     bool bMuteChanged = (bMute != m_bMute);
     key_t velthrshld = cControls.iVelocityThreshold % (1 << 7);
@@ -1224,7 +1224,7 @@ GameState::GameError MainScreen::Logic(void) {
         LoopBody:
         {
             const MIDIChannelEvent* pEvent = m_vEvents[m_iStartPos];
-            key_t type = pEvent->GetChannelEventType();
+            auto type = pEvent->GetChannelEventType();
             key_t vel = pEvent->GetParam2();
             key_t key = pEvent->GetParam1();
             const idx_t sistidx = pEvent->GetSisterIdx();
@@ -1279,7 +1279,7 @@ GameState::GameError MainScreen::Logic(void) {
             {
                 m_vThreadWork[key].push_back({
                     .idx = Reverse ? sistidx : m_iStartPos,
-                    .sister_idx = (IsOnOg) ? (Reverse ? m_iStartPos : IDX_MAX) : (Reverse ? IDX_MAX : sistidx),
+                    .sister_idx = (IsOnOg) ? (Reverse ? m_iStartPos : -1) : (Reverse ? -1 : sistidx),
                     });
             }
 
@@ -1372,14 +1372,14 @@ GameState::GameError MainScreen::Logic(void) {
 
 void MainScreen::UpdateState(key_t key, const thread_work_t& work) {
     auto& note_state = m_vState[key];
-    if (work.sister_idx == IDX_MAX) {
+    if (work.sister_idx == -1) {
         note_state.push_back(work.idx);
         m_pNoteState[key] = work.idx;
     }
     else {
         // binary search
         idx_t pos = LocateElement(note_state, work.sister_idx);
-        if (pos != IDX_MAX)
+        if (pos != -1)
             note_state.erase(note_state.begin() + pos);
 
         if (note_state.size() == 0)
@@ -1391,14 +1391,14 @@ void MainScreen::UpdateState(key_t key, const thread_work_t& work) {
 
 void MainScreen::UpdateStateBackwards(key_t key, const thread_work_t& work) {
     auto& note_state = m_vState[key];
-    if (work.sister_idx == IDX_MAX) {
+    if (work.sister_idx == -1) {
         InsertSorted(note_state, work.idx);
         m_pNoteState[key] = work.idx;
     }
     else {
         // binary search
         idx_t pos = LocateElement(note_state, work.sister_idx);
-        if (pos != IDX_MAX)
+        if (pos != -1)
             note_state.erase(note_state.begin() + pos);
 
         if (note_state.size() == 0)
@@ -1443,7 +1443,7 @@ void MainScreen::JumpTo(mms_t llStartTime, boolean loadingMode) {
     auto itBegin = m_vEvents.begin();
     auto itEnd = m_vEvents.end();
     // Want lower bound to minimize simultaneous complexity
-    auto itMiddle = lower_bound(itBegin, itEnd, llStartTime, [&](MIDIChannelEvent* lhs, const long long rhs) {
+    auto itMiddle = lower_bound(itBegin, itEnd, llStartTime, [&](MIDIChannelEvent* lhs, const mms_t rhs) {
         return lhs->GetAbsMicroSec() < rhs;
         });
 
@@ -1791,7 +1791,7 @@ mms_t MainScreen::GetTickTime(mtk_t iTick) {
 mms_t MainScreen::GetTickTime(mtk_t iTick, mtk_t iLastTempoTick, mms_t llLastTempoTime, bpm_t iMicroSecsPerBeat) {
     uint16_t iDivision = m_MIDI.GetInfo().iDivision;
     if (!(iDivision & 0x8000))
-        return llLastTempoTime + (static_cast<long long>(iMicroSecsPerBeat) * (iTick - iLastTempoTick)) / iDivision;
+        return llLastTempoTime + (static_cast<mms_t>(iMicroSecsPerBeat) * (iTick - iLastTempoTick)) / iDivision;
     //else
     //    return llLastTempoTime + ( 1000000LL * ( iTick - iLastTempoTick ) ) / iTicksPerSecond;
     return -1;
@@ -2017,7 +2017,7 @@ void MainScreen::RenderNotes() {
 
     if (Config::GetConfig().GetVideoSettings().bOR) {
         if (m_dNSpeed < 0) {
-            for (idx_t i = iStartPos; i <= iEndPos; i++) {
+            for (sidx_t i = iStartPos; i <= iEndPos; i++) {
                 MIDIChannelEvent* pEvent = m_vEvents[i];
                 if ((pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOff || (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() == 0)) && pEvent->HasSister() &&
                     m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
@@ -2026,7 +2026,7 @@ void MainScreen::RenderNotes() {
             }
         }
         else {
-            for (idx_t i = iEndPos; i >= iStartPos; i--) {
+            for (sidx_t i = iEndPos; i >= iStartPos; i--) {
                 MIDIChannelEvent* pEvent = m_vEvents[i];
                 if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0 && pEvent->HasSister() &&
                     m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
@@ -2035,19 +2035,19 @@ void MainScreen::RenderNotes() {
             }
         }
         for (key_t i = m_iStartNote; i <= m_iEndNote; i++) {
-            for (vector<idx_t>::reverse_iterator it = (m_vState[i]).rbegin(); it != (m_vState[i]).rend(); it++) {
+            for (vector<sidx_t>::reverse_iterator it = (m_vState[i]).rbegin(); it != (m_vState[i]).rend(); it++) {
                 RenderNote(m_vEvents[*it]);
             }
         }
     }
     else {
         for (key_t i = m_iStartNote; i <= m_iEndNote; i++) {
-            for (vector<idx_t>::iterator it = (m_vState[i]).begin(); it != (m_vState[i]).end(); it++) {
+            for (vector<sidx_t>::iterator it = (m_vState[i]).begin(); it != (m_vState[i]).end(); it++) {
                 RenderNote(m_vEvents[*it]);
             }
         }
         if (m_dNSpeed < 0) {
-            for (idx_t i = iEndPos; i >= iStartPos; i--) {
+            for (sidx_t i = iEndPos; i >= iStartPos; i--) {
                 MIDIChannelEvent* pEvent = m_vEvents[i];
                 if ((pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOff || (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() == 0)) && pEvent->HasSister() &&
                     m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
@@ -2056,7 +2056,7 @@ void MainScreen::RenderNotes() {
             }
         }
         else {
-            for (idx_t i = iStartPos; i <= iEndPos; i++) {
+            for (sidx_t i = iStartPos; i <= iEndPos; i++) {
                 MIDIChannelEvent* pEvent = m_vEvents[i];
                 if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0 && pEvent->HasSister() &&
                     m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
@@ -2478,28 +2478,28 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
     }
 
     llStartTimeFormatted = to_string(abs(m_llStartTime));
-    for (idx_t i = llStartTimeFormatted.length() - 3; i > 0; i -= 3)
+    for (signed short i = llStartTimeFormatted.length() - 3; i > 0; i -= 3)
         llStartTimeFormatted.insert(i, " ");
     if (m_llStartTime < 0)
         llStartTimeFormatted.insert(0, "-");
 
     TotalTimeFormatted = to_string(TotalTime);
-    for (idx_t i = TotalTimeFormatted.length() - 3; i > 0; i -= 3)
+    for (signed short i = TotalTimeFormatted.length() - 3; i > 0; i -= 3)
         TotalTimeFormatted.insert(i, " ");
 
-    polyphony = transform_reduce(begin(m_vState), end(m_vState), 0, plus<>(), [](const vector<idx_t>& state) {return state.size(); });
+    polyphony = transform_reduce(begin(m_vState), end(m_vState), 0, plus<>(), [](const vector<sidx_t>& state) {return state.size(); });
     polyFormatted = to_string(polyphony);
-    for (idx_t i = polyFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
+    for (signed short i = polyFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
         polyFormatted.insert(i, ",");
 
     nps = m_vNCTable[min(max(m_llStartTime / MS, 0LL), iMaxMS)] - m_vNCTable[min(max((m_llStartTime - S) / MS, 0LL), iMaxMS)];
     npsFormatted = to_string(nps);
-    for (idx_t i = npsFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
+    for (signed short i = npsFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
         npsFormatted.insert(i, ",");
 
     passed = m_vNCTable[min(max(m_llStartTime / MS, 0LL), iMaxMS)];
     passedFormatted = to_string(passed);
-    for (idx_t i = passedFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
+    for (signed short i = passedFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
         passedFormatted.insert(i, ",");
 
     RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText1).c_str(), WStringToUtf8(L"v" VersionString).c_str());
@@ -2573,7 +2573,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText24).c_str(), "%d", cControls.iVelocityThreshold);
     }
     if (cControls.bPhigros) {
-        RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText25).c_str(), "%07.0f", (passed == static_cast<long long>(TotalNC) ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(TotalNC) * 1000000)));
+        RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText25).c_str(), "%07.0f", (passed == TotalNC ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(TotalNC) * 1000000)));
         RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText26).c_str(), Difficulty);
         RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText27).c_str(), WStringToUtf8(StatisticsText28).c_str());
         if (static_cast<float>(passed == TotalNC ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(TotalNC) * 1000000)) == static_cast<float>(1000000)) {

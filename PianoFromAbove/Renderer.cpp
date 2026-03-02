@@ -1216,7 +1216,7 @@ HRESULT D3D12Renderer::EndScene(bool draw_bg) {
 
     // Flush the intermediate note buffer
     if (!m_vNotesIntermediate.empty()) {
-        for (size_t i = 0; i < m_vNotesIntermediate.size(); i += RectsPerPass) {
+        for (idx_t i = 0; i < m_vNotesIntermediate.size(); i += RectsPerPass) {
             if (i == 0) {
                 if (Config::GetConfig().GetVideoSettings().bSameWidth) {
                     if (Config::GetConfig().GetVideoSettings().bOR) {
@@ -1330,7 +1330,7 @@ HRESULT D3D12Renderer::EndSplashScene() {
     // Flush the intermediate rect buffer
     HRESULT res = S_OK;
     if (!m_vRectsIntermediate.empty()) {
-        for (size_t i = 0; i < m_vRectsIntermediate.size(); i += RectsPerPass * 4) {
+        for (idx_t i = 0; i < m_vRectsIntermediate.size(); i += RectsPerPass * 4) {
             if (i == 0) {
                 SetPipeline(Pipeline::Rect);
             }

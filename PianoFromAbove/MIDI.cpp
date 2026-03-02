@@ -111,7 +111,7 @@ idx_t MIDIPos::GetNextEvent(mms_t iMicroSecs, MIDIEvent** pOutEvent)
 
     // Get the next closest event
     idx_t iTracks = m_vTrackPos.size();
-    idx_t iMinPos = (idx_t)min_index_sse(m_pTrackTime, (iTracks + 8) & ~7);
+    idx_t iMinPos = (idx_t)min_index_sse(reinterpret_cast<int32_t*>(m_pTrackTime), (iTracks + 8) & ~7);
 
     if (m_pTrackTime[iMinPos] == INT_MAX)
         return 0;
@@ -436,7 +436,7 @@ key_t MIDI::WhiteCount(key_t iMinNote, key_t iMaxNote)
 wstring MIDI::aNoteNames[MIDI::KEYS + 1];
 MIDI::Note MIDI::aNoteVal[MIDI::KEYS];
 bool MIDI::aIsSharp[MIDI::KEYS];
-unsigned char MIDI::aWhiteCount[MIDI::KEYS + 1];
+key_t MIDI::aWhiteCount[MIDI::KEYS + 1];
 
 void MIDI::InitArrays()
 {
@@ -450,7 +450,7 @@ void MIDI::InitArrays()
         int16_t iOctave = -1;
         bool bIsSharp = false;
         MIDI::Note eNote = MIDI::C;
-        for (int i = 0; i < MIDI::KEYS; i++)
+        for (key_t i = 0; i < MIDI::KEYS; i++)
         {
             // Don't want sprintf because we're in c++ and string building is too slow. Manual construction!
             int16_t iPos = 0;
@@ -924,7 +924,7 @@ void MIDITrack::MIDITrackInfo::AddEventInfo(const MIDIEvent& mEvent)
 // MIDIEvent functions
 //-----------------------------------------------------------------------------
 
-MIDIEvent::EventType MIDIEvent::DecodeEventType(int iEventCode)
+MIDIEvent::EventType MIDIEvent::DecodeEventType(msg_t iEventCode)
 {
     if (iEventCode < 0x80) return RunningStatus;
     if (iEventCode < 0xF0) return ChannelEvent;
@@ -1217,7 +1217,7 @@ bool MIDIOutDevice::PlayEventAcrossChannels(msg_t cStatus, msg_t cParam1, msg_t 
 
     cStatus &= 0xF0;
     bool bResult = true;
-    for (int i = 0; i < 16; i++)
+    for (chan_t i = 0; i < 16; i++)
         bResult &= PlayEvent(cStatus + i, cParam1, cParam2);
 
     return bResult;
