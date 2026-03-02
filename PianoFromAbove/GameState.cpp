@@ -1294,7 +1294,7 @@ GameState::GameError MainScreen::Logic(void) {
             }
         }
         LoopEnd:
-        concurrency::parallel_for(size_t(0), size_t(128), [&](unsigned char key) {
+        concurrency::parallel_for(key_t(0), key_t(128), [&](key_t key) {
             for (const auto& work : m_vThreadWork[key])
                 if (Reverse) {
                     UpdateStateBackwards(key, work);
@@ -1357,8 +1357,8 @@ GameState::GameError MainScreen::Logic(void) {
     // Update track colors
     // TODO: Only update track colors lazily
     auto* track_colors = m_pRenderer->GetTrackColors();
-    for (size_t i = 0; i < min(m_vTrackSettings.size(), MaxTrackColors); i++) {
-        for (size_t j = 0; j < 16; j++) {
+    for (track_t i = 0; i < min(m_vTrackSettings.size(), MaxTrackColors); i++) {
+        for (chan_t j = 0; j < MaxChannelColors; j++) {
             auto& src = m_vTrackSettings[i].aChannels[j];
             auto& dst = track_colors[i * 16 + j];
             dst.primary = src.iPrimaryRGB;
@@ -2217,7 +2217,7 @@ void MainScreen::RenderKeys() {
                     goto skiploopa;
                 }
 
-                for (size_t OverlapCount = 0; OverlapCount < m_vState[i].size(); OverlapCount++) {
+                for (idx_t OverlapCount = 0; OverlapCount < m_vState[i].size(); OverlapCount++) {
                 skiploopa:
                     const MIDIChannelEvent* pEvent = m_vEvents[m_bRemoveOverlaps ? m_pNoteState[i] : m_vState[i][OverlapCount]];
                     const uint16_t iTrack = pEvent->GetTrack() % MaxTrackColors;
@@ -2313,7 +2313,7 @@ void MainScreen::RenderKeys() {
                     goto skiploopb;
                 }
 
-                for (size_t OverlapCount = 0; OverlapCount < m_vState[i].size(); OverlapCount++) {
+                for (idx_t OverlapCount = 0; OverlapCount < m_vState[i].size(); OverlapCount++) {
                 skiploopb:
                     const MIDIChannelEvent* pEvent = m_vEvents[m_bRemoveOverlaps ? m_pNoteState[i] : m_vState[i][OverlapCount]];
                     const uint16_t iTrack = pEvent->GetTrack() % MaxTrackColors;

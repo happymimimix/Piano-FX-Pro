@@ -285,7 +285,7 @@ void AudioSettings::LoadConfigValues(TiXmlElement* txRoot)
     if (txAudio->QueryStringAttribute("MIDIOutDevice", &sMIDIOutDevice) == TIXML_SUCCESS)
     {
         sDesiredOut = Util::StringToWstring(sMIDIOutDevice);
-        for (size_t i = 0; i < vMIDIOutDevices.size(); i++)
+        for (win32_t i = 0; i < vMIDIOutDevices.size(); i++)
             if (vMIDIOutDevices[i] == sDesiredOut)
                 iOutDevice = i;
     }
@@ -372,10 +372,14 @@ void ViewSettings::LoadConfigValues(TiXmlElement* txRoot)
     txView->QueryFloatAttribute("OffsetX", &m_fOffsetX);
     txView->QueryFloatAttribute("OffsetY", &m_fOffsetY);
     txView->QueryFloatAttribute("ZoomX", &m_fZoomX);
-    txView->QueryIntAttribute("MainLeft", &m_iMainLeft);
-    txView->QueryIntAttribute("MainTop", &m_iMainTop);
-    txView->QueryIntAttribute("MainWidth", &m_iMainWidth);
-    txView->QueryIntAttribute("MainHeight", &m_iMainHeight);
+    if (txView->QueryIntAttribute("MainLeft", &iAttrVal) == TIXML_SUCCESS)
+        m_iMainLeft = iAttrVal;
+    if (txView->QueryIntAttribute("MainTop", &iAttrVal) == TIXML_SUCCESS)
+        m_iMainTop = iAttrVal;
+    if (txView->QueryIntAttribute("MainWidth", &iAttrVal) == TIXML_SUCCESS)
+        m_iMainWidth = iAttrVal;
+    if (txView->QueryIntAttribute("MainHeight", &iAttrVal) == TIXML_SUCCESS)
+        m_iMainHeight = iAttrVal;
 }
 
 //-----------------------------------------------------------------------------
@@ -392,7 +396,7 @@ bool VisualSettings::SaveConfigValues(TiXmlElement* txRoot)
 
     TiXmlElement* txColors = new TiXmlElement("Colors");
     txVisual->LinkEndChild(txColors);
-    for (size_t i = 0; i < sizeof(colors) / sizeof(colors[0]); i++)
+    for (chan_t i = 0; i < sizeof(colors) / sizeof(colors[0]); i++)
     {
         TiXmlElement* txColor = new TiXmlElement("Color");
         txColors->LinkEndChild(txColor);

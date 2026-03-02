@@ -47,12 +47,12 @@ public:
     bpm_t GetTicksPerSecond() const { return m_iTicksPerSecond; }
     bpm_t GetMicroSecsPerBeat() const { return m_iMicroSecsPerBeat; }
 
-    int* m_pTrackTime;
+    tick_t* m_pTrackTime;
 
 private:
     // Where are we in the file?
     MIDI& m_MIDI;
-    vector< size_t > m_vTrackPos;
+    vector<idx_t> m_vTrackPos;
 
     // Tempo variables
     bool m_bIsStandard;
@@ -121,7 +121,7 @@ public:
         uint16_t iNumTracks, iNumChannels;
         uint16_t iDivision;
         unsigned char iMinNote, iMaxNote;
-        size_t iNoteCount, iEventCount;
+        idx_t iNoteCount, iEventCount;
         long iTotalTicks, iTotalBeats;
         long long llTotalMicroSecs, llFirstNote;
     };
@@ -132,7 +132,7 @@ public:
 private:
     struct EventPool {
         MIDIChannelEvent* events;
-        size_t count;
+        idx_t count;
     };
 
     static void InitArrays();
@@ -142,7 +142,7 @@ private:
     static unsigned char aWhiteCount[KEYS + 1];
 
     MIDIInfo m_Info;
-    vector< MIDITrack* > m_vTracks;
+    vector<MIDITrack*> m_vTracks;
 
     vector<EventPool> event_pools;
 };
@@ -177,10 +177,10 @@ public:
         uint16_t iSequenceNumber;
         string sSequenceName;
         unsigned char iMinNote, iMaxNote;
-        size_t iNoteCount, iEventCount;
+        idx_t iNoteCount, iEventCount;
         long iTotalTicks;
         long long llTotalMicroSecs;
-        size_t aNoteCount[16];
+        idx_t aNoteCount[16];
         unsigned char aProgram[16], iNumChannels;
     };
     const MIDITrackInfo& GetInfo() const { return m_TrackInfo; }
@@ -224,7 +224,7 @@ public:
 class MIDIChannelEvent : public MIDIEvent
 {
 public:
-    MIDIChannelEvent() : m_iSisterIdx(-1ll), m_iSimultaneous(0ll), m_bPassDone(false) { }
+    MIDIChannelEvent() : m_iSisterIdx(IDX_MAX), m_iSimultaneous(0), m_bPassDone(false) { }
 
     enum ChannelEventType { NoteOff = 0x8, NoteOn, NoteAftertouch, Controller, ProgramChange, ChannelAftertouch, PitchBend };
     enum RPN { RPNType = 100, PBSRPNID = 0, RPNData = 6 };
@@ -250,9 +250,9 @@ public:
     void SetChannel(unsigned char channel) { m_cChannel = channel; }
     void SetParam1(unsigned char param1) { m_cParam1 = param1; }
     void SetParam2(unsigned char param2) { m_cParam2 = param2; }
-    void SetSisterIdx(size_t iSisterIdx) { m_iSisterIdx = iSisterIdx; }
-    void SetSimultaneous(size_t iSimultaneous) { m_iSimultaneous = iSimultaneous; }
-    void SetLength(size_t length) { m_uLength = length; }
+    void SetSisterIdx(idx_t iSisterIdx) { m_iSisterIdx = iSisterIdx; }
+    void SetSimultaneous(idx_t iSimultaneous) { m_iSimultaneous = iSimultaneous; }
+    void SetLength(idx_t length) { m_uLength = length; }
     void SetPassDone(bool done) { m_bPassDone = done; }
 
     bool HasSister() const { return m_iSisterIdx != IDX_MAX; }
@@ -347,7 +347,7 @@ private:
 
 class MIDILoadingProgress {
 public:
-    enum Stage { CopyToMem, Decompress, ParseTracks, ConnectNotes, SortEvents, NCTable, Done };
+    enum Stage : uint8_t { CopyToMem, Decompress, ParseTracks, ConnectNotes, SortEvents, NCTable, Done };
 
     Stage stage;
     wstring name;

@@ -156,8 +156,8 @@ public:
     void ToggleOnTop(bool bUpdateGUI = false) { SetOnTop(!m_bOnTop, bUpdateGUI); }
     void ToggleFullScreen(bool bUpdateGUI = false) { SetFullScreen(!m_bFullScreen, bUpdateGUI); }
 
-    void SetMainPos(int iMainLeft, int iMainTop) { m_iMainLeft = iMainLeft; m_iMainTop = iMainTop; }
-    void SetMainSize(int iMainWidth, int iMainHeight) { m_iMainWidth = iMainWidth; m_iMainHeight = iMainHeight; }
+    void SetMainPos(win32_t iMainLeft, win32_t iMainTop) { m_iMainLeft = iMainLeft; m_iMainTop = iMainTop; }
+    void SetMainSize(win32_t iMainWidth, win32_t iMainHeight) { m_iMainWidth = iMainWidth; m_iMainHeight = iMainHeight; }
     void SetOffsetX(float fOffsetX) { m_fOffsetX = fOffsetX; }
     void SetOffsetY(float fOffsetY) { m_fOffsetY = fOffsetY; }
     void SetZoomX(float fZoomX) { m_fZoomX = fZoomX; }
@@ -167,10 +167,10 @@ public:
     void SetFullScreen(bool bFullScreen, bool bUpdateGUI = false) { m_bFullScreen = bFullScreen; if (bUpdateGUI) ::SetFullScreen(bFullScreen); }
     void SetZoomMove(bool bZoomMove) { m_bZoomMove = bZoomMove; ::SetZoomMove(bZoomMove); }
 
-    int GetMainLeft() const { return m_iMainLeft == -32000 ? CW_USEDEFAULT : m_iMainLeft; }
-    int GetMainTop() const { return m_iMainTop == -32000 ? CW_USEDEFAULT : m_iMainTop; }
-    int GetMainWidth() const { return m_iMainWidth; }
-    int GetMainHeight() const { return m_iMainHeight; }
+    win32_t GetMainLeft() const { return m_iMainLeft == -32000 ? CW_USEDEFAULT : m_iMainLeft; }
+    win32_t GetMainTop() const { return m_iMainTop == -32000 ? CW_USEDEFAULT : m_iMainTop; }
+    win32_t GetMainWidth() const { return m_iMainWidth; }
+    win32_t GetMainHeight() const { return m_iMainHeight; }
     float GetOffsetX() const { return m_fOffsetX; }
     float GetOffsetY() const { return m_fOffsetY; }
     float GetZoomX() const { return m_fZoomX; }
@@ -191,7 +191,7 @@ public:
 private:
     bool m_bControls, m_bKeyboard, m_bOnTop, m_bFullScreen, m_bZoomMove;
     float m_fOffsetX, m_fOffsetY, m_fZoomX;
-    int m_iMainLeft, m_iMainTop, m_iMainWidth, m_iMainHeight;
+    win32_t m_iMainLeft, m_iMainTop, m_iMainWidth, m_iMainHeight;
 };
 
 class Config : public ISettings

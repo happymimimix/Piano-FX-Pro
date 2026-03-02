@@ -28,12 +28,12 @@ MIDIPos::MIDIPos(MIDI& midi) : m_MIDI(midi)
     m_iCurrTick = m_iCurrMicroSec = 0;
 
     // Init track positions
-    size_t iTracks = m_MIDI.m_vTracks.size();
-    size_t iTracksRounded = (iTracks + 8) & ~7; // Need to round up to 32 bytes, each int is 4 bytes
-    m_pTrackTime = (int*)_aligned_malloc(iTracksRounded * sizeof(int), 32);
-    for (size_t i = 0; i < iTracks; i++)
+    idx_t iTracks = m_MIDI.m_vTracks.size();
+    idx_t iTracksRounded = (iTracks + 8) & ~7; // Need to round up to 32 bytes, each int is 4 bytes
+    m_pTrackTime = (tick_t*)_aligned_malloc(iTracksRounded * sizeof(tick_t), 32);
+    for (idx_t i = 0; i < iTracks; i++)
         m_vTrackPos.push_back(0);
-    for (size_t i = 0; i < iTracksRounded; i++)
+    for (idx_t i = 0; i < iTracksRounded; i++)
         m_pTrackTime[i] = INT_MAX;
 
     // Init SMPTE tempo
@@ -87,7 +87,7 @@ idx_t min_index_sse(int32_t* array, idx_t size) {
     _mm_storeu_si128((__m128i*)values_array, minvalues);
     _mm_storeu_si128((__m128i*)indices_array, minindices);
 
-    size_t  minindex = indices_array[0];
+    idx_t  minindex = indices_array[0];
     int32_t minvalue = values_array[0];
     for (idx_t i = 1; i < 4; i++) {
         if (values_array[i] < minvalue) {
@@ -95,7 +95,7 @@ idx_t min_index_sse(int32_t* array, idx_t size) {
             minindex = indices_array[i];
         }
         else if (values_array[i] == minvalue) {
-            minindex = min(minindex, size_t(indices_array[i]));
+            minindex = min(minindex, idx_t(indices_array[i]));
         }
     }
 
@@ -110,7 +110,7 @@ idx_t MIDIPos::GetNextEvent(mms_t iMicroSecs, MIDIEvent** pOutEvent)
     *pOutEvent = NULL;
 
     // Get the next closest event
-    size_t iTracks = m_vTrackPos.size();
+    idx_t iTracks = m_vTrackPos.size();
     idx_t iMinPos = (idx_t)min_index_sse(m_pTrackTime, (iTracks + 8) & ~7);
 
     if (m_pTrackTime[iMinPos] == INT_MAX)
@@ -195,7 +195,7 @@ MIDI::MIDI(const wstring& sFilename)
     {
         // Go to the end of the file to get the max size
         _fseeki64(stream, 0, SEEK_END);
-        size_t iSize = static_cast<size_t>(_ftelli64(stream));
+        idx_t iSize = static_cast<idx_t>(_ftelli64(stream));
         unsigned char* pcMemBlock = new unsigned char[iSize];
 
         // Go to the beginning of the file to prepare for parsing
