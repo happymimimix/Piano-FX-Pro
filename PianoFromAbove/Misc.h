@@ -160,7 +160,7 @@ private:
 template< class T >
 bool TSQueue<T>::Push(const T& tElement)
 {
-    int iNextElement = (m_iWrite + 1) % QueueSize;
+    win32_t iNextElement = (m_iWrite + 1) % QueueSize;
 
     // Is the queue full?
     if (iNextElement == m_iRead) return false;
@@ -179,7 +179,7 @@ bool TSQueue<T>::Pop(T& tElement)
     if (m_iWrite == m_iRead) return false;
 
     // Compute where to read. Read. Update read pointer. Order very important.
-    int iNextElement = (m_iRead + 1) % QueueSize;
+    win32_t iNextElement = (m_iRead + 1) % QueueSize;
     tElement = m_tQueue[m_iRead];
     m_iRead = iNextElement;
 

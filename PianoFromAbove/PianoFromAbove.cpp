@@ -2414,7 +2414,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
 #endif
 
     g_hInstance = hInstance;
-    srand((win32_t)time(NULL));
+    srand((unsigned int)time(NULL));
 
     // Ensure that the common control DLL is loaded. 
     INITCOMMONCONTROLSEX icex;

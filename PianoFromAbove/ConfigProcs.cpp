@@ -221,9 +221,9 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             cVisual.iLastKey = (key_t)SendMessage(GetDlgItem(hWnd, IDC_LASTKEY), CB_GETCURSEL, 0, 0);
             cVisual.bRandomizeColor = IsDlgButtonChecked(hWnd, IDC_RANDOMIZE);
             for (chan_t i = 0; i < IDC_COLOR16 - IDC_COLOR1 + 1; i++)
-                cVisual.colors[i] = (win32_t)GetWindowLongPtr(GetDlgItem(hWnd, IDC_COLOR1 + i), GWLP_USERDATA) & 0x00FFFFFF | (cVisual.colors[i] & 0xFF000000);
-            cVisual.iBkgColor = (win32_t)GetWindowLongPtr(GetDlgItem(hWnd, IDC_BKGCOLOR), GWLP_USERDATA) & 0x00FFFFFF | (cVisual.iBkgColor & 0xFF000000);
-            cVisual.iBarColor = (win32_t)GetWindowLongPtr(GetDlgItem(hWnd, IDC_BARCOLOR), GWLP_USERDATA) & 0x00FFFFFF | (cVisual.iBarColor & 0xFF000000);
+                cVisual.colors[i] = (color_t)GetWindowLongPtr(GetDlgItem(hWnd, IDC_COLOR1 + i), GWLP_USERDATA) & 0x00FFFFFF | (cVisual.colors[i] & 0xFF000000);
+            cVisual.iBkgColor = (color_t)GetWindowLongPtr(GetDlgItem(hWnd, IDC_BKGCOLOR), GWLP_USERDATA) & 0x00FFFFFF | (cVisual.iBkgColor & 0xFF000000);
+            cVisual.iBarColor = (color_t)GetWindowLongPtr(GetDlgItem(hWnd, IDC_BARCOLOR), GWLP_USERDATA) & 0x00FFFFFF | (cVisual.iBarColor & 0xFF000000);
             wchar_t background[1 << 10]{};
             GetWindowTextW(GetDlgItem(hWnd, IDC_BACKGROUND), background, 1 << 10);
             cVisual.sBackground = background;
@@ -285,7 +285,7 @@ INT_PTR WINAPI AudioProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             AudioSettings cAudio = config.GetAudioSettings();
 
             // Get the values
-            cAudio.iOutDevice = (UINT)SendDlgItemMessage(hWnd, IDC_MIDIOUT, LB_GETCURSEL, 0, 0);
+            cAudio.iOutDevice = (win32_t)SendDlgItemMessage(hWnd, IDC_MIDIOUT, LB_GETCURSEL, 0, 0);
             cAudio.bKDMAPI = IsDlgButtonChecked(hWnd, IDC_KDMAPI);
             cAudio.sDesiredOut = cAudio.vMIDIOutDevices[cAudio.iOutDevice];
 
@@ -584,7 +584,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         MainScreen* pGameState = (MainScreen*)lParam;
         const MIDI& midi = pGameState->GetMIDI();
         const MIDI::MIDIInfo& mInfo = midi.GetInfo();
-        const vector< MIDITrack* >& vTracks = midi.GetTracks();
+        const vector<MIDITrack*>& vTracks = midi.GetTracks();
         SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)pGameState);
 
         // Fill out the static text vals

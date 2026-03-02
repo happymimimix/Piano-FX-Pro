@@ -193,14 +193,6 @@ public:
     const MIDI& GetMIDI() const { return m_MIDI; }
 
     // Settings
-    void ToggleMuted(track_t iTrack, chan_t iChannel) {
-        m_vTrackSettings[iTrack].aChannels[iChannel].bMuted =
-            !m_vTrackSettings[iTrack].aChannels[iChannel].bMuted;
-    }
-    void ToggleHidden(track_t iTrack, chan_t iChannel) {
-        m_vTrackSettings[iTrack].aChannels[iChannel].bHidden =
-            !m_vTrackSettings[iTrack].aChannels[iChannel].bHidden;
-    }
     void MuteChannel(track_t iTrack, chan_t iChannel, bool bMuted) { m_vTrackSettings[iTrack].aChannels[iChannel].bMuted = bMuted; }
     void HideChannel(track_t iTrack, chan_t iChannel, bool bHidden) { m_vTrackSettings[iTrack].aChannels[iChannel].bHidden = bHidden; }
     void ColorChannel(track_t iTrack, chan_t iChannel, color_t iColor, bool bRandom = false);

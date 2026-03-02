@@ -261,7 +261,7 @@ SplashScreen::SplashScreen(HWND hWnd, D3D12Renderer* pRenderer, bool enableSplas
         m_MIDI.PostProcess(m_vEvents);
 
         // Allocate
-        m_vTrackSettings.resize(m_MIDI.GetInfo().iNumTracks);
+        m_vTrackSettings.resize(m_MIDI.GetInfo().iNumTracks % MaxTrackColors);
         for (key_t i = 0; i < 128; i++)
             m_vState[i].reserve(1<<10);
     }
@@ -577,7 +577,7 @@ void SplashScreen::RenderNotes() {
 
 void SplashScreen::RenderNote(MIDIChannelEvent* pNote) {
     key_t iNote = pNote->GetParam1();
-    track_t iTrack = pNote->GetTrack();
+    track_t iTrack = pNote->GetTrack() % MaxTrackColors;
     chan_t iChannel = pNote->GetChannel();
     mms_t llNoteStart = pNote->GetAbsMicroSec();
     mms_t llNoteEnd = llNoteStart + pNote->GetLength();
@@ -659,7 +659,7 @@ MainScreen::MainScreen(wstring sMIDIFile, State eGameMode, HWND hWnd, D3D12Rende
     m_vEvents.reserve(m_MIDI.GetInfo().iEventCount);
 
     // Allocate
-    m_vTrackSettings.resize(m_MIDI.GetInfo().iNumTracks);
+    m_vTrackSettings.resize(m_MIDI.GetInfo().iNumTracks % MaxTrackColors);
     for (key_t i = 0; i < 128; i++)
         m_vState[i].reserve(1 << 10);
 
@@ -1237,7 +1237,7 @@ GameState::GameError MainScreen::Logic(void) {
                 vel = pEvent->GetParam2();
             }
             const chan_t chan = pEvent->GetChannel();
-            const track_t trk = pEvent->GetTrack();
+            const track_t trk = pEvent->GetTrack() % MaxTrackColors;
             const bool IsOn = type == MIDIChannelEvent::NoteOn && vel > 0;
             if (!IsOn && IsPaired) vel = pEvent->GetSister(m_vEvents)->GetParam2();
             const msg_t raw = pEvent->GetEventCode();
@@ -1951,8 +1951,8 @@ void MainScreen::RenderLines() {
         mms_t llEndTime = (m_bTickMode ? m_iStartTick : m_llStartTime) + m_llTimeSpan;
 
         // Copy tempo state vars
-        uint32_t iLastTempoTick = m_iLastTempoTick;
-        uint32_t iMicroSecsPerBeat = m_iMicroSecsPerBeat;
+        bpm_t iLastTempoTick = m_iLastTempoTick;
+        bpm_t iMicroSecsPerBeat = m_iMicroSecsPerBeat;
         mms_t llLastTempoTime = m_llLastTempoTime;
         eventvec_t::const_iterator itNextTempo = m_itNextTempo;
 
@@ -2220,8 +2220,8 @@ void MainScreen::RenderKeys() {
                 for (idx_t OverlapCount = 0; OverlapCount < m_vState[i].size(); OverlapCount++) {
                 skiploopa:
                     const MIDIChannelEvent* pEvent = m_vEvents[m_bRemoveOverlaps ? m_pNoteState[i] : m_vState[i][OverlapCount]];
-                    const uint16_t iTrack = pEvent->GetTrack() % MaxTrackColors;
-                    const uint8_t iChannel = pEvent->GetChannel();
+                    const track_t iTrack = pEvent->GetTrack() % MaxTrackColors;
+                    const chan_t iChannel = pEvent->GetChannel();
 
                 nxtlayera:
                     if (layer1drawn) {
@@ -2316,8 +2316,8 @@ void MainScreen::RenderKeys() {
                 for (idx_t OverlapCount = 0; OverlapCount < m_vState[i].size(); OverlapCount++) {
                 skiploopb:
                     const MIDIChannelEvent* pEvent = m_vEvents[m_bRemoveOverlaps ? m_pNoteState[i] : m_vState[i][OverlapCount]];
-                    const uint16_t iTrack = pEvent->GetTrack() % MaxTrackColors;
-                    const uint8_t iChannel = pEvent->GetChannel();
+                    const track_t iTrack = pEvent->GetTrack() % MaxTrackColors;
+                    const chan_t iChannel = pEvent->GetChannel();
 
                 nxtlayerb:
                     if (layer1drawn) {
