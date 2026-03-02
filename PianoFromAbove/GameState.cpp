@@ -631,7 +631,7 @@ void SplashScreen::RenderNote(MIDIChannelEvent* pNote) {
     }
 
     // Visualize!
-    color_t iAlpha = min(max(static_cast<color_t>(0xFF * (m_fNotesCY - y) / m_fNotesCY), 0x00), 0xFF);
+    color_t iAlpha = min(max(static_cast<mtk_t>(0xFF * (m_fNotesCY - y) / m_fNotesCY), 0x00), 0xFF);
     iAlpha <<= 24;
     m_pRenderer->DrawRect(x, y - cy, cx, cy, csTrack.iVeryDarkRGB & 0x00FFFFFF | iAlpha);
     m_pRenderer->DrawRect(x + fDeflate, y - cy + fDeflate,

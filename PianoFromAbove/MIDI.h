@@ -71,7 +71,7 @@ class MIDI
 public:
     enum Note { A, AS, B, C, CS, D, DS, E, F, FS, G, GS };
 
-    static const key_t KEYS = 129; // One extra because 128th is a sharp
+    static const key_t KEYS = 129;
     static const wstring Instruments[129];
     static const wstring& NoteName(key_t iNote);
     static Note NoteVal(key_t iNote);

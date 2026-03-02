@@ -238,9 +238,9 @@ void VisualSettings::LoadConfigValues(TiXmlElement* txRoot)
     if (txVisual->QueryIntAttribute("KeysShown", &iAttrVal) == TIXML_SUCCESS)
         eKeysShown = static_cast<KeysShown>(max(KeysShown::All, min(iAttrVal, KeysShown::Custom)));
     if (txVisual->QueryIntAttribute("FirstKey", &iAttrVal) == TIXML_SUCCESS)
-        iFirstKey = static_cast<key_t>(iAttrVal);
+        iFirstKey = static_cast<key_t>(max(0, min(iAttrVal, 127)));
     if (txVisual->QueryIntAttribute("LastKey", &iAttrVal) == TIXML_SUCCESS)
-        iLastKey = static_cast<key_t>(iAttrVal);
+        iLastKey = static_cast<key_t>(max(0, min(iAttrVal, 127)));
 
     //Colors
     int r, g, b, a = 0;
