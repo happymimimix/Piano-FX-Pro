@@ -81,7 +81,7 @@ public:
     D3D12Renderer();
     ~D3D12Renderer();
 
-    std::tuple<HRESULT, const char*> Init(HWND hWnd, bool bLimitFPS);
+    tuple<HRESULT, const char*> Init(HWND hWnd, bool bLimitFPS);
     HRESULT ResetDeviceIfNeeded();
     HRESULT ResetDevice();
     HRESULT ClearAndBeginScene(DWORD color);
@@ -102,7 +102,7 @@ public:
     int GetBufferHeight() const { return m_iBufferHeight; }
 
     HRESULT WaitForGPU();
-    std::wstring GetAdapterName();
+    wstring GetAdapterName();
     void SetPipeline(Pipeline pipeline);
     __forceinline void AutoSetNotePipeline(bool inloop = false);
     __forceinline void AutoSetRectPipeline(bool inloop = false);
@@ -116,7 +116,7 @@ public:
     void SplitRect() { m_iRectSplit = (int)m_vRectsIntermediate.size(); }
 
     char* Screenshot();
-    bool LoadBackgroundBitmap(std::wstring path);
+    bool LoadBackgroundBitmap(wstring path);
 
     void ImGuiStartFrame() {
         ImGui_ImplDX12_NewFrame();
@@ -126,7 +126,7 @@ public:
     ImDrawList* GetDrawList() { return m_pDrawList; }
 
 private:
-    std::tuple<HRESULT, const char*> CreateWindowDependentObjects(HWND hWnd);
+    tuple<HRESULT, const char*> CreateWindowDependentObjects(HWND hWnd);
     void SetupCommandList();
     bool UploadBackgroundBitmap();
 
@@ -193,15 +193,15 @@ private:
     UINT64 m_pFenceValues[FrameCount] = {};
 
     ComPtr<ID3D12Resource> m_pScreenshotStaging;
-    std::vector<char> m_vScreenshotOutput;
+    vector<char> m_vScreenshotOutput;
     UINT64 m_ullScreenshotPitch;
 
     ComPtr<ID3D12Resource> m_pTextureUpload;
     ComPtr<ID3D12Resource> m_pTextureBuffer;
     ComPtr<IWICBitmapSource> m_pUnscaledBackground;
 
-    std::vector<RectVertex> m_vRectsIntermediate;
-    std::vector<NoteData> m_vNotesIntermediate;
+    vector<RectVertex> m_vRectsIntermediate;
+    vector<NoteData> m_vNotesIntermediate;
     int m_iRectSplit = -1;
 
     ImDrawList* m_pDrawList;

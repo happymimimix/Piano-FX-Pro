@@ -30,14 +30,14 @@ D3D12Renderer::~D3D12Renderer() {
         CloseHandle(m_hFenceEvent);
 }
 
-std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) {
+tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) {
     HRESULT res;
 
     // Create DXGI factory
     res = CreateDXGIFactory2(0, IID_PPV_ARGS(&m_pFactory));
 
     if (FAILED(res))
-        return std::make_tuple(res, "CreateDXGIFactory2");
+        return make_tuple(res, "CreateDXGIFactory2");
 
     // Create device
     // TODO: Allow device selection for people with multiple GPUs
@@ -53,7 +53,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
         DXGI_ADAPTER_DESC2 desc = {};
         res = m_pAdapter->GetDesc2(&desc);
         if (FAILED(res))
-            return std::make_tuple(res, "GetDesc2");
+            return make_tuple(res, "GetDesc2");
 
         if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
             continue;
@@ -71,10 +71,10 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
         ComPtr<IDXGIAdapter> warpAdapter;
         res = m_pFactory->EnumWarpAdapter(IID_PPV_ARGS(&warpAdapter));
         if (FAILED(res))
-            return std::make_tuple(res, "EnumWarpAdapter");
+            return make_tuple(res, "EnumWarpAdapter");
         res = D3D12CreateDevice(warpAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&m_pDevice));
         if (FAILED(res))
-            return std::make_tuple(res, "D3D12CreateDevice");
+            return make_tuple(res, "D3D12CreateDevice");
     }
 
     // Create command queue
@@ -86,7 +86,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     };
     res = m_pDevice->CreateCommandQueue(&queue_desc, IID_PPV_ARGS(&m_pCommandQueue));
     if (FAILED(res))
-        return std::make_tuple(res, "CreateCommandQueue");
+        return make_tuple(res, "CreateCommandQueue");
 
     // Create render target view descriptor heap
     D3D12_DESCRIPTOR_HEAP_DESC rtv_heap_desc = {
@@ -97,7 +97,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     };
     res = m_pDevice->CreateDescriptorHeap(&rtv_heap_desc, IID_PPV_ARGS(&m_pRTVDescriptorHeap));
     if (FAILED(res))
-        return std::make_tuple(res, "CreateDescriptorHeap (RTV)");
+        return make_tuple(res, "CreateDescriptorHeap (RTV)");
     m_uRTVDescriptorSize = m_pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
     // Create depth stencil view descriptor heap
@@ -109,7 +109,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     };
     res = m_pDevice->CreateDescriptorHeap(&dsv_heap_desc, IID_PPV_ARGS(&m_pDSVDescriptorHeap));
     if (FAILED(res))
-        return std::make_tuple(res, "CreateDescriptorHeap (DSV)");
+        return make_tuple(res, "CreateDescriptorHeap (DSV)");
     m_uDSVDescriptorSize = m_pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
     // Create shader resource view heap
@@ -121,7 +121,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     };
     res = m_pDevice->CreateDescriptorHeap(&srv_heap_desc, IID_PPV_ARGS(&m_pSRVDescriptorHeap));
     if (FAILED(res))
-        return std::make_tuple(res, "CreateDescriptorHeap (SRV)");
+        return make_tuple(res, "CreateDescriptorHeap (SRV)");
     m_uSRVDescriptorSize = m_pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
     // Allocate note shader resource views
@@ -170,7 +170,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     };
     res = m_pDevice->CreateDescriptorHeap(&imgui_srv_heap_desc, IID_PPV_ARGS(&m_pImGuiSRVDescriptorHeap));
     if (FAILED(res))
-        return std::make_tuple(res, "CreateDescriptorHeap (ImGui SRV)");
+        return make_tuple(res, "CreateDescriptorHeap (ImGui SRV)");
 
     // Create texture shader resource view heap
     D3D12_DESCRIPTOR_HEAP_DESC texture_srv_heap_desc = {
@@ -181,14 +181,14 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     };
     res = m_pDevice->CreateDescriptorHeap(&texture_srv_heap_desc, IID_PPV_ARGS(&m_pTextureSRVDescriptorHeap));
     if (FAILED(res))
-        return std::make_tuple(res, "CreateDescriptorHeap (Texture SRV)");
+        return make_tuple(res, "CreateDescriptorHeap (Texture SRV)");
     m_uTextureSRVDescriptorSize = m_pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
     // Create command allocators
     for (uint32_t i = 0; i < FrameCount; i++) {
         res = m_pDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_pCommandAllocator[i]));
         if (FAILED(res))
-            return std::make_tuple(res, "CreateCommandAllocator (direct)");
+            return make_tuple(res, "CreateCommandAllocator (direct)");
     }
 
     // Create root signature
@@ -239,10 +239,10 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     };
     res = D3D12SerializeRootSignature(&root_sig_desc, D3D_ROOT_SIGNATURE_VERSION_1, &rect_serialized, nullptr);
     if (FAILED(res))
-        return std::make_tuple(res, "D3D12SerializeRootSignature (rectangle)");
+        return make_tuple(res, "D3D12SerializeRootSignature (rectangle)");
     res = m_pDevice->CreateRootSignature(0, rect_serialized->GetBufferPointer(), rect_serialized->GetBufferSize(), IID_PPV_ARGS(&m_pRectRootSignature));
     if (FAILED(res))
-        return std::make_tuple(res, "CreateRootSignature (rectangle)");
+        return make_tuple(res, "CreateRootSignature (rectangle)");
 
     // Create rect pipeline
     D3D12_INPUT_ELEMENT_DESC rect_vertex_input[] = {
@@ -317,40 +317,40 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     };
     res = m_pDevice->CreateGraphicsPipelineState(&rect_pipeline_desc, IID_PPV_ARGS(&m_pRectPipelineState));
     if (FAILED(res))
-        return std::make_tuple(res, "CreateGraphicsPipelineState (rect)");
+        return make_tuple(res, "CreateGraphicsPipelineState (rect)");
 
     // Create note root signature
     ComPtr<ID3DBlob> note_serialized;
     res = D3D12SerializeRootSignature(&root_sig_desc, D3D_ROOT_SIGNATURE_VERSION_1, &note_serialized, nullptr);
     if (FAILED(res))
-        return std::make_tuple(res, "D3D12SerializeRootSignature (note)");
+        return make_tuple(res, "D3D12SerializeRootSignature (note)");
     res = m_pDevice->CreateRootSignature(0, note_serialized->GetBufferPointer(), note_serialized->GetBufferSize(), IID_PPV_ARGS(&m_pNoteRootSignature));
     if (FAILED(res))
-        return std::make_tuple(res, "CreateRootSignature (note)");
+        return make_tuple(res, "CreateRootSignature (note)");
 
     ComPtr<ID3DBlob> same_width_note_serialized;
     res = D3D12SerializeRootSignature(&root_sig_desc, D3D_ROOT_SIGNATURE_VERSION_1, &same_width_note_serialized, nullptr);
     if (FAILED(res))
-        return std::make_tuple(res, "D3D12SerializeRootSignature (same width note)");
+        return make_tuple(res, "D3D12SerializeRootSignature (same width note)");
     res = m_pDevice->CreateRootSignature(0, same_width_note_serialized->GetBufferPointer(), same_width_note_serialized->GetBufferSize(), IID_PPV_ARGS(&m_pNoteSameWidthRootSignature));
     if (FAILED(res))
-        return std::make_tuple(res, "CreateRootSignature (same width note)");
+        return make_tuple(res, "CreateRootSignature (same width note)");
 
     ComPtr<ID3DBlob> noteOR_serialized;
     res = D3D12SerializeRootSignature(&root_sig_desc, D3D_ROOT_SIGNATURE_VERSION_1, &noteOR_serialized, nullptr);
     if (FAILED(res))
-        return std::make_tuple(res, "D3D12SerializeRootSignature (note OR)");
+        return make_tuple(res, "D3D12SerializeRootSignature (note OR)");
     res = m_pDevice->CreateRootSignature(0, noteOR_serialized->GetBufferPointer(), noteOR_serialized->GetBufferSize(), IID_PPV_ARGS(&m_pNoteRootSignatureOR));
     if (FAILED(res))
-        return std::make_tuple(res, "CreateRootSignature (note OR)");
+        return make_tuple(res, "CreateRootSignature (note OR)");
 
     ComPtr<ID3DBlob> same_width_noteOR_serialized;
     res = D3D12SerializeRootSignature(&root_sig_desc, D3D_ROOT_SIGNATURE_VERSION_1, &same_width_noteOR_serialized, nullptr);
     if (FAILED(res))
-        return std::make_tuple(res, "D3D12SerializeRootSignature (same width note OR)");
+        return make_tuple(res, "D3D12SerializeRootSignature (same width note OR)");
     res = m_pDevice->CreateRootSignature(0, same_width_noteOR_serialized->GetBufferPointer(), same_width_noteOR_serialized->GetBufferSize(), IID_PPV_ARGS(&m_pNoteSameWidthRootSignatureOR));
     if (FAILED(res))
-        return std::make_tuple(res, "CreateRootSignature (same width note OR)");
+        return make_tuple(res, "CreateRootSignature (same width note OR)");
 
     // Create note pipeline
     auto note_pipeline_desc = rect_pipeline_desc;
@@ -373,7 +373,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     };
     res = m_pDevice->CreateGraphicsPipelineState(&note_pipeline_desc, IID_PPV_ARGS(&m_pNotePipelineState));
     if (FAILED(res))
-        return std::make_tuple(res, "CreateGraphicsPipelineState (note)");
+        return make_tuple(res, "CreateGraphicsPipelineState (note)");
 
     auto same_width_note_pipeline_desc = note_pipeline_desc;
     same_width_note_pipeline_desc.pRootSignature = m_pNoteSameWidthRootSignature.Get();
@@ -386,7 +386,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     };
     res = m_pDevice->CreateGraphicsPipelineState(&same_width_note_pipeline_desc, IID_PPV_ARGS(&m_pNoteSameWidthPipelineState));
     if (FAILED(res))
-        return std::make_tuple(res, "CreateGraphicsPipelineState (same width note)");
+        return make_tuple(res, "CreateGraphicsPipelineState (same width note)");
 
     auto noteOR_pipeline_desc = rect_pipeline_desc;
     noteOR_pipeline_desc.pRootSignature = m_pNoteRootSignatureOR.Get();
@@ -408,7 +408,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     };
     res = m_pDevice->CreateGraphicsPipelineState(&noteOR_pipeline_desc, IID_PPV_ARGS(&m_pNotePipelineStateOR));
     if (FAILED(res))
-        return std::make_tuple(res, "CreateGraphicsPipelineState (note OR)");
+        return make_tuple(res, "CreateGraphicsPipelineState (note OR)");
 
     auto same_width_noteOR_pipeline_desc = noteOR_pipeline_desc;
     same_width_noteOR_pipeline_desc.pRootSignature = m_pNoteSameWidthRootSignatureOR.Get();
@@ -418,7 +418,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     };
     res = m_pDevice->CreateGraphicsPipelineState(&same_width_noteOR_pipeline_desc, IID_PPV_ARGS(&m_pNoteSameWidthPipelineStateOR));
     if (FAILED(res))
-        return std::make_tuple(res, "CreateGraphicsPipelineState (same width note OR)");
+        return make_tuple(res, "CreateGraphicsPipelineState (same width note OR)");
 
     // Create background root signature
     D3D12_DESCRIPTOR_RANGE descriptor_ranges[] = {
@@ -470,10 +470,10 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     };
     res = D3D12SerializeRootSignature(&background_root_sig_desc, D3D_ROOT_SIGNATURE_VERSION_1, &background_serialized, nullptr);
     if (FAILED(res))
-        return std::make_tuple(res, "D3D12SerializeRootSignature (background)");
+        return make_tuple(res, "D3D12SerializeRootSignature (background)");
     res = m_pDevice->CreateRootSignature(0, background_serialized->GetBufferPointer(), background_serialized->GetBufferSize(), IID_PPV_ARGS(&m_pBackgroundRootSignature));
     if (FAILED(res))
-        return std::make_tuple(res, "CreateRootSignature (background)");
+        return make_tuple(res, "CreateRootSignature (background)");
 
     // Create background pipeline
     auto background_pipeline_desc = rect_pipeline_desc;
@@ -491,21 +491,21 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     };
     res = m_pDevice->CreateGraphicsPipelineState(&background_pipeline_desc, IID_PPV_ARGS(&m_pBackgroundPipelineState));
     if (FAILED(res))
-        return std::make_tuple(res, "CreateGraphicsPipelineState (background)");
+        return make_tuple(res, "CreateGraphicsPipelineState (background)");
 
     // Create command list
     //res = m_pDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(&m_pCommandList));
     res = m_pDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_pCommandAllocator[m_uFrameIndex].Get(), nullptr, IID_PPV_ARGS(&m_pCommandList));
     if (FAILED(res))
-        return std::make_tuple(res, "CreateCommandList");
+        return make_tuple(res, "CreateCommandList");
     res = m_pCommandList->Close();
     if (FAILED(res))
-        return std::make_tuple(res, "Closing command list");
+        return make_tuple(res, "Closing command list");
 
     // Create synchronization fence
     res = m_pDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_pFence));
     if (FAILED(res))
-        return std::make_tuple(res, "CreateFence");
+        return make_tuple(res, "CreateFence");
     m_pFenceValues[m_uFrameIndex]++;
 
     // Create synchronization fence event
@@ -524,7 +524,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
         IID_PPV_ARGS(&m_pGenericUpload)
     );
     if (FAILED(res))
-        return std::make_tuple(res, "CreateCommittedResource (generic upload buffer)");
+        return make_tuple(res, "CreateCommittedResource (generic upload buffer)");
 
     // Create fixed size constants buffer
     auto fixed_desc = CD3DX12_RESOURCE_DESC::Buffer(sizeof(FixedSizeConstants));
@@ -537,7 +537,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
         IID_PPV_ARGS(&m_pFixedBuffer)
     );
     if (FAILED(res))
-        return std::make_tuple(res, "CreateCommittedResource (fixed buffer)");
+        return make_tuple(res, "CreateCommittedResource (fixed buffer)");
 
     // Create track color buffer
     auto track_color_desc = CD3DX12_RESOURCE_DESC::Buffer(MaxTrackColors * 16 * sizeof(TrackColor));
@@ -550,7 +550,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
         IID_PPV_ARGS(&m_pTrackColorBuffer)
     );
     if (FAILED(res))
-        return std::make_tuple(res, "CreateCommittedResource (track color buffer)");
+        return make_tuple(res, "CreateCommittedResource (track color buffer)");
 
     // Create dynamic rect vertex buffers
     // Each in-flight frame has its own vertex buffer
@@ -565,7 +565,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
             IID_PPV_ARGS(&m_pVertexBuffers[i])
         );
         if (FAILED(res))
-            return std::make_tuple(res, "CreateCommittedResource (vertex buffer)");
+            return make_tuple(res, "CreateCommittedResource (vertex buffer)");
         m_pVertexBuffers[i]->SetName(L"Vertex buffer");
         m_VertexBufferViews[i].BufferLocation = m_pVertexBuffers[i]->GetGPUVirtualAddress();
         m_VertexBufferViews[i].SizeInBytes = vertex_buffer_desc.Width;
@@ -584,7 +584,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
             IID_PPV_ARGS(&m_pNoteBuffers[i])
         );
         if (FAILED(res))
-            return std::make_tuple(res, "CreateCommittedResource (note buffer)");
+            return make_tuple(res, "CreateCommittedResource (note buffer)");
         m_pNoteBuffers[i]->SetName(L"Note buffer");
     }
 
@@ -599,7 +599,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
         IID_PPV_ARGS(&m_pIndexBuffer)
     );
     if (FAILED(res))
-        return std::make_tuple(res, "CreateCommittedResource (index buffer)");
+        return make_tuple(res, "CreateCommittedResource (index buffer)");
     m_pIndexBuffer->SetName(L"Index buffer");
     m_IndexBufferView.BufferLocation = m_pIndexBuffer->GetGPUVirtualAddress();
     m_IndexBufferView.Format = DXGI_FORMAT_R32_UINT;
@@ -616,11 +616,11 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
         IID_PPV_ARGS(&index_buffer_upload)
     );
     if (FAILED(res))
-        return std::make_tuple(res, "CreateCommittedResource (index upload buffer)");
+        return make_tuple(res, "CreateCommittedResource (index upload buffer)");
     index_buffer_upload->SetName(L"Index upload buffer");
 
     // Generate index buffer data
-    std::vector<uint32_t> index_buffer_vec;
+    vector<uint32_t> index_buffer_vec;
     index_buffer_vec.resize(IndexBufferCount);
     for (uint32_t i = 0; i < IndexBufferCount / 6; i++) {
         index_buffer_vec[i * 6] = i * 4;
@@ -650,7 +650,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
     // Close the command list
     res = m_pCommandList->Close();
     if (FAILED(res))
-        return std::make_tuple(res, "Closing command list for initial buffer upload");
+        return make_tuple(res, "Closing command list for initial buffer upload");
 
     // Execute the command list
     ID3D12CommandList* command_lists[] = { m_pCommandList.Get() };
@@ -658,11 +658,11 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
 
     // Wait for everything to finish
     if (FAILED(WaitForGPU()))
-        return std::make_tuple(res, "WaitForGPU");
+        return make_tuple(res, "WaitForGPU");
 
     // Make the swap chain
     auto res2 = CreateWindowDependentObjects(hWnd);
-    if (FAILED(std::get<0>(res2)))
+    if (FAILED(get<0>(res2)))
         return res2;
 
     // Initialize ImGui
@@ -704,10 +704,10 @@ std::tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) 
 
     m_pDrawList = new ImDrawList(ImGui::GetDrawListSharedData());
 
-    return std::make_tuple(S_OK, "");
+    return make_tuple(S_OK, "");
 }
 
-std::tuple<HRESULT, const char*> D3D12Renderer::CreateWindowDependentObjects(HWND hWnd) {
+tuple<HRESULT, const char*> D3D12Renderer::CreateWindowDependentObjects(HWND hWnd) {
     HRESULT res;
     if (m_pSwapChain) {
         // Wait for the GPU to finish any remaining work
@@ -722,7 +722,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::CreateWindowDependentObjects(HWN
         // Resize the swap chain
         res = m_pSwapChain->ResizeBuffers(FrameCount, 0, 0, DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING);
         if (FAILED(res))
-            return std::make_tuple(res, "ResizeBuffers");
+            return make_tuple(res, "ResizeBuffers");
     }
     else {
         // Create swap chain
@@ -744,10 +744,10 @@ std::tuple<HRESULT, const char*> D3D12Renderer::CreateWindowDependentObjects(HWN
         };
         res = m_pFactory->CreateSwapChainForHwnd(m_pCommandQueue.Get(), hWnd, &swap_chain_desc, nullptr, nullptr, &temp_swapchain);
         if (FAILED(res))
-            return std::make_tuple(res, "CreateSwapChainForHwnd");
+            return make_tuple(res, "CreateSwapChainForHwnd");
         res = temp_swapchain->QueryInterface(IID_PPV_ARGS(&m_pSwapChain));
         if (FAILED(res))
-            return std::make_tuple(res, "IDXGISwapChain1 -> IDXGISwapChain3");
+            return make_tuple(res, "IDXGISwapChain1 -> IDXGISwapChain3");
     }
 
     // Read backbuffer width and height
@@ -755,7 +755,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::CreateWindowDependentObjects(HWN
     DXGI_SWAP_CHAIN_DESC1 actual_swap_desc = {};
     res = m_pSwapChain->GetDesc1(&actual_swap_desc);
     if (FAILED(res))
-        return std::make_tuple(res, "GetDesc1");
+        return make_tuple(res, "GetDesc1");
     m_iBufferWidth = actual_swap_desc.Width;
     m_iBufferHeight = actual_swap_desc.Height;
 
@@ -768,7 +768,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::CreateWindowDependentObjects(HWN
     for (uint32_t i = 0; i < FrameCount; i++) {
         res = m_pSwapChain->GetBuffer(i, IID_PPV_ARGS(&m_pRenderTargets[i]));
         if (FAILED(res))
-            return std::make_tuple(res, "GetBuffer");
+            return make_tuple(res, "GetBuffer");
         m_pDevice->CreateRenderTargetView(m_pRenderTargets[i].Get(), nullptr, rtv_handle);
         m_pRenderTargets[i]->SetName(L"Render target");
         rtv_handle.ptr += m_uRTVDescriptorSize;
@@ -799,7 +799,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::CreateWindowDependentObjects(HWN
         IID_PPV_ARGS(&m_pDepthBuffer)
     );
     if (FAILED(res))
-        return std::make_tuple(res, "CreateCommittedResource (depth buffer)");
+        return make_tuple(res, "CreateCommittedResource (depth buffer)");
     m_pDevice->CreateDepthStencilView(m_pDepthBuffer.Get(), &dsv_desc, dsv_handle);
 
     // Reset the current frame index
@@ -838,7 +838,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::CreateWindowDependentObjects(HWN
         IID_PPV_ARGS(&m_pScreenshotStaging)
     );
     if (FAILED(res))
-        return std::make_tuple(res, "CreateCommittedResource (screenshot staging buffer)");
+        return make_tuple(res, "CreateCommittedResource (screenshot staging buffer)");
     m_pScreenshotStaging->SetName(L"Screenshot staging buffer");
 
     // Resize screenshot target buffer
@@ -869,7 +869,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::CreateWindowDependentObjects(HWN
         IID_PPV_ARGS(&m_pTextureBuffer)
     );
     if (FAILED(res))
-        return std::make_tuple(res, "CreateCommittedResource (background texture)");
+        return make_tuple(res, "CreateCommittedResource (background texture)");
     m_pTextureBuffer->SetName(L"Background texture");
 
     // Create texture SRV
@@ -897,7 +897,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::CreateWindowDependentObjects(HWN
         IID_PPV_ARGS(&m_pTextureUpload)
     );
     if (FAILED(res))
-        return std::make_tuple(res, "CreateCommittedResource (background texture upload buffer)");
+        return make_tuple(res, "CreateCommittedResource (background texture upload buffer)");
     m_pTextureUpload->SetName(L"Background texture upload buffer");
 
     // Scale and upload background image
@@ -917,7 +917,7 @@ std::tuple<HRESULT, const char*> D3D12Renderer::CreateWindowDependentObjects(HWN
     };
     memcpy(m_RootConstants.proj, mvp, sizeof(mvp));
 
-    return std::make_tuple(S_OK, "");
+    return make_tuple(S_OK, "");
 }
 
 HRESULT D3D12Renderer::ResetDeviceIfNeeded() {
@@ -927,8 +927,8 @@ HRESULT D3D12Renderer::ResetDeviceIfNeeded() {
 
 HRESULT D3D12Renderer::ResetDevice() {
     auto res = CreateWindowDependentObjects(m_hWnd);
-    if (FAILED(std::get<0>(res)))
-        return std::get<0>(res);
+    if (FAILED(get<0>(res)))
+        return get<0>(res);
     return S_OK;
 }
 
@@ -1027,6 +1027,7 @@ __forceinline void D3D12Renderer::AutoSetRectPipeline(bool inloop) {
 }
 
 HRESULT D3D12Renderer::EndScene(bool draw_bg) {
+    /*
     // Generate ImGui render data
     ImGui::Render();
     ImGui::GetDrawData()->AddDrawList(m_pDrawList);
@@ -1158,6 +1159,146 @@ HRESULT D3D12Renderer::EndScene(bool draw_bg) {
         goto Draw;
     Location3:
         ;
+    }
+
+    // Draw ImGui
+    ID3D12DescriptorHeap* heaps[] = { m_pImGuiSRVDescriptorHeap.Get() };
+    m_pCommandList->SetDescriptorHeaps(_countof(heaps), heaps);
+    ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), m_pCommandList.Get());
+
+    // Transition backbuffer state to present
+    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_pRenderTargets[m_uFrameIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+    m_pCommandList->ResourceBarrier(1, &barrier);
+
+    // Close the command list
+    res = m_pCommandList->Close();
+    if (FAILED(res))
+        return res;
+
+    // Execute the command list
+    ID3D12CommandList* command_lists[] = { m_pCommandList.Get() };
+    m_pCommandQueue->ExecuteCommandLists(1, command_lists);
+
+    return S_OK;
+    */
+    // Generate ImGui render data
+    ImGui::Render();
+    ImGui::GetDrawData()->AddDrawList(m_pDrawList);
+
+    // Draw background
+    if (draw_bg) {
+        SetPipeline(Pipeline::Background);
+        m_pCommandList->DrawIndexedInstanced(3, 1, 0, 0, 0);
+        SetPipeline(Pipeline::Rect);
+        m_pCommandList->IASetVertexBuffers(0, 1, &m_VertexBufferViews[m_uFrameIndex]);
+    }
+
+    // Flush the intermediate rect buffer
+    // TODO: Handle more than RectsPerPass
+    HRESULT res = S_OK;
+    auto rect_count = min(m_vRectsIntermediate.size(), RectsPerPass * 4);
+    auto rect_split = min(m_iRectSplit < 0 ? rect_count : m_iRectSplit, RectsPerPass * 4);
+    if (!m_vRectsIntermediate.empty()) {
+        D3D12_RANGE rect_range = {
+            .Begin = 0,
+            .End = rect_count * sizeof(RectVertex),
+        };
+        RectVertex* vertices = nullptr;
+        res = m_pVertexBuffers[m_uFrameIndex]->Map(0, &rect_range, (void**)&vertices);
+        if (FAILED(res))
+            return res;
+        memcpy(vertices, m_vRectsIntermediate.data(), rect_count * sizeof(RectVertex));
+        m_pVertexBuffers[m_uFrameIndex]->Unmap(0, &rect_range);
+
+        // Draw the first rect batch
+        m_pCommandList->DrawIndexedInstanced(rect_split / 4 * 6, 1, 0, 0, 0);
+    }
+
+    // Flush the intermediate note buffer
+    if (!m_vNotesIntermediate.empty()) {
+        for (size_t i = 0; i < m_vNotesIntermediate.size(); i += RectsPerPass) {
+            if (i == 0) {
+                if (Config::GetConfig().GetVideoSettings().bSameWidth) {
+                    if (Config::GetConfig().GetVideoSettings().bOR) {
+                        SetPipeline(Pipeline::SameWidthNoteOR);
+                    }
+                    else {
+                        SetPipeline(Pipeline::SameWidthNote);
+                    }
+                }
+                else {
+                    if (Config::GetConfig().GetVideoSettings().bOR) {
+                        SetPipeline(Pipeline::NoteOR);
+                    }
+                    else {
+                        SetPipeline(Pipeline::Note);
+                    }
+                }
+            }
+
+            auto remaining = m_vNotesIntermediate.size() - i;
+            auto note_count = min(remaining, RectsPerPass);
+            D3D12_RANGE note_range = {
+                .Begin = 0,
+                .End = note_count * sizeof(NoteData),
+            };
+            NoteData* notes = nullptr;
+            res = m_pNoteBuffers[m_uFrameIndex]->Map(0, &note_range, (void**)&notes);
+            if (FAILED(res))
+                return res;
+            memcpy(notes, &m_vNotesIntermediate[i], note_count * sizeof(NoteData));
+            m_pNoteBuffers[m_uFrameIndex]->Unmap(0, &note_range);
+
+            // Draw the notes
+            m_pCommandList->DrawIndexedInstanced(note_count * 6, 1, 0, 0, 0);
+
+            if (remaining - note_count != 0) {
+                // Still more notes to go! Render the current batch and wait for the GPU to finish rendering it
+                // Close the command list
+                res = m_pCommandList->Close();
+                if (FAILED(res))
+                    return res;
+
+                // Execute the command list
+                ID3D12CommandList* command_lists[] = { m_pCommandList.Get() };
+                m_pCommandQueue->ExecuteCommandLists(1, command_lists);
+
+                // Wait for the GPU to finish rendering the frame
+                res = WaitForGPU();
+                if (FAILED(res))
+                    return res;
+
+                // Reset the command list
+                m_pCommandAllocator[m_uFrameIndex]->Reset();
+                m_pCommandList->Reset(m_pCommandAllocator[m_uFrameIndex].Get(), m_pRectPipelineState.Get());
+
+                // Set up the state again
+                if (Config::GetConfig().GetVideoSettings().bSameWidth) {
+                    if (Config::GetConfig().GetVideoSettings().bOR) {
+                        SetPipeline(Pipeline::SameWidthNoteOR);
+                    }
+                    else {
+                        SetPipeline(Pipeline::SameWidthNote);
+                    }
+                }
+                else {
+                    if (Config::GetConfig().GetVideoSettings().bOR) {
+                        SetPipeline(Pipeline::NoteOR);
+                    }
+                    else {
+                        SetPipeline(Pipeline::Note);
+                    }
+                }
+                SetupCommandList();
+            }
+        }
+    }
+
+    // Draw the second rect batch
+    if (rect_count > rect_split) {
+        SetPipeline(Pipeline::Rect);
+        m_pCommandList->IASetVertexBuffers(0, 1, &m_VertexBufferViews[m_uFrameIndex]);
+        m_pCommandList->DrawIndexedInstanced((rect_count - rect_split) / 4 * 6, 1, rect_split / 4 * 6, 0, 0);
     }
 
     // Draw ImGui
@@ -1342,7 +1483,7 @@ HRESULT D3D12Renderer::SetLimitFPS(bool bLimitFPS) {
     return S_OK;
 }
 
-std::wstring D3D12Renderer::GetAdapterName() {
+wstring D3D12Renderer::GetAdapterName() {
     if (m_pAdapter) {
         DXGI_ADAPTER_DESC2 desc = {};
         if (FAILED(m_pAdapter->GetDesc2(&desc)))
@@ -1510,7 +1651,7 @@ char* D3D12Renderer::Screenshot() {
     return m_vScreenshotOutput.data();
 }
 
-bool D3D12Renderer::LoadBackgroundBitmap(std::wstring path) {
+bool D3D12Renderer::LoadBackgroundBitmap(wstring path) {
     // Initialize the WIC factory if it hasn't been initialized yet
     if (!s_pWICFactory) {
         if (FAILED(CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&s_pWICFactory))))
@@ -1569,7 +1710,7 @@ bool D3D12Renderer::UploadBackgroundBitmap() {
         return false;
 
     // Copy the scaled bitmap to a new buffer
-    std::vector<BYTE> scaled;
+    vector<BYTE> scaled;
     scaled.resize(m_iBufferWidth * m_iBufferHeight * 4);
     if (FAILED(scaler->CopyPixels(NULL, m_iBufferWidth * 4, scaled.size(), scaled.data())))
         return false;

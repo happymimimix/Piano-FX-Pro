@@ -155,14 +155,14 @@ GameState::GameError IntroScreen::Render() {
 //-----------------------------------------------------------------------------
 
 void InsertSorted(vector<idx_t>& vec, idx_t value) {
-    auto it = std::lower_bound(vec.begin(), vec.end(), value);
+    auto it = lower_bound(vec.begin(), vec.end(), value);
     vec.insert(it, value);
 }
 
 idx_t LocateElement(const vector<idx_t>& vec, idx_t value) {
-    auto it = std::lower_bound(vec.begin(), vec.end(), value);
+    auto it = lower_bound(vec.begin(), vec.end(), value);
     if (it != vec.end() && *it == value) return it - vec.begin();
-    return -1ll;
+    return IDX_MAX;
 }
 
 SplashScreen::SplashScreen(HWND hWnd, D3D12Renderer* pRenderer, bool enableSplash) : GameState(hWnd, pRenderer) {
@@ -444,7 +444,7 @@ void SplashScreen::UpdateState(idx_t iPos) {
     {
         // binary search
         idx_t pos = LocateElement(note_state, iSisterIdx);
-        if (static_cast<sidx_t>(pos) != -1)
+        if (pos != IDX_MAX)
             note_state.erase(note_state.begin() + pos);
     }
 }
@@ -1279,7 +1279,7 @@ GameState::GameError MainScreen::Logic(void) {
             {
                 m_vThreadWork[key].push_back({
                     .idx = Reverse ? sistidx : m_iStartPos,
-                    .sister_idx = (IsOnOg) ? (Reverse ? m_iStartPos : ~0ll) : (Reverse ? ~0ll : sistidx),
+                    .sister_idx = (IsOnOg) ? (Reverse ? m_iStartPos : IDX_MAX) : (Reverse ? IDX_MAX : sistidx),
                     });
             }
 
@@ -1372,14 +1372,14 @@ GameState::GameError MainScreen::Logic(void) {
 
 void MainScreen::UpdateState(key_t key, const thread_work_t& work) {
     auto& note_state = m_vState[key];
-    if (work.sister_idx == UINT64_MAX) {
+    if (work.sister_idx == IDX_MAX) {
         note_state.push_back(work.idx);
         m_pNoteState[key] = work.idx;
     }
     else {
         // binary search
-        auto pos = LocateElement(note_state, work.sister_idx);
-        if (pos != -1)
+        idx_t pos = LocateElement(note_state, work.sister_idx);
+        if (pos != IDX_MAX)
             note_state.erase(note_state.begin() + pos);
 
         if (note_state.size() == 0)
@@ -1391,14 +1391,14 @@ void MainScreen::UpdateState(key_t key, const thread_work_t& work) {
 
 void MainScreen::UpdateStateBackwards(key_t key, const thread_work_t& work) {
     auto& note_state = m_vState[key];
-    if (work.sister_idx == UINT64_MAX) {
+    if (work.sister_idx == IDX_MAX) {
         InsertSorted(note_state, work.idx);
         m_pNoteState[key] = work.idx;
     }
     else {
         // binary search
-        auto pos = LocateElement(note_state, work.sister_idx);
-        if (pos != -1)
+        idx_t pos = LocateElement(note_state, work.sister_idx);
+        if (pos != IDX_MAX)
             note_state.erase(note_state.begin() + pos);
 
         if (note_state.size() == 0)
@@ -1474,7 +1474,7 @@ void MainScreen::JumpTo(mms_t llStartTime, boolean loadingMode) {
 
         idx_t iFound = 0;
         idx_t iSimultaneous = (*itPrev)->GetSimultaneous() + 1;
-        for (std::vector<MIDIChannelEvent*>::reverse_iterator it(itMiddle); iFound < iSimultaneous && it != m_vEvents.rend(); ++it)
+        for (vector<MIDIChannelEvent*>::reverse_iterator it(itMiddle); iFound < iSimultaneous && it != m_vEvents.rend(); ++it)
         {
             idx_t idx = m_vEvents.size() - 1 - (it - m_vEvents.rbegin());
             MIDIChannelEvent* pEvent = m_vEvents[idx];
@@ -1572,7 +1572,7 @@ void MainScreen::ApplyMarker(unsigned char* data, msgln_t size) {
         static Config& config = Config::GetConfig();
         static const VideoSettings& cVideo = config.GetVideoSettings();
 
-        constexpr uint8_t codepages[] = { 1252, 437, 82, 886, 932, 936, CP_UTF8 };
+        constexpr uint16_t codepages[] = { 1252, 437, 82, 886, 932, 936, CP_UTF8 };
 
         auto temp_str = new char[size + 1];
         memcpy(temp_str, data, size);
@@ -1580,7 +1580,7 @@ void MainScreen::ApplyMarker(unsigned char* data, msgln_t size) {
 
         if (codepages[cVideo.eMarkerEncoding] != CP_UTF8) {
             // Yes, I have to convert to wide and then back to UTF-8...
-            auto wide_len = MultiByteToWideChar(codepages[cVideo.eMarkerEncoding], 0, temp_str, size + 1, NULL, 0);
+            msgln_t wide_len = MultiByteToWideChar(codepages[cVideo.eMarkerEncoding], 0, temp_str, size + 1, NULL, 0);
             auto wide_temp_str = new WCHAR[wide_len];
             MultiByteToWideChar(codepages[cVideo.eMarkerEncoding], 0, temp_str, size + 1, wide_temp_str, wide_len);
 
@@ -1766,29 +1766,29 @@ MIDIMetaEvent* MainScreen::GetPrevious(eventvec_t::const_iterator& itCurrent, co
 }
 
 // Gets the tick corresponding to llStartTime using current tempo
-long MainScreen::GetCurrentTick(long long llStartTime) {
+tick_t MainScreen::GetCurrentTick(mms_t llStartTime) {
     return GetCurrentTick(llStartTime, m_iLastTempoTick, m_llLastTempoTime, m_iMicroSecsPerBeat);
 }
 
-long MainScreen::GetCurrentTick(long long llStartTime, long iLastTempoTick, long long llLastTempoTime, long iMicroSecsPerBeat)
+tick_t MainScreen::GetCurrentTick(mms_t llStartTime, tick_t iLastTempoTick, mms_t llLastTempoTime, bpm_t iMicroSecsPerBeat)
 {
     uint16_t iDivision = m_MIDI.GetInfo().iDivision;
     if (!(iDivision & 0x8000))
     {
         if (llStartTime >= llLastTempoTime)
-            return iLastTempoTick + static_cast<long>((iDivision * (llStartTime - llLastTempoTime)) / iMicroSecsPerBeat);
+            return iLastTempoTick + static_cast<tick_t>((iDivision * (llStartTime - llLastTempoTime)) / iMicroSecsPerBeat);
         else
-            return iLastTempoTick - static_cast<long>((iDivision * (llLastTempoTime - llStartTime) + 1) / iMicroSecsPerBeat) - 1;
+            return iLastTempoTick - static_cast<tick_t>((iDivision * (llLastTempoTime - llStartTime) + 1) / iMicroSecsPerBeat) - 1;
     }
     return -1;
 }
 
 // Gets the time corresponding to the tick
-long long MainScreen::GetTickTime(long iTick) {
+mms_t MainScreen::GetTickTime(tick_t iTick) {
     return GetTickTime(iTick, m_iLastTempoTick, m_llLastTempoTime, m_iMicroSecsPerBeat);
 }
 
-long long MainScreen::GetTickTime(long iTick, long iLastTempoTick, long long llLastTempoTime, long iMicroSecsPerBeat) {
+mms_t MainScreen::GetTickTime(tick_t iTick, tick_t iLastTempoTick, mms_t llLastTempoTime, bpm_t iMicroSecsPerBeat) {
     uint16_t iDivision = m_MIDI.GetInfo().iDivision;
     if (!(iDivision & 0x8000))
         return llLastTempoTime + (static_cast<long long>(iMicroSecsPerBeat) * (iTick - iLastTempoTick)) / iDivision;
@@ -1798,9 +1798,9 @@ long long MainScreen::GetTickTime(long iTick, long iLastTempoTick, long long llL
 }
 
 // Rounds up to the nearest beat
-long MainScreen::GetBeat(long iTick, long iBeatType, long iLastSignatureTick) {
+bpm_t MainScreen::GetBeat(tick_t iTick, bpm_t iBeatType, tick_t iLastSignatureTick) {
     uint16_t iDivision = m_MIDI.GetInfo().iDivision;
-    long iTickOffset = iTick - iLastSignatureTick;
+    tick_t iTickOffset = iTick - iLastSignatureTick;
     if (!(iDivision & 0x8000))
     {
         m_CurBeat = (iTickOffset * iBeatType) / (iDivision * 4);
@@ -1815,7 +1815,7 @@ long MainScreen::GetBeat(long iTick, long iBeatType, long iLastSignatureTick) {
 }
 
 // Rounds up to the nearest beat
-long MainScreen::GetBeatTick(long iTick, long iBeatType, long iLastSignatureTick) {
+tick_t MainScreen::GetBeatTick(tick_t iTick, bpm_t iBeatType, tick_t iLastSignatureTick) {
     uint16_t iDivision = m_MIDI.GetInfo().iDivision;
     if (!(iDivision & 0x8000))
         return iLastSignatureTick + (GetBeat(iTick, iBeatType, iLastSignatureTick) * iDivision * 4) / iBeatType;
@@ -1915,7 +1915,7 @@ void MainScreen::RenderGlobals() {
         m_llRndStartTime = m_iStartTick;
     }
     else {
-        long long llMicroSecsPP = static_cast<long long>(m_llTimeSpan / m_fNotesCY + 0.5f);
+        mms_t llMicroSecsPP = static_cast<mms_t>(m_llTimeSpan / m_fNotesCY + 0.5f);
         if (llMicroSecsPP != 0) {
             m_llRndStartTime = m_llStartTime - (m_llStartTime < 0 ? llMicroSecsPP : 0);
             m_llRndStartTime = (m_llRndStartTime / llMicroSecsPP) * llMicroSecsPP;
@@ -1930,10 +1930,10 @@ void MainScreen::RenderLines() {
         return;
 
     // Vertical lines
-    for (unsigned char i = m_iStartNote + 1; i <= m_iEndNote; i++)
+    for (key_t i = m_iStartNote + 1; i <= m_iEndNote; i++)
         if (!MIDI::IsSharp(i - 1) && !MIDI::IsSharp(i))
         {
-            int iWhiteKeys = MIDI::WhiteCount(m_iStartNote, i);
+            key_t iWhiteKeys = MIDI::WhiteCount(m_iStartNote, i);
             float fStartX = MIDI::IsSharp(m_iStartNote) * SharpRatio / 2.0f;
             float x = m_fNotesX + m_fWhiteCX * (iWhiteKeys + fStartX);
             x = floor(x + 0.5f); // Needs to be rounded because of the gradient
@@ -1947,24 +1947,24 @@ void MainScreen::RenderLines() {
     if (!(iDivision & 0x8000))
     {
         // Copy time state vars
-        long iCurrTick = m_iStartTick - 1;
-        long long llEndTime = (m_bTickMode ? m_iStartTick : m_llStartTime) + m_llTimeSpan;
+        tick_t iCurrTick = m_iStartTick - 1;
+        mms_t llEndTime = (m_bTickMode ? m_iStartTick : m_llStartTime) + m_llTimeSpan;
 
         // Copy tempo state vars
         uint32_t iLastTempoTick = m_iLastTempoTick;
         uint32_t iMicroSecsPerBeat = m_iMicroSecsPerBeat;
-        long long llLastTempoTime = m_llLastTempoTime;
+        mms_t llLastTempoTime = m_llLastTempoTime;
         eventvec_t::const_iterator itNextTempo = m_itNextTempo;
 
         // Copy signature state vars
-        long iLastSignatureTick = m_iLastSignatureTick;
-        long iBeatsPerMeasure = m_iBeatsPerMeasure;
-        long iBeatType = m_iBeatType;
+        tick_t iLastSignatureTick = m_iLastSignatureTick;
+        bpm_t iBeatsPerMeasure = m_iBeatsPerMeasure;
+        bpm_t iBeatType = m_iBeatType;
         eventvec_t::const_iterator itNextSignature = m_itNextSignature;
 
         // Compute initial next beat tick and next beat time
-        long long llNextBeatTime = 0;
-        long iNextBeatTick = 0;
+        mms_t llNextBeatTime = 0;
+        tick_t iNextBeatTick = 0;
         do
         {
             iNextBeatTick = GetBeatTick(iCurrTick + 1, iBeatType, iLastSignatureTick);
@@ -1991,7 +1991,7 @@ void MainScreen::RenderLines() {
             }
 
             // Finally render the beat or measure
-            long iNextBeat = GetBeat(iNextBeatTick, iBeatType, iLastSignatureTick);
+            bpm_t iNextBeat = GetBeat(iNextBeatTick, iBeatType, iLastSignatureTick);
             bool bIsMeasure = !((iNextBeat < 0 ? -iNextBeat : iNextBeat) % iBeatsPerMeasure);
             llNextBeatTime = GetTickTime(iNextBeatTick, iLastTempoTick, llLastTempoTime, iMicroSecsPerBeat);
             float y = m_fNotesY + m_fNotesCY * (1.0f - ((float)(m_bTickMode ? iNextBeatTick : llNextBeatTime) - m_llRndStartTime) / m_llTimeSpan);
@@ -2007,8 +2007,8 @@ void MainScreen::RenderLines() {
 }
 
 void MainScreen::RenderNotes() {
-    size_t iStartPos = m_dNSpeed < 0 ? m_iStartPos - (m_iEndPos - m_iStartPos) + 1 : m_iStartPos;
-    size_t iEndPos = m_dNSpeed < 0 ? m_iEndPos - (m_iEndPos - m_iStartPos) : m_iEndPos;
+    idx_t iStartPos = m_dNSpeed < 0 ? m_iStartPos - (m_iEndPos - m_iStartPos) + 1 : m_iStartPos;
+    idx_t iEndPos = m_dNSpeed < 0 ? m_iEndPos - (m_iEndPos - m_iStartPos) : m_iEndPos;
 
     if (iStartPos < 0 || iEndPos >= m_vEvents.size()) return; // the note speed has been changed after processing these positions but before reaching here. 
 
@@ -2017,7 +2017,7 @@ void MainScreen::RenderNotes() {
 
     if (Config::GetConfig().GetVideoSettings().bOR) {
         if (m_dNSpeed < 0) {
-            for (size_t i = iStartPos; i <= iEndPos; i++) {
+            for (idx_t i = iStartPos; i <= iEndPos; i++) {
                 MIDIChannelEvent* pEvent = m_vEvents[i];
                 if ((pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOff || (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() == 0)) && pEvent->HasSister() &&
                     m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
@@ -2026,7 +2026,7 @@ void MainScreen::RenderNotes() {
             }
         }
         else {
-            for (size_t i = iEndPos; i >= iStartPos; i--) {
+            for (idx_t i = iEndPos; i >= iStartPos; i--) {
                 MIDIChannelEvent* pEvent = m_vEvents[i];
                 if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0 && pEvent->HasSister() &&
                     m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
@@ -2034,20 +2034,20 @@ void MainScreen::RenderNotes() {
                 }
             }
         }
-        for (unsigned char i = m_iStartNote; i <= m_iEndNote; i++) {
-            for (vector<size_t>::reverse_iterator it = (m_vState[i]).rbegin(); it != (m_vState[i]).rend(); it++) {
+        for (key_t i = m_iStartNote; i <= m_iEndNote; i++) {
+            for (vector<idx_t>::reverse_iterator it = (m_vState[i]).rbegin(); it != (m_vState[i]).rend(); it++) {
                 RenderNote(m_vEvents[*it]);
             }
         }
     }
     else {
-        for (unsigned char i = m_iStartNote; i <= m_iEndNote; i++) {
-            for (vector<size_t>::iterator it = (m_vState[i]).begin(); it != (m_vState[i]).end(); it++) {
+        for (key_t i = m_iStartNote; i <= m_iEndNote; i++) {
+            for (vector<idx_t>::iterator it = (m_vState[i]).begin(); it != (m_vState[i]).end(); it++) {
                 RenderNote(m_vEvents[*it]);
             }
         }
         if (m_dNSpeed < 0) {
-            for (size_t i = iEndPos; i >= iStartPos; i--) {
+            for (idx_t i = iEndPos; i >= iStartPos; i--) {
                 MIDIChannelEvent* pEvent = m_vEvents[i];
                 if ((pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOff || (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() == 0)) && pEvent->HasSister() &&
                     m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
@@ -2056,7 +2056,7 @@ void MainScreen::RenderNotes() {
             }
         }
         else {
-            for (size_t i = iStartPos; i <= iEndPos; i++) {
+            for (idx_t i = iStartPos; i <= iEndPos; i++) {
                 MIDIChannelEvent* pEvent = m_vEvents[i];
                 if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0 && pEvent->HasSister() &&
                     m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
@@ -2068,12 +2068,12 @@ void MainScreen::RenderNotes() {
 }
 
 void MainScreen::RenderNote(const MIDIChannelEvent* pNote) {
-    uint8_t iNote = pNote->GetParam1();
-    uint8_t iChannel = pNote->GetChannel();
-    uint16_t iTrack = pNote->GetTrack();
-    long long llNoteStart = pNote->GetAbsMicroSec();
-    long long llNoteEnd = llNoteStart + pNote->GetLength();
-    uint8_t iVel = m_bMapVel ? pNote->GetParam2() ^ 0x7F : 0x7F;
+    key_t iNote = pNote->GetParam1();
+    chan_t iChannel = pNote->GetChannel();
+    track_t iTrack = pNote->GetTrack();
+    mms_t llNoteStart = pNote->GetAbsMicroSec();
+    mms_t llNoteEnd = llNoteStart + pNote->GetLength();
+    key_t iVel = m_bMapVel ? pNote->GetParam2() ^ 0x7F : 0x7F;
     if (m_bTickMode) {
         llNoteStart = pNote->GetAbsT();
         llNoteEnd = pNote->GetSister(m_vEvents)->GetAbsT();
@@ -2106,13 +2106,13 @@ void MainScreen::RenderNote(const MIDIChannelEvent* pNote) {
 void MainScreen::GenNoteXTable() {
     UpdateNotePos = false; //We don't need to do this on every single frame! 
     float NoteWidth = (m_pRenderer->GetBufferWidth() * abs(m_fZoomX) * abs(m_fTempZoomX)) / (m_iEndNote - m_iStartNote);
-    for (char ch = 0; ch < 16; ch++) {
+    for (chan_t ch = 0; ch < MaxChannelColors; ch++) {
         float ShiftAmount = m_pBendsRange[ch] == 0 ? 0 : m_pBendsValue[ch] / ((1 << 13) / m_pBendsRange[ch]);
         if (m_bFlipKeyboard) ShiftAmount *= -1;
         m_pBends[ch] = NoteWidth * ShiftAmount;
     }
     bool Direction = !m_bFlipKeyboard;
-    for (unsigned char i = m_iStartNote; i <= m_iEndNote; i++) {
+    for (key_t i = m_iStartNote; i <= m_iEndNote; i++) {
         if (m_bSameWidth) {
             float fStartNote = m_iStartNote;
             float fEndNote = m_iEndNote;
@@ -2133,7 +2133,7 @@ void MainScreen::GenNoteXTable() {
                 
         }
         else {
-            unsigned char iWhiteKeys = MIDI::WhiteCount(m_iStartNote, i);
+            key_t iWhiteKeys = MIDI::WhiteCount(m_iStartNote, i);
             float fStartX = (MIDI::IsSharp(m_iStartNote) - MIDI::IsSharp(i)) * SharpRatio / 2.0f;
             if (MIDI::IsSharp(i))
             {
@@ -2151,7 +2151,7 @@ void MainScreen::GenNoteXTable() {
     }
 }
 
-float MainScreen::GetNoteX(unsigned char iNote) {
+float MainScreen::GetNoteX(key_t iNote) {
     return notex_table[iNote];
 }
 
@@ -2195,7 +2195,7 @@ void MainScreen::RenderKeys() {
     // Draw the white keys
     float fCurX = m_fNotesX + (MIDI::IsSharp(m_bFlipKeyboard ? m_iEndNote : m_iStartNote) ? m_fWhiteCX * SharpRatio / 2.0f : 0.0f);
     float fCurY = m_fZoomX * m_fTempZoomX < 0 ? fKeysY : fKeysY + fTransitionCY + fRedCY + fSpacerCY;
-    for (unsigned char i = (m_bFlipKeyboard ? m_iEndNote : m_iStartNote); m_bFlipKeyboard ? (i >= m_iStartNote) : (i <= m_iEndNote); i += (m_bFlipKeyboard ? -1 : 1))
+    for (key_t i = (m_bFlipKeyboard ? m_iEndNote : m_iStartNote); m_bFlipKeyboard ? (i >= m_iStartNote) : (i <= m_iEndNote); i += (m_bFlipKeyboard ? -1 : 1))
         if (!MIDI::IsSharp(i))
         {
             if (m_pNoteState[i] == -1)
@@ -2261,7 +2261,7 @@ void MainScreen::RenderKeys() {
     float fSharpTop = SharpRatio * 0.7f;
     fCurX = m_fNotesX + (MIDI::IsSharp(m_bFlipKeyboard ? m_iEndNote : m_iStartNote) ? m_fWhiteCX * SharpRatio / 2.0f : 0.0f);
     fCurY = m_fZoomX * m_fTempZoomX < 0 ? fKeysY : fKeysY + fTransitionCY + fRedCY + fSpacerCY;
-    for (unsigned char i = (m_bFlipKeyboard ? m_iEndNote : m_iStartNote); m_bFlipKeyboard ? (i >= m_iStartNote) : (i <= m_iEndNote); i += (m_bFlipKeyboard ? -1 : 1))
+    for (key_t i = (m_bFlipKeyboard ? m_iEndNote : m_iStartNote); m_bFlipKeyboard ? (i >= m_iStartNote) : (i <= m_iEndNote); i += (m_bFlipKeyboard ? -1 : 1))
         if (!MIDI::IsSharp(i))
             fCurX += m_fWhiteCX;
         else
@@ -2463,43 +2463,43 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
 
     width = m_pRenderer->GetBufferWidth();
     height = m_pRenderer->GetBufferHeight();
-    auto min = abs(m_llStartTime) / 60000000;
-    auto sec = (abs(m_llStartTime) % 60000000) / 1000000;
-    auto cs = (abs(m_llStartTime) % 1000000) / 100000;
-    auto tmin = TotalTime / 60000000;
-    auto tsec = (TotalTime % 60000000) / 1000000;
-    auto tcs = (TotalTime % 1000000) / 100000;
-    auto tempo = 60000000.0 / m_iMicroSecsPerBeat;
-    long long iMaxMS = m_MIDI.GetInfo().llTotalMicroSecs / MS;
-    unsigned char cur_line = 0;
+    mms_t min = abs(m_llStartTime) / 60000000;
+    mms_t sec = (abs(m_llStartTime) % 60000000) / 1000000;
+    mms_t cs = (abs(m_llStartTime) % 1000000) / 100000;
+    mms_t tmin = TotalTime / 60000000;
+    mms_t tsec = (TotalTime % 60000000) / 1000000;
+    mms_t tcs = (TotalTime % 1000000) / 100000;
+    mms_t tempo = 60000000.0 / m_iMicroSecsPerBeat;
+    mms_t iMaxMS = m_MIDI.GetInfo().llTotalMicroSecs / MS;
+    uint8_t cur_line = 0;
 
     if (!cVideo.bDisableUI) {
         m_pRenderer->GetDrawList()->AddRectFilled(ImVec2(prcStatus->left, prcStatus->top), ImVec2(prcStatus->right, prcStatus->bottom), 0x80000000);
     }
 
-    llStartTimeFormatted = std::to_string(abs(m_llStartTime));
-    for (size_t i = llStartTimeFormatted.length() - 3; i > 0; i -= 3)
+    llStartTimeFormatted = to_string(abs(m_llStartTime));
+    for (idx_t i = llStartTimeFormatted.length() - 3; i > 0; i -= 3)
         llStartTimeFormatted.insert(i, " ");
     if (m_llStartTime < 0)
         llStartTimeFormatted.insert(0, "-");
 
-    TotalTimeFormatted = std::to_string(TotalTime);
-    for (size_t i = TotalTimeFormatted.length() - 3; i > 0; i -= 3)
+    TotalTimeFormatted = to_string(TotalTime);
+    for (idx_t i = TotalTimeFormatted.length() - 3; i > 0; i -= 3)
         TotalTimeFormatted.insert(i, " ");
 
-    polyphony = transform_reduce(begin(m_vState), end(m_vState), 0, plus<>(), [](const vector<int>& state) {return state.size(); });
-    polyFormatted = std::to_string(polyphony);
-    for (size_t i = polyFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
+    polyphony = transform_reduce(begin(m_vState), end(m_vState), 0, plus<>(), [](const vector<idx_t>& state) {return state.size(); });
+    polyFormatted = to_string(polyphony);
+    for (idx_t i = polyFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
         polyFormatted.insert(i, ",");
 
     nps = m_vNCTable[min(max(m_llStartTime / MS, 0LL), iMaxMS)] - m_vNCTable[min(max((m_llStartTime - S) / MS, 0LL), iMaxMS)];
-    npsFormatted = std::to_string(nps);
-    for (size_t i = npsFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
+    npsFormatted = to_string(nps);
+    for (idx_t i = npsFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
         npsFormatted.insert(i, ",");
 
     passed = m_vNCTable[min(max(m_llStartTime / MS, 0LL), iMaxMS)];
-    passedFormatted = std::to_string(passed);
-    for (size_t i = passedFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
+    passedFormatted = to_string(passed);
+    for (idx_t i = passedFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
         passedFormatted.insert(i, ",");
 
     RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText1).c_str(), WStringToUtf8(L"v" VersionString).c_str());
@@ -2613,181 +2613,181 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    SongLength: " << TotalTimeFormatted << " (Qword +" + GetAddress(TotalTime) + ") [Read Only]";
+        cout << "    SongLength: " << TotalTimeFormatted << " (" << IntSizeToCE(sizeof(TotalTime)) << " + " + GetAddress(TotalTime) + ")[Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Microseconds: " << llStartTimeFormatted << " (Qword +" + GetAddress(m_llStartTime) + ") [Read / Write]";
+        cout << "    Microseconds: " << llStartTimeFormatted << " (" << IntSizeToCE(sizeof(m_llStartTime)) << " +" + GetAddress(m_llStartTime) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Ticks: " << m_iStartTick << " (Integer +" + GetAddress(m_iStartTick) + ")[Read Only]";
+        cout << "    Ticks: " << m_iStartTick << " (" << IntSizeToCE(sizeof(m_iStartTick)) << " +" + GetAddress(m_iStartTick) + ")[Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Resolution: " << resolution << " (SmallInteger +" + GetAddress(resolution) + ") [Read Only]";
+        cout << "    Resolution: " << resolution << " (" << IntSizeToCE(sizeof(resolution)) << " +" + GetAddress(resolution) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    NoteCount: " << TotalNC << " (Integer +" + GetAddress(TotalNC) + ") [Read Only]";
+        cout << "    NoteCount: " << TotalNC << " (" << IntSizeToCE(sizeof(TotalNC)) << " +" + GetAddress(TotalNC) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    NotesPerSecond: " << nps << " (Integer +" + GetAddress(nps) + ") [Read Only]";
+        cout << "    NotesPerSecond: " << nps << " (" << IntSizeToCE(sizeof(nps)) << " +" + GetAddress(nps) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Polyphony: " << polyphony << " (Integer +" + GetAddress(polyphony) + ") [Read Only]";
+        cout << "    Polyphony: " << polyphony << " (" << IntSizeToCE(sizeof(polyphony)) << " +" + GetAddress(polyphony) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Passed: " << passed << " (Integer +" + GetAddress(passed) + ") [Read Only]";
+        cout << "    Passed: " << passed << " (" << IntSizeToCE(sizeof(passed)) << " +" + GetAddress(passed) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Volume: " << cPlayback.GetVolume() << " (Double +" + cPlayback.GetVolumeAddress() + ") [Read / Write]";
+        cout << "    Volume: " << cPlayback.GetVolume() << " (" << IntSizeToCE(cPlayback.GetVolumeSize()) << " +" + cPlayback.GetVolumeAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Mute: " << cPlayback.GetMute() << " (ShortInteger +" + cPlayback.GetMuteAddress() + ") [Read / Write]";
+        cout << "    Mute: " << cPlayback.GetMute() << " (" << IntSizeToCE(cPlayback.GetMuteSize()) << " +" + cPlayback.GetMuteAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    PlaybackSpeed: " << cPlayback.GetSpeed() << " (Double +" + cPlayback.GetSpeedAddress() + ") [Read / Write]";
+        cout << "    PlaybackSpeed: " << cPlayback.GetSpeed() << " (" << FloatSizeToCE(cPlayback.GetSpeedSize()) << " +" + cPlayback.GetSpeedAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    NoteSpeed: " << cPlayback.GetNSpeed() << " (Double +" + cPlayback.GetNSpeedAddress() + ") [Read / Write]";
+        cout << "    NoteSpeed: " << cPlayback.GetNSpeed() << " (" << FloatSizeToCE(cPlayback.GetNSpeedSize()) << " +" + cPlayback.GetNSpeedAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Offset-X: " << cView.GetOffsetX() << " (Float +" + cView.GetOffsetXAddress() + ") [Read / Write]";
+        cout << "    Offset-X: " << cView.GetOffsetX() << " (" << FloatSizeToCE(cView.GetOffsetXSize()) << " +" + cView.GetOffsetXAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Offset-Y: " << cView.GetOffsetY() << " (Float +" + cView.GetOffsetYAddress() + ") [Read / Write]";
+        cout << "    Offset-Y: " << cView.GetOffsetY() << " (" << FloatSizeToCE(cView.GetOffsetYSize()) << " +" + cView.GetOffsetYAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Zoom: " << cView.GetZoomX() << " (Float +" + cView.GetZoomXAddress() + ") [Read / Write]";
+        cout << "    Zoom: " << cView.GetZoomX() << " (" << FloatSizeToCE(cView.GetZoomXSize()) << " +" + cView.GetZoomXAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    SameWidthNotes: " << cVideo.bSameWidth << " (ShortInteger +" + GetAddress(cVideo.bSameWidth) + ") [Read / Write]";
+        cout << "    SameWidthNotes: " << cVideo.bSameWidth << " (" << IntSizeToCE(sizeof(cVideo.bSameWidth)) << " +" + GetAddress(cVideo.bSameWidth) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    NoteVelocityMapping: " << cVideo.bMapVel << " (ShortInteger +" + GetAddress(cVideo.bMapVel) + ") [Read / Write]";
+        cout << "    NoteVelocityMapping: " << cVideo.bMapVel << " (" << IntSizeToCE(sizeof(cVideo.bMapVel)) << " +" + GetAddress(cVideo.bMapVel) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    KeyRange: " << cVisual.iFirstKey << "~" << cVisual.iLastKey << " (Integer +" + GetAddress(cVisual.iFirstKey) + " ~ Integer +" + GetAddress(cVisual.iLastKey) + ") [Read / Write]";
+        cout << "    KeyRange: " << cVisual.iFirstKey << "~" << cVisual.iLastKey << " (" << IntSizeToCE(sizeof(cVisual.iFirstKey)) << " +" + GetAddress(cVisual.iFirstKey) + " ~ " << IntSizeToCE(sizeof(cVisual.iLastKey)) << " +" + GetAddress(cVisual.iLastKey) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    KeyMode: " << static_cast<short>(cVisual.eKeysShown) << " (ShortInteger +" + GetAddress(cVisual.eKeysShown) + ") [Read / Write]";
+        cout << "    KeyMode: " << static_cast<short>(cVisual.eKeysShown) << " (" << IntSizeToCE(sizeof(cVisual.eKeysShown)) << " +" + GetAddress(cVisual.eKeysShown) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    WindowSize: " << width << "*" << height << " (Integer +" + GetAddress(width) + " * Integer +" + GetAddress(height) + ") [Read Only]";
+        cout << "    WindowSize: " << width << "*" << height << " (" << IntSizeToCE(sizeof(width)) << " +" + GetAddress(width) + " * " << IntSizeToCE(sizeof(height)) << " +" + GetAddress(height) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Paused: " << cPlayback.GetPaused() << " (ShortInteger +" + cPlayback.GetPausedAddress() + ") [Read / Write]";
+        cout << "    Paused: " << cPlayback.GetPaused() << " (" << IntSizeToCE(cPlayback.GetPausedSize()) << " +" + cPlayback.GetPausedAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Keyboard: " << cView.GetKeyboard() << " (ShortInteger +" + cView.GetKeyboardAddress() + ") [Read / Write]";
+        cout << "    Keyboard: " << cView.GetKeyboard() << " (" << IntSizeToCE(cView.GetKeyboardVarSize()) << " +" + cView.GetKeyboardAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    VisualizePitchBends: " << cVideo.bVisualizePitchBends << " (ShortInteger +" + GetAddress(cVideo.bVisualizePitchBends) + ")[Read / Write]";
+        cout << "    VisualizePitchBends: " << cVideo.bVisualizePitchBends << " (" << IntSizeToCE(sizeof(cVideo.bVisualizePitchBends)) << " +" + GetAddress(cVideo.bVisualizePitchBends) + ")[Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    PhigrosMode: " << cControls.bPhigros << " (ShortInteger +" + GetAddress(cControls.bPhigros) + ") [Read / Write]";
+        cout << "    PhigrosMode: " << cControls.bPhigros << " (" << IntSizeToCE(sizeof(cControls.bPhigros)) << " +" + GetAddress(cControls.bPhigros) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    ShowMarkers: " << cVideo.bShowMarkers << " (ShortInteger +" + GetAddress(cVideo.bShowMarkers) + ") [Read / Write]";
+        cout << "    ShowMarkers: " << cVideo.bShowMarkers << " (" << IntSizeToCE(sizeof(cVideo.bShowMarkers)) << " +" + GetAddress(cVideo.bShowMarkers) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    TickBased: " << cVideo.bTickBased << " (ShortInteger +" + GetAddress(cVideo.bTickBased) + ") [Read / Write]";
+        cout << "    TickBased: " << cVideo.bTickBased << " (" << IntSizeToCE(sizeof(cVideo.bTickBased)) << " +" + GetAddress(cVideo.bTickBased) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    HideStatistics: " << cVideo.bDisableUI << " (ShortInteger +" + GetAddress(cVideo.bDisableUI) + ") [Read / Write]";
+        cout << "    HideStatistics: " << cVideo.bDisableUI << " (" << IntSizeToCE(sizeof(cVideo.bDisableUI)) << " +" + GetAddress(cVideo.bDisableUI) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    RemoveOverlaps: " << cVideo.bOR << " (ShortInteger +" + GetAddress(cVideo.bOR) + ") [Read / Write]";
+        cout << "    RemoveOverlaps: " << cVideo.bOR << " (" << IntSizeToCE(sizeof(cVideo.bOR)) << " +" + GetAddress(cVideo.bOR) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    LimitFPS: " << m_pRenderer->GetLimitFPS() << " (ShortInteger +" + GetAddress(cVideo.bLimitFPS) + ") [Read / Write]";
+        cout << "    LimitFPS: " << m_pRenderer->GetLimitFPS() << " (" << IntSizeToCE(sizeof(cVideo.bLimitFPS)) << " +" + GetAddress(cVideo.bLimitFPS) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    VelocityThreshold: " << static_cast<int>(cControls.iVelocityThreshold % (1 << 7)) << " (ShortInteger +" + GetAddress(cControls.iVelocityThreshold) + ") [Read / Write]";
+        cout << "    VelocityThreshold: " << static_cast<short>(cControls.iVelocityThreshold & 0x7F) << " (" << IntSizeToCE(sizeof(cControls.iVelocityThreshold)) << " +" + GetAddress(cControls.iVelocityThreshold) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);

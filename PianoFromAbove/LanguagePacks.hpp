@@ -10,6 +10,16 @@
 #else
 #define MainWindowTitle7 L""
 #endif
+#ifdef LONG_INTEGER
+#define MainWindowTitle8 L"  (Extended Addressing)"
+#else
+#define MainWindowTitle8 L""
+#endif
+#ifdef LIMIT_COLORS
+#define MainWindowTitle9 L"  (Limited Track Coloring)"
+#else
+#define MainWindowTitle9 L""
+#endif
 #define WelcomeText L"Welcome to Piano-FX Pro"
 #define StartupStage1Text L"Preparing..."
 #define StartupStage2Text L"Loading splash midi..."
@@ -157,6 +167,11 @@
 #define MainWindowTitle7 L"  (强制软件渲染)"
 #else
 #define MainWindowTitle7 L""
+#endif
+#ifdef LONG_INTEGER
+#define MainWindowTitle8 L"  (扩展寻址)"
+#else
+#define MainWindowTitle8 L""
 #endif
 #define WelcomeText L"欢迎使用 专业の钢琴特效"
 #define StartupStage1Text L"准备中……"
@@ -306,6 +321,11 @@
 #else
 #define MainWindowTitle7 L""
 #endif
+#ifdef LONG_INTEGER
+#define MainWindowTitle8 L"  (拡張アドレッシング)"
+#else
+#define MainWindowTitle8 L""
+#endif
 #define WelcomeText L"Piano-FX Proへようこそ"
 #define StartupStage1Text L"準備中..."
 #define StartupStage2Text L"スプラッシュMIDIを読み込み中..."
@@ -453,6 +473,11 @@
 #define MainWindowTitle7 L"  (ソフトウェアレンダリングきょうせい)"
 #else
 #define MainWindowTitle7 L""
+#endif
+#ifdef LONG_INTEGER
+#define MainWindowTitle8 L"  (かくちょうアドレッシング)"
+#else
+#define MainWindowTitle8 L""
 #endif
 #define WelcomeText L"Piano-FX Proへようこそ"
 #define StartupStage1Text L"じゅんびちゅう..."
@@ -606,6 +631,11 @@
 #else
 #define MainWindowTitle7 L""
 #endif
+#ifdef LONG_INTEGER
+#define MainWindowTitle8 L"  (확장 주소 지정)"
+#else
+#define MainWindowTitle8 L""
+#endif
 #define WelcomeText L"Piano-FX Pro 오신 것을 환영합니다"
 #define StartupStage1Text L"준비 중..."
 #define StartupStage2Text L"시작 MIDI 불러오는 중..."
@@ -754,6 +784,11 @@
 #else
 #define MainWindowTitle7 L""
 #endif
+#ifdef LONG_INTEGER
+#define MainWindowTitle8 L"  (확장 주소 지정)"
+#else
+#define MainWindowTitle8 L""
+#endif
 #define WelcomeText L"Piano-FX Pro 열렬히 환영합니다"
 #define StartupStage1Text L"준비하고 있습니다..."
 #define StartupStage2Text L"기동 MIDI 불러들이는 중..."
@@ -898,9 +933,14 @@
 #define MainWindowTitle5 L"Нет"
 #define MainWindowTitle6 L"Заставка MIDI"
 #ifdef SOFTWARE_RENDER_ONLY
-#define MainWindowTitle7 L"  (Принудительный программный рендеринг)"
+#define MainWindowTitle7 L"  (Принудительный Программный Рендеринг)"
 #else
 #define MainWindowTitle7 L""
+#endif
+#ifdef LONG_INTEGER
+#define MainWindowTitle8 L"  (Расширенная Адресация)"
+#else
+#define MainWindowTitle8 L""
 #endif
 #define WelcomeText L"Добро пожаловать в Piano-FX Pro"
 #define StartupStage1Text L"Подготовка..."
@@ -1049,6 +1089,11 @@
 #define MainWindowTitle7 L"  (QIANG2 ZHI4 RUAN3 JIAN4 XUAN4 RAN3)"
 #else
 #define MainWindowTitle7 L""
+#endif
+#ifdef LONG_INTEGER
+#define MainWindowTitle8 L"  (KUO4 ZHAN3 XUN2 ZHI3)"
+#else
+#define MainWindowTitle8 L""
 #endif
 #define WelcomeText L"HUAN1 YING2 SHI3 YONG4 ZHUAN1 YE4 DE5 GANG1 QIN2 TE4 XIAO4"
 #define StartupStage1Text L"ZHUN3 BEI4 ZHONG1..."
@@ -1203,6 +1248,11 @@
 #define MainWindowTitle7 L"  (ЪВ2 ЖИ4 РЩ3 ЙП4 ЩЩ4 РН3)"
 #else
 #define MainWindowTitle7 L""
+#endif
+#ifdef LONG_INTEGER
+#define MainWindowTitle8 L"  (КХ4 ЖН3 ЩЬ2 ЖИ3)"
+#else
+#define MainWindowTitle8 L""
 #endif
 #define WelcomeText L"ХЩ1 ЯЫ2 ШИ3 ЯК4 ЖЩ1 ЯЭ4 ДЭ5 ГГ1 ЪМ2 ТЭ4 ЩС4"
 #define StartupStage1Text L"ЖЬ3 БЙ4 ЖК1..."

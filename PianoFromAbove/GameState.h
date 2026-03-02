@@ -222,14 +222,14 @@ private:
     MIDIMetaEvent* GetPrevious(eventvec_t::const_iterator& itCurrent, const eventvec_t& vEventMap, msgln_t iDataLen);
 
     // MIDI helpers
-    long GetCurrentTick(long long llStartTime);
-    long GetCurrentTick(long long llStartTime, long iLastTempoTick, long long llLastTempoTime, long iMicroSecsPerBeat);
-    long long GetTickTime(long iTick);
-    long long GetTickTime(long iTick, long iLastTempoTick, long long llLastTempoTime, long iMicroSecsPerBeat);
-    long GetBeat(long iTick, long iBeatType, long iLastTempoTick);
-    long GetBeatTick(long iTick, long iBeatType, long iLastTempoTick);
-    long long GetMinTime() const { return m_MIDI.GetInfo().llFirstNote - 3000000; }
-    long long GetMaxTime() const { return m_MIDI.GetInfo().llTotalMicroSecs + 500000; }
+    tick_t GetCurrentTick(mms_t llStartTime);
+    tick_t GetCurrentTick(mms_t llStartTime, tick_t iLastTempoTick, mms_t llLastTempoTime, bpm_t iMicroSecsPerBeat);
+    mms_t GetTickTime(tick_t iTick);
+    mms_t GetTickTime(tick_t iTick, tick_t iLastTempoTick, mms_t llLastTempoTime, bpm_t iMicroSecsPerBeat);
+    bpm_t GetBeat(tick_t iTick, bpm_t iBeatType, tick_t iLastTempoTick);
+    tick_t GetBeatTick(tick_t iTick, bpm_t iBeatType, tick_t iLastTempoTick);
+    mms_t GetMinTime() const { return m_MIDI.GetInfo().llFirstNote - 3000000; }
+    mms_t GetMaxTime() const { return m_MIDI.GetInfo().llTotalMicroSecs + 500000; }
 
     // Rendering
     void RenderGlobals();
@@ -237,7 +237,7 @@ private:
     void RenderNotes();
     void RenderNote(const MIDIChannelEvent* pNote);
     void GenNoteXTable();
-    float GetNoteX(unsigned char iNote);
+    float GetNoteX(key_t iNote);
     void RenderKeys();
     void RenderText();
     void RenderStatusLine(unsigned char line, const char* left, const char* format, ...);

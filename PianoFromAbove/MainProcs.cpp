@@ -128,7 +128,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                     cPlayback.SetPlayMode(GameState::Intro, true);
                     cPlayback.SetPlayable(false, true);
                     cPlayback.SetPosition(0);
-                    SetWindowText(g_hWnd, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7);
+                    SetWindowText(g_hWnd, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7 MainWindowTitle8 MainWindowTitle9);
                     HandOffMsg(WM_COMMAND, ID_CHANGESTATE, (LPARAM)new IntroScreen(NULL, NULL));
                 }
                 PlayFile(sFilename);
@@ -141,7 +141,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             cPlayback.SetPlayMode(GameState::Intro, true);
             cPlayback.SetPlayable(false, true);
             cPlayback.SetPosition(0);
-            SetWindowText(g_hWnd, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7);
+            SetWindowText(g_hWnd, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7 MainWindowTitle8 MainWindowTitle9);
             HandOffMsg(WM_COMMAND, ID_CHANGESTATE, (LPARAM)new IntroScreen(NULL, NULL));
             return 0;
         }
@@ -291,14 +291,14 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         if (DragQueryFile(drop, 0xFFFFFFFF, NULL, 0) != 1)
             return 0;
         // it's 2020, so no MAX_PATH!
-        std::vector<wchar_t> filename;
+        vector<wchar_t> filename;
         filename.resize(DragQueryFile(drop, 0, NULL, 0) + 1);
         DragQueryFile(drop, 0, filename.data(), filename.size());
         if (cPlayback.GetPlayMode()) { //Close the current file first before opening another one! 
             cPlayback.SetPlayMode(GameState::Intro, true);
             cPlayback.SetPlayable(false, true);
             cPlayback.SetPosition(0);
-            SetWindowText(g_hWnd, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7);
+            SetWindowText(g_hWnd, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7 MainWindowTitle8 MainWindowTitle9);
             HandOffMsg(WM_COMMAND, ID_CHANGESTATE, (LPARAM)new IntroScreen(NULL, NULL));
         }
         PlayFile(filename.data());
@@ -1139,7 +1139,7 @@ BOOL PlayFile(const wstring& sFile)
     g_LoadingProgress.name = sFile;
     g_LoadingProgress.progress = 0;
     g_LoadingProgress.max = 1;
-    auto thread = std::thread([&]() {
+    auto thread = thread([&]() {
         pGameState = new MainScreen(sFile, ePlayMode, NULL, NULL);
         g_LoadingProgress.stage = MIDILoadingProgress::Done;
         });
@@ -1165,10 +1165,10 @@ BOOL PlayFile(const wstring& sFile)
     cView.SetZoomMove(false);
     TCHAR sTitle[1 << 10];
     if (cControls.bDumpFrames) {
-        _stprintf_s(sTitle, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle4 L"%ws" MainWindowTitle7, sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
+        _stprintf_s(sTitle, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle4 L"%ws" MainWindowTitle7 MainWindowTitle8 MainWindowTitle9, sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
     }
     else {
-        _stprintf_s(sTitle, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 L"%ws" MainWindowTitle7, sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
+        _stprintf_s(sTitle, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 L"%ws" MainWindowTitle7 MainWindowTitle8 MainWindowTitle9, sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
     }
     SetWindowText(g_hWnd, sTitle);
 

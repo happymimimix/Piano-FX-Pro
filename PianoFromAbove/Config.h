@@ -45,9 +45,9 @@ struct VisualSettings : public ISettings
     bool SaveConfigValues(TiXmlElement* txRoot);
 
     enum KeysShown : uint8_t { All, Song, Custom } eKeysShown;
-    unsigned char iFirstKey, iLastKey;
-    unsigned int colors[16], iBkgColor;
-    int iBarColor;
+    key_t iFirstKey, iLastKey;
+    color_t colors[16], iBkgColor;
+    color_t iBarColor;
     bool bRandomizeColor;
     wstring sBackground;
 };
@@ -59,8 +59,8 @@ struct AudioSettings : public ISettings
     bool SaveConfigValues(TiXmlElement* txRoot);
 
     void LoadMIDIDevices();
-    vector< wstring > vMIDIOutDevices;
-    UINT iOutDevice;
+    vector<wstring> vMIDIOutDevices;
+    win32_t iOutDevice;
     wstring sDesiredOut;
     bool bKDMAPI;
 };
@@ -92,7 +92,7 @@ struct ControlsSettings : public ISettings
     double dFwdBackSecs, dSpeedUpPct;
     bool bAlwaysShowControls;
     bool bPhigros;
-    uint8_t iVelocityThreshold;
+    key_t iVelocityThreshold;
     wstring sSplashMIDI;
     bool bDumpFrames;
 };
@@ -131,6 +131,11 @@ public:
     string GetSpeedAddress() const { return GetAddress(m_dSpeed); }
     string GetNSpeedAddress() const { return GetAddress(m_dNSpeed); }
     string GetVolumeAddress() const { return GetAddress(m_dVolume); }
+    uint8_t GetPausedSize() const { return sizeof(m_bPaused); }
+    uint8_t GetMuteSize() const { return sizeof(m_bMute); }
+    uint8_t GetSpeedSize() const { return sizeof(m_dSpeed); }
+    uint8_t GetNSpeedSize() const { return sizeof(m_dNSpeed); }
+    uint8_t GetVolumeSize() const { return sizeof(m_dVolume); }
 
 private:
     GameState::State m_ePlayMode;
@@ -172,9 +177,13 @@ public:
     string GetOffsetXAddress() const { return GetAddress(m_fOffsetX); }
     string GetOffsetYAddress() const { return GetAddress(m_fOffsetY); }
     string GetZoomXAddress() const { return GetAddress(m_fZoomX); }
+    uint8_t GetOffsetXSize() const { return sizeof(m_fOffsetX); }
+    uint8_t GetOffsetYSize() const { return sizeof(m_fOffsetY); }
+    uint8_t GetZoomXSize() const { return sizeof(m_fZoomX); }
     bool GetControls() const { return m_bControls; }
     bool GetKeyboard() const { return m_bKeyboard; }
     string GetKeyboardAddress() const { return GetAddress(m_bKeyboard); }
+    uint8_t GetKeyboardVarSize() const { return sizeof(m_bKeyboard); }
     bool GetOnTop() const { return m_bOnTop; }
     bool GetFullScreen() const { return m_bFullScreen; }
     bool GetZoomMove() const { return m_bZoomMove; }

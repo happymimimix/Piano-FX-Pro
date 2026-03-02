@@ -10,10 +10,31 @@
 #pragma once
 
 #include <string>
-#include "Globals.h"
 using namespace std;
 
 #define VersionString L"4.2"
+
+// Type definitions... 
+typedef signed long tick_t;
+typedef signed long long mms_t;
+typedef unsigned char key_t;
+typedef uint16_t track_t;
+typedef uint8_t chan_t;
+typedef uint32_t TnC_t;
+typedef uint8_t msg_t;
+typedef uint32_t msgln_t;
+#ifdef LONG_INTEGER
+static_assert(sizeof(void*) == 8, "Extended addressing is not supported in 32bit! ");
+typedef size_t idx_t;
+typedef intptr_t sidx_t;
+#else
+typedef uint32_t idx_t;
+typedef int32_t sidx_t;
+#endif
+constexpr idx_t IDX_MAX = static_cast<idx_t>(-1);
+typedef uint32_t color_t;
+typedef uint32_t bpm_t;
+typedef DWORD win32_t;
 
 template <typename T>
 string GetAddress(const T& Variable) {
@@ -23,6 +44,32 @@ string GetAddress(const T& Variable) {
     stringstream sout;
     sout << uppercase << hex << OffsetAddress;
     return sout.str();
+}
+
+string IntSizeToCE(uint8_t Size) {
+    if (Size == 1) {
+        return "ShortInteger";
+    }
+    if (Size == 2) {
+        return "SmallInteger";
+    }
+    if (Size == 4) {
+        return "Integer";
+    }
+    if (Size == 8) {
+        return "Qword";
+    }
+    return "Bytes";
+}
+
+string FloatSizeToCE(uint8_t Size) {
+    if (Size == 4) {
+        return "Float";
+    }
+    if (Size == 8) {
+        return "Double";
+    }
+    return "Bytes";
 }
 
 //The timer

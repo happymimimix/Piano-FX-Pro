@@ -135,8 +135,8 @@ void VisualSettings::LoadDefaultColors()
 {
     iBkgColor = 0x007F7F00;
     iBarColor = 0x000000FF;
-    int R, G, B = 0, S = 80, V = 100;
-    int iColors = sizeof(colors) / sizeof(colors[0]);
+    color_t R, G, B = 0, S = 80, V = 100;
+    color_t iColors = sizeof(colors) / sizeof(colors[0]);
     for (int i = 10, count = 0; count < iColors; i = (i + 7) % iColors, count++)
     {
         Util::HSVtoRGB(360 * i / iColors, S, V, R, G, B);
@@ -208,8 +208,8 @@ void AudioSettings::LoadMIDIDevices()
     wstring oldOutDev(iOutDevice >= 0 ? vMIDIOutDevices[iOutDevice] : L"");
     iOutDevice = -1;
     vMIDIOutDevices.clear();
-    UINT iNumOutDevs = midiOutGetNumDevs();
-    for (UINT i = 0; i < iNumOutDevs; i++)
+    win32_t iNumOutDevs = midiOutGetNumDevs();
+    for (win32_t i = 0; i < iNumOutDevs; i++)
     {
         MIDIOUTCAPS moc;
         midiOutGetDevCaps(i, &moc, sizeof(MIDIOUTCAPS));
@@ -244,7 +244,7 @@ void VisualSettings::LoadConfigValues(TiXmlElement* txRoot)
 
     //Colors
     int r, g, b, a = 0;
-    size_t i = 0;
+    chan_t i = 0;
     TiXmlElement* txColors = txVisual->FirstChildElement("Colors");
     if (txColors)
         for (TiXmlElement* txColor = txColors->FirstChildElement("Color");
@@ -254,21 +254,21 @@ void VisualSettings::LoadConfigValues(TiXmlElement* txRoot)
                 txColor->QueryIntAttribute("G", &g) == TIXML_SUCCESS &&
                 txColor->QueryIntAttribute("B", &b) == TIXML_SUCCESS &&
                 txColor->QueryIntAttribute("A", &a) == TIXML_SUCCESS)
-                colors[i] = ((r & 0xFF) << 0) | ((g & 0xFF) << 8) | ((b & 0xFF) << 16) | ((a & 0xFF) << 24);
+                colors[i] = static_cast<color_t>(((r & 0xFF) << 0) | ((g & 0xFF) << 8) | ((b & 0xFF) << 16) | ((a & 0xFF) << 24));
     TiXmlElement* txBkgColor = txVisual->FirstChildElement("BkgColor");
     if (txBkgColor)
         if (txBkgColor->QueryIntAttribute("R", &r) == TIXML_SUCCESS &&
             txBkgColor->QueryIntAttribute("G", &g) == TIXML_SUCCESS &&
             txBkgColor->QueryIntAttribute("B", &b) == TIXML_SUCCESS &&
             txBkgColor->QueryIntAttribute("A", &a) == TIXML_SUCCESS)
-            iBkgColor = ((r & 0xFF) << 0) | ((g & 0xFF) << 8) | ((b & 0xFF) << 16) | ((a & 0xFF) << 24);
+            iBkgColor = static_cast<color_t>(((r & 0xFF) << 0) | ((g & 0xFF) << 8) | ((b & 0xFF) << 16) | ((a & 0xFF) << 24));
     TiXmlElement* txBarColor = txVisual->FirstChildElement("BarColor");
     if (txBarColor)
         if (txBarColor->QueryIntAttribute("R", &r) == TIXML_SUCCESS &&
             txBarColor->QueryIntAttribute("G", &g) == TIXML_SUCCESS &&
             txBarColor->QueryIntAttribute("B", &b) == TIXML_SUCCESS &&
             txBarColor->QueryIntAttribute("A", &a) == TIXML_SUCCESS)
-            iBarColor = ((r & 0xFF) << 0) | ((g & 0xFF) << 8) | ((b & 0xFF) << 16) | ((a & 0xFF) << 24);
+            iBarColor = static_cast<color_t>(((r & 0xFF) << 0) | ((g & 0xFF) << 8) | ((b & 0xFF) << 16) | ((a & 0xFF) << 24));
     if (txVisual->QueryIntAttribute("RandomizeColor", &iAttrVal) == TIXML_SUCCESS)
         bRandomizeColor = (iAttrVal != 0);
     string sTempStr;

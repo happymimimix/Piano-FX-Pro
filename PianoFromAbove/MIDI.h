@@ -39,13 +39,13 @@ public:
     MIDIPos(MIDI& midi);
     ~MIDIPos();
 
-    int GetNextEvent(int iMicroSecs, MIDIEvent** pEvent);
-    int GetNextEvents(int iMicroSecs, vector<MIDIEvent*>& vEvents);
+    idx_t GetNextEvent(mms_t iMicroSecs, MIDIEvent** pEvent);
+    idx_t GetNextEvents(mms_t iMicroSecs, vector<MIDIEvent*>& vEvents);
 
     bool IsStandard() const { return m_bIsStandard; }
-    long GetTicksPerBeat() const { return m_iTicksPerBeat; }
-    long GetTicksPerSecond() const { return m_iTicksPerSecond; }
-    long GetMicroSecsPerBeat() const { return m_iMicroSecsPerBeat; }
+    bpm_t GetTicksPerBeat() const { return m_iTicksPerBeat; }
+    bpm_t GetTicksPerSecond() const { return m_iTicksPerSecond; }
+    bpm_t GetMicroSecsPerBeat() const { return m_iMicroSecsPerBeat; }
 
     int* m_pTrackTime;
 
@@ -56,15 +56,14 @@ private:
 
     // Tempo variables
     bool m_bIsStandard;
-    uint32_t m_iTicksPerBeat, m_iMicroSecsPerBeat; // For standard division
-    int m_iTicksPerSecond; // For SMPTE division
+    bpm_t m_iTicksPerBeat, m_iMicroSecsPerBeat, m_iTicksPerSecond; // For SMPTE division
 
     // Position variables
-    int m_iCurrTick;
-    int m_iCurrMicroSec;
+    tick_t m_iCurrTick;
+    mms_t m_iCurrMicroSec;
 };
 
-typedef vector< pair< long long, size_t > > eventvec_t;
+typedef vector<pair<mms_t, idx_t>> eventvec_t;
 
 //Holds MIDI data
 class MIDI
@@ -72,19 +71,19 @@ class MIDI
 public:
     enum Note { A, AS, B, C, CS, D, DS, E, F, FS, G, GS };
 
-    static const int KEYS = 129; // One extra because 128th is a sharp
+    static const key_t KEYS = 129; // One extra because 128th is a sharp
     static const wstring Instruments[129];
-    static const wstring& NoteName(int iNote);
-    static Note NoteVal(int iNote);
-    static bool IsSharp(int iNote);
-    static int WhiteCount(int iMinNote, int iMaxNote);
+    static const wstring& NoteName(key_t iNote);
+    static Note NoteVal(key_t iNote);
+    static bool IsSharp(key_t iNote);
+    static key_t WhiteCount(key_t iMinNote, key_t iMaxNote);
 
     //Generally usefull static parsing functions
-    static uint32_t ParseVarNum(const unsigned char* pcData, size_t iMaxSize, uint32_t* piOut);
-    static uint32_t Parse32Bit(const unsigned char* pcData, size_t iMaxSize, uint32_t* piOut);
-    static uint32_t Parse24Bit(const unsigned char* pcData, size_t iMaxSize, uint32_t* piOut);
-    static uint16_t Parse16Bit(const unsigned char* pcData, size_t iMaxSize, uint16_t* piOut);
-    static uint32_t ParseNChars(const unsigned char* pcData, size_t iNChars, size_t iMaxSize, char* pcOut);
+    static uint32_t ParseVarNum(const unsigned char* pcData, msgln_t iMaxSize, uint32_t* piOut);
+    static uint32_t Parse32Bit(const unsigned char* pcData, msgln_t iMaxSize, uint32_t* piOut);
+    static uint32_t Parse24Bit(const unsigned char* pcData, msgln_t iMaxSize, uint32_t* piOut);
+    static uint16_t Parse16Bit(const unsigned char* pcData, msgln_t iMaxSize, uint16_t* piOut);
+    static uint32_t ParseNChars(const unsigned char* pcData, msgln_t iNChars, msgln_t iMaxSize, char* pcOut);
 
     MIDI(void) {};
     MIDI(const wstring& sFilename);
@@ -94,9 +93,9 @@ public:
     MIDIChannelEvent* AllocChannelEvent();
 
     //Parsing functions that load data into the instance
-    size_t ParseMIDI(const unsigned char* pcData, size_t iMaxSize);
-    size_t ParseTracks(const unsigned char* pcData, size_t iMaxSize);
-    size_t ParseEvents(const unsigned char* pcData, size_t iMaxSize);
+    idx_t ParseMIDI(const unsigned char* pcData, idx_t iMaxSize);
+    idx_t ParseTracks(const unsigned char* pcData, idx_t iMaxSize);
+    idx_t ParseEvents(const unsigned char* pcData, idx_t iMaxSize);
     bool IsValid() const { return (m_vTracks.size() > 0 && m_Info.iNoteCount > 0 && m_Info.iDivision > 0); }
 
     void PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMetaEvent*>* vMetaEvents = nullptr, eventvec_t* vTempo = nullptr, eventvec_t* vSignature = nullptr, eventvec_t* vMarkers = nullptr, eventvec_t* vColors = nullptr);
@@ -145,7 +144,7 @@ private:
     MIDIInfo m_Info;
     vector< MIDITrack* > m_vTracks;
 
-    std::vector<EventPool> event_pools;
+    vector<EventPool> event_pools;
 };
 
 //Holds all the event of one MIDI track
@@ -156,8 +155,8 @@ public:
     ~MIDITrack(void);
 
     //Parsing functions that load data into the instance
-    size_t ParseTrack(const unsigned char* pcData, size_t iMaxSize, size_t iTrack);
-    size_t ParseEvents(const unsigned char* pcData, size_t iMaxSize, size_t iTrack);
+    idx_t ParseTrack(const unsigned char* pcData, idx_t iMaxSize, track_t iTrack);
+    idx_t ParseEvents(const unsigned char* pcData, idx_t iMaxSize, track_t iTrack);
     void clear(void);
 
     friend class MIDIPos;
@@ -204,21 +203,21 @@ public:
     static EventType DecodeEventType(int iEventCode);
 
     //Parsing functions that load data into the instance
-    static uint32_t MakeNextEvent(MIDI& midi, const unsigned char* pcData, size_t iMaxSize, int iTrack, MIDIEvent** pOutEvent);
+    static uint32_t MakeNextEvent(MIDI& midi, const unsigned char* pcData, msgln_t iMaxSize, track_t iTrack, MIDIEvent** pOutEvent);
 
     //Accessors
     EventType GetEventType() const { return (EventType)m_eEventType; }
-    unsigned char GetEventCode() const { return m_iEventCode; }
-    uint16_t GetTrack() const { return m_iTrack; }
-    long GetAbsT() const { return m_iAbsT; }
-    long long GetAbsMicroSec() const { return m_llAbsMicroSec; }
-    void SetAbsMicroSec(long long llAbsMicroSec) { m_llAbsMicroSec = llAbsMicroSec; };
+    msg_t GetEventCode() const { return m_iEventCode; }
+    track_t GetTrack() const { return m_iTrack; }
+    tick_t GetAbsT() const { return m_iAbsT; }
+    mms_t GetAbsMicroSec() const { return m_llAbsMicroSec; }
+    void SetAbsMicroSec(mms_t llAbsMicroSec) { m_llAbsMicroSec = llAbsMicroSec; };
 
-    long long m_llAbsMicroSec;
-    long m_iAbsT;
-    uint16_t m_iTrack;
-    unsigned char m_eEventType;
-    unsigned char m_iEventCode;
+    mms_t m_llAbsMicroSec;
+    tick_t m_iAbsT;
+    track_t m_iTrack;
+    msg_t m_eEventType;
+    msg_t m_iEventCode;
 };
 
 //Channel Event: notes and whatnot
@@ -229,23 +228,23 @@ public:
 
     enum ChannelEventType { NoteOff = 0x8, NoteOn, NoteAftertouch, Controller, ProgramChange, ChannelAftertouch, PitchBend };
     enum RPN { RPNType = 100, PBSRPNID = 0, RPNData = 6 };
-    uint32_t ParseEvent(const unsigned char* pcData, size_t iMaxSize);
+    uint32_t ParseEvent(const unsigned char* pcData, msgln_t iMaxSize);
 
     //Accessors
     ChannelEventType GetChannelEventType() const { return static_cast<ChannelEventType>(m_iEventCode >> 4); }
-    void SetChannelEventType(ChannelEventType type) { m_iEventCode = (m_iEventCode & 0x0F) | (static_cast<unsigned char>(type) << 4); }
-    unsigned char GetChannel() const { return m_cChannel & 0x0F; }
-    unsigned char GetParam1() const { return m_cParam1 & 0x7F; }
-    unsigned char GetParam2() const { return m_cParam2 & 0x7F; }
-    MIDIChannelEvent* GetSister(const std::vector<MIDIChannelEvent*>& events) const {
-        return m_iSisterIdx == UINT64_MAX ? nullptr : events[m_iSisterIdx];
+    void SetChannelEventType(ChannelEventType type) { m_iEventCode = (m_iEventCode & 0x0F) | (static_cast<msg_t>(type) << 4); }
+    msg_t GetChannel() const { return m_cChannel & 0x0F; }
+    msg_t GetParam1() const { return m_cParam1 & 0x7F; }
+    msg_t GetParam2() const { return m_cParam2 & 0x7F; }
+    MIDIChannelEvent* GetSister(const vector<MIDIChannelEvent*>& events) const {
+        return m_iSisterIdx == IDX_MAX ? nullptr : events[m_iSisterIdx];
     }
-    MIDIChannelEvent* GetSister(const std::vector<MIDIEvent*>& events) const {
-        return m_iSisterIdx == UINT64_MAX ? nullptr : (MIDIChannelEvent*)events[m_iSisterIdx];
+    MIDIChannelEvent* GetSister(const vector<MIDIEvent*>& events) const {
+        return m_iSisterIdx == IDX_MAX ? nullptr : (MIDIChannelEvent*)events[m_iSisterIdx];
     }
-    size_t GetSisterIdx() const { return m_iSisterIdx; }
-    size_t GetSimultaneous() const { return m_iSimultaneous; }
-    size_t GetLength() const { return m_uLength; }
+    idx_t GetSisterIdx() const { return m_iSisterIdx; }
+    idx_t GetSimultaneous() const { return m_iSimultaneous; }
+    idx_t GetLength() const { return m_uLength; }
     bool GetPassDone() const { return m_bPassDone; }
 
     void SetChannel(unsigned char channel) { m_cChannel = channel; }
@@ -256,16 +255,16 @@ public:
     void SetLength(size_t length) { m_uLength = length; }
     void SetPassDone(bool done) { m_bPassDone = done; }
 
-    bool HasSister() const { return m_iSisterIdx != UINT64_MAX; }
+    bool HasSister() const { return m_iSisterIdx != IDX_MAX; }
 
 private:
-    size_t m_iSisterIdx;
-    size_t m_iSimultaneous;
-    size_t m_uLength;
+    idx_t m_iSisterIdx;
+    idx_t m_iSimultaneous;
+    idx_t m_uLength;
     bool m_bPassDone;
-    unsigned char m_cChannel;
-    unsigned char m_cParam1;
-    unsigned char m_cParam2;
+    chan_t m_cChannel;
+    key_t m_cParam1;
+    key_t m_cParam2;
 };
 
 //Meta Event: info about the notes and whatnot
@@ -280,16 +279,16 @@ public:
         CuePoint, GenericTextA = 0x0a, ChannelPrefix = 0x20, PortPrefix = 0x21, EndOfTrack = 0x2F, SetTempo = 0x51,
         SMPTEOffset = 0x54, TimeSignature = 0x58, KeySignature = 0x59, Proprietary = 0x7F
     };
-    uint32_t ParseEvent(const unsigned char* pcData, size_t iMaxSize);
+    uint32_t ParseEvent(const unsigned char* pcData, msgln_t iMaxSize);
 
     //Accessors
     MetaEventType GetMetaEventType() const { return m_eMetaEventType; }
-    uint32_t GetDataLen() const { return m_iDataLen; }
+    msgln_t GetDataLen() const { return m_iDataLen; }
     unsigned char* GetData() const { return m_pcData; }
 
 private:
     MetaEventType m_eMetaEventType;
-    uint32_t m_iDataLen;
+    msgln_t m_iDataLen;
     unsigned char* m_pcData;
 };
 
@@ -300,7 +299,7 @@ public:
     MIDISysExEvent() : m_pcData(0) { }
     ~MIDISysExEvent() { if (m_pcData) delete[] m_pcData; }
 
-    uint32_t ParseEvent(const unsigned char* pcData, size_t iMaxSize);
+    uint32_t ParseEvent(const unsigned char* pcData, msgln_t iMaxSize);
 
 private:
     uint32_t m_iDataLen;
@@ -318,9 +317,9 @@ public:
     MIDIOutDevice() : m_bIsOpen(false), m_hMIDIOut(NULL) { }
     virtual ~MIDIOutDevice() { Close(); }
 
-    int GetNumDevs() const;
-    wstring GetDevName(int iDev) const;
-    bool Open(int iDev);
+    win32_t GetNumDevs() const;
+    wstring GetDevName(win32_t iDev) const;
+    bool Open(win32_t iDev);
     bool OpenKDMAPI();
     void Close();
     void Reset();
@@ -329,17 +328,15 @@ public:
     const wstring& GetDevice() const { return m_sDevice; };
 
     void AllNotesOff();
-    void AllNotesOff(const vector<unsigned char>& vChannels);
+    void AllNotesOff(const vector<chan_t>& vChannels);
     void SetVolume(double dVolume);
 
-    bool PlayEventAcrossChannels(unsigned char cStatus, unsigned char cParam1, unsigned char cParam2);
-    bool PlayEventAcrossChannels(unsigned char cStatus, unsigned char cParam1, unsigned char cParam2, const vector< int >& vChannels);
-    bool PlayEvent(unsigned char bStatus, unsigned char bParam1, unsigned char bParam2 = 0);
+    bool PlayEventAcrossChannels(msg_t cStatus, msg_t cParam1, msg_t cParam2);
+    bool PlayEventAcrossChannels(msg_t cStatus, msg_t cParam1, msg_t cParam2, const vector<chan_t>& vChannels);
+    bool PlayEvent(msg_t bStatus, msg_t bParam1, msg_t bParam2 = 0);
 
 private:
     static FARPROC GetOmniMIDIProc(const char* func);
-    static void CALLBACK MIDIOutProc(HMIDIOUT hmo, UINT wMsg, DWORD_PTR dwInstance,
-        DWORD_PTR dwParam1, DWORD_PTR dwParam2);
 
     bool m_bIsOpen;
     bool m_bIsKDMAPI;
@@ -353,8 +350,8 @@ public:
     enum Stage { CopyToMem, Decompress, ParseTracks, ConnectNotes, SortEvents, NCTable, Done };
 
     Stage stage;
-    std::wstring name;
-    std::atomic<uint64_t> progress;
+    wstring name;
+    atomic<uint64_t> progress;
     uint64_t max;
 };
 

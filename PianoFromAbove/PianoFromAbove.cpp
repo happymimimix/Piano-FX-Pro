@@ -2168,39 +2168,39 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += CreateDebugWindow("Pending", "0", "0", "400", "250", true);
                 Code += CreateDebugWindow("Active", "0", "280", "400", "220", true);
                 Code += CreateDebugWindow("History", "400", "0", "350", "500", false);
-                Code += GettersAndSetters("SongLength", "Qword", true, "History");
-                Code += GettersAndSetters("Microseconds", "Qword", false, "History");
-                Code += GettersAndSetters("Ticks", "Integer", true, "History", true);
-                Code += GettersAndSetters("Resolution", "SmallInteger", true, "History");
-                Code += GettersAndSetters("NoteCount", "Integer", true, "History", true);
-                Code += GettersAndSetters("NotesPerSecond", "Integer", true, "History", true);
-                Code += GettersAndSetters("Polyphony", "Integer", true, "History", true);
-                Code += GettersAndSetters("Passed", "Integer", true, "History", true);
-                Code += GettersAndSetters("Volume", "Double", false, "History");
-                Code += GettersAndSetters("Mute", "ShortInteger", false, "History");
-                Code += GettersAndSetters("PlaybackSpeed", "Double", false, "History");
-                Code += GettersAndSetters("NoteSpeed", "Double", false, "History");
-                Code += GettersAndSetters("OffsetX", "Float", false, "History", false, true);
-                Code += GettersAndSetters("OffsetY", "Float", false, "History", false, true);
-                Code += GettersAndSetters("Zoom", "Float", false, "History", false, true);
-                Code += GettersAndSetters("SameWidth", "ShortInteger", false, "History", false, true);
-                Code += GettersAndSetters("VelocityMapping", "ShortInteger", false, "History", false, true);
-                Code += GettersAndSetters("StartKey", "ShortInteger", false, "History", false, true);
-                Code += GettersAndSetters("EndKey", "ShortInteger", false, "History", false, true);
-                Code += GettersAndSetters("KeyMode", "ShortInteger", false, "History", false, true);
-                Code += GettersAndSetters("Width", "Integer", true, "History", true, true);
+                Code += GettersAndSetters("SongLength", IntSizeToCE(sizeof(TotalTime)), true, "History");
+                Code += GettersAndSetters("Microseconds", IntSizeToCE(sizeof(m_llStartTime)), false, "History");
+                Code += GettersAndSetters("Ticks", IntSizeToCE(sizeof(m_iStartTick)), true, "History", true);
+                Code += GettersAndSetters("Resolution", IntSizeToCE(sizeof(resolution)), true, "History");
+                Code += GettersAndSetters("NoteCount", IntSizeToCE(sizeof(TotalNC)), true, "History", true);
+                Code += GettersAndSetters("NotesPerSecond", IntSizeToCE(sizeof(nps)), true, "History", true);
+                Code += GettersAndSetters("Polyphony", IntSizeToCE(sizeof(polyphony)), true, "History", true);
+                Code += GettersAndSetters("Passed", IntSizeToCE(sizeof(passed)), true, "History", true);
+                Code += GettersAndSetters("Volume", FloatSizeToCE(cPlayback.GetVolumeSize()), false, "History");
+                Code += GettersAndSetters("Mute", IntSizeToCE(cPlayback.GetMuteSize()), false, "History");
+                Code += GettersAndSetters("PlaybackSpeed", FloatSizeToCE(cPlayback.GetSpeedSize()), false, "History");
+                Code += GettersAndSetters("NoteSpeed", FloatSizeToCE(cPlayback.GetNSpeedSize()), false, "History");
+                Code += GettersAndSetters("OffsetX", FloatSizeToCE(cView.GetOffsetXSize()), false, "History", false, true);
+                Code += GettersAndSetters("OffsetY", FloatSizeToCE(cView.GetOffsetYSize()), false, "History", false, true);
+                Code += GettersAndSetters("Zoom", FloatSizeToCE(cView.GetZoomXSize()), false, "History", false, true);
+                Code += GettersAndSetters("SameWidth", IntSizeToCE(sizeof(cVideo.bSameWidth)), false, "History", false, true);
+                Code += GettersAndSetters("VelocityMapping", IntSizeToCE(sizeof(cVideo.bMapVel)), false, "History", false, true);
+                Code += GettersAndSetters("StartKey", IntSizeToCE(sizeof(cVisual.iFirstKey)), false, "History", false, true);
+                Code += GettersAndSetters("EndKey", IntSizeToCE(sizeof(cVisual.iLastKey)), false, "History", false, true);
+                Code += GettersAndSetters("KeyMode", IntSizeToCE(sizeof(width)), false, "History", false, true);
+                Code += GettersAndSetters("Width", IntSizeToCE(sizeof(height)), true, "History", true, true);
                 Code += GettersAndSetters("Height", "Integer", true, "History", true, true);
                 Code += SetResolutionFunction();
-                Code += GettersAndSetters("Paused", "ShortInteger", false, "History");
-                Code += GettersAndSetters("Keyboard", "ShortInteger", false, "History");
-                Code += GettersAndSetters("VisualizePitchBends", "ShortInteger", false, "History", false, true);
-                Code += GettersAndSetters("PhigrosMode", "ShortInteger", false, "History");
-                Code += GettersAndSetters("ShowMarkers", "ShortInteger", false, "History");
-                Code += GettersAndSetters("TickBased", "ShortInteger", false, "History");
-                Code += GettersAndSetters("HideStatistics", "ShortInteger", false, "History");
-                Code += GettersAndSetters("RemoveOverlaps", "ShortInteger", false, "History");
-                Code += GettersAndSetters("LimitFPS", "ShortInteger", false, "History");
-                Code += GettersAndSetters("VelocityThreshold", "ShortInteger", false, "History");
+                Code += GettersAndSetters("Paused", IntSizeToCE(cPlayback.GetPausedSize()), false, "History");
+                Code += GettersAndSetters("Keyboard", IntSizeToCE(cView.GetKeyboardVarSize()), false, "History");
+                Code += GettersAndSetters("VisualizePitchBends", IntSizeToCE(sizeof(cVideo.bVisualizePitchBends)), false, "History", false, true);
+                Code += GettersAndSetters("PhigrosMode", IntSizeToCE(sizeof(cControls.bPhigros)), false, "History");
+                Code += GettersAndSetters("ShowMarkers", IntSizeToCE(sizeof(cVideo.bShowMarkers)), false, "History");
+                Code += GettersAndSetters("TickBased", IntSizeToCE(sizeof(cVideo.bTickBased)), false, "History");
+                Code += GettersAndSetters("HideStatistics", IntSizeToCE(sizeof(cVideo.bDisableUI)), false, "History");
+                Code += GettersAndSetters("RemoveOverlaps", IntSizeToCE(sizeof(cVideo.bOR)), false, "History");
+                Code += GettersAndSetters("LimitFPS", IntSizeToCE(sizeof(cVideo.bLimitFPS)), false, "History");
+                Code += GettersAndSetters("VelocityThreshold", IntSizeToCE(sizeof(cControls.iVelocityThreshold)), false, "History");
                 Code += StringTypeGettersAndSetters("Caption", sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]), false, "History");
                 Code += StringTypeGettersAndSetters("DifficultyText", sizeof(Difficulty) / sizeof(Difficulty[0]), false, "History");
                 Code += EasingFunctions();
@@ -2414,7 +2414,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
 #endif
 
     g_hInstance = hInstance;
-    srand((unsigned)time(NULL));
+    srand((win32_t)time(NULL));
 
     // Ensure that the common control DLL is loaded. 
     INITCOMMONCONTROLSEX icex;
@@ -2464,7 +2464,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
     ViewSettings& cView = config.GetViewSettings();
 
     // Create the application window
-    g_hWnd = CreateWindowEx(NULL, CLASSNAME, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, cView.GetMainLeft(), cView.GetMainTop(), cView.GetMainWidth(), cView.GetMainHeight(), NULL, NULL, wc.hInstance, NULL);
+    g_hWnd = CreateWindowEx(NULL, CLASSNAME, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7 MainWindowTitle8 MainWindowTitle9, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, cView.GetMainLeft(), cView.GetMainTop(), cView.GetMainWidth(), cView.GetMainHeight(), NULL, NULL, wc.hInstance, NULL);
 
     if (!g_hWnd) return 1;
 
@@ -2551,10 +2551,10 @@ DWORD WINAPI GameThread(LPVOID lpParameter)
     // Initialize Direct3D
     D3D12Renderer* pRenderer = new D3D12Renderer();
     auto init_res = pRenderer->Init(g_hWndGfx, Config::GetConfig().GetVideoSettings().bLimitFPS);
-    if (FAILED(std::get<0>(init_res)))
+    if (FAILED(get<0>(init_res)))
     {
         wchar_t msg[1 << 10] = {};
-        _snwprintf_s(msg, 1024, L"Fatal error initializing D3D12.\n%S failed with code 0x%x.", std::get<1>(init_res), std::get<0>(init_res));
+        _snwprintf_s(msg, 1024, L"Fatal error initializing D3D12.\n%S failed with code 0x%x.", get<1>(init_res), get<0>(init_res));
         MessageBox(g_hWnd, msg, TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
         PostMessage(g_hWnd, WM_QUIT, 1, 0);
         return 1;
@@ -2568,7 +2568,7 @@ DWORD WINAPI GameThread(LPVOID lpParameter)
     GameState::GameError ErrorLevel;
 
     wchar_t buf[1 << 10] = {};
-    _snwprintf_s(buf, 1 << 10, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle6 MainWindowTitle7);
+    _snwprintf_s(buf, 1 << 10, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle6 MainWindowTitle7 MainWindowTitle8 MainWindowTitle9);
     SetWindowTextW(g_hWnd, buf);
 
     // Event, logic, render...
