@@ -30,7 +30,7 @@ VOID DrawSliderChannel(LPNMCUSTOMDRAW lpnmcd, HWND hWndOwner);
 LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 VOID GetChannelRect(HWND hWnd, RECT* rcChannel);
 VOID GetThumbRect(HWND hWnd, winword_t iPosition, const RECT* rcChannel, RECT* rcThumb);
-INT GetThumbPosition(winword_t iXPos, RECT* rcChannel);
+winword_t GetThumbPosition(winword_t iXPos, RECT* rcChannel);
 VOID MoveThumbPosition(winword_t iPositionNew, winword_t& iPosition, HWND hWnd, RECT* rcChannel, RECT* rcThumbOld, BOOL bUpdateGame = TRUE);
 
 INT_PTR WINAPI AboutProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

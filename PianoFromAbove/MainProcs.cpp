@@ -797,7 +797,7 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         RECT rcChannel, rcThumbOld;
         GetChannelRect(hWnd, &rcChannel);
         GetThumbRect(hWnd, iPosition, &rcChannel, &rcThumbOld);
-        winword_t iPositionNew = max(min(lParam, 1000), 0);
+        winword_t iPositionNew = max(min((winword_t)lParam, 1000), 0);
         MoveThumbPosition(iPositionNew, iPosition, hWnd, &rcChannel, &rcThumbOld, FALSE);
         return 0;
     }
@@ -832,7 +832,7 @@ VOID GetThumbRect(HWND hWnd, winword_t iPosition, const RECT* rcChannel, RECT* r
     rcThumb->bottom = rcThumb->top + iSize + 8;
 }
 
-INT GetThumbPosition(winword_t iXPos, RECT* rcChannel)
+winword_t GetThumbPosition(winword_t iXPos, RECT* rcChannel)
 {
     winword_t iPositionNew = (2 * 1000 * (iXPos - rcChannel->left) + rcChannel->right - rcChannel->left) / (2 * (rcChannel->right - rcChannel->left));
     iPositionNew = max(min(iPositionNew, 1000), 0);
