@@ -26,7 +26,7 @@
 
 static WNDPROC g_pPrevBarProc; // Have to override the toolbar proc to make controls transparent
 
-VOID SizeWindows(win32_t iMainWidth, win32_t iMainHeight);
+VOID SizeWindows(winword_t iMainWidth, winword_t iMainHeight);
 INT_PTR CALLBACK SetResolutionProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM) {
     switch (msg) {
     case WM_INITDIALOG: {
@@ -44,7 +44,7 @@ INT_PTR CALLBACK SetResolutionProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM) {
         return true;
     }
     case WM_COMMAND: {
-        win32_t iId = LOWORD(wparam);
+        winword_t iId = LOWORD(wparam);
         switch (iId) {
         case IDOK: {
             char buf[1 << 10] = {};
@@ -101,7 +101,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         return 0;
     case WM_COMMAND:
     {
-        win32_t iId = LOWORD(wParam);
+        winword_t iId = LOWORD(wParam);
         switch (iId)
         {
         case IDOK:
@@ -313,7 +313,7 @@ HMENU GetMainMenu()
     return hMenu;
 }
 
-VOID SizeWindows(win32_t iMainWidth, win32_t iMainHeight)
+VOID SizeWindows(winword_t iMainWidth, winword_t iMainHeight)
 {
     static const ViewSettings& cView = Config::GetConfig().GetViewSettings();
     static const ControlsSettings& cControls = Config::GetConfig().GetControlsSettings();
@@ -393,8 +393,8 @@ LRESULT WINAPI GfxProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             bTrack = true;
         }
 
-        win32_t iXPos = LOWORD(lParam);
-        win32_t iYPos = HIWORD(lParam);
+        winword_t iXPos = LOWORD(lParam);
+        winword_t iYPos = HIWORD(lParam);
         POINT pt = { iXPos, iYPos };
         ClientToScreen(hWnd, &pt);
         CheckActivity(TRUE, &pt);
@@ -457,12 +457,12 @@ LRESULT WINAPI BarProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         // WM_HSCROLL doesn't percolate up, so got to handle it here
     case WM_HSCROLL:
     {
-        win32_t iCode = LOWORD(wParam);
+        winword_t iCode = LOWORD(wParam);
         if (iCode == TB_LINEUP || iCode == TB_LINEDOWN || iCode == TB_PAGEUP ||
             iCode == TB_PAGEDOWN || iCode == TB_THUMBTRACK || iCode == TB_THUMBPOSITION)
         {
             HWND hWndTrackbar = (HWND)lParam;
-            win32_t iPos = (iCode == TB_THUMBTRACK || iCode == TB_THUMBPOSITION ? HIWORD(wParam) : (int)SendMessage(hWndTrackbar, TBM_GETPOS, 0, 0));
+            win32_t iPos = (iCode == TB_THUMBTRACK || iCode == TB_THUMBPOSITION ? static_cast<winword_t>(HIWORD(wParam)) : (win32_t)SendMessage(hWndTrackbar, TBM_GETPOS, 0, 0));
             win32_t iId = GetDlgCtrlID(hWndTrackbar);
             switch (iId)
             {
@@ -511,8 +511,8 @@ LRESULT WINAPI BarProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     }
     case WM_MOUSEMOVE:
     {
-        win32_t iXPos = LOWORD(lParam);
-        win32_t iYPos = HIWORD(lParam);
+        winword_t iXPos = LOWORD(lParam);
+        winword_t iYPos = HIWORD(lParam);
         POINT pt = { iXPos, iYPos };
         ClientToScreen(hWnd, &pt);
         CheckActivity(TRUE, &pt);
@@ -661,7 +661,7 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     // Bad design. Will need to be moved into a struct if we need more than 1 in a program
     static BOOL bEnabled = TRUE, bTracking = FALSE;
-    static win32_t iPosition = 0;
+    static winword_t iPosition = 0;
     static HIMAGELIST hIml = NULL;
     static HBITMAP hBackbuffer = NULL;
     static HBITMAP hBackground = NULL;
@@ -756,7 +756,7 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_LBUTTONDOWN:
     {
         if (!bEnabled) return 0;
-        POINT pt = { (SHORT)LOWORD(lParam), (SHORT)HIWORD(lParam) };
+        POINT pt = {(winword_t)LOWORD(lParam), (winword_t)HIWORD(lParam)};
 
         RECT rcChannel, rcThumb;
         GetChannelRect(hWnd, &rcChannel);
@@ -765,7 +765,7 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
         if (PtInRect(&rcChannel, pt) || PtInRect(&rcThumb, pt))
         {
-            win32_t iPositionNew = GetThumbPosition((SHORT)pt.x, &rcChannel);
+            winword_t iPositionNew = GetThumbPosition(pt.x, &rcChannel);
             MoveThumbPosition(iPositionNew, iPosition, hWnd, &rcChannel, &rcThumb);
             bTracking = TRUE;
             SetCapture(hWnd);
@@ -783,12 +783,12 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
         if (!bTracking) return 0;
 
-        win32_t iXPos = LOWORD(lParam);
+        winword_t iXPos = LOWORD(lParam);
         RECT rcChannel, rcThumbOld;
         GetChannelRect(hWnd, &rcChannel);
         GetThumbRect(hWnd, iPosition, &rcChannel, &rcThumbOld);
 
-        win32_t iPositionNew = GetThumbPosition(iXPos, &rcChannel);
+        winword_t iPositionNew = GetThumbPosition(iXPos, &rcChannel);
         MoveThumbPosition(iPositionNew, iPosition, hWnd, &rcChannel, &rcThumbOld);
         return 0;
     }
@@ -797,7 +797,7 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         RECT rcChannel, rcThumbOld;
         GetChannelRect(hWnd, &rcChannel);
         GetThumbRect(hWnd, iPosition, &rcChannel, &rcThumbOld);
-        win32_t iPositionNew = max(min((win32_t)lParam, 1000), 0);
+        winword_t iPositionNew = max(min(lParam, 1000), 0);
         MoveThumbPosition(iPositionNew, iPosition, hWnd, &rcChannel, &rcThumbOld, FALSE);
         return 0;
     }
@@ -822,7 +822,7 @@ VOID GetChannelRect(HWND hWnd, RECT* rcChannel)
         rcChannel->bottom--;
 }
 
-VOID GetThumbRect(HWND hWnd, win32_t iPosition, const RECT* rcChannel, RECT* rcThumb)
+VOID GetThumbRect(HWND hWnd, winword_t iPosition, const RECT* rcChannel, RECT* rcThumb)
 {
     win32_t iSize = rcChannel->bottom - rcChannel->top;
     win32_t iPixel = (2 * iPosition * (rcChannel->right - rcChannel->left - 1) + 1000) / (2 * 1000);
@@ -832,14 +832,14 @@ VOID GetThumbRect(HWND hWnd, win32_t iPosition, const RECT* rcChannel, RECT* rcT
     rcThumb->bottom = rcThumb->top + iSize + 8;
 }
 
-INT GetThumbPosition(win32_t iXPos, RECT* rcChannel)
+INT GetThumbPosition(winword_t iXPos, RECT* rcChannel)
 {
-    win32_t iPositionNew = (2 * 1000 * (iXPos - rcChannel->left) + rcChannel->right - rcChannel->left) / (2 * (rcChannel->right - rcChannel->left));
+    winword_t iPositionNew = (2 * 1000 * (iXPos - rcChannel->left) + rcChannel->right - rcChannel->left) / (2 * (rcChannel->right - rcChannel->left));
     iPositionNew = max(min(iPositionNew, 1000), 0);
     return iPositionNew;
 }
 
-VOID MoveThumbPosition(win32_t iPositionNew, win32_t& iPosition, HWND hWnd, RECT* rcChannel, RECT* rcThumbOld, BOOL bUpdateGame)
+VOID MoveThumbPosition(winword_t iPositionNew, winword_t& iPosition, HWND hWnd, RECT* rcChannel, RECT* rcThumbOld, BOOL bUpdateGame)
 {
     RECT rcThumbNew, rcInvalid;
     GetThumbRect(hWnd, iPositionNew, rcChannel, &rcThumbNew);
@@ -883,7 +883,7 @@ INT_PTR CALLBACK AboutProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM)
     }
     case WM_COMMAND:
     {
-        win32_t iId = LOWORD(wParam);
+        winword_t iId = LOWORD(wParam);
         switch (iId)
         {
         case IDOK: case IDCANCEL:

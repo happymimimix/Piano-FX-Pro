@@ -67,7 +67,7 @@ GameState::GameError IntroScreen::MsgProc(HWND, UINT msg, WPARAM wParam, LPARAM 
     {
     case WM_COMMAND:
     {
-        win32_t iId = LOWORD(wParam);
+        winword_t iId = LOWORD(wParam);
         switch (iId)
         {
         case ID_CHANGESTATE:
@@ -365,7 +365,7 @@ GameState::GameError SplashScreen::MsgProc(HWND, UINT msg, WPARAM wParam, LPARAM
     {
     case WM_COMMAND:
     {
-        win32_t iId = LOWORD(wParam);
+        winword_t iId = LOWORD(wParam);
         switch (iId)
         {
         case ID_CHANGESTATE:
@@ -931,7 +931,7 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
         // Commands that were passed straight through because they're more involved than setting a state variable
     case WM_COMMAND:
     {
-        win32_t iId = LOWORD(wParam);
+        winword_t iId = LOWORD(wParam);
         switch (iId)
         {
         case ID_CHANGESTATE:
@@ -1004,8 +1004,8 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
     {
         if (m_bZoomMove)
         {
-            m_ptLastPos.x = (SHORT)LOWORD(lParam);
-            m_ptLastPos.y = (SHORT)HIWORD(lParam);
+            m_ptLastPos.x = (winword_t)LOWORD(lParam);
+            m_ptLastPos.y = (winword_t)HIWORD(lParam);
             m_bTrackPos = true;
         }
         return Success;
@@ -1013,10 +1013,10 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
     case WM_RBUTTONDOWN:
     {
         if (!m_bZoomMove) return Success;
-        m_ptLastPos.x = (SHORT)LOWORD(lParam);
-        m_ptLastPos.y = (SHORT)HIWORD(lParam);
-        m_ptStartZoom.x = static_cast<int>((m_ptLastPos.x - m_fOffsetX - m_fTempOffsetX) / (m_fZoomX * m_fTempZoomX));
-        m_ptStartZoom.y = static_cast<int>(m_ptLastPos.y - m_fOffsetY - m_fTempOffsetY);
+        m_ptLastPos.x = (winword_t)LOWORD(lParam);
+        m_ptLastPos.y = (winword_t)HIWORD(lParam);
+        m_ptStartZoom.x = static_cast<win32_t>((m_ptLastPos.x - m_fOffsetX - m_fTempOffsetX) / (m_fZoomX * m_fTempZoomX));
+        m_ptStartZoom.y = static_cast<win32_t>(m_ptLastPos.y - m_fOffsetY - m_fTempOffsetY);
         m_bTrackZoom = true;
         return Success;
     }
@@ -1032,10 +1032,10 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
     case WM_MOUSEMOVE:
     {
         if (!m_bTrackPos && !m_bTrackZoom) return Success;
-        short x = LOWORD(lParam);
-        short y = HIWORD(lParam);
-        short dx = static_cast<short>(x - m_ptLastPos.x);
-        short dy = static_cast<short>(y - m_ptLastPos.y);
+        winword_t x = LOWORD(lParam);
+        winword_t y = HIWORD(lParam);
+        winword_t dx = static_cast<winword_t>(x - m_ptLastPos.x);
+        winword_t dy = static_cast<winword_t>(y - m_ptLastPos.y);
 
         if (m_bTrackPos)
         {

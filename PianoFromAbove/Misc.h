@@ -28,7 +28,8 @@ typedef int64_t sidx_t; // Array indexing type (signed)
 constexpr idx_t IDX_MAX = static_cast<idx_t>(-1); // Maximum array size
 typedef uint32_t color_t; // Color type
 typedef uint32_t bpm_t; // Anything that has something to do with tempo, beat, and measure
-typedef signed int win32_t; // Classic signed 32bit integer used for interfacing with Win32 API (should not appear in any game logic)
+typedef signed int win32_t; // Classic signed 32bit integer, aka dword, used for interfacing with Win32 API (should not appear in any game logic)
+typedef signed short winword_t; // Classic signed 16bit integer, aka word, used for interfacing with Win32 API (should not appear in any game logic)
 
 template <typename T>
 string GetAddress(const T& Variable) {

@@ -116,7 +116,7 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     }
     case WM_COMMAND:
     {
-        win32_t iId = LOWORD(wParam);
+        winword_t iId = LOWORD(wParam);
         Changed(hWnd);
         switch (iId)
         {
@@ -266,8 +266,8 @@ INT_PTR WINAPI AudioProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     }
     case WM_COMMAND:
     {
-        win32_t iId = LOWORD(wParam);
-        win32_t iCode = HIWORD(wParam);
+        winword_t iId = LOWORD(wParam);
+        winword_t iCode = HIWORD(wParam);
         if (iCode == LBN_SELCHANGE || (iId == IDC_KDMAPI && iCode == BN_CLICKED))
             Changed(hWnd);
         break;
@@ -418,7 +418,7 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         return TRUE;
     }
     case WM_COMMAND: {
-        win32_t iId = LOWORD(wParam);
+        winword_t iId = LOWORD(wParam);
         Changed(hWnd);
         switch (iId)
         {
@@ -839,7 +839,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     }
     case WM_COMMAND:
     {
-        win32_t iId = LOWORD(wParam);
+        winword_t iId = LOWORD(wParam);
         switch (iId)
         {
         case IDOK:
