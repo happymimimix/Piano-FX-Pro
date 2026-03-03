@@ -26,7 +26,7 @@
 
 static WNDPROC g_pPrevBarProc; // Have to override the toolbar proc to make controls transparent
 
-VOID SizeWindows(winword_t iMainWidth, winword_t iMainHeight);
+VOID SizeWindows(win32_t iMainWidth, win32_t iMainHeight);
 INT_PTR CALLBACK SetResolutionProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM) {
     switch (msg) {
     case WM_INITDIALOG: {
@@ -313,7 +313,7 @@ HMENU GetMainMenu()
     return hMenu;
 }
 
-VOID SizeWindows(winword_t iMainWidth, winword_t iMainHeight)
+VOID SizeWindows(win32_t iMainWidth, win32_t iMainHeight)
 {
     static const ViewSettings& cView = Config::GetConfig().GetViewSettings();
     static const ControlsSettings& cControls = Config::GetConfig().GetControlsSettings();

@@ -18,7 +18,7 @@ using namespace std;
 // Message handlers for the main windows
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 HMENU GetMainMenu();
-VOID SizeWindows(winword_t iMainWidth, winword_t iMainHeight);
+VOID SizeWindows(win32_t iMainWidth, win32_t iMainHeight);
 
 LRESULT WINAPI GfxProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 VOID CopyMenuState(HMENU hMenuSrc, HMENU hMenuDest);

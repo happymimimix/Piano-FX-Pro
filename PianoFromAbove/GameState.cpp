@@ -2733,7 +2733,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    KeyRange: " << cVisual.iFirstKey << "~" << cVisual.iLastKey << " (" << IntSizeToCE(sizeof(cVisual.iFirstKey)) << " +" + GetAddress(cVisual.iFirstKey) + " ~ " << IntSizeToCE(sizeof(cVisual.iLastKey)) << " +" + GetAddress(cVisual.iLastKey) + ") [Read / Write]";
+        cout << "    KeyRange: " << static_cast<short>(cVisual.iFirstKey) << "~" << static_cast<short>(cVisual.iLastKey) << " (" << IntSizeToCE(sizeof(cVisual.iFirstKey)) << " +" + GetAddress(cVisual.iFirstKey) + " ~ " << IntSizeToCE(sizeof(cVisual.iLastKey)) << " +" + GetAddress(cVisual.iLastKey) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
