@@ -1,3 +1,3 @@
-[submodule "Z/X"]
-	path = RCE/modules/Z
+[submodule "RCE/scripts"]
+	path = GITLNK/modules/RCE
 	url = https://github.com/happymimimix/PFX-RCE.git
