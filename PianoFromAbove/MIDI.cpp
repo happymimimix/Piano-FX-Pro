@@ -375,8 +375,7 @@ MIDIChannelEvent* MIDI::AllocChannelEvent() {
     return ev;
 }
 
-
-const wstring MIDI::Instruments[129] =
+const wstring MIDI::Instruments[(1 << 7) + 1] =
 {
     L"Acoustic Grand Piano", L"Bright Acoustic Piano", L"Electric Grand Piano", L"Honky-tonk Piano", L"Electric Piano 1",
     L"Electric Piano 2", L"Harpsichord", L"Clavi", L"Celesta", L"Glockenspiel",
@@ -406,33 +405,6 @@ const wstring MIDI::Instruments[129] =
     L"Helicopter", L"Applause", L"Gunshot", L"Various"
 };
 
-const wstring& MIDI::NoteName(key_t iNote)
-{
-    InitArrays();
-    if (iNote < 0 || iNote >= MIDI::KEYS) return aNoteNames[MIDI::KEYS];
-    return aNoteNames[iNote];
-}
-
-MIDI::Note MIDI::NoteVal(key_t iNote)
-{
-    InitArrays();
-    if (iNote < 0 || iNote >= MIDI::KEYS) return C;
-    return aNoteVal[iNote];
-}
-
-bool MIDI::IsSharp(key_t iNote)
-{
-    return (1 << (iNote % 12)) & 0b010101001010;
-}
-
-// Number of white keys in [iMinNote, iMaxNote)
-key_t MIDI::WhiteCount(key_t iMinNote, key_t iMaxNote)
-{
-    InitArrays();
-    if (iMinNote < 0 || iMinNote >= MIDI::KEYS || iMaxNote < 0 || iMaxNote >= MIDI::KEYS) return false;
-    return aWhiteCount[iMaxNote] - aWhiteCount[iMinNote];
-}
-
 wstring MIDI::aNoteNames[MIDI::KEYS + 1];
 MIDI::Note MIDI::aNoteVal[MIDI::KEYS];
 bool MIDI::aIsSharp[MIDI::KEYS];
@@ -440,51 +412,44 @@ key_t MIDI::aWhiteCount[MIDI::KEYS + 1];
 
 void MIDI::InitArrays()
 {
-    static bool bValid = false;
-
-    // Build the array of note names upon first call
-    if (!bValid)
+    wchar_t buf[1<<2];
+    wchar_t cNote = L'C';
+    int16_t iOctave = -1;
+    bool bIsSharp = false;
+    MIDI::Note eNote = MIDI::C;
+    for (key_t i = 0; i < MIDI::KEYS; i++)
     {
-        wchar_t buf[10];
-        wchar_t cNote = L'C';
-        int16_t iOctave = -1;
-        bool bIsSharp = false;
-        MIDI::Note eNote = MIDI::C;
-        for (key_t i = 0; i < MIDI::KEYS; i++)
+        // Don't want sprintf because we're in c++ and string building is too slow. Manual construction!
+        int16_t iPos = 0;
+        buf[iPos++] = cNote;
+        if (bIsSharp) buf[iPos++] = L'#';
+        if (iOctave < 0) buf[iPos++] = L'-';
+        buf[iPos++] = L'0' + abs(iOctave);
+        buf[iPos++] = L'\0';
+
+        aNoteNames[i] = buf;
+        aNoteVal[i] = eNote;
+        aIsSharp[i] = bIsSharp;
+
+        // Advance counters
+        if (eNote == MIDI::B || eNote == MIDI::E || bIsSharp)
+            cNote++;
+        if (eNote != MIDI::B && eNote != MIDI::E)
+            bIsSharp = !bIsSharp;
+        if (eNote == MIDI::B)
+            iOctave++;
+        if (eNote == MIDI::GS)
         {
-            // Don't want sprintf because we're in c++ and string building is too slow. Manual construction!
-            int16_t iPos = 0;
-            buf[iPos++] = cNote;
-            if (bIsSharp) buf[iPos++] = L'#';
-            if (iOctave < 0) buf[iPos++] = L'-';
-            buf[iPos++] = L'0' + abs(iOctave);
-            buf[iPos++] = L'\0';
-
-            aNoteNames[i] = buf;
-            aNoteVal[i] = eNote;
-            aIsSharp[i] = bIsSharp;
-
-            // Advance counters
-            if (eNote == MIDI::B || eNote == MIDI::E || bIsSharp)
-                cNote++;
-            if (eNote != MIDI::B && eNote != MIDI::E)
-                bIsSharp = !bIsSharp;
-            if (eNote == MIDI::B)
-                iOctave++;
-            if (eNote == MIDI::GS)
-            {
-                cNote = 'A';
-                eNote = MIDI::A;
-            }
-            else
-                eNote = static_cast<MIDI::Note>(eNote + 1);
+            cNote = 'A';
+            eNote = MIDI::A;
         }
-        aWhiteCount[0] = 0;
-        for (key_t i = 1; i < MIDI::KEYS + 1; i++)
-            aWhiteCount[i] = aWhiteCount[i - 1] + !aIsSharp[i - 1];
-        aNoteNames[MIDI::KEYS] = L"Invalid";
-        bValid = true;
+        else
+            eNote = static_cast<MIDI::Note>(eNote + 1);
     }
+    aWhiteCount[0] = 0;
+    for (key_t i = 1; i < MIDI::KEYS + 1; i++)
+        aWhiteCount[i] = aWhiteCount[i - 1] + !aIsSharp[i - 1];
+    aNoteNames[MIDI::KEYS] = L"Invalid";
 }
 
 void MIDI::clear(void)

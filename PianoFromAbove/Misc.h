@@ -18,6 +18,7 @@ using namespace std;
 typedef signed long mtk_t; // Midi tick timing type
 typedef signed long long mms_t; // Midi microsecond timing type
 typedef unsigned char key_t; // Midi note key and velocity type
+typedef signed char skey_t; // If value is 192 or more, reinterpret cast to this type
 typedef uint16_t track_t; // Midi track id type
 typedef uint8_t chan_t; // Midi channel id type
 typedef uint32_t TnC_t; // Any code that does `track * 16 + channel` must use this type

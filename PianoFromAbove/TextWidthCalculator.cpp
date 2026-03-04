@@ -95,6 +95,5 @@ int main() {
     DeleteObject(hFont);
     DeleteObject(hBrush);
     ReleaseDC(cmd, cmdDC);
-    Sleep(1 << 10);
     return 0;
 }

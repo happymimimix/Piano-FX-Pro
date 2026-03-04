@@ -71,13 +71,38 @@ class MIDI
 public:
     enum Note { A, AS, B, C, CS, D, DS, E, F, FS, G, GS };
 
-    static const key_t KEYS = 129;
-    static const wstring Instruments[129];
-    static const wstring& NoteName(key_t iNote);
-    static Note NoteVal(key_t iNote);
-    static bool IsSharp(key_t iNote);
-    static key_t WhiteCount(key_t iMinNote, key_t iMaxNote);
+    static const key_t KEYS = 1<<7;
+    static const wstring Instruments[(1 << 7) + 1];
 
+    __forceinline static const wstring& NoteName(key_t iNote)
+    {
+        if (iNote & 0x80) return aNoteNames[MIDI::KEYS];
+        return aNoteNames[iNote];
+    }
+
+    __forceinline static Note NoteVal(key_t iNote)
+    {
+        if (iNote & 0x80) return C;
+        return aNoteVal[iNote];
+    }
+    
+    __forceinline static bool IsSharp(key_t iNote)
+    {
+        if (iNote < 192) {
+            return (1 << (iNote % 12)) & 0b010101001010;
+        }
+        else {
+            skey_t siNote = (skey_t)iNote;
+            return (1 << (siNote % 12)) & 0b010101001010;
+        }
+    }
+    
+    __forceinline static key_t WhiteCount(key_t iMinNote, key_t iMaxNote)
+    {
+        if (iMinNote >= MIDI::KEYS || iMaxNote > MIDI::KEYS) return false;
+        return aWhiteCount[iMaxNote] - aWhiteCount[iMinNote];
+    }
+    
     //Generally usefull static parsing functions
     static uint32_t ParseVarNum(const unsigned char* pcData, msgln_t iMaxSize, uint32_t* piOut);
     static uint32_t Parse32Bit(const unsigned char* pcData, msgln_t iMaxSize, uint32_t* piOut);
@@ -130,13 +155,14 @@ public:
     const MIDIInfo& GetInfo() const { return m_Info; }
     const vector<MIDITrack*>& GetTracks() const { return m_vTracks; }
 
+    static void InitArrays();
+
 private:
     struct EventPool {
         MIDIChannelEvent* events;
         idx_t count;
     };
 
-    static void InitArrays();
     static wstring aNoteNames[KEYS + 1];
     static Note aNoteVal[KEYS];
     static bool aIsSharp[KEYS];

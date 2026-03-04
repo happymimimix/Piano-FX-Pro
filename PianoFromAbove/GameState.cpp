@@ -2631,7 +2631,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    SongLength: " << TotalTimeFormatted << " (" << IntSizeToCE(sizeof(TotalTime)) << " + " + GetAddress(TotalTime) + ")[Read Only]";
+        cout << "    SongLength: " << TotalTimeFormatted << " (" << IntSizeToCE(sizeof(TotalTime)) << " +" + GetAddress(TotalTime) + ")[Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
@@ -2703,13 +2703,13 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Offset-X: " << cView.GetOffsetX() << " (" << FloatSizeToCE(cView.GetOffsetXSize()) << " +" + cView.GetOffsetXAddress() + ") [Read / Write]";
+        cout << "    OffsetX: " << cView.GetOffsetX() << " (" << FloatSizeToCE(cView.GetOffsetXSize()) << " +" + cView.GetOffsetXAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Offset-Y: " << cView.GetOffsetY() << " (" << FloatSizeToCE(cView.GetOffsetYSize()) << " +" + cView.GetOffsetYAddress() + ") [Read / Write]";
+        cout << "    OffsetY: " << cView.GetOffsetY() << " (" << FloatSizeToCE(cView.GetOffsetYSize()) << " +" + cView.GetOffsetYAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
