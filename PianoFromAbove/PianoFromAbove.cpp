@@ -300,13 +300,13 @@ string CreateDebugWindow(string Name, string X, string Y, string W, string H, bo
     Code += "Debug" + Name + "List.Items.add(\"\")\n";
     if (Add) {
         Code += "function " + Name + "Add(name)\n";
-        Code += "Debug" + Name + "List.Items.insert(2,name)\n";
+        Code += "if Debug" + Name + "List.Items~=nil then Debug" + Name + "List.Items.insert(2,name) end\n";
         Code += "return name\n";
         Code += "end\n";
     }
     if (Del) {
         Code += "function " + Name + "Del(name)\n";
-        Code += "Debug" + Name + "List.Items.delete(Debug" + Name + "List.Items.indexOf(name))\n";
+        Code += "if Debug" + Name + "List.Items~=nil then Debug" + Name + "List.Items.delete(Debug" + Name + "List.Items.indexOf(name)) end\n";
         Code += "return name\n";
         Code += "end\n";
     }
@@ -433,6 +433,12 @@ string EasingFunctions() {
     Code += "function CenterY(Zoom)\n";
     Code += "return -(GetHeight()*(1-Zoom))/2\n";
     Code += "end\n";
+    Code += "function MapValue(Value,SourceMin,SourceMax,DestMin,DestMax)\n";
+    Code += "return (Value-SourceMin)/(SourceMax-SourceMin)*(DestMax-DestMin)+DestMin\n";
+    Code += "end\n";
+    Code += "function MapValueWithEasing(Value,SourceMin,SourceMax,DestMin,DestMax,EasingFunction)\n";
+    Code += "return EasingFunction((Value-SourceMin)/(SourceMax-SourceMin))*(DestMax-DestMin)+DestMin\n";
+    Code += "end\n";
     Code += "function var2str(var)\n";
     Code += "for name,value in pairs(_G) do\n";
     Code += "if value==var then\n";
@@ -495,11 +501,13 @@ string InstantaneousAnimationFunction(bool TickBased, bool Wait, string DebugLis
 string RunShader(bool TickBased) {
     string Code = "";
     Code += "function RunShaderBy" + string(TickBased ? "Tick" : "Time") + "(StartTime,EndTime,ShaderFunction,...)\n";
-    Code += "local EffectParameters={...}\n";
-    Code += "if hGDI==0 then return end\n";
+    Code += "local EffectParameters=table.pack(...)\n";
+    Code += "local Concat=\"\"\n";
+    Code += "for Entry=1,EffectParameters.n do Concat=Concat..\",\"..tostring(EffectParameters[Entry])end\n";
+    Code += "if hGDI==0 or DebugShaderList.Items==nil then return end\n";
     Code += "ShaderLookupCounter=ShaderLookupCounter+1\n";
     Code += "ShaderLookupTable[ShaderLookupCounter]={Func=ShaderFunction,Param={TimingMethod=Get" + string(TickBased ? "Ticks" : "Microseconds") + ",StartTime=StartTime,EndTime=EndTime,EffectParameters=EffectParameters}}\n";
-    Code += "DebugShaderList.Items.add(\"RunShaderBy" + string(TickBased ? "Tick" : "Time") + "(\"..StartTime..\",\"..EndTime..\",\"..var2str(ShaderFunction)..\",\"..table.concat(EffectParameters,\",\")..\")\",ShaderLookupCounter)\n";
+    Code += "DebugShaderList.Items.add(\"RunShaderBy" + string(TickBased ? "Tick" : "Time") + "(\"..StartTime..\",\"..EndTime..\",\"..var2str(ShaderFunction)..Concat..\")\",ShaderLookupCounter)\n";
     Code += "end\n";
     return Code;
 }
@@ -520,7 +528,7 @@ string ShaderEngine() {
     Code += "function ShaderEngine()\n";
     Code += "if hGDI==0 then return end\n";
     Code += "ShaderWorking=true\n";
-    Code += "while Incomplete() do\n";
+    Code += "while Incomplete() and DebugShaderList.Items~=nil do\n";
     Code += "local W=GetWidth()\n";
     Code += "local H=GetHeight()\n";
     Code += "local MEMdc=EXE(\"CreateCompatibleDC\",GDIdc)\n";
@@ -952,8 +960,8 @@ string BuiltinShaders() {
     Code += "end\n";
     Code += "function RadialBlurShader(dc,t,W,H,MaxRotation,BlendAlpha,Iteration)\n";
     Code += "if MaxRotation==nil then MaxRotation=0.02 end\n";
-    Code += "if BlendAlpha==nil then BlendAlpha=1<<6 end\n";
-    Code += "if Iteration==nil then Iteration=3 end\n";
+    Code += "if BlendAlpha==nil then BlendAlpha=1<<7 end\n";
+    Code += "if Iteration==nil then Iteration=5 end\n";
     Code += "for Current=1,Iteration do\n";
     Code += "local MEMdc=EXE(\"CreateCompatibleDC\",dc)\n";
     Code += "local BMP=EXE(\"CreateCompatibleBitmap\",dc,W,H)\n";
@@ -1181,8 +1189,7 @@ string BuiltinShaders() {
     Code += "Radius=Radius-LineThickness\n";
     Code += "end\n";
     Code += "end\n";
-    Code += "end\n";;
-    Code += "local Color=(B<<16)|(G<<8)|R\n";
+    Code += "end\n";
     Code += "for PolygonID,ThisPolygon in pairs(Polygons) do\n";
     Code += "local Pen=EXE(\"CreatePen\",PS_SOLID,0,Colors[PolygonID])\n";
     Code += "EXE(\"SelectObject\",dc,Pen)\n";
@@ -1340,7 +1347,7 @@ string BuiltinShaders() {
     Code += "end\n";
     Code += "function AlphaPixelateShader(dc,t,W,H,Multiplier,Alpha)\n";
     Code += "if Multiplier==nil then Multiplier=4 end\n";
-    Code += "if Alpha==nil then Alpha=63 end\n";
+    Code += "if Alpha==nil then Alpha=1<<7 end\n";
     Code += "local MEMdc=EXE(\"CreateCompatibleDC\",dc)\n";
     Code += "local BMP=EXE(\"CreateCompatibleBitmap\",dc,math.floor(W/Multiplier),math.floor(H/Multiplier))\n";
     Code += "local MEMdc2=EXE(\"CreateCompatibleDC\",dc)\n";
@@ -1415,6 +1422,27 @@ string BuiltinShaders() {
     Code += "end\n";
     Code += "end\n";
     Code += "EXE(\"DeleteObject\",Font)\n";
+    Code += "end\n";
+    Code += "function GlassFadeShader(dc,t,W,H,BlendAlpha,MaxBlur,MinBlur)\n";
+    Code += "if BlendAlpha==nil then BlendAlpha=1<<6 end\n";
+    Code += "if MaxBlur==nil then MaxBlur=5 end\n";
+    Code += "if MinBlur==nil then MinBlur=0 end\n";
+    Code += "local MEMdc=EXE(\"CreateCompatibleDC\",dc)\n";
+    Code += "local BMP=EXE(\"CreateCompatibleBitmap\",dc,W,H)\n";
+    Code += "EXE(\"SelectObject\",MEMdc,BMP)\n";
+    Code += "local BlendFunc=(BlendAlpha<<16)|0x00000000\n";
+    Code += "EXE(\"BitBlt\",MEMdc,0,0,W,H,dc,0,0,SRCCOPY)\n";
+    Code += "EXE(\"AlphaBlend\",MEMdc,0,math.ceil((MaxBlur-MinBlur)*t+MinBlur),W,H,dc,0,0,W,H,BlendFunc)\n";
+    Code += "EXE(\"AlphaBlend\",MEMdc,math.ceil((MaxBlur-MinBlur)*t+MinBlur),0,W,H,dc,0,0,W,H,BlendFunc)\n";
+    Code += "EXE(\"AlphaBlend\",MEMdc,0,-math.ceil((MaxBlur-MinBlur)*t+MinBlur),W,H,dc,0,0,W,H,BlendFunc)\n";
+    Code += "EXE(\"AlphaBlend\",MEMdc,-math.ceil((MaxBlur-MinBlur)*t+MinBlur),0,W,H,dc,0,0,W,H,BlendFunc)\n";
+    Code += "EXE(\"AlphaBlend\",MEMdc,math.ceil((MaxBlur-MinBlur)*t+MinBlur),math.ceil((MaxBlur-MinBlur)*t+MinBlur),W,H,dc,0,0,W,H,BlendFunc)\n";
+    Code += "EXE(\"AlphaBlend\",MEMdc,math.ceil((MaxBlur-MinBlur)*t+MinBlur),-math.ceil((MaxBlur-MinBlur)*t+MinBlur),W,H,dc,0,0,W,H,BlendFunc)\n";
+    Code += "EXE(\"AlphaBlend\",MEMdc,-math.ceil((MaxBlur-MinBlur)*t+MinBlur),-math.ceil((MaxBlur-MinBlur)*t+MinBlur),W,H,dc,0,0,W,H,BlendFunc)\n";
+    Code += "EXE(\"AlphaBlend\",MEMdc,-math.ceil((MaxBlur-MinBlur)*t+MinBlur),math.ceil((MaxBlur-MinBlur)*t+MinBlur),W,H,dc,0,0,W,H,BlendFunc)\n";
+    Code += "EXE(\"BitBlt\",dc,0,0,W,H,MEMdc,0,0,SRCCOPY)\n";
+    Code += "EXE(\"DeleteObject\",BMP)\n";
+    Code += "EXE(\"DeleteDC\",MEMdc)\n";
     Code += "end\n";
     return Code;
 }
