@@ -1810,8 +1810,6 @@ mms_t MainScreen::GetTickTime(mtk_t iTick, mtk_t iLastTempoTick, mms_t llLastTem
     uint16_t iDivision = m_MIDI.GetInfo().iDivision;
     if (!(iDivision & 0x8000))
         return llLastTempoTime + (static_cast<mms_t>(iMicroSecsPerBeat) * (iTick - iLastTempoTick)) / iDivision;
-    //else
-    //    return llLastTempoTime + ( 1000000LL * ( iTick - iLastTempoTick ) ) / iTicksPerSecond;
     return -1;
 }
 
@@ -2487,7 +2485,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
     mms_t tmin = TotalTime / 60000000;
     mms_t tsec = (TotalTime % 60000000) / 1000000;
     mms_t tcs = (TotalTime % 1000000) / 100000;
-    mms_t tempo = 60000000.0 / m_iMicroSecsPerBeat;
+    bpm_t tempo = 60000000.0 / m_iMicroSecsPerBeat;
     mms_t iMaxMS = m_MIDI.GetInfo().llTotalMicroSecs / MS;
     uint8_t cur_line = 0;
 
