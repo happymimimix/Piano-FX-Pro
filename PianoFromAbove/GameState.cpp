@@ -1650,6 +1650,7 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
         if (pPrevious)
         {
             MIDI::Parse24Bit(pPrevious->GetData(), 3, (uint32_t*)&m_iMicroSecsPerBeat);
+            m_iMicroSecsPerBeat |= !m_iMicroSecsPerBeat;// Clamp to > 0
             m_iLastTempoTick = pPrevious->GetAbsT();
             m_llLastTempoTime = pPrevious->GetAbsMicroSec();
         }
@@ -1701,6 +1702,7 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
             if (pPrevious)
             {
                 MIDI::Parse24Bit(pPrevious->GetData(), 3, (uint32_t*)&m_iMicroSecsPerBeat);
+                m_iMicroSecsPerBeat |= !m_iMicroSecsPerBeat;// Clamp to > 0
                 m_iLastTempoTick = pPrevious->GetAbsT();
                 m_llLastTempoTime = pPrevious->GetAbsMicroSec();
             }
@@ -1750,6 +1752,7 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
                 if (pEvent->GetDataLen() == 3)
                 {
                     MIDI::Parse24Bit(pEvent->GetData(), 3, (uint32_t*)&m_iMicroSecsPerBeat);
+                    m_iMicroSecsPerBeat |= !m_iMicroSecsPerBeat;// Clamp to > 0
                     m_iLastTempoTick = pEvent->GetAbsT();
                     m_llLastTempoTime = pEvent->GetAbsMicroSec();
                 }
@@ -1838,24 +1841,24 @@ mms_t MainScreen::GetTickTime(mtk_t iTick, mtk_t iLastTempoTick, mms_t llLastTem
 bpm_t MainScreen::GetBeat(mtk_t iTick, bpm_t iBeatType, mtk_t iLastSignatureTick) {
     uint16_t iDivision = m_MIDI.GetInfo().iDivision;
     mtk_t iTickOffset = iTick - iLastSignatureTick;
-    if (!(iDivision & 0x8000))
-    {
+    if (iDivision & 0x8000) { return -1; }
+    else {
         m_CurBeat = (iTickOffset * iBeatType) / (iDivision * 4);
 
-        if (iTickOffset > 0)
+        if (iTickOffset > 0) {
             return (iTickOffset * iBeatType - 1) / (iDivision * 4) + 1;
-        else
+        }
+        else {
             return (iTickOffset * iBeatType) / (iDivision * 4);
+        }
     }
-
-    return -1;
+    
 }
 
 // Rounds up to the nearest beat
 mtk_t MainScreen::GetBeatTick(mtk_t iTick, bpm_t iBeatType, mtk_t iLastSignatureTick) {
     uint16_t iDivision = m_MIDI.GetInfo().iDivision;
-    if (!(iDivision & 0x8000))
-        return iLastSignatureTick + (GetBeat(iTick, iBeatType, iLastSignatureTick) * iDivision * 4) / iBeatType;
+    if (!(iDivision & 0x8000)) { return iLastSignatureTick + (GetBeat(iTick, iBeatType, iLastSignatureTick) * iDivision * 4) / iBeatType; }
     return -1;
 }
 
@@ -2012,6 +2015,7 @@ void MainScreen::RenderLines() {
             {
                 MIDIMetaEvent* pEvent = m_vMetaEvents[itNextTempo->second];
                 MIDI::Parse24Bit(pEvent->GetData(), 3, (uint32_t*)&iMicroSecsPerBeat);
+                iMicroSecsPerBeat |= !iMicroSecsPerBeat;// Clamp to > 0
                 iLastTempoTick = pEvent->GetAbsT();
                 llLastTempoTime = pEvent->GetAbsMicroSec();
                 ++itNextTempo;
@@ -2555,11 +2559,16 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
     }
     if (m_MIDI.GetInfo().iDivision & 0x8000) {
         unsigned short iFramesPerSec = static_cast<unsigned short>(-static_cast<signed char>(m_MIDI.GetInfo().iDivision >> 8)) * static_cast<unsigned short>(100);
+        if (iFramesPerSec == 2900) iFramesPerSec = 2997;
+        if (iFramesPerSec == 5900) iFramesPerSec = 5994;
+        if (iFramesPerSec == 11900) iFramesPerSec = 11988;
         unsigned char iTicksPerFrame = m_MIDI.GetInfo().iDivision & 0xFF;
-        RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText7).c_str(), "%d tpf @%d fps", iTicksPerFrame, iFramesPerSec);
+        iFramesPerSec |= !iFramesPerSec;// Clamp to > 0
+        iTicksPerFrame |= !iTicksPerFrame;// Clamp to > 0
+        RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText7).c_str(), "%d TPF @%.2f FPS", iTicksPerFrame, static_cast<float>(iFramesPerSec)/100.0f);
     }
     else {
-        RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText7).c_str(), "%.3lf bpm", tempo);
+        RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText7).c_str(), "%.3lf BPM", tempo);
     }
     if (cControls.bPhigros) {
         RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText8).c_str(), passedFormatted.c_str());

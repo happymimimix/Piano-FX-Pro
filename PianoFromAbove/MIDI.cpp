@@ -44,6 +44,8 @@ MIDIPos::MIDIPos(MIDI& midi) : m_MIDI(midi)
         if (iFramesPerSec == 5900) iFramesPerSec = 5994;
         if (iFramesPerSec == 11900) iFramesPerSec = 11988;
         unsigned char iTicksPerFrame = m_MIDI.m_Info.iDivision & 0xFF;
+        iFramesPerSec |= !iFramesPerSec;// Clamp to > 0
+        iTicksPerFrame |= !iTicksPerFrame;// Clamp to > 0
 
         m_bIsStandard = false;
         m_iTicksPerBeat = m_iMicroSecsPerBeat = 0;
@@ -56,6 +58,8 @@ MIDIPos::MIDIPos(MIDI& midi) : m_MIDI(midi)
         m_iTicksPerSecond = 0;
         m_iTicksPerBeat = m_MIDI.m_Info.iDivision;
         m_iMicroSecsPerBeat = 500000;
+
+        m_iTicksPerBeat |= !m_iTicksPerBeat;
     }
 }
 
@@ -121,8 +125,7 @@ idx_t MIDIPos::GetNextEvent(mms_t iMicroSecs, MIDIEvent** pOutEvent)
     // Make sure the event doesn't occur after the requested time window
     mtk_t iMaxTickAllowed = m_iCurrTick;
     if (m_bIsStandard) {
-        if (m_iMicroSecsPerBeat != 0)
-            iMaxTickAllowed += (static_cast<mms_t>(m_iTicksPerBeat) * (m_iCurrMicroSec + iMicroSecs)) / m_iMicroSecsPerBeat;
+        iMaxTickAllowed += (static_cast<mms_t>(m_iTicksPerBeat) * (m_iCurrMicroSec + iMicroSecs)) / m_iMicroSecsPerBeat;
     }
     else {
         iMaxTickAllowed += (static_cast<mms_t>(m_iTicksPerSecond) * (m_iCurrMicroSec + iMicroSecs)) / 1000000;
@@ -146,8 +149,10 @@ idx_t MIDIPos::GetNextEvent(mms_t iMicroSecs, MIDIEvent** pOutEvent)
         if (pMinEvent->GetEventType() == MIDIEvent::MetaEvent)
         {
             MIDIMetaEvent* pMetaEvent = reinterpret_cast<MIDIMetaEvent*>(pMinEvent);
-            if (pMetaEvent->GetMetaEventType() == MIDIMetaEvent::SetTempo && pMetaEvent->GetDataLen() == 3)
+            if (pMetaEvent->GetMetaEventType() == MIDIMetaEvent::SetTempo && pMetaEvent->GetDataLen() == 3) {
                 MIDI::Parse24Bit(pMetaEvent->GetData(), 3, (uint32_t*)&m_iMicroSecsPerBeat);
+                m_iMicroSecsPerBeat |= !m_iMicroSecsPerBeat;// Clamp to > 0
+            }
         }
 
         return iSpan;
