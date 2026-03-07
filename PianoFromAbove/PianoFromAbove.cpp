@@ -804,6 +804,24 @@ string HatchBrushShader() {
 string TextShader(bool Type, bool IsReversed) {
     string Code = "";
     Code += "function " + string(Type ? (IsReversed ? "Delete" : "Type") : "") + "TextShader(DC,Time,Elapsed,W,H,GlobalState,Text,FontHeight,FontWidth,FontWeight,FaceName,Alignment,Italic,Underline,StrikeOut,PosX,PosY,NoBackground,TextR,TextG,TextB,BkR,BkG,BkB)\n";
+    Code += "if Text==nil then Text=\"Hello World\" end\n";
+    Code += "if FontHeight==nil then FontHeight=50 end\n";
+    Code += "if FontWidth==nil then FontWidth=30 end\n";
+    Code += "if FontWeight==nil then FontWeight=400 end\n";
+    Code += "if FaceName==nil then FaceName=\"Fixedsys\" end\n";
+    Code += "if Alignment==nil then Alignment=ALIGN_LEFT|ALIGN_TOP end\n";
+    Code += "if Italic==nil then Italic=0 end\n";
+    Code += "if Underline==nil then Underline=0 end\n";
+    Code += "if StrikeOut==nil then StrikeOut=0 end\n";
+    Code += "if PosX==nil then PosX=0 end\n";
+    Code += "if PosY==nil then PosY=0 end\n";
+    Code += "if NoBackground==nil then NoBackground=false end\n";
+    Code += "if TextR==nil then TextR=255 end\n";
+    Code += "if TextG==nil then TextG=255 end\n";
+    Code += "if TextB==nil then TextB=255 end\n";
+    Code += "if BkR==nil then BkR=255 end\n";
+    Code += "if BkG==nil then BkG=0 end\n";
+    Code += "if BkB==nil then BkB=0 end\n";
     EncodeColor::ColorR = "TextR";
     EncodeColor::ColorG = "TextG";
     EncodeColor::ColorB = "TextB";
@@ -1281,7 +1299,7 @@ string PixelateShader(bool WithAlpha) {
     string Code = "";
     Code += "function " + string(WithAlpha ? "Alpha" : "") + "PixelateShader(DC,Time,Elapsed,W,H,GlobalState,Multiplier"+string(WithAlpha?",Alpha" :"") + ")\n";
     Code += "if Multiplier==nil then Multiplier=4 end\n";
-    Code += WithAlpha?"if Alpha==nil then Alpha=(1<<6)-1 end\n":"";
+    Code += WithAlpha?"if Alpha==nil then Alpha=(1<<7)+(1<<6)-1 end\n":"";
     Code += "local MEMdc=EXE(\"CreateCompatibleDC\",DC)\n";
     Code += "local BMP=EXE(\"CreateCompatibleBitmap\",DC,math.floor(W/Multiplier),math.floor(H/Multiplier))\n";
     Code += "EXE(\"SelectObject\",MEMdc,BMP)\n";
@@ -1305,7 +1323,7 @@ string MatrixShader() {
     Code += "if MinSpeed==nil then MinSpeed=5 end\n";
     Code += "if MaxTailLength==nil then MaxTailLength=20 end\n";
     Code += "if MinTailLength==nil then MinTailLength=5 end\n";
-    Code += "if FontName==nil then FontName=\"Courier New\" end\n";
+    Code += "if FontName==nil then FontName=\"Fixedsys\" end\n";
     Code += "if R==nil then R=0 end\n";
     Code += "if G==nil then G=255 end\n";
     Code += "if B==nil then B=0 end\n";
