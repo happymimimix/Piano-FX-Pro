@@ -47,7 +47,7 @@ inline static const mms_t S = 1e+6;
 class GameState
 {
 public:
-    enum GameError : uint8_t { Success = 0, BadPointer, DirectXError };
+    enum GameError : uint8_t { Success = 0, BadPointer, OutOfMemory, DirectXError};
     enum State : uint8_t { Intro = 0, Splash, Practice };
 
     //Static methods

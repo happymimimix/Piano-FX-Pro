@@ -26,8 +26,9 @@
 const wstring GameState::Errors[] =
 {
     L"Success.",
-    L"Invalid pointer passed. ",
-    L"Error calling DirectX. "
+    L"Invalid pointer passed. It would be nice if you could submit feedback with a description of how this happened.",
+    L"Out of memory.",
+    L"Error calling DirectX. It would be nice if you could submit feedback with a description of how this happened."
 };
 
 GameState::GameError GameState::ChangeState(GameState* pNextState, GameState** pDestObj) {
@@ -258,7 +259,11 @@ SplashScreen::SplashScreen(HWND hWnd, D3D12Renderer* pRenderer, bool enableSplas
         vector< MIDIEvent* > vEvents;
         vEvents.reserve(m_MIDI.GetInfo().iEventCount);
         m_MIDI.ConnectNotes(); // Order's important here
-        m_MIDI.PostProcess(m_vEvents);
+        bool IsPostProcessOK = m_MIDI.PostProcess(m_vEvents);
+        if (!IsPostProcessOK) {
+            MessageBoxW(hWnd, Errors[GameError::OutOfMemory].c_str(), L"Error", MB_OK);
+            return;
+        }
 
         // Allocate
         m_vTrackSettings.resize(min(m_MIDI.GetInfo().iNumTracks, MaxTrackColors));
@@ -462,8 +467,12 @@ void SplashScreen::UpdateState(sidx_t iPos) {
     {
         // binary search
         sidx_t pos = LocateElement(note_state, iSisterIdx);
-        if (pos != -1)
+        if (pos != -1) {
             note_state.erase(note_state.begin() + pos);
+        }
+        else {
+            MessageBoxW(NULL, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
+        }
     }
 }
 
@@ -681,7 +690,11 @@ MainScreen::MainScreen(wstring sMIDIFile, State eGameMode, HWND hWnd, D3D12Rende
     for (key_t i = 0; i < 128; i++)
         m_vState[i].reserve(1 << 10);
 
-    m_MIDI.PostProcess(m_vEvents, &m_vMetaEvents, &m_vTempo, &m_vSignature, &m_vMarkers, &m_vColors);
+    bool IsPostProcessOK = m_MIDI.PostProcess(m_vEvents, &m_vMetaEvents, &m_vTempo, &m_vSignature, &m_vMarkers, &m_vColors);
+    if (!IsPostProcessOK) {
+        MessageBoxW(hWnd, Errors[GameError::OutOfMemory].c_str(), L"Error", MB_OK);
+        return;
+    }
 
     g_LoadingProgress.stage = MIDILoadingProgress::Stage::NCTable;
     g_LoadingProgress.progress = 0;
@@ -1397,8 +1410,12 @@ void MainScreen::UpdateState(key_t key, const thread_work_t& work) {
     else {
         // binary search
         idx_t pos = LocateElement(note_state, work.sister_idx);
-        if (pos != -1)
+        if (pos != -1) {
             note_state.erase(note_state.begin() + pos);
+        }
+        else {
+            MessageBoxW(NULL, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
+        }
 
         if (note_state.size() == 0)
             m_pNoteState[key] = -1;
@@ -1416,8 +1433,12 @@ void MainScreen::UpdateStateBackwards(key_t key, const thread_work_t& work) {
     else {
         // binary search
         idx_t pos = LocateElement(note_state, work.sister_idx);
-        if (pos != -1)
+        if (pos != -1) {
             note_state.erase(note_state.begin() + pos);
+        }
+        else {
+            MessageBoxW(NULL, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
+        }
 
         if (note_state.size() == 0)
             m_pNoteState[key] = -1;

@@ -17,6 +17,7 @@ using namespace std;
 // Type definitions... 
 typedef signed long mtk_t; // Midi tick timing type
 typedef signed long long mms_t; // Midi microsecond timing type
+typedef unsigned long ums_t; // Midi microsecond timing type (unsigned)
 typedef unsigned char key_t; // Midi note key and velocity type
 typedef signed char skey_t; // If value is 192 or more, reinterpret cast to this type
 typedef uint16_t track_t; // Midi track id type

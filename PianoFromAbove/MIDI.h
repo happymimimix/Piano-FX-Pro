@@ -123,7 +123,7 @@ public:
     idx_t ParseEvents(const unsigned char* pcData, idx_t iMaxSize);
     bool IsValid() const { return (m_vTracks.size() > 0 && m_Info.iNoteCount > 0 && m_Info.iDivision > 0); }
 
-    void PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMetaEvent*>* vMetaEvents = nullptr, eventvec_t* vTempo = nullptr, eventvec_t* vSignature = nullptr, eventvec_t* vMarkers = nullptr, eventvec_t* vColors = nullptr);
+    bool PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMetaEvent*>* vMetaEvents = nullptr, eventvec_t* vTempo = nullptr, eventvec_t* vSignature = nullptr, eventvec_t* vMarkers = nullptr, eventvec_t* vColors = nullptr);
     void ConnectNotes();
     void clear(void);
 
@@ -148,7 +148,8 @@ public:
         uint16_t iDivision;
         key_t iMinNote, iMaxNote;
         idx_t iNoteCount, iEventCount;
-        mtk_t iTotalTicks, iTotalBeats;
+        mtk_t iTotalTicks;
+        bpm_t iTotalBeats;
         mms_t llTotalMicroSecs, llFirstNote;
     };
 
@@ -272,7 +273,7 @@ public:
     }
     idx_t GetSisterIdx() const { return m_iSisterIdx; }
     idx_t GetSimultaneous() const { return m_iSimultaneous; }
-    mtk_t GetLength() const { return m_uLength; }
+    ums_t GetLength() const { return m_uLength; }
     bool GetPassDone() const { return m_bPassDone; }
 
     void SetChannel(chan_t channel) { m_cChannel = channel; }
@@ -280,7 +281,7 @@ public:
     void SetParam2(key_t param2) { m_cParam2 = param2; }
     void SetSisterIdx(idx_t iSisterIdx) { m_iSisterIdx = iSisterIdx; }
     void SetSimultaneous(idx_t iSimultaneous) { m_iSimultaneous = iSimultaneous; }
-    void SetLength(mtk_t length) { m_uLength = length; }
+    void SetLength(ums_t length) { m_uLength = length; }
     void SetPassDone(bool done) { m_bPassDone = done; }
 
     bool HasSister() const { return m_iSisterIdx != IDX_MAX; }
@@ -288,7 +289,7 @@ public:
 private:
     idx_t m_iSisterIdx;
     idx_t m_iSimultaneous;
-    mtk_t m_uLength;
+    ums_t m_uLength;
     bool m_bPassDone;
     chan_t m_cChannel;
     key_t m_cParam1;

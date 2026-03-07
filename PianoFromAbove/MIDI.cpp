@@ -570,7 +570,7 @@ void MIDI::MIDIInfo::AddTrackInfo(const MIDITrack& mTrack)
 
 // Sets absolute time variables. A lot of code for not much happening...
 // Has to be EXACT. Even a little drift and things start messing up a few minutes in (metronome, etc)
-void MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMetaEvent*>* vMetaEvents, eventvec_t* vTempo, eventvec_t* vSignature, eventvec_t* vMarkers, eventvec_t* vColors)
+bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMetaEvent*>* vMetaEvents, eventvec_t* vTempo, eventvec_t* vSignature, eventvec_t* vMarkers, eventvec_t* vColors)
 {
     // Iterator like class
     MIDIPos midiPos(*this);
@@ -622,11 +622,16 @@ void MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
                     iSimultaneous--;
                 }
                 auto sister = pChannelEvent->GetPassDone() ? pChannelEvent->GetSister(vChannelEvents) : pChannelEvent->GetSister(m_vTracks[pEvent->GetTrack()]->m_vEvents);
-                sister->SetSisterIdx(vChannelEvents.size());
-                sister->SetPassDone(true);
-                if (pChannelEvent->GetChannelEventType() == MIDIChannelEvent::NoteOff ||
-                    (pChannelEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pChannelEvent->GetParam2() == 0)) {
-                    sister->SetLength(llTime - sister->GetAbsMicroSec());
+                if (vChannelEvents.size() >= IDX_MAX) {
+                    return false;
+                }
+                else {
+                    sister->SetSisterIdx(vChannelEvents.size());
+                    sister->SetPassDone(true);
+                    if (pChannelEvent->GetChannelEventType() == MIDIChannelEvent::NoteOff ||
+                        (pChannelEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pChannelEvent->GetParam2() == 0)) {
+                        sister->SetLength(llTime - sister->GetAbsMicroSec());
+                    }
                 }
             }
             vChannelEvents.push_back(pChannelEvent);
@@ -678,6 +683,8 @@ void MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
 
     m_Info.llTotalMicroSecs = llTime;
     m_Info.llFirstNote = max(0LL, llFirstNote);
+
+    return true;
 }
 
 void MIDI::ConnectNotes()
