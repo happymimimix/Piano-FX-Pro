@@ -1628,7 +1628,7 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
         MIDIMetaEvent* pPrevious = GetPrevious(m_itNextTempo, m_vTempo, 3);
         if (pPrevious)
         {
-            MIDI::Parse24Bit(pPrevious->GetData(), 3, &m_iMicroSecsPerBeat);
+            MIDI::Parse24Bit(pPrevious->GetData(), 3, (uint32_t*)&m_iMicroSecsPerBeat);
             m_iLastTempoTick = pPrevious->GetAbsT();
             m_llLastTempoTime = pPrevious->GetAbsMicroSec();
         }
@@ -1679,7 +1679,7 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
             MIDIMetaEvent* pPrevious = GetPrevious(m_itNextTempo, m_vTempo, 3);
             if (pPrevious)
             {
-                MIDI::Parse24Bit(pPrevious->GetData(), 3, &m_iMicroSecsPerBeat);
+                MIDI::Parse24Bit(pPrevious->GetData(), 3, (uint32_t*)&m_iMicroSecsPerBeat);
                 m_iLastTempoTick = pPrevious->GetAbsT();
                 m_llLastTempoTime = pPrevious->GetAbsMicroSec();
             }
@@ -1728,7 +1728,7 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
                 MIDIMetaEvent* pEvent = m_vMetaEvents[m_itNextTempo->second];
                 if (pEvent->GetDataLen() == 3)
                 {
-                    MIDI::Parse24Bit(pEvent->GetData(), 3, &m_iMicroSecsPerBeat);
+                    MIDI::Parse24Bit(pEvent->GetData(), 3, (uint32_t*)&m_iMicroSecsPerBeat);
                     m_iLastTempoTick = pEvent->GetAbsT();
                     m_llLastTempoTime = pEvent->GetAbsMicroSec();
                 }
@@ -1967,7 +1967,7 @@ void MainScreen::RenderLines() {
         mms_t llEndTime = (m_bTickMode ? m_iStartTick : m_llStartTime) + m_llTimeSpan;
 
         // Copy tempo state vars
-        bpm_t iLastTempoTick = m_iLastTempoTick;
+        mtk_t iLastTempoTick = m_iLastTempoTick;
         bpm_t iMicroSecsPerBeat = m_iMicroSecsPerBeat;
         mms_t llLastTempoTime = m_llLastTempoTime;
         eventvec_t::const_iterator itNextTempo = m_itNextTempo;
@@ -1990,7 +1990,7 @@ void MainScreen::RenderLines() {
                 iNextBeatTick > m_vMetaEvents[itNextTempo->second]->GetAbsT())
             {
                 MIDIMetaEvent* pEvent = m_vMetaEvents[itNextTempo->second];
-                MIDI::Parse24Bit(pEvent->GetData(), 3, &iMicroSecsPerBeat);
+                MIDI::Parse24Bit(pEvent->GetData(), 3, (uint32_t*)&iMicroSecsPerBeat);
                 iLastTempoTick = pEvent->GetAbsT();
                 llLastTempoTime = pEvent->GetAbsMicroSec();
                 ++itNextTempo;
@@ -2485,7 +2485,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
     mms_t tmin = TotalTime / 60000000;
     mms_t tsec = (TotalTime % 60000000) / 1000000;
     mms_t tcs = (TotalTime % 1000000) / 100000;
-    bpm_t tempo = 60000000.0 / m_iMicroSecsPerBeat;
+    double tempo = 60000000.0 / m_iMicroSecsPerBeat;
     mms_t iMaxMS = m_MIDI.GetInfo().llTotalMicroSecs / MS;
     uint8_t cur_line = 0;
 

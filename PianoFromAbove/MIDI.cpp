@@ -147,7 +147,7 @@ idx_t MIDIPos::GetNextEvent(mms_t iMicroSecs, MIDIEvent** pOutEvent)
         {
             MIDIMetaEvent* pMetaEvent = reinterpret_cast<MIDIMetaEvent*>(pMinEvent);
             if (pMetaEvent->GetMetaEventType() == MIDIMetaEvent::SetTempo && pMetaEvent->GetDataLen() == 3)
-                MIDI::Parse24Bit(pMetaEvent->GetData(), 3, &m_iMicroSecsPerBeat);
+                MIDI::Parse24Bit(pMetaEvent->GetData(), 3, (uint32_t*)&m_iMicroSecsPerBeat);
         }
 
         return iSpan;
@@ -496,7 +496,8 @@ idx_t MIDI::ParseMIDI(const unsigned char* pcData, idx_t iMaxSize)
 
 idx_t MIDI::ParseTracks(const unsigned char* pcData, idx_t iMaxSize)
 {
-    idx_t iTotal = 0, iCount = 0, iTrack = m_vTracks.size();
+    idx_t iTotal = 0, iCount = 0;
+    track_t iTrack = m_vTracks.size();
     g_LoadingProgress.stage = MIDILoadingProgress::Stage::ParseTracks;
     g_LoadingProgress.progress = 0;
     g_LoadingProgress.max = m_Info.iNumTracks; // not actually guaranteed to hit this
@@ -582,7 +583,7 @@ void MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
     idx_t iSimultaneous = 0;
 
     idx_t event_count = 0;
-    for (idx_t i = 0; i < m_vTracks.size(); i++) {
+    for (track_t i = 0; i < m_vTracks.size(); i++) {
         event_count += m_vTracks[i]->m_vEvents.size();
         if (!m_vTracks[i]->m_vEvents.empty())
             midiPos.m_pTrackTime[i] = m_vTracks[i]->m_vEvents[0]->GetAbsT();
@@ -688,7 +689,7 @@ void MIDI::ConnectNotes()
     g_LoadingProgress.progress = 0;
     g_LoadingProgress.max = m_vTracks.size();
 
-    concurrency::parallel_for(size_t(0), m_vTracks.size(), [&](idx_t track) {
+    concurrency::parallel_for(track_t(0), static_cast<track_t>(m_vTracks.size()), [&](track_t track) {
         vector<MIDIEvent*>& vEvents = m_vTracks[track]->m_vEvents;
         for (idx_t i = 0; i < vEvents.size(); i++) {
             if (vEvents[i]->GetEventType() == MIDIEvent::ChannelEvent)
