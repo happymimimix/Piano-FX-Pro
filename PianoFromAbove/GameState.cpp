@@ -126,27 +126,12 @@ GameState::GameError IntroScreen::Render() {
 
     // Present the backbuffer contents to the display
     m_pRenderer->EndScene();
-    m_pRenderer->Present();
 
     // Get the current frame
-    auto* frame = m_pRenderer->Screenshot();
+    auto* Frame = m_pRenderer->Screenshot();
     //Don't let BitBlt capture a blank screen! 
-    HDC hdcGFX = GetDC(g_hWndGfx);
-    HDC hdcMem = CreateCompatibleDC(hdcGFX);
-    HBITMAP hBitmap = CreateCompatibleBitmap(hdcGFX, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight());
-    SelectObject(hdcMem, hBitmap);
-    BITMAPINFO bmpInfo = {};
-    bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    bmpInfo.bmiHeader.biWidth = m_pRenderer->GetBufferWidth();
-    bmpInfo.bmiHeader.biHeight = -m_pRenderer->GetBufferHeight();
-    bmpInfo.bmiHeader.biPlanes = 1;
-    bmpInfo.bmiHeader.biBitCount = 32;
-    bmpInfo.bmiHeader.biCompression = BI_RGB;
-    SetDIBits(hdcMem, hBitmap, 0, m_pRenderer->GetBufferHeight(), frame, &bmpInfo, DIB_RGB_COLORS);
-    BitBlt(hdcGFX, 0, 0, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(), hdcMem, 0, 0, SRCCOPY);
-    DeleteObject(hBitmap);
-    DeleteDC(hdcMem);
-    ReleaseDC(g_hWndGfx, hdcGFX);
+    UpdateGDI(g_hWndGfx, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(), Frame);
+    m_pRenderer->Present();
 
     return Success;
 }
@@ -512,27 +497,12 @@ GameState::GameError SplashScreen::Render() {
 
     // Present the backbuffer contents to the display
     m_pRenderer->EndSplashScene();
-    m_pRenderer->Present();
 
     // Get the current frame
-    auto* frame = m_pRenderer->Screenshot();
+    auto* Frame = m_pRenderer->Screenshot();
     //Don't let BitBlt capture a blank screen! 
-    HDC hdcGFX = GetDC(g_hWndGfx);
-    HDC hdcMem = CreateCompatibleDC(hdcGFX);
-    HBITMAP hBitmap = CreateCompatibleBitmap(hdcGFX, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight());
-    SelectObject(hdcMem, hBitmap);
-    BITMAPINFO bmpInfo = {};
-    bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    bmpInfo.bmiHeader.biWidth = m_pRenderer->GetBufferWidth();
-    bmpInfo.bmiHeader.biHeight = -m_pRenderer->GetBufferHeight();
-    bmpInfo.bmiHeader.biPlanes = 1;
-    bmpInfo.bmiHeader.biBitCount = 32;
-    bmpInfo.bmiHeader.biCompression = BI_RGB;
-    SetDIBits(hdcMem, hBitmap, 0, m_pRenderer->GetBufferHeight(), frame, &bmpInfo, DIB_RGB_COLORS);
-    BitBlt(hdcGFX, 0, 0, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(), hdcMem, 0, 0, SRCCOPY);
-    DeleteObject(hBitmap);
-    DeleteDC(hdcMem);
-    ReleaseDC(g_hWndGfx, hdcGFX);
+    UpdateGDI(g_hWndGfx, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(),Frame);
+    m_pRenderer->Present();
 
     return Success;
 }
@@ -773,6 +743,9 @@ void MainScreen::InitState() {
     m_llTimeSpan = static_cast<mms_t>(3.0 * abs(m_dNSpeed) * 1000000);
     IsLastFrameReversed = m_dSpeed < 0;
     IsReversedStateInitialized = false;
+    CE_Connected = false;
+    CE_DoNextTick = false;
+    CE_Responded = false;
 
     resolution = m_MIDI.GetInfo().iDivision;
     TotalTime = m_MIDI.GetInfo().llTotalMicroSecs + 250000;
@@ -1889,34 +1862,54 @@ GameState::GameError MainScreen::Render()
 
     // Present the backbuffer contents to the display
     m_pRenderer->EndScene(m_bBackgroundLoaded);
-    m_pRenderer->Present();
 
     // Get the current frame
-    auto* frame = m_pRenderer->Screenshot();
+    auto* Frame = m_pRenderer->Screenshot();
+    bool DoGDI = false;
     // Dump frame!!!!
     if (m_bDumpFrames && !cPlayback.GetPaused()) {
+        if (CE_Connected) {
+            HWND hGDI = FindWindowW(L"PFXGDI", NULL);
+            if (hGDI != NULL && IsWindow(hGDI)) {
+                // GDI is active!
+                DoGDI = true;
+                // This is a special case where we need to update GDI even in render mode. 
+                UpdateGDI(g_hWndGfx, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(), Frame);
+            }
+            // Send a signal to CE and wait for CE to do its job...
+            CE_DoNextTick = true;
+            while (!CE_Responded)
+            {
+                // Prevent hangs
+                MSG msg = {};
+                if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
+                    TranslateMessage(&msg);
+                    DispatchMessageW(&msg);
+                }
+            }
+            // CE has responded! 
+            CE_Responded = false;
+
+            // We need to do something different if GDI shaders are active. 
+            if (DoGDI) {
+                char* Output = new char[m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4];
+                // Capture what CE has drawn
+                GetGDI(hGDI, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(), Output);
+                // Write to pipe
+                WriteFile(m_hVideoPipe, Output, static_cast<DWORD>(m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4), nullptr, nullptr);
+                // Free memory
+                delete[] Output;
+            }
+        }
         // Write to pipe
-        WriteFile(m_hVideoPipe, frame, static_cast<DWORD>(m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4), nullptr, nullptr);
+        // Only when GDI shaders are NOT active. 
+        if (!DoGDI) { WriteFile(m_hVideoPipe, Frame, static_cast<DWORD>(m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4), nullptr, nullptr); }
     }
     if (!m_bDumpFrames) { //Stop wasting time on GDI shit when rendering to video. 
         //Don't let BitBlt capture a blank screen! 
-        HDC hdcGFX = GetDC(g_hWndGfx);
-        HDC hdcMem = CreateCompatibleDC(hdcGFX);
-        HBITMAP hBitmap = CreateCompatibleBitmap(hdcGFX, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight());
-        SelectObject(hdcMem, hBitmap);
-        BITMAPINFO bmpInfo = {};
-        bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-        bmpInfo.bmiHeader.biWidth = m_pRenderer->GetBufferWidth();
-        bmpInfo.bmiHeader.biHeight = -m_pRenderer->GetBufferHeight();
-        bmpInfo.bmiHeader.biPlanes = 1;
-        bmpInfo.bmiHeader.biBitCount = 32;
-        bmpInfo.bmiHeader.biCompression = BI_RGB;
-        SetDIBits(hdcMem, hBitmap, 0, m_pRenderer->GetBufferHeight(), frame, &bmpInfo, DIB_RGB_COLORS);
-        BitBlt(hdcGFX, 0, 0, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(), hdcMem, 0, 0, SRCCOPY);
-        DeleteObject(hBitmap);
-        DeleteDC(hdcMem);
-        ReleaseDC(g_hWndGfx, hdcGFX);
+        UpdateGDI(g_hWndGfx, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(), Frame);
     }
+    m_pRenderer->Present();
 
     return Success;
 }

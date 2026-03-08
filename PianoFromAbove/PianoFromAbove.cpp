@@ -85,6 +85,12 @@ string FakeThreadingEngine() {
     Code += "coroutine.resume(Thread)\n";
     Code += "end\n";
     Code += "function Tick()\n";
+    Code += "if readShortInteger(CE_VideoOutput)~=0 then\n";
+    Code += "while Incomplete() and readShortInteger(CE_DoNextTick)==0 do\n";
+    Code += "processMessages()\n";
+    Code += "end\n";
+    Code += "writeShortInteger(CE_DoNextTick,0)\n";
+    Code += "end\n";
     Code += "local ThreadIdx=1\n";
     Code += "while ThreadIdx<=#Threads do\n";
     Code += "if coroutine.status(Threads[ThreadIdx])==\"dead\" then\n";
@@ -97,6 +103,9 @@ string FakeThreadingEngine() {
     Code += "end\n";
     Code += "processMessages()\n";
     Code += "collectgarbage(\"collect\")\n";
+    Code += "if readShortInteger(CE_VideoOutput)~=0 then\n";
+    Code += "writeShortInteger(CE_Responded,1)\n";
+    Code += "end\n";
     Code += "end\n";
     Code += "function Next()\n";
     Code += "coroutine.yield()\n";
@@ -264,19 +273,21 @@ string CloseDebugWindow(string Name) {
 string CleanUp() {
     string Code = "";
     Code += "while Incomplete() or ShaderWorking==true do Tick() end\n";
+    Code += "writeShortInteger(CE_Connected,0)\n";
     Code += "EXE(\"ReleaseDC\",hGFX,PFXdc)\n";
     Code += "EXE(\"ReleaseDC\",hGDI,GDIdc)\n";
+    Code += "if DebugPending~=nil then\n";
     Code += CloseDebugWindow("Pending");
+    Code += "end\n";
+    Code += "if DebugActive~=nil then\n";
     Code += CloseDebugWindow("Active");
+    Code += "end\n";
+    Code += "if DebugHistory~=nil then\n";
     Code += CloseDebugWindow("History");
+    Code += "end\n";
     Code += "if DebugShader~=nil then\n";
     Code += CloseDebugWindow("Shader");
     Code += "end\n";
-    Code += "Threads=nil\n";
-    Code += "LastUpdate=nil\n";
-    Code += "ShaderLookupTable=nil\n";
-    Code += "ShaderGlobalState=nil\n";
-    Code += "ShaderLookupCounter=nil\n";
     Code += "collectgarbage(\"collect\")\n";
     Code += MultiInstanceGuardRelease();
     return Code;
@@ -1360,7 +1371,7 @@ string MatrixShader() {
     Code += "end\n";
     Code += "for TailPiece=0,ColData.TailLength do\n";
     Code += "local PieceY=ColData.Y-TailPiece*CharHeight\n";
-    Code += "if PieceY>=0 and PieceY<=H then\n";
+    Code += "if PieceY>=-CharHeight and PieceY<H then\n";
     Code += "local Brightness=1-TailPiece/ColData.TailLength\n";
     Code += "local NewR=math.ceil(R*Brightness)\n";
     Code += "local NewG=math.ceil(G*Brightness)\n";
@@ -1505,6 +1516,11 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += DefineMemoryAddress("VelocityThreshold", GetAddress(cControls.iVelocityThreshold));
                 Code += DefineMemoryAddress("Caption", GetAddress(CheatEngineCaption));
                 Code += DefineMemoryAddress("DifficultyText", GetAddress(Difficulty));
+                Code += "-- FFMPEG Video Export\n";
+                Code += DefineMemoryAddress("CE_VideoOutput", GetAddress(cControls.bDumpFrames));
+                Code += DefineMemoryAddress("CE_Connected", GetAddress(CE_Connected));
+                Code += DefineMemoryAddress("CE_DoNextTick", GetAddress(CE_DoNextTick));
+                Code += DefineMemoryAddress("CE_Responded", GetAddress(CE_Responded));
                 Code += "-- Custom Variable Definitions: (Version: " + WStringToUtf8(VersionString) + ")\n";
                 Code += "\n";
                 Code += "-- Function Definitions: (DO NOT CHANGE!)\n";
@@ -1577,6 +1593,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += "-- Custom GDI Shaders: \n";
                 Code += "\n";
                 Code += "-- Initialization: \n";
+                Code += "writeShortInteger(CE_Connected,1)\n";
                 Code += "EXE(\"SetForegroundWindow\",hPFX)\n";
                 Code += "DisplayShaderFPS=true\n";
                 Code += "SetMicroseconds(-3*S)\n";
@@ -1590,7 +1607,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += "SetOffsetX(0.00)\n";
                 Code += "SetOffsetY(0.00)\n";
                 Code += "SetZoom(0.00)\n";
-                Code += "SetSameWidth(1)\n";
+                Code += "SetSameWidth(0)\n";
                 Code += "SetVelocityMapping(0)\n";
                 Code += "SetPaused(0)\n";
                 Code += "SetKeyboard(1)\n";
@@ -1600,7 +1617,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += "SetTickBased(1)\n";
                 Code += "SetHideStatistics(0)\n";
                 Code += "SetRemoveOverlaps(0)\n";
-                Code += "SetLimitFPS(1)\n";
+                Code += "SetLimitFPS(0)\n";
                 Code += "SetVelocityThreshold(1)\n";
                 Code += "SetCaption(\"Welcome to Piano-FX Pro\")\n";
                 Code += "-- If you feel the default difficulty is inappropriate, change it with the following code: \n";
@@ -1773,7 +1790,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
         return 1;
 
     // Register the graphics window class
-    wc.style = CS_OWNDC;
+    wc.style = CS_OWNDC | CS_SAVEBITS;
     wc.lpfnWndProc = GfxProc;
     wc.lpszMenuName = NULL;
     wc.lpszClassName = GFXCLASSNAME;
@@ -1781,7 +1798,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
         return 1;
 
     // Register the position control window class
-    wc.style = 0;
+    wc.style = NULL;
     wc.lpfnWndProc = PosnProc;
     wc.lpszClassName = POSNCLASSNAME;
     if (!RegisterClassEx(&wc))

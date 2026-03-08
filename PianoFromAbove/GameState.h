@@ -42,6 +42,48 @@ inline char Difficulty[1 << 10] = {};
 inline bool UpdateNotePos = true;
 inline static const mms_t MS = 1e+3;
 inline static const mms_t S = 1e+6;
+inline bool CE_Connected = false;
+inline bool CE_DoNextTick = false;
+inline bool CE_Responded = false;
+
+inline void UpdateGDI(HWND hPFX, win32_t W, win32_t H, char* Frame) {
+    HDC PFXdc = GetDC(hPFX);
+    HDC MEMdc = CreateCompatibleDC(PFXdc);
+    HBITMAP BMP = CreateCompatibleBitmap(PFXdc, W, H);
+    SelectObject(MEMdc, BMP);
+    BITMAPINFO BMPinfo = {};
+    BMPinfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    BMPinfo.bmiHeader.biWidth =W;
+    BMPinfo.bmiHeader.biHeight = -H;
+    BMPinfo.bmiHeader.biPlanes = 1;
+    BMPinfo.bmiHeader.biBitCount = 32;
+    BMPinfo.bmiHeader.biCompression = BI_RGB;
+    SetDIBits(MEMdc, BMP, 0, H, Frame, &BMPinfo, DIB_RGB_COLORS);
+    BitBlt(PFXdc, 0, 0,W,H, MEMdc, 0, 0, SRCCOPY);
+    DeleteDC(MEMdc);
+    DeleteObject(BMP);
+    ReleaseDC(hPFX, PFXdc);
+}
+
+inline void GetGDI(HWND hGDI, win32_t W, win32_t H, char* Output) {
+    HDC GDIdc = GetDC(hGDI);
+    HDC MEMdc = CreateCompatibleDC(GDIdc);
+    HBITMAP BMP = CreateCompatibleBitmap(GDIdc, W, H);
+    SelectObject(MEMdc, BMP);
+    BitBlt(MEMdc, 0, 0,W,H, GDIdc, 0, 0, SRCCOPY);
+    BITMAPINFO bmpInfo = {};
+    bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bmpInfo.bmiHeader.biWidth = W;
+    bmpInfo.bmiHeader.biHeight = -H;
+    bmpInfo.bmiHeader.biPlanes = 1;
+    bmpInfo.bmiHeader.biBitCount = 32;
+    bmpInfo.bmiHeader.biCompression = BI_RGB;
+    GetDIBits(MEMdc, BMP, 0, H, Output, &bmpInfo, DIB_RGB_COLORS);
+    DeleteDC(MEMdc);
+    DeleteObject(BMP);
+    ReleaseDC(hGDI, GDIdc);
+}
+
 
 //Abstract base class
 class GameState
