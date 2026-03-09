@@ -51,7 +51,7 @@ GameState::GameError GameState::ChangeState(GameState* pNextState, GameState** p
     {
         *pDestObj = new IntroScreen(pNextState->m_hWnd, pNextState->m_pRenderer);
         delete pNextState;
-        (*pDestObj)->Init();
+        iResult = (*pDestObj)->Init();
         return iResult;
     }
 
@@ -123,7 +123,7 @@ GameState::GameError IntroScreen::Render() {
         0xFFFFFFFF,
         MyTradeMark.c_str()
     );
-    m_pRenderer->EndText();
+    if (FAILED(m_pRenderer->EndText())) return DirectXError;
 
     // Present the backbuffer contents to the display
     if (FAILED(m_pRenderer->EndScene())) return DirectXError;
@@ -1595,7 +1595,7 @@ void MainScreen::ApplyMarker(unsigned char* data, msgln_t size) {
 
         if (codepages[cVideo.eMarkerEncoding] != CP_UTF8) {
             // Yes, I have to convert to wide and then back to UTF-8...
-            msgln_t wide_len = MultiByteToWideChar(codepages[cVideo.eMarkerEncoding], 0, temp_str, size + 1, NULL, 0);
+            win32_t wide_len = MultiByteToWideChar(codepages[cVideo.eMarkerEncoding], 0, temp_str, size + 1, NULL, 0);
             auto wide_temp_str = new WCHAR[wide_len];
             MultiByteToWideChar(codepages[cVideo.eMarkerEncoding], 0, temp_str, size + 1, wide_temp_str, wide_len);
 
@@ -1855,62 +1855,52 @@ GameState::GameError MainScreen::Render()
         m_sCurBackground = cVisual.sBackground;
     }
 
-    m_pRenderer->ClearAndBeginScene(m_csBackground.iPrimaryRGB);
+    if (FAILED(m_pRenderer->ClearAndBeginScene(m_csBackground.iPrimaryRGB))) return DirectXError;
+
     if (m_fZoomX * m_fTempZoomX != 0.0f) {
         RenderLines();
         RenderNotes();
         if (m_bShowKB) RenderKeys();
     }
+    if (FAILED(m_pRenderer->BeginText())) return DirectXError;
     RenderText();
+    if (FAILED(m_pRenderer->EndText())) return DirectXError;
 
     // Present the backbuffer contents to the display
     if (FAILED(m_pRenderer->EndScene(m_bBackgroundLoaded))) return DirectXError;
 
     // Get the current frame
     auto* Frame = m_pRenderer->Screenshot();
-    bool DoGDI = false;
-    // Dump frame!!!!
-    if (m_bDumpFrames && !cPlayback.GetPaused()) {
-        if (CE_Connected) {
-            HWND hGDI = FindWindowW(L"PFXGDI", NULL);
-            if (hGDI != NULL && IsWindow(hGDI)) {
-                // GDI is active!
-                DoGDI = true;
-                // This is a special case where we need to update GDI even in render mode. 
-                UpdateGDI(g_hWndGfx, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(), Frame);
-            }
-            // Send a signal to CE and wait for CE to do its job...
-            CE_DoNextTick = true;
-            while (!CE_Responded)
-            {
-                // Prevent hangs
-                MSG msg = {};
-                if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
-                    TranslateMessage(&msg);
-                    DispatchMessageW(&msg);
-                }
-            }
-            // CE has responded! 
-            CE_Responded = false;
-
-            // We need to do something different if GDI shaders are active. 
-            if (DoGDI) {
-                char* Output = new char[m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4];
-                // Capture what CE has drawn
-                GetGDI(hGDI, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(), Output);
-                // Write to pipe
-                WriteFile(m_hVideoPipe, Output, static_cast<DWORD>(m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4), nullptr, nullptr);
-                // Free memory
-                delete[] Output;
-            }
-        }
-        // Write to pipe
-        // Only when GDI shaders are NOT active. 
-        if (!DoGDI) { WriteFile(m_hVideoPipe, Frame, static_cast<DWORD>(m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4), nullptr, nullptr); }
-    }
+    HWND hGDI = FindWindowW(L"PFXGDI", NULL);
     if (!m_bDumpFrames) { //Stop wasting time on GDI shit when rendering to video. 
         //Don't let BitBlt capture a blank screen! 
         UpdateGDI(g_hWndGfx, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(), Frame);
+    }
+    if (config.m_bManualTimer && CE_Connected) {
+        if (IsWindow(hGDI) && m_bDumpFrames && !cPlayback.GetPaused()) {
+            // This is a special case where we need to update GDI even in render mode. 
+            UpdateGDI(g_hWndGfx, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(), Frame);
+        }
+        // Send a signal to CE and wait for CE to do its job...
+        CE_DoNextTick = true;
+        while (!CE_Responded){}
+        // CE has responded! 
+        CE_Responded = false;
+    }
+    // Dump frame!!!!
+    if (m_bDumpFrames && !cPlayback.GetPaused()) {
+        // Write to pipe
+        if (IsWindow(hGDI) && CE_Connected) {
+            char* Output = new char[m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4];
+            // Capture what CE has drawn
+            GetGDI(hGDI, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(), Output);
+            // Write to pipe
+            WriteFile(m_hVideoPipe, Output, static_cast<DWORD>(m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4), nullptr, nullptr);
+            // Free memory
+            delete[] Output;
+        }else{
+            WriteFile(m_hVideoPipe, Frame, static_cast<DWORD>(m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4), nullptr, nullptr);
+        }
     }
     if (FAILED(m_pRenderer->Present())) return DirectXError;
 
@@ -2451,7 +2441,6 @@ void MainScreen::RenderText() {
     rcMsg.bottom = rcMsg.top + iMsgCY;
 
     // Draw the text
-    m_pRenderer->BeginText();
     RenderStatus(&rcStatus);
     if (!m_sMarker.empty() && cVideo.bShowMarkers) {
         RenderMarker(m_sMarker.c_str());
@@ -2467,7 +2456,6 @@ void MainScreen::RenderText() {
             RenderMessage(&rcMsg, ("The caption has exceeded the maximum acceptable length of " + to_string(sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0])) + " characters. \nAs a result, this caption has been blocked from showing in order to prevent crashing. \nPlease consider writing something slightly shorter. ").c_str());
         }
     }
-    m_pRenderer->EndText();
 }
 
 void MainScreen::RenderStatusLine(unsigned char line, const char* left, const char* format, ...) {

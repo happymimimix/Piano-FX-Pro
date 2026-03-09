@@ -137,14 +137,14 @@ wchar_t Util::m_wsBuf[16384];
 
 wchar_t* Util::StringToWstring(const string& s)
 {
-    int result = MultiByteToWideChar(CP_UTF8, 0, s.c_str(), -1, m_wsBuf, sizeof(m_wsBuf) / sizeof(wchar_t));
+    win32_t result = MultiByteToWideChar(CP_UTF8, 0, s.c_str(), -1, m_wsBuf, sizeof(m_wsBuf) / sizeof(wchar_t));
     if (!result) m_wsBuf[0] = L'\0';
     return m_wsBuf;
 }
 
 char* Util::WstringToString(const wstring& s)
 {
-    int result = WideCharToMultiByte(CP_UTF8, 0, s.c_str(), -1, m_sBuf, sizeof(m_sBuf), NULL, NULL);
+    win32_t result = WideCharToMultiByte(CP_UTF8, 0, s.c_str(), -1, m_sBuf, sizeof(m_sBuf), NULL, NULL);
     if (!result) m_sBuf[0] = '\0';
     return m_sBuf;
 }

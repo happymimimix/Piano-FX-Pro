@@ -1907,11 +1907,13 @@ DWORD WINAPI GameThread(LPVOID lpParameter)
     }
 
     // Create the game object
+    GameState::GameError ErrorLevel;
     GameState* pGameState = reinterpret_cast<GameState*>(lpParameter);
     pGameState->SetHWnd(g_hWndGfx);
     pGameState->SetRenderer(pRenderer);
-    pGameState->Init();
-    GameState::GameError ErrorLevel;
+    if ((ErrorLevel = pGameState->Init()) != GameState::Success) {
+        PostMessage(g_hWnd, WM_COMMAND, ID_GAMEERROR, ErrorLevel);
+        }
 
     wchar_t buf[1 << 10] = {};
     _snwprintf_s(buf, 1 << 10, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle6 MainWindowTitle7 MainWindowTitle8);
@@ -1921,8 +1923,11 @@ DWORD WINAPI GameThread(LPVOID lpParameter)
     MSG msg = {};
     while (msg.message != WM_QUIT)
     {
-        while (g_MsgQueue.Pop(msg))
-            pGameState->MsgProc(msg.hwnd, msg.message, msg.wParam, msg.lParam);
+        while (g_MsgQueue.Pop(msg)) {
+            if ((ErrorLevel = pGameState->MsgProc(msg.hwnd, msg.message, msg.wParam, msg.lParam)) != GameState::Success) {
+                PostMessage(g_hWnd, WM_COMMAND, ID_GAMEERROR, ErrorLevel);
+            }
+        }
 
         if ((ErrorLevel = GameState::ChangeState(pGameState->NextState(), &pGameState)) != GameState::Success) {
             PostMessage(g_hWnd, WM_COMMAND, ID_GAMEERROR, ErrorLevel);

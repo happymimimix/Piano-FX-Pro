@@ -133,7 +133,7 @@ tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) {
             .Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
             .Buffer = {
                 .FirstElement = 0,
-                .NumElements = RectsPerPass,
+                .NumElements = NotesPerPass,
                 .StructureByteStride = sizeof(NoteData),
                 .Flags = D3D12_BUFFER_SRV_FLAG_NONE,
             }
@@ -1217,7 +1217,7 @@ HRESULT D3D12Renderer::EndScene(bool draw_bg) {
 
     // Flush the intermediate note buffer
     if (!m_vNotesIntermediate.empty()) {
-        for (idx_t i = 0; i < m_vNotesIntermediate.size(); i += RectsPerPass) {
+        for (idx_t i = 0; i < m_vNotesIntermediate.size(); i += NotesPerPass) {
             if (i == 0) {
                 if (Config::GetConfig().GetVideoSettings().bSameWidth) {
                     if (Config::GetConfig().GetVideoSettings().bOR) {
@@ -1238,7 +1238,7 @@ HRESULT D3D12Renderer::EndScene(bool draw_bg) {
             }
 
             auto remaining = m_vNotesIntermediate.size() - i;
-            auto note_count = min(remaining, RectsPerPass);
+            auto note_count = min(remaining, NotesPerPass);
             D3D12_RANGE note_range = {
                 .Begin = 0,
                 .End = note_count * sizeof(NoteData),
@@ -1600,7 +1600,6 @@ void D3D12Renderer::SetupCommandList() {
 }
 
 char* D3D12Renderer::Screenshot() {
-    WaitForGPU();
     // Reset the command list
     m_pCommandAllocator[m_uFrameIndex]->Reset();
     m_pCommandList->Reset(m_pCommandAllocator[m_uFrameIndex].Get(), m_pRectPipelineState.Get());
