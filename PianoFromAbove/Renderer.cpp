@@ -921,7 +921,8 @@ tuple<HRESULT, const char*> D3D12Renderer::CreateWindowDependentObjects(HWND hWn
 }
 
 HRESULT D3D12Renderer::ResetDeviceIfNeeded() {
-    // TODO
+    HRESULT hr = m_pDevice->GetDeviceRemovedReason();
+    if (FAILED(hr)) { return ResetDevice(); }
     return S_OK;
 }
 
@@ -1599,6 +1600,7 @@ void D3D12Renderer::SetupCommandList() {
 }
 
 char* D3D12Renderer::Screenshot() {
+    WaitForGPU();
     // Reset the command list
     m_pCommandAllocator[m_uFrameIndex]->Reset();
     m_pCommandList->Reset(m_pCommandAllocator[m_uFrameIndex].Get(), m_pRectPipelineState.Get());

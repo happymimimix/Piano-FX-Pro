@@ -1924,10 +1924,23 @@ DWORD WINAPI GameThread(LPVOID lpParameter)
         while (g_MsgQueue.Pop(msg))
             pGameState->MsgProc(msg.hwnd, msg.message, msg.wParam, msg.lParam);
 
-        if ((ErrorLevel = GameState::ChangeState(pGameState->NextState(), &pGameState)) != GameState::Success)
+        if ((ErrorLevel = GameState::ChangeState(pGameState->NextState(), &pGameState)) != GameState::Success) {
             PostMessage(g_hWnd, WM_COMMAND, ID_GAMEERROR, ErrorLevel);
-        pGameState->Logic();
-        pGameState->Render();
+        }
+        if ((ErrorLevel = pGameState->Logic()) != GameState::Success) {
+            PostMessage(g_hWnd, WM_COMMAND, ID_GAMEERROR, ErrorLevel);
+            if (GameState::ChangeState(new IntroScreen(NULL, NULL), &pGameState) != GameState::Success) {
+                MessageBoxW(g_hWnd, GameState::Errors[ErrorLevel].c_str(), L"Unrecoverable Fatal Error", MB_OK | MB_ICONERROR);
+                PostMessage(g_hWnd, WM_QUIT, 1, 0);
+            }
+        }
+        if ((ErrorLevel = pGameState->Render()) != GameState::Success) {
+            PostMessage(g_hWnd, WM_COMMAND, ID_GAMEERROR, ErrorLevel);
+            if (GameState::ChangeState(new IntroScreen(NULL, NULL), &pGameState) != GameState::Success) {
+                MessageBoxW(g_hWnd, GameState::Errors[ErrorLevel].c_str(), L"Unrecoverable Fatal Error", MB_OK | MB_ICONERROR);
+                PostMessage(g_hWnd, WM_QUIT, 1, 0);
+            }
+        }
     }
 
     delete pGameState;

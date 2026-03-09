@@ -76,9 +76,10 @@ GameState::GameError IntroScreen::MsgProc(HWND, UINT msg, WPARAM wParam, LPARAM 
             return Success;
         case ID_VIEW_RESETDEVICE:
             UpdateNotePos = true;
-            m_pRenderer->ResetDevice();
+            if (FAILED(m_pRenderer->ResetDevice())) return DirectXError;
             return Success;
         }
+        break;
     }
     }
 
@@ -101,9 +102,9 @@ GameState::GameError IntroScreen::Render() {
     color_t R = (iColor >> 0) & 0xFF;
     color_t G = (iColor >> 8) & 0xFF;
     color_t B = (iColor >> 16) & 0xFF;
-    m_pRenderer->ClearAndBeginScene(D3DCOLOR_XRGB(R, G, B));
+    if (FAILED(m_pRenderer->ClearAndBeginScene(D3DCOLOR_XRGB(R, G, B)))) return DirectXError;
     auto draw_list = m_pRenderer->GetDrawList();
-    m_pRenderer->BeginText();
+    if (FAILED(m_pRenderer->BeginText())) return DirectXError;
     uint16_t TextSize = 1 << 5;
     string MyTradeMark = WStringToUtf8(StatisticsText1);
     MyTradeMark += " v";
@@ -125,13 +126,13 @@ GameState::GameError IntroScreen::Render() {
     m_pRenderer->EndText();
 
     // Present the backbuffer contents to the display
-    m_pRenderer->EndScene();
+    if (FAILED(m_pRenderer->EndScene())) return DirectXError;
+    if (FAILED(m_pRenderer->Present())) return DirectXError;
 
     // Get the current frame
     auto* Frame = m_pRenderer->Screenshot();
     //Don't let BitBlt capture a blank screen! 
     UpdateGDI(g_hWndGfx, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(), Frame);
-    m_pRenderer->Present();
 
     return Success;
 }
@@ -363,9 +364,10 @@ GameState::GameError SplashScreen::MsgProc(HWND, UINT msg, WPARAM wParam, LPARAM
             return Success;
         case ID_VIEW_RESETDEVICE:
             UpdateNotePos = true;
-            m_pRenderer->ResetDevice();
+            if (FAILED(m_pRenderer->ResetDevice())) return DirectXError;
             return Success;
         }
+        break;
     }
     case WM_DEVICECHANGE:
         if (cAudio.bKDMAPI) {
@@ -471,10 +473,10 @@ GameState::GameError SplashScreen::Render() {
     int R = (iColor >> 0) & 0xFF;
     int G = (iColor >> 8) & 0xFF;
     int B = (iColor >> 16) & 0xFF;
-    m_pRenderer->ClearAndBeginScene(D3DCOLOR_XRGB(R, G, B));
+    if (FAILED(m_pRenderer->ClearAndBeginScene(D3DCOLOR_XRGB(R, G, B)))) return DirectXError;
     RenderNotes();
     auto draw_list = m_pRenderer->GetDrawList();
-    m_pRenderer->BeginText();
+    if (FAILED(m_pRenderer->BeginText())) return DirectXError;
     uint16_t TextSize = 1 << 5;
     string MyTradeMark = WStringToUtf8(StatisticsText1);
     MyTradeMark += " v";
@@ -493,16 +495,16 @@ GameState::GameError SplashScreen::Render() {
         0xFFFFFFFF,
         MyTradeMark.c_str()
     );
-    m_pRenderer->EndText();
+    if (FAILED(m_pRenderer->EndText())) return DirectXError;
 
     // Present the backbuffer contents to the display
-    m_pRenderer->EndSplashScene();
+    if (FAILED(m_pRenderer->EndSplashScene())) return DirectXError;
+    if (FAILED(m_pRenderer->Present())) return DirectXError;
 
     // Get the current frame
     auto* Frame = m_pRenderer->Screenshot();
     //Don't let BitBlt capture a blank screen! 
     UpdateGDI(g_hWndGfx, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(),Frame);
-    m_pRenderer->Present();
 
     return Success;
 }
@@ -779,7 +781,7 @@ void MainScreen::InitState() {
 
         //Running ffmpeg
         wchar_t buf[1 << 10] = {};
-        swprintf(buf, sizeof(buf), L"cd /d \"%s\" && md \"%s\\PianoFX_Framedump\" & start cmd /k ffmpeg -r 60 -f rawvideo -s %dx%d -pix_fmt bgra -i async:\\\\.\\pipe\\PFXdump -c:v h264 -qp 1 -pix_fmt yuv420p \"%s\\PianoFX_Framedump\\Output.mp4\"", GetExePath().c_str(), GetExePath().c_str(), width, height, GetExePath().c_str());
+        swprintf(buf, sizeof(buf), L"cd /d \"%s\" && md \"%s\\PianoFX_Framedump\" & start cmd /k ffmpeg -r 60 -f rawvideo -s %dx%d -pix_fmt bgra -i async:\\\\.\\pipe\\PFXdump -c:v h264 -qp 19 -pix_fmt yuv420p \"%s\\PianoFX_Framedump\\Output.mp4\"", GetExePath().c_str(), GetExePath().c_str(), width, height, GetExePath().c_str());
         m_hVideoPipe = CreateNamedPipe(TEXT("\\\\.\\pipe\\PFXdump"), PIPE_ACCESS_OUTBOUND, PIPE_TYPE_BYTE | PIPE_WAIT, PIPE_UNLIMITED_INSTANCES, static_cast<DWORD>(width * height * 4 * 120), 0, 0, nullptr);
         _wsystem(buf);
         ConnectNamedPipe(m_hVideoPipe, NULL);
@@ -935,7 +937,7 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
             return Success;
         case ID_VIEW_RESETDEVICE:
             UpdateNotePos = true;
-            m_pRenderer->ResetDevice();
+            if (FAILED(m_pRenderer->ResetDevice())) return DirectXError;
             return Success;
         case ID_VIEW_MOVEANDZOOM:
             if (cView.GetZoomMove())
@@ -1119,7 +1121,7 @@ GameState::GameError MainScreen::Logic(void) {
     m_bSameWidth = cVideo.bSameWidth;
     m_bRemoveOverlaps = cVideo.bOR;
     m_bMapVel = cVideo.bMapVel;
-    m_pRenderer->SetLimitFPS(cVideo.bLimitFPS);
+    if (FAILED(m_pRenderer->SetLimitFPS(cVideo.bLimitFPS))) return DirectXError;
     if (cVisual.iBkgColor != m_csBackground.iOrigBGR) m_csBackground.SetColor(cVisual.iBkgColor, 0.7f, 1.3f);
 
     if (cVideo.eMarkerEncoding != m_iCurEncoding) {
@@ -1335,6 +1337,7 @@ GameState::GameError MainScreen::Logic(void) {
             swprintf(buf, sizeof(buf), L"start \"Result\" \"C:\\Windows\\Explorer.exe\" \"%s\\PianoFX_Framedump\\\"", GetExePath().c_str());
             _wsystem(buf);
             CloseHandle(m_hVideoPipe);
+            m_bDumpFrames = false;
         }
         cPlayback.SetPaused(true, true);
     }
@@ -1861,7 +1864,7 @@ GameState::GameError MainScreen::Render()
     RenderText();
 
     // Present the backbuffer contents to the display
-    m_pRenderer->EndScene(m_bBackgroundLoaded);
+    if (FAILED(m_pRenderer->EndScene(m_bBackgroundLoaded))) return DirectXError;
 
     // Get the current frame
     auto* Frame = m_pRenderer->Screenshot();
@@ -1909,7 +1912,7 @@ GameState::GameError MainScreen::Render()
         //Don't let BitBlt capture a blank screen! 
         UpdateGDI(g_hWndGfx, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(), Frame);
     }
-    m_pRenderer->Present();
+    if (FAILED(m_pRenderer->Present())) return DirectXError;
 
     return Success;
 }
