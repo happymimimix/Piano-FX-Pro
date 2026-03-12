@@ -42,9 +42,9 @@ inline char Difficulty[1 << 10] = {};
 inline bool UpdateNotePos = true;
 inline static const mms_t MS = 1e+3;
 inline static const mms_t S = 1e+6;
-inline bool CE_Connected = false;
-inline bool CE_DoNextTick = false;
-inline bool CE_Responded = false;
+inline volatile bool CE_Connected = false;
+inline volatile bool CE_DoNextTick = false;
+inline volatile bool CE_Responded = false;
 
 inline void UpdateGDI(HWND hPFX, win32_t W, win32_t H, char* Frame) {
     HDC PFXdc = GetDC(hPFX);

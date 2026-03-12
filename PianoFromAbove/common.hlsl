@@ -1,10 +1,10 @@
-struct RootSignatureData {
-    float4x4 proj;
-    float deflate;
-    float notes_y;
-    float notes_cy;
-    float white_cx;
-    float timespan;
+cbuffer RootConstants : register(b0) {
+    float4x4 rootproj;
+    float rootdeflate;
+    float rootnotes_y;
+    float rootnotes_cy;
+    float rootwhite_cx;
+    float roottimespan;
 };
 
 struct RectPSInput {

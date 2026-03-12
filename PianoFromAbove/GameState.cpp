@@ -1883,7 +1883,7 @@ GameState::GameError MainScreen::Render()
         }
         // Send a signal to CE and wait for CE to do its job...
         CE_DoNextTick = true;
-        while (!CE_Responded){}
+        while (!CE_Responded) { _mm_pause(); }
         // CE has responded! 
         CE_Responded = false;
     }

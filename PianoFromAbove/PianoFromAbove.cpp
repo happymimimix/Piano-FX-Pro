@@ -529,10 +529,6 @@ string RunShader(bool TickBased) {
 
 string ShaderEngine() {
     string Code = "";
-    Code += "LastUpdate=os.time()*S+os.clock()*S\n";
-    Code += "ShaderLookupTable={}\n";
-    Code += "ShaderGlobalState={}\n";
-    Code += "ShaderLookupCounter=0\n";
     // Shader debug window
     Code += "if hGDI~=0 then\n";
     Code += CreateDebugWindow("Shader", "750", "0", "350", "500", false, false);
@@ -543,6 +539,13 @@ string ShaderEngine() {
     Code += "ShaderWorking=false\n";
     Code += "function ShaderEngine()\n";
     Code += "if hGDI==0 then return end\n";
+    Code += "if ShaderWorking==true then return end\n";
+    Code += "LastUpdate=os.time()*S+os.clock()*S\n";
+    Code += "ShaderLookupTable={}\n";
+    Code += "ShaderGlobalState={}\n";
+    Code += "ShaderPersistentDC={}\n";
+    Code += "ShaderPersistentBMP={}\n";
+    Code += "ShaderLookupCounter=0\n";
     Code += "ShaderWorking=true\n";
     Code += "while Incomplete() and DebugShaderList.Items~=nil do\n";
     Code += "local W=GetWidth()\n";
@@ -558,13 +561,19 @@ string ShaderEngine() {
     Code += "while ShaderEntry.Param.TimingMethod()>ShaderEntry.Param.EndTime do\n";
     Code += "ShaderLookupTable[DebugShaderList.Items.getData(ShaderID)]=nil\n";
     Code += "ShaderGlobalState[DebugShaderList.Items.getData(ShaderID)]=nil\n";
+    Code += "EXE(\"DeleteDC\",ShaderPersistentDC[DebugShaderList.Items.getData(ShaderID)])\n";
+    Code += "EXE(\"DeleteObject\",ShaderPersistentBMP[DebugShaderList.Items.getData(ShaderID)])\n";
+    Code += "ShaderPersistentDC[DebugShaderList.Items.getData(ShaderID)]=nil\n";
+    Code += "ShaderPersistentBMP[DebugShaderList.Items.getData(ShaderID)]=nil\n";
     Code += "DebugShaderList.Items.delete(ShaderID)\n";
     Code += "if ShaderID>=DebugShaderList.Items.Count then goto Finish end\n";
     Code += "ShaderEntry=ShaderLookupTable[DebugShaderList.Items.getData(ShaderID)]\n";
     Code += "end\n";
     Code += "if ShaderEntry.Param.TimingMethod()<ShaderEntry.Param.StartTime then goto Skip end\n";
     Code += "if ShaderGlobalState[DebugShaderList.Items.getData(ShaderID)]==nil then ShaderGlobalState[DebugShaderList.Items.getData(ShaderID)]={} end\n";
-    Code += "ShaderEntry.Func(MEMdc,(ShaderEntry.Param.TimingMethod()-ShaderEntry.Param.StartTime)/(ShaderEntry.Param.EndTime-ShaderEntry.Param.StartTime),ShaderEntry.Param.TimingMethod()-ShaderEntry.Param.StartTime,W,H,ShaderGlobalState[DebugShaderList.Items.getData(ShaderID)],table.unpack(ShaderEntry.Param.EffectParameters))\n";
+    Code += "if ShaderPersistentDC[DebugShaderList.Items.getData(ShaderID)]==nil then ShaderPersistentDC[DebugShaderList.Items.getData(ShaderID)]=EXE(\"CreateCompatibleDC\",GDIdc) end\n";
+    Code += "if ShaderPersistentBMP[DebugShaderList.Items.getData(ShaderID)]==nil then ShaderPersistentBMP[DebugShaderList.Items.getData(ShaderID)]=EXE(\"CreateCompatibleBitmap\",GDIdc,W,H) end\n";
+    Code += "ShaderEntry.Func(MEMdc,ShaderPersistentDC[DebugShaderList.Items.getData(ShaderID)],(ShaderEntry.Param.TimingMethod()-ShaderEntry.Param.StartTime)/(ShaderEntry.Param.EndTime-ShaderEntry.Param.StartTime),ShaderEntry.Param.TimingMethod()-ShaderEntry.Param.StartTime,W,H,ShaderGlobalState[DebugShaderList.Items.getData(ShaderID)],table.unpack(ShaderEntry.Param.EffectParameters))\n";
     Code += "::Skip::\n";
     Code += "ShaderID=ShaderID+1\n";
     Code += "end\n";
@@ -605,7 +614,14 @@ string ShaderEngine() {
     Code += "EXE(\"DeleteObject\",BMP)\n";
     Code += "Next()\n";
     Code += "end\n";
+    Code += "LastUpdate=nil\n";
+    Code += "ShaderLookupTable=nil\n";
+    Code += "ShaderGlobalState=nil\n";
+    Code += "ShaderPersistentDC=nil\n";
+    Code += "ShaderPersistentBMP=nil\n";
+    Code += "ShaderLookupCounter=nil\n";
     Code += "ShaderWorking=false\n";
+    Code += "collectgarbage(\"collect\")\n";
     Code += "end\n";
     return Code;
 }
@@ -631,34 +647,35 @@ string BlankShader(bool IsDark) {
     return Code;
 }
 
-string WaveBitBlt(bool Vertical,string SRC) {
+string WaveBitBlt(bool Vertical,string SRC,bool Persistent) {
     string ShiftCode = "math.random(-math.abs(ShiftingAmount),math.abs(ShiftingAmount))";
-    return "EXE(\"BitBlt\",DC," + string(Vertical ? "Line" : ShiftCode) + "," + string(Vertical ? ShiftCode: "Line") + "," + string(Vertical ? "MaxWaveWidth" : "W") + "," + string(Vertical ? "H" : "MaxWaveHeight") + ",DC," + string(Vertical ? "Line,0" : "0,Line") + ","+SRC+")\n";
+    return "EXE(\"BitBlt\"," + string(Persistent ? "PersiDC" :"DC") + "," + string(Vertical ? "Line" : ShiftCode) + "," + string(Vertical ? ShiftCode: "Line") + "," + string(Vertical ? "MaxWaveWidth" : "W") + "," + string(Vertical ? "H" : "MaxWaveHeight") + ",DC," + string(Vertical ? "Line,0" : "0,Line") + ","+SRC+")\n";
 }
 
 string WaveShader(string prefix, bool Vertical, bool Glitch) {
     string Code = "";
-    Code += "function " + prefix + "Shader(DC,Time,Elapsed,W,H,GlobalState,MaxWave" + string(Vertical ? "Width" : "Height") + ",MinWave" + string(Vertical ? "Width" : "Height") + ",ShiftingAmount)\n";
+    Code += "function " + prefix + "Shader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,MaxWave" + string(Vertical ? "Width" : "Height") + ",MinWave" + string(Vertical ? "Width" : "Height") + ",ShiftingAmount)\n";
     Code += "if MaxWave" + string(Vertical ? "Width" : "Height") + "==nil then MaxWave" + string(Vertical ? "Width" : "Height") + "=" + string(Vertical ? "100" : "10") + " end\n";
     Code += "if MinWave" + string(Vertical ? "Width" : "Height") + "==nil then MinWave" + string(Vertical ? "Width" : "Height") + "=" + string(Vertical ? "20" : "5") + " end\n";
     Code += "if ShiftingAmount==nil then ShiftingAmount=10 end\n";
     Code += "local Line=0\n";
     Code += "while Line<" + string(Vertical ? "W" : "H") + " do\n";
     Code += Glitch ? "if math.random(0,1)==0 then\n" : "";
-    Code += Glitch ? "" : WaveBitBlt(Vertical, "SRCCOPY");
-    Code += Glitch ? WaveBitBlt(Vertical, "SRCPAINT") : "";
+    Code += Glitch ? "" : WaveBitBlt(Vertical, "SRCCOPY",false);
+    Code += Glitch ? WaveBitBlt(Vertical, "SRCPAINT", true) : "";
     Code += Glitch ? "else\n" : "";
-    Code += Glitch ? WaveBitBlt(Vertical, "SRCAND") : "";
+    Code += Glitch ? WaveBitBlt(Vertical, "SRCAND", true) : "";
     Code += Glitch ? "end\n" : "";
     Code += "Line=Line+math.random(MinWave" + string(Vertical ? "Width" : "Height") + ",MaxWave" + string(Vertical ? "Width" : "Height") + ")\n";
     Code += "end\n";
+    Code += Glitch ? "EXE(\"BitBlt\",DC,0,0,W,H,PersiDC,0,0,SRCCOPY)\n" : "";
     Code += "end\n";
     return Code;
 }
 
 string ColorBurnShader() {
     string Code = "";
-    Code += "function ColorBurnShader(DC,Time,Elapsed,W,H,GlobalState,R,G,B)\n";
+    Code += "function ColorBurnShader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,R,G,B)\n";
     Code += "if R==nil then R=0 end\n";
     Code += "if G==nil then G=255 end\n";
     Code += "if B==nil then B=0 end\n";
@@ -676,7 +693,7 @@ string ColorBurnShader() {
 
 string RainbowBurnShader(bool Vertical,bool Animated,bool Reversed) {
     string Code = "";
-    Code += "function " + string(Reversed ? "Reversed" : "") + string(Animated ? "Animated" : "") + string(Vertical ? "Vertical" : "") + "RainbowBurnShader(DC,Time,Elapsed,W,H,GlobalState,Initial_R,Initial_G,Initial_B,Final_R,Final_G,Final_B" + string(Animated ? ",Iteration" : "")+",Bar" + string(Vertical ? "Width" : "Height") + ")\n";
+    Code += "function " + string(Reversed ? "Reversed" : "") + string(Animated ? "Animated" : "") + string(Vertical ? "Vertical" : "") + "RainbowBurnShader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,Initial_R,Initial_G,Initial_B,Final_R,Final_G,Final_B" + string(Animated ? ",Iteration" : "")+",Bar" + string(Vertical ? "Width" : "Height") + ")\n";
     Code += "if Initial_R==nil then Initial_R=0 end\n";
     Code += "if Initial_G==nil then Initial_G=255 end\n";
     Code += "if Initial_B==nil then Initial_B=0 end\n";   
@@ -707,7 +724,7 @@ string RainbowBurnShader(bool Vertical,bool Animated,bool Reversed) {
 
 string ColorOffset(bool WithWave) {
     string Code = "";
-    Code += "function ColorOffset"+string(WithWave?"Wave":"") + "Shader(DC,Time,Elapsed,W,H,GlobalState,OffsettingAmount" + string(WithWave ? ",MaxWaveHeight,MinWaveHeight,ShiftingAmount" : "") + ")\n";
+    Code += "function ColorOffset"+string(WithWave?"Wave":"") + "Shader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,OffsettingAmount" + string(WithWave ? ",MaxWaveHeight,MinWaveHeight,ShiftingAmount" : "") + ")\n";
     Code += "if OffsettingAmount==nil then OffsettingAmount=5 end\n";
     Code += WithWave?"if MaxWaveHeight==nil then MaxWaveHeight=40 end\n":"";
     Code += WithWave?"if MinWaveHeight==nil then MinWaveHeight=10 end\n" : "";
@@ -769,7 +786,7 @@ string ColorOffset(bool WithWave) {
 
 string FadeShader(bool IsDark, bool IsReversed) {
     string Code = "";
-    Code += "function " + string(IsReversed ? "Reversed" : "") + string(IsDark ? "Dark" : "Bright") + "FadeShader(DC,Time,Elapsed,W,H,GlobalState,MaxAlpha,MinAlpha)\n";
+    Code += "function " + string(IsReversed ? "Reversed" : "") + string(IsDark ? "Dark" : "Bright") + "FadeShader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,MaxAlpha,MinAlpha)\n";
     Code += "if MaxAlpha==nil then MaxAlpha=255.0 end\n";
     Code += "if MinAlpha==nil then MinAlpha=0.0 end\n";
     Code += "local MEMdc=EXE(\"CreateCompatibleDC\",DC)\n";
@@ -788,7 +805,7 @@ string FadeShader(bool IsDark, bool IsReversed) {
 
 string HatchBrushShader() {
     string Code = "";
-    Code += "function HatchBrushShader(DC,Time,Elapsed,W,H,GlobalState,R,G,B,BkR,BkG,BkB)\n";
+    Code += "function HatchBrushShader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,R,G,B,BkR,BkG,BkB)\n";
     Code += "if R==nil then R=0 end\n";
     Code += "if G==nil then G=255 end\n";
     Code += "if B==nil then B=0 end\n";
@@ -814,7 +831,7 @@ string HatchBrushShader() {
 
 string TextShader(bool Type, bool IsReversed) {
     string Code = "";
-    Code += "function " + string(Type ? (IsReversed ? "Delete" : "Type") : "") + "TextShader(DC,Time,Elapsed,W,H,GlobalState,Text,FontHeight,FontWidth,FontWeight,FaceName,Alignment,Italic,Underline,StrikeOut,PosX,PosY,NoBackground,TextR,TextG,TextB,BkR,BkG,BkB)\n";
+    Code += "function " + string(Type ? (IsReversed ? "Delete" : "Type") : "") + "TextShader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,Text,FontHeight,FontWidth,FontWeight,FaceName,Alignment,Italic,Underline,StrikeOut,PosX,PosY,NoBackground,TextR,TextG,TextB,BkR,BkG,BkB)\n";
     Code += "if Text==nil then Text=\"Hello World\" end\n";
     Code += "if FontHeight==nil then FontHeight=50 end\n";
     Code += "if FontWidth==nil then FontWidth=30 end\n";
@@ -933,7 +950,7 @@ string RotatePointTool() {
 
 string RadialBlurShader(bool IsBlur, bool IsPaint) {
     string Code = "";
-    Code += "function Radial" + string(IsBlur ? "Blur" : (IsPaint ? "Paint" : "And")) + "Shader(DC,Time,Elapsed,W,H,GlobalState,MaxRotation,Precision" + string(IsBlur ? ",BlendAlpha" : "") + ",Iteration)\n";
+    Code += "function Radial" + string(IsBlur ? "Blur" : (IsPaint ? "Paint" : "And")) + "Shader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,MaxRotation,Precision" + string(IsBlur ? ",BlendAlpha" : "") + ",Iteration)\n";
     Code += "if MaxRotation==nil then MaxRotation=0.05 end\n";
     Code += "if Precision==nil then Precision=4 end\n";
     Code += IsBlur ? "if BlendAlpha==nil then BlendAlpha=(1<<7)-1 end\n":"";
@@ -974,7 +991,7 @@ string PolygonShader(bool IsColored, bool IsRandom) {
     EncodeColor::ColorR = "R";
     EncodeColor::ColorG = "G";
     EncodeColor::ColorB = "B";
-    Code += "function " + string(IsColored ? (IsRandom ? "RandomColor" : "Color") : "Invert") + "PolygonShader(DC,Time,Elapsed,W,H,GlobalState,MaxSides,MinSides,MaxRadius,MinRadius,MaxCount,MinCount,RotationSpeed,LineThickness,Delay" + string(IsColored ? (IsRandom ? "" : ",R,G,B") : "") + ")\n";
+    Code += "function " + string(IsColored ? (IsRandom ? "RandomColor" : "Color") : "Invert") + "PolygonShader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,MaxSides,MinSides,MaxRadius,MinRadius,MaxCount,MinCount,RotationSpeed,LineThickness,Delay" + string(IsColored ? (IsRandom ? "" : ",R,G,B") : "") + ")\n";
     Code += "if MaxSides==nil then MaxSides=10 end\n";
     Code += "if MinSides==nil then MinSides=3 end\n";
     Code += "if MaxRadius==nil then MaxRadius=400 end\n";
@@ -1057,7 +1074,7 @@ string TriangleFrameShader(bool IsRandom) {
     EncodeColor::ColorG = "G";
     EncodeColor::ColorB = "B";
     EncodeColor::ColorA = "Transparency";
-    Code += "function " + string(IsRandom ? "RandomColor" : "") + "TriangleFrameShader(DC,Time,Elapsed,W,H,GlobalState,Size,Speed,Transparency" + string(IsRandom ? "" : ",R,G,B") + ")\n";
+    Code += "function " + string(IsRandom ? "RandomColor" : "") + "TriangleFrameShader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,Size,Speed,Transparency" + string(IsRandom ? "" : ",R,G,B") + ")\n";
     Code += "if Size==nil then Size=200 end\n";
     Code += "if Speed==nil then Speed=5 end\n";
     Code += "if Transparency==nil then Transparency=(1<<7)+(1<<6)-1 end\n";
@@ -1146,7 +1163,7 @@ string TriangleFrameShader(bool IsRandom) {
 
 string CRTShader() {
     string Code = "";
-    Code += "function CRTShader(DC,Time,Elapsed,W,H,GlobalState,ColorOffsetAmount,ColorOffsetTransparency,ScanLineTransparency,ScanLineHeight,ScanLineSpacing)\n";
+    Code += "function CRTShader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,ColorOffsetAmount,ColorOffsetTransparency,ScanLineTransparency,ScanLineHeight,ScanLineSpacing)\n";
     Code += "if ColorOffsetAmount==nil then ColorOffsetAmount=2 end\n";
     Code += "if ColorOffsetTransparency==nil then ColorOffsetTransparency=(1<<7)-1 end\n";
     Code += "if ScanLineTransparency==nil then ScanLineTransparency=(1<<6)-1 end\n";
@@ -1218,7 +1235,7 @@ string CRTShader() {
 
 string NoiseShader() {
     string Code = "";
-    Code += "function NoiseShader(DC,Time,Elapsed,W,H,GlobalState,MaxNoiseSize,MinNoiseSize,MaxNoiseAmount,MinNoiseAmount)\n";
+    Code += "function NoiseShader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,MaxNoiseSize,MinNoiseSize,MaxNoiseAmount,MinNoiseAmount)\n";
     Code += "if MaxNoiseSize==nil then MaxNoiseSize=3 end\n";
     Code += "if MinNoiseSize==nil then MinNoiseSize=1 end\n";
     Code += "if MaxNoiseAmount==nil then MaxNoiseAmount=(1<<9)-1 end\n";
@@ -1234,7 +1251,7 @@ string NoiseShader() {
 
 string FrameShader(bool IsAnimated) {
     string Code = "";
-    Code += "function " + string(IsAnimated ? "Animated" : "") + "FrameShader(DC,Time,Elapsed,W,H,GlobalState,FrameSize,Resolution" + string(IsAnimated ? ",Initial_R,Initial_G,Initial_B,Initial_A,Final_R,Final_G,Final_B,Final_A,Iteration" : ",R,G,B,A") + ")\n";
+    Code += "function " + string(IsAnimated ? "Animated" : "") + "FrameShader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,FrameSize,Resolution" + string(IsAnimated ? ",Initial_R,Initial_G,Initial_B,Initial_A,Final_R,Final_G,Final_B,Final_A,Iteration" : ",R,G,B,A") + ")\n";
     Code += "if FrameSize==nil then FrameSize=(1<<7)-1 end\n";
     Code += "if Resolution==nil then Resolution=2 end\n";
     Code += IsAnimated ? "if Initial_R==nil then Initial_R=255 end\n": "if R==nil then R=255 end\n";
@@ -1284,7 +1301,7 @@ string FrameShader(bool IsAnimated) {
 
 string GlassShader(bool Reversed) {
     string Code = "";
-    Code += "function " + string(Reversed ? "Reversed" : "") + "GlassFadeShader(DC,Time,Elapsed,W,H,GlobalState,BlendAlpha,MaxBlur,MinBlur)\n";
+    Code += "function " + string(Reversed ? "Reversed" : "") + "GlassFadeShader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,BlendAlpha,MaxBlur,MinBlur)\n";
     Code += "if BlendAlpha==nil then BlendAlpha=(1<<6)-1 end\n";
     Code += "if MaxBlur==nil then MaxBlur=10 end\n";
     Code += "if MinBlur==nil then MinBlur=0 end\n";
@@ -1308,7 +1325,7 @@ string GlassShader(bool Reversed) {
 
 string PixelateShader(bool WithAlpha) {
     string Code = "";
-    Code += "function " + string(WithAlpha ? "Alpha" : "") + "PixelateShader(DC,Time,Elapsed,W,H,GlobalState,Multiplier"+string(WithAlpha?",Alpha" :"") + ")\n";
+    Code += "function " + string(WithAlpha ? "Alpha" : "") + "PixelateShader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,Multiplier"+string(WithAlpha?",Alpha" :"") + ")\n";
     Code += "if Multiplier==nil then Multiplier=4 end\n";
     Code += WithAlpha?"if Alpha==nil then Alpha=(1<<7)+(1<<6)-1 end\n":"";
     Code += "local MEMdc=EXE(\"CreateCompatibleDC\",DC)\n";
@@ -1326,7 +1343,7 @@ string PixelateShader(bool WithAlpha) {
 
 string MatrixShader() {
     string Code = "";
-    Code += "function MatrixShader(DC,Time,Elapsed,W,H,GlobalState,Cols,CharHeight,FontWeight,MaxSpeed,MinSpeed,MaxTailLength,MinTailLength,FontName,R,G,B)\n";
+    Code += "function MatrixShader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,Cols,CharHeight,FontWeight,MaxSpeed,MinSpeed,MaxTailLength,MinTailLength,FontName,R,G,B)\n";
     Code += "if Cols==nil then Cols=50 end\n";
     Code += "if CharHeight==nil then CharHeight=20 end\n";
     Code += "if FontWeight==nil then FontWeight=400 end\n";
