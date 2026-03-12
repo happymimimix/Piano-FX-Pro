@@ -74,13 +74,13 @@ NotePSInput main(uint id : SV_VertexID) {
     }
 
     float x = fixed[0].note_x[note] + fixed[0].bends[chan];
-    float y = round(root.notes_y + root.notes_cy * (1.0f - note_pos / root.timespan));
+    float y = round(root_notes_y + root_notes_cy * (1.0f - note_pos / root_timespan));
 #ifdef EQ_W
-    float cx = root.white_cx * 0.65f;
+    float cx = root_white_cx * 0.65f;
 #else
-    float cx = sharp ? root.white_cx * 0.65f : root.white_cx;
+    float cx = sharp ? root_white_cx * 0.65f : root_white_cx;
 #endif
-    float cy = max(round(root.notes_cy * note_length / root.timespan), 0)+1;
+    float cy = max(round(root_notes_cy * note_length / root_timespan), 0)+1;
 
     float3 position = float3(x, y, 0);
     position.y -= cy * float(vertex < 2);
@@ -89,7 +89,7 @@ NotePSInput main(uint id : SV_VertexID) {
     position.z = !sharp * 0.5;
 #endif
     
-    result.position = colors[track * 16 + chan].colors[2] == 0xFFFFFFFF ? float4(0, 0, 0, 0) : mul(root.proj, float4(position, 1));
+    result.position = colors[track * 16 + chan].colors[2] == 0xFFFFFFFF ? float4(0, 0, 0, 0) : mul(root_proj, float4(position, 1));
     result.color = float4(unpack_color(maincolor));
     result.border = float4(unpack_color(boardercolor));
     result.edges = float4(x, y, x + cx, y - cy);

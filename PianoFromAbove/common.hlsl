@@ -1,10 +1,10 @@
 cbuffer RootConstants : register(b0) {
-    float4x4 rootproj;
-    float rootdeflate;
-    float rootnotes_y;
-    float rootnotes_cy;
-    float rootwhite_cx;
-    float roottimespan;
+    float4x4 root_proj;
+    float root_deflate;
+    float root_notes_y;
+    float root_notes_cy;
+    float root_white_cx;
+    float root_timespan;
 };
 
 struct RectPSInput {
