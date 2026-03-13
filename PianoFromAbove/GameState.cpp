@@ -1826,14 +1826,30 @@ GameState::GameError MainScreen::Render()
         HWND hGDI = FindWindowW(L"PFXGDI", NULL);
         if (CE_Connected && IsWindow(hGDI)) {
             char* Frame = new char[m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4];
-            GetGDI(hGDI, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(), Frame);
-            WriteFile(m_hVideoPipe, Frame, static_cast<DWORD>(m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4), nullptr, nullptr);
-            delete[] Frame;
+            HRESULT res = GetGDI(hGDI, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(), Frame);
+            if (res == S_OK) {
+                WriteFile(m_hVideoPipe, Frame, static_cast<DWORD>(m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4), nullptr, nullptr);
+                delete[] Frame;
+            }
+            else if (res == E_NOTIMPL) {
+                delete[] Frame;
+            }
+            else {
+                return DirectXError;
+            }
         }else{
             char* Frame = new char[m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4];
-            if (FAILED(m_pRenderer->Screenshot(Frame))) return DirectXError;
-            WriteFile(m_hVideoPipe, Frame, static_cast<DWORD>(m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4), nullptr, nullptr);
-            delete[] Frame;
+            HRESULT res = m_pRenderer->Screenshot(Frame);
+            if (res == S_OK) {
+                WriteFile(m_hVideoPipe, Frame, static_cast<DWORD>(m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4), nullptr, nullptr);
+                delete[] Frame;
+            }
+            else if (res == E_NOTIMPL) {
+                delete[] Frame;
+            }
+            else {
+                return DirectXError;
+            }
         }
     }
     if (FAILED(m_pRenderer->Present())) return DirectXError;

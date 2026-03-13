@@ -17,6 +17,7 @@ Global
 		Korean|x64 = Korean|x64
 		LimitedColor|x64 = LimitedColor|x64
 		NoOptimization|x64 = NoOptimization|x64
+		OpenGL|x64 = OpenGL|x64
 		Release|x64 = Release|x64
 		Russian|x64 = Russian|x64
 		SoftwareRender|x64 = SoftwareRender|x64
@@ -42,6 +43,8 @@ Global
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.LimitedColor|x64.Build.0 = LimitedColor|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.NoOptimization|x64.ActiveCfg = NoOptimization|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.NoOptimization|x64.Build.0 = NoOptimization|x64
+		{DD4C822F-844F-40BF-8113-129B04EDE199}.OpenGL|x64.ActiveCfg = OpenGL|x64
+		{DD4C822F-844F-40BF-8113-129B04EDE199}.OpenGL|x64.Build.0 = OpenGL|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Release|x64.ActiveCfg = Release|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Release|x64.Build.0 = Release|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Russian|x64.ActiveCfg = Russian|x64

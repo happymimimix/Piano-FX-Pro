@@ -65,7 +65,6 @@ tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
         m_pAdapter = adapter;
         break;
     }
-
     if (m_pDevice == nullptr) //Oh we love software rendering!
 #endif
     {
@@ -86,8 +85,8 @@ tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
 
     // Create rect input layout
     D3D11_INPUT_ELEMENT_DESC rect_input[] = {
-        { "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT,  0, 0,                            D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "COLOR",    0, DXGI_FORMAT_B8G8R8A8_UNORM, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        {"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"COLOR", 0, DXGI_FORMAT_B8G8R8A8_UNORM, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
     };
     res = m_pDevice->CreateInputLayout(rect_input, _countof(rect_input), g_pRectVertexShader, sizeof(g_pRectVertexShader), &m_pRectInputLayout);
     if (FAILED(res)) return make_tuple(res, "CreateInputLayout (rect)");
@@ -509,6 +508,7 @@ HRESULT Renderer11::EndScene(bool draw_bg) {
     res = DrawRectRange(rect_split, rect_count);
     if (FAILED(res)) return res;
 
+#ifndef OPENGL_MODE
     // Unbind render target before acquiring GDI DC
     ID3D11RenderTargetView* nullRT = nullptr;
     m_pContext->OMSetRenderTargets(1, &nullRT, nullptr);
@@ -516,6 +516,9 @@ HRESULT Renderer11::EndScene(bool draw_bg) {
 
     // Flush queued text last — GDI draws on top of everything
     return FlushText();
+#else
+    return S_OK;
+#endif // OPENGL_MODE
 }
 
 HRESULT Renderer11::Present() {
@@ -736,13 +739,11 @@ HRESULT Renderer11::FlushText() {
 //-----------------------------------------------------------------------------
 
 HRESULT Renderer11::Screenshot(char* Output) {
+#ifndef OPENGL_MODE
     if (!m_pBackBufferSurface) return E_FAIL;
-
-    // Back buffer is already flushed and RT unbound from FlushText
     HDC DXDC = NULL;
     HRESULT hr = m_pBackBufferSurface->GetDC(FALSE, &DXDC);
     if (FAILED(hr)) return hr;
-
     BITMAPINFO BMPinfo = {};
     BMPinfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     BMPinfo.bmiHeader.biWidth = m_iBufferWidth;
@@ -763,6 +764,9 @@ HRESULT Renderer11::Screenshot(char* Output) {
 
     m_pBackBufferSurface->ReleaseDC(nullptr);
     return S_OK;
+#else
+    return E_NOTIMPL;
+#endif
 }
 
 //-----------------------------------------------------------------------------

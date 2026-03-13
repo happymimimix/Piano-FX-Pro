@@ -46,7 +46,9 @@ inline volatile bool CE_Connected = false;
 inline volatile bool CE_DoNextTick = false;
 inline volatile bool CE_Responded = false;
 
-inline void GetGDI(HWND hGDI, win32_t W, win32_t H, char* Output) {
+inline HRESULT GetGDI(HWND hGDI, win32_t W, win32_t H, char* Output) {
+#ifndef OPENGL_MODE
+    if (!hGDI) return E_FAIL;
     HDC GDIdc = GetDC(hGDI);
     BITMAPINFO BMPinfo = {};
     BMPinfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
@@ -66,6 +68,10 @@ inline void GetGDI(HWND hGDI, win32_t W, win32_t H, char* Output) {
     DeleteDC(MEMdc);
     DeleteObject(BMP);
     ReleaseDC(hGDI, GDIdc);
+    return S_OK;
+#else
+    return E_NOTIMPL;
+#endif
 }
 
 //Abstract base class
