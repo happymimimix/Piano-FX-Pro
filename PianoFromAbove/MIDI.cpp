@@ -12,8 +12,6 @@
 #include <stack>
 #include <array>
 #include <ppl.h>
-#include <intrin.h>
-#include <smmintrin.h>
 #include "lzma.h"
 
 MIDILoadingProgress g_LoadingProgress;
@@ -29,12 +27,9 @@ MIDIPos::MIDIPos(MIDI& midi) : m_MIDI(midi)
 
     // Init track positions
     idx_t iTracks = m_MIDI.m_vTracks.size();
-    idx_t iTracksRounded = (iTracks + 8) & ~7; // Need to round up to 32 bytes, each int is 4 bytes
-    m_pTrackTime = (mtk_t*)_aligned_malloc(iTracksRounded * sizeof(mtk_t), 32);
+    m_pTrackTime = new mtk_t[iTracks];
     for (idx_t i = 0; i < iTracks; i++)
         m_vTrackPos.push_back(0);
-    for (idx_t i = 0; i < iTracksRounded; i++)
-        m_pTrackTime[i] = INT_MAX;
 
     // Init SMPTE tempo
     if (m_MIDI.m_Info.iDivision & 0x8000)
@@ -64,46 +59,11 @@ MIDIPos::MIDIPos(MIDI& midi) : m_MIDI(midi)
 }
 
 MIDIPos::~MIDIPos() {
-    if (m_pTrackTime)
-        _aligned_free(m_pTrackTime);
+    delete[] m_pTrackTime;
 }
 
-idx_t min_index_sse(int32_t* array, idx_t size) {
-    const __m128i increment = _mm_set1_epi32(4);
-    __m128i indices = _mm_setr_epi32(0, 1, 2, 3);
-    __m128i minindices = indices;
-    __m128i minvalues = _mm_loadu_si128((__m128i*)array);
-
-    for (idx_t i = 4; i < size; i += 4) {
-
-        indices = _mm_add_epi32(indices, increment);
-
-        const __m128i values = _mm_loadu_si128((__m128i*)(array + i));
-        const __m128i lt = _mm_cmplt_epi32(values, minvalues);
-        minindices = _mm_blendv_epi8(minindices, indices, lt);
-        minvalues = _mm_min_epi32(values, minvalues);
-    }
-
-    // find min index in vector result (in an extremely naive way)
-    int32_t values_array[4];
-    uint32_t indices_array[4];
-
-    _mm_storeu_si128((__m128i*)values_array, minvalues);
-    _mm_storeu_si128((__m128i*)indices_array, minindices);
-
-    idx_t  minindex = indices_array[0];
-    int32_t minvalue = values_array[0];
-    for (idx_t i = 1; i < 4; i++) {
-        if (values_array[i] < minvalue) {
-            minvalue = values_array[i];
-            minindex = indices_array[i];
-        }
-        else if (values_array[i] == minvalue) {
-            minindex = min(minindex, idx_t(indices_array[i]));
-        }
-    }
-
-    return minindex;
+idx_t GetMinItem(mtk_t* array, idx_t size) {
+    return min_element(array, array + size) - array;
 }
 
 // Gets the next closest event as long as it occurs before iMicroSecs elapse
@@ -114,8 +74,7 @@ idx_t MIDIPos::GetNextEvent(mms_t iMicroSecs, MIDIEvent** pOutEvent)
     *pOutEvent = NULL;
 
     // Get the next closest event
-    idx_t iTracks = m_vTrackPos.size();
-    idx_t iMinPos = (idx_t)min_index_sse(reinterpret_cast<int32_t*>(m_pTrackTime), (iTracks + 8) & ~7);
+    idx_t iMinPos = GetMinItem(reinterpret_cast<mtk_t*>(m_pTrackTime), static_cast<idx_t>(m_vTrackPos.size()));
 
     if (m_pTrackTime[iMinPos] == INT_MAX)
         return 0;
@@ -363,7 +322,7 @@ MIDI::~MIDI(void)
     clear();
 }
 
-#define EVENT_POOL_MAX 3
+#define EVENT_POOL_MAX (1<<19)
 MIDIChannelEvent* MIDI::AllocChannelEvent() {
     if (event_pools.size() == 0 || event_pools.back().count == EVENT_POOL_MAX) {
         // Currently, MIDIChannelEvent is 32 bytes large.

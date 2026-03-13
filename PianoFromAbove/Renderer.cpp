@@ -743,18 +743,21 @@ HRESULT Renderer11::Screenshot(char* Output) {
     HRESULT hr = m_pBackBufferSurface->GetDC(FALSE, &DXDC);
     if (FAILED(hr)) return hr;
 
+    BITMAPINFO BMPinfo = {};
+    BMPinfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    BMPinfo.bmiHeader.biWidth = m_iBufferWidth;
+    BMPinfo.bmiHeader.biHeight = -m_iBufferHeight;
+    BMPinfo.bmiHeader.biPlanes = 1;
+    BMPinfo.bmiHeader.biBitCount = 32;
+    BMPinfo.bmiHeader.biCompression = BI_RGB;
+    BMPinfo.bmiHeader.biSizeImage = 0;
+    void* Bits = nullptr;
     HDC MEMdc = CreateCompatibleDC(DXDC);
-    HBITMAP BMP = CreateCompatibleBitmap(DXDC, m_iBufferWidth, m_iBufferHeight);
+    HBITMAP BMP = CreateDIBSection(DXDC, &BMPinfo, DIB_RGB_COLORS, &Bits, nullptr, 0);
     SelectObject(MEMdc, BMP);
     BitBlt(MEMdc, 0, 0, m_iBufferWidth, m_iBufferHeight, DXDC, 0, 0, SRCCOPY);
-    BITMAPINFO bmpInfo = {};
-    bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    bmpInfo.bmiHeader.biWidth = m_iBufferWidth;
-    bmpInfo.bmiHeader.biHeight = -m_iBufferHeight;
-    bmpInfo.bmiHeader.biPlanes = 1;
-    bmpInfo.bmiHeader.biBitCount = 32;
-    bmpInfo.bmiHeader.biCompression = BI_RGB;
-    GetDIBits(MEMdc, BMP, 0, m_iBufferHeight, Output, &bmpInfo, DIB_RGB_COLORS);
+    GdiFlush();
+    memcpy(Output, Bits, m_iBufferWidth * m_iBufferHeight * 4);
     DeleteDC(MEMdc);
     DeleteObject(BMP);
 

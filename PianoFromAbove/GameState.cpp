@@ -1020,7 +1020,7 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
     return Success;
 }
 
-GameState::GameError MainScreen::Logic(void) {
+GameState::GameError MainScreen::Logic() {
     static Config& config = Config::GetConfig();
     static PlaybackSettings& cPlayback = config.GetPlaybackSettings();
     static const ViewSettings& cView = config.GetViewSettings();
@@ -1204,7 +1204,7 @@ GameState::GameError MainScreen::Logic(void) {
             
             if (!IsNote) {
                 if (type == MIDIChannelEvent::ProgramChange && config.m_bPianoOverride) {
-                    key = 0;
+                    key &= 0x00;
                 }
                 if (type == MIDIChannelEvent::PitchBend) {
                     m_pBendsValue[chan] = ((vel << 7) | key) - (1 << 13);
@@ -2387,7 +2387,7 @@ void MainScreen::RenderText() {
             RenderMessage(&rcMsg, Utf8ToWString(CheatEngineCaption));
         }
         else {
-            RenderMessage(&rcMsg, Utf8ToWString("The caption has exceeded the maximum acceptable length of " + to_string(sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0])) + " characters. \r\nAs a result, this caption has been blocked from showing in order to prevent crashing. \r\nPlease consider writing something slightly shorter. "));
+            RenderMessage(&rcMsg, Utf8ToWString("The caption has exceeded the maximum acceptable length of " + to_string(sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0])) + " characters. \nAs a result, this caption has been blocked from showing in order to prevent crashing. \nPlease consider writing something slightly shorter. "));
         }
     }
 }

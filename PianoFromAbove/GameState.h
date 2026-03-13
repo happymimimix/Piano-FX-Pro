@@ -48,23 +48,25 @@ inline volatile bool CE_Responded = false;
 
 inline void GetGDI(HWND hGDI, win32_t W, win32_t H, char* Output) {
     HDC GDIdc = GetDC(hGDI);
+    BITMAPINFO BMPinfo = {};
+    BMPinfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    BMPinfo.bmiHeader.biWidth = W;
+    BMPinfo.bmiHeader.biHeight = -H;
+    BMPinfo.bmiHeader.biPlanes = 1;
+    BMPinfo.bmiHeader.biBitCount = 32;
+    BMPinfo.bmiHeader.biCompression = BI_RGB;
+    BMPinfo.bmiHeader.biSizeImage = 0;
+    void* Bits = nullptr;
     HDC MEMdc = CreateCompatibleDC(GDIdc);
-    HBITMAP BMP = CreateCompatibleBitmap(GDIdc, W, H);
+    HBITMAP BMP = CreateDIBSection(GDIdc, &BMPinfo, DIB_RGB_COLORS, &Bits, nullptr, 0);
     SelectObject(MEMdc, BMP);
-    BitBlt(MEMdc, 0, 0,W,H, GDIdc, 0, 0, SRCCOPY);
-    BITMAPINFO bmpInfo = {};
-    bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    bmpInfo.bmiHeader.biWidth = W;
-    bmpInfo.bmiHeader.biHeight = -H;
-    bmpInfo.bmiHeader.biPlanes = 1;
-    bmpInfo.bmiHeader.biBitCount = 32;
-    bmpInfo.bmiHeader.biCompression = BI_RGB;
-    GetDIBits(MEMdc, BMP, 0, H, Output, &bmpInfo, DIB_RGB_COLORS);
+    BitBlt(MEMdc, 0, 0, W, H, GDIdc, 0, 0, SRCCOPY);
+    GdiFlush();
+    memcpy(Output, Bits, W * H * 4);
     DeleteDC(MEMdc);
     DeleteObject(BMP);
     ReleaseDC(hGDI, GDIdc);
 }
-
 
 //Abstract base class
 class GameState
@@ -208,8 +210,8 @@ public:
     // GameState functions
     GameError MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     GameError Init();
-    GameError Logic(void);
-    GameError Render(void);
+    GameError Logic();
+    GameError Render();
 
     // Info
     bool IsValid() const { return m_MIDI.IsValid(); }

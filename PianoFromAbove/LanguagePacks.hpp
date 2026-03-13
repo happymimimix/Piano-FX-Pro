@@ -108,7 +108,7 @@
 #define TrackText7 L"Play"
 #define TrackText8 L"Abort"
 #define AboutWindowTitle L"About"
-#define AboutText1 L"Piano-FX Pro v4.2 | Forked from Piano From Above v1.1.0\n\nContributors list: \nHappy_mimimix <-Funny special effects && Final optimization\nKhangaroo <-Performance boost\nBrianPantano <-Main program"
+#define AboutText1 L"Piano-FX Pro v4.3 | Forked from Piano From Above v1.1.0\n\nContributors list: \nHappy_mimimix <-Funny special effects && Final optimization\nKhangaroo <-Performance boost\nBrianPantano <-Main program\nClaudeOpus <-DirectX 11 upgrade"
 #define AboutText2 L"OK"
 #define LoadWindowTitle L"Loading..."
 #define LoadingText L"Loading"

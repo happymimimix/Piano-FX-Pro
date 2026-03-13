@@ -223,107 +223,107 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\Release\</OutDir>
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro</TargetName>
+    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\Release\</OutDir>
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro-ARN</TargetName>
+    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\Release\</OutDir>
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro-DRN</TargetName>
+    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\Release\</OutDir>
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro-KOR</TargetName>
+    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\Release\</OutDir>
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro-KOP</TargetName>
+    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\Release\</OutDir>
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro-RUS</TargetName>
+    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\Release\</OutDir>
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro-CHN</TargetName>
+    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\Release\</OutDir>
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro-JPN</TargetName>
+    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\Release\</OutDir>
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro-HRG</TargetName>
+    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\Release\</OutDir>
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro-EnforcedSoftwareRendering</TargetName>
+    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\Release\</OutDir>
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro-LimitedTrackColoring</TargetName>
+    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\Release\</OutDir>
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro</TargetName>
+    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)\Release\</OutDir>
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro</TargetName>
+    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnabled>false</VcpkgEnabled>
@@ -338,9 +338,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;LZMA_API_STATIC;INCLUDE_FFMPEG;ENG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalOptions>/clang:-Ofast /clang:-msse4.2 %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -424,9 +422,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;LZMA_API_STATIC;INCLUDE_FFMPEG;ARN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalOptions>/clang:-Ofast /clang:-msse4.2 %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -512,9 +508,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;LZMA_API_STATIC;INCLUDE_FFMPEG;DRN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalOptions>/clang:-Ofast /clang:-msse4.2 %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -600,9 +594,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;LZMA_API_STATIC;INCLUDE_FFMPEG;KOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalOptions>/clang:-Ofast /clang:-msse4.2 %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -688,9 +680,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;LZMA_API_STATIC;INCLUDE_FFMPEG;KOP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalOptions>/clang:-Ofast /clang:-msse4.2 %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -776,9 +766,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;LZMA_API_STATIC;INCLUDE_FFMPEG;RUS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalOptions>/clang:-Ofast /clang:-msse4.2 %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -864,9 +852,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;LZMA_API_STATIC;INCLUDE_FFMPEG;CHN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalOptions>/clang:-Ofast /clang:-msse4.2 %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -952,9 +938,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;LZMA_API_STATIC;INCLUDE_FFMPEG;JPN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalOptions>/clang:-Ofast /clang:-msse4.2 %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -1040,9 +1024,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;LZMA_API_STATIC;INCLUDE_FFMPEG;HRG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalOptions>/clang:-Ofast /clang:-msse4.2 %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -1128,9 +1110,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;LZMA_API_STATIC;SOFTWARE_RENDER_ONLY;INCLUDE_FFMPEG;ENG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalOptions>/clang:-Ofast /clang:-msse4.2 %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -1214,9 +1194,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;LZMA_API_STATIC;LIMIT_COLORS;INCLUDE_FFMPEG;ENG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalOptions>/clang:-Ofast /clang:-msse4.2 %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -1302,9 +1280,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;LZMA_API_STATIC;DBG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalOptions>/clang:-Ofast /clang:-msse4.2 %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -1360,9 +1336,7 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <PreprocessorDefinitions>WIN32;DEBUG;_WINDOWS;TIXML_USE_STL;LZMA_API_STATIC;DBG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalOptions>/clang:-Ofast /clang:-msse4.2 %(AdditionalOptions)</AdditionalOptions>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
