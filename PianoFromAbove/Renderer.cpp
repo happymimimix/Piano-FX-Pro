@@ -294,9 +294,12 @@ tuple<HRESULT, const char*> Renderer11::CreateWindowDependentObjects(HWND hWnd) 
     res = m_pSwapChain->GetBuffer(0, IID_PPV_ARGS(&m_pBackBuffer));
     if (FAILED(res))
         return make_tuple(res, "GetBuffer");
+
+#ifndef OPENGL_MODE
     res = m_pBackBuffer.As(&m_pBackBufferSurface);
     if (FAILED(res))
         return make_tuple(res, "QueryInterface (IDXGISurface1)");
+#endif
 
     // Read backbuffer width and height
     D3D11_TEXTURE2D_DESC bbDesc = {};

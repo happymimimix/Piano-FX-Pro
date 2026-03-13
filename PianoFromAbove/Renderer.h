@@ -19,6 +19,7 @@
 #include <Fonts.h>
 #include <imguiCompressedFont2GDI.h>
 #include <Misc.h>
+#include "LanguagePacks.hpp"
 
 using Microsoft::WRL::ComPtr;
 
