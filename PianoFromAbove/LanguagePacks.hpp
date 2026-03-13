@@ -15,6 +15,11 @@
 #else
 #define MainWindowTitle8 L""
 #endif
+#ifdef OPENGL_MODE
+#define MainWindowTitle8 L"  (Limited Track Coloring)"
+#else
+#define MainWindowTitle8 L""
+#endif
 #define WelcomeText L"Welcome to Piano-FX Pro"
 #define StartupStage1Text L"Preparing..."
 #define StartupStage2Text L"Loading splash midi..."

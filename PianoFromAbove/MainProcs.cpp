@@ -126,7 +126,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                     cPlayback.SetPlayMode(GameState::Intro, true);
                     cPlayback.SetPlayable(false, true);
                     cPlayback.SetPosition(0);
-                    SetWindowText(g_hWnd, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7 MainWindowTitle8);
+                    SetWindowText(g_hWnd, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7 MainWindowTitle8 MainWindowTitle9);
                     HandOffMsg(WM_COMMAND, ID_CHANGESTATE, (LPARAM)new IntroScreen(NULL, NULL));
                 }
                 PlayFile(sFilename);
@@ -139,7 +139,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             cPlayback.SetPlayMode(GameState::Intro, true);
             cPlayback.SetPlayable(false, true);
             cPlayback.SetPosition(0);
-            SetWindowText(g_hWnd, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7 MainWindowTitle8);
+            SetWindowText(g_hWnd, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7 MainWindowTitle8 MainWindowTitle9);
             HandOffMsg(WM_COMMAND, ID_CHANGESTATE, (LPARAM)new IntroScreen(NULL, NULL));
             return 0;
         }
@@ -296,7 +296,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             cPlayback.SetPlayMode(GameState::Intro, true);
             cPlayback.SetPlayable(false, true);
             cPlayback.SetPosition(0);
-            SetWindowText(g_hWnd, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7 MainWindowTitle8);
+            SetWindowText(g_hWnd, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7 MainWindowTitle8 MainWindowTitle9);
             HandOffMsg(WM_COMMAND, ID_CHANGESTATE, (LPARAM)new IntroScreen(NULL, NULL));
         }
         PlayFile(filename.data());
@@ -1163,10 +1163,10 @@ BOOL PlayFile(const wstring& sFile)
     cView.SetZoomMove(false);
     TCHAR sTitle[1 << 10];
     if (cControls.bDumpFrames) {
-        _stprintf_s(sTitle, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle4 L"%ws" MainWindowTitle7 MainWindowTitle8, sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
+        _stprintf_s(sTitle, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle4 L"%ws" MainWindowTitle7 MainWindowTitle8 MainWindowTitle9, sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
     }
     else {
-        _stprintf_s(sTitle, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 L"%ws" MainWindowTitle7 MainWindowTitle8, sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
+        _stprintf_s(sTitle, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 L"%ws" MainWindowTitle7 MainWindowTitle8 MainWindowTitle9, sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
     }
     SetWindowText(g_hWnd, sTitle);
 

@@ -1826,7 +1826,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
     ViewSettings& cView = config.GetViewSettings();
 
     // Create the application window
-    g_hWnd = CreateWindowEx(NULL, CLASSNAME, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7 MainWindowTitle8, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, cView.GetMainLeft(), cView.GetMainTop(), cView.GetMainWidth(), cView.GetMainHeight(), NULL, NULL, wc.hInstance, NULL);
+    g_hWnd = CreateWindowEx(NULL, CLASSNAME, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7 MainWindowTitle8 MainWindowTitle9, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, cView.GetMainLeft(), cView.GetMainTop(), cView.GetMainWidth(), cView.GetMainHeight(), NULL, NULL, wc.hInstance, NULL);
 
     if (!g_hWnd) return 1;
 
@@ -1933,7 +1933,7 @@ DWORD WINAPI GameThread(LPVOID lpParameter)
         }
 
     wchar_t buf[1 << 10] = {};
-    _snwprintf_s(buf, 1 << 10, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle6 MainWindowTitle7 MainWindowTitle8);
+    _snwprintf_s(buf, 1 << 10, MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle6 MainWindowTitle7 MainWindowTitle8 MainWindowTitle9);
     SetWindowTextW(g_hWnd, buf);
 
     // Event, logic, render...

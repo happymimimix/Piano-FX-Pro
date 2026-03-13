@@ -9,6 +9,7 @@
 *************************************************************************************************/
 #include "Globals.h"
 #include "Renderer.h"
+#include "resource.h"
 
 #include "RectPixelShader.h"
 #include "RectVertexShader.h"
