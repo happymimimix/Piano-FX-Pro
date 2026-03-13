@@ -632,6 +632,52 @@ void Renderer11::AddGDIRect(win32_t X, win32_t Y, win32_t W, win32_t H, COLORREF
     m_vTextCommands.push_back({ L"", 0, X+W/2, Y+H/2, 0x00000000, ALIGN_CENTER|ALIGN_MIDDLE, W/2, H/2, Color});
 }
 
+static COLORREF PremultiplyARGB(COLORREF argb)
+{
+    uint8_t a = (uint8_t)(argb >> 24);
+    uint8_t r = (uint8_t)(argb >> 16);
+    uint8_t g = (uint8_t)(argb >> 8);
+    uint8_t b = (uint8_t)(argb);
+
+    r = (uint8_t)((r * a + 127) / 255);
+    g = (uint8_t)((g * a + 127) / 255);
+    b = (uint8_t)((b * a + 127) / 255);
+
+    return ((uint32_t)a << 24) | ((uint32_t)r << 16) | ((uint32_t)g << 8) | (uint32_t)b;
+}
+
+static void AlphaFillRect(HDC DestDC, win32_t X, win32_t Y, win32_t W, win32_t H, COLORREF argb)
+{
+    BITMAPINFO BMPinfo = {};
+    BMPinfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    BMPinfo.bmiHeader.biWidth = 1;
+    BMPinfo.bmiHeader.biHeight = -1;
+    BMPinfo.bmiHeader.biPlanes = 1;
+    BMPinfo.bmiHeader.biBitCount = 32;
+    BMPinfo.bmiHeader.biCompression = BI_RGB;
+    BMPinfo.bmiHeader.biSizeImage = 0;
+
+    void* Bits = nullptr;
+    HDC SourceDC = CreateCompatibleDC(DestDC);
+
+    HBITMAP BMP = CreateDIBSection(DestDC, &BMPinfo, DIB_RGB_COLORS, &Bits, nullptr, 0);
+    
+    SelectObject(SourceDC, BMP);
+
+    *(uint32_t*)Bits = PremultiplyARGB(argb);
+
+    BLENDFUNCTION BlendFunc = {};
+    BlendFunc.BlendOp = AC_SRC_OVER;
+    BlendFunc.BlendFlags = 0;
+    BlendFunc.SourceConstantAlpha = 0xFF;
+    BlendFunc.AlphaFormat = AC_SRC_ALPHA;
+
+    AlphaBlend(DestDC, X, Y, W, H,SourceDC, 0, 0, 1, 1, BlendFunc);
+
+    DeleteDC(SourceDC);
+    DeleteObject(BMP);
+}
+
 HRESULT Renderer11::FlushText() {
     if (m_vTextCommands.empty()) return S_OK;
 
@@ -671,22 +717,7 @@ HRESULT Renderer11::FlushText() {
         }
 
         if (CMD.bgColor & 0xFF000000) {
-            HDC MEMdc = CreateCompatibleDC(DXDC);
-            HBITMAP BMP = CreateCompatibleBitmap(DXDC, 1, 1);
-            SelectObject(MEMdc, BMP);
-            HBRUSH Brush = CreateSolidBrush(CMD.bgColor & 0x00FFFFFF);
-            SelectObject(MEMdc, Brush);
-            PatBlt(MEMdc, 0, 0, 1, 1, PATCOPY);
-            union
-            {
-                DWORD Bits;
-                BLENDFUNCTION Func;
-            } BlendFunc;
-            BlendFunc.Bits = 0x00ff0000;
-            AlphaBlend(DXDC, TextX - CMD.PadX, TextY - CMD.PadY, TextSize.cx + 2 * CMD.PadX, TextSize.cy + 2 * CMD.PadY, MEMdc, 0, 0, 1, 1, BlendFunc.Func);
-            DeleteDC(MEMdc);
-            DeleteObject(BMP);
-            DeleteObject(Brush);
+            AlphaFillRect(DXDC, TextX - CMD.PadX, TextY - CMD.PadY, TextSize.cx + 2 * CMD.PadX, TextSize.cy + 2 * CMD.PadY, CMD.bgColor);
         }
         if (!CMD.Text.empty()) {
             TextOutW(DXDC, TextX, TextY, CMD.Text.c_str(), CMD.Text.size());
