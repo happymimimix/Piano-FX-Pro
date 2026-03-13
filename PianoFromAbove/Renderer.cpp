@@ -56,11 +56,7 @@ tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
             continue;
 
         D3D_FEATURE_LEVEL featureLevel;
-#ifndef OPENGL_MODE
         static const D3D_FEATURE_LEVEL wanted[] = { D3D_FEATURE_LEVEL_11_0 };
-#else
-        static const D3D_FEATURE_LEVEL wanted[] = { D3D_FEATURE_LEVEL_9_3 };
-#endif
         res = D3D11CreateDevice(adapter.Get(), D3D_DRIVER_TYPE_UNKNOWN, NULL,
             D3D11_CREATE_DEVICE_BGRA_SUPPORT, wanted, _countof(wanted),
             D3D11_SDK_VERSION, &m_pDevice, &featureLevel, &m_pContext);
@@ -73,11 +69,7 @@ tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
 #endif
     {
         D3D_FEATURE_LEVEL featureLevel;
-#ifndef OPENGL_MODE
         static const D3D_FEATURE_LEVEL wanted[] = { D3D_FEATURE_LEVEL_11_0 };
-#else
-        static const D3D_FEATURE_LEVEL wanted[] = { D3D_FEATURE_LEVEL_9_3 };
-#endif
         res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_WARP, NULL,
             D3D11_CREATE_DEVICE_BGRA_SUPPORT, wanted, _countof(wanted),
             D3D11_SDK_VERSION, &m_pDevice, &featureLevel, &m_pContext);
