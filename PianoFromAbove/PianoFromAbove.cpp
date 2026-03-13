@@ -1465,8 +1465,8 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
     AllocConsole();
     freopen("CONOUT$", "w", stdout);
     SetConsoleOutputCP(65001);
-    wcin.imbue(locale("en_US.UTF-8"));
-    wcout.imbue(locale("en_US.UTF-8"));
+    cin.imbue(locale("en_US.UTF-8"));
+    cout.imbue(locale("en_US.UTF-8"));
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     COORD pos;
     CONSOLE_SCREEN_BUFFER_INFO csbi;
@@ -1474,14 +1474,14 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
     pos.X = 4;
     pos.Y = 2;
     SetConsoleCursorPosition(hConsole, pos);
-    wcout << WelcomeText;
-    wcout << L" v" << VersionString;
-    wcout << L"\n\n\n";
+    cout << WStringToUtf8(WelcomeText);
+    cout << " v" << WStringToUtf8(VersionString);
+    cout << "\n\n\n";
     for (uint8_t i = 0; i < (1 << 6); i++) {
-        wcout << L"=";
+        cout << "=";
     }
-    wcout << L"\n\n";
-    wcout << StartupStage1Text << "\n";
+    cout << "\n\n";
+    cout << WStringToUtf8(StartupStage1Text) << "\n";
 
     if (__argc == 3) {
         string ARG1 = __argv[1];
@@ -1867,7 +1867,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
         PlayFile(sFilename);
     }
     else {
-        wcout << StartupStage2Text << "\n";
+        cout << WStringToUtf8(StartupStage2Text) << "\n";
         // Get the game going
         hThread = CreateThread(NULL, 0, GameThread, new SplashScreen(NULL, NULL, true), 0, NULL);
         if (!hThread) return 1;
@@ -1880,7 +1880,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
         UpdateWindow(g_hWnd);
         SetFocus(g_hWndGfx);
     }
-    wcout << StartupStage3Text << "\n";
+    cout << WStringToUtf8(StartupStage3Text) << "\n";
 
     // Enter the message loop
     MSG msg = {};

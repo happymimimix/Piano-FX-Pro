@@ -56,7 +56,11 @@ tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
             continue;
 
         D3D_FEATURE_LEVEL featureLevel;
+#ifndef OPENGL_MODE
         static const D3D_FEATURE_LEVEL wanted[] = { D3D_FEATURE_LEVEL_11_0 };
+#else
+        static const D3D_FEATURE_LEVEL wanted[] = { D3D_FEATURE_LEVEL_9_3 };
+#endif
         res = D3D11CreateDevice(adapter.Get(), D3D_DRIVER_TYPE_UNKNOWN, NULL,
             D3D11_CREATE_DEVICE_BGRA_SUPPORT, wanted, _countof(wanted),
             D3D11_SDK_VERSION, &m_pDevice, &featureLevel, &m_pContext);
@@ -69,7 +73,11 @@ tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
 #endif
     {
         D3D_FEATURE_LEVEL featureLevel;
+#ifndef OPENGL_MODE
         static const D3D_FEATURE_LEVEL wanted[] = { D3D_FEATURE_LEVEL_11_0 };
+#else
+        static const D3D_FEATURE_LEVEL wanted[] = { D3D_FEATURE_LEVEL_9_3 };
+#endif
         res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_WARP, NULL,
             D3D11_CREATE_DEVICE_BGRA_SUPPORT, wanted, _countof(wanted),
             D3D11_SDK_VERSION, &m_pDevice, &featureLevel, &m_pContext);
@@ -258,7 +266,11 @@ tuple<HRESULT, const char*> Renderer11::CreateWindowDependentObjects(HWND hWnd) 
         m_pDepthBuffer.Reset();
 
         // Resize the swap chain
+#ifndef OPENGL_MODE
         res = m_pSwapChain->ResizeBuffers(1, 0, 0, DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_GDI_COMPATIBLE);
+#else
+        res = m_pSwapChain->ResizeBuffers(1, 0, 0, DXGI_FORMAT_B8G8R8A8_UNORM, 0);
+#endif
         if (FAILED(res))
             return make_tuple(res, "ResizeBuffers");
     }
@@ -272,7 +284,11 @@ tuple<HRESULT, const char*> Renderer11::CreateWindowDependentObjects(HWND hWnd) 
         scd.OutputWindow = hWnd;
         scd.Windowed = TRUE;
         scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+#ifndef OPENGL_MODE
         scd.Flags = DXGI_SWAP_CHAIN_FLAG_GDI_COMPATIBLE;
+#else
+        scd.Flags = 0;
+#endif
         res = m_pFactory->CreateSwapChain(m_pDevice.Get(), &scd, &m_pSwapChain);
         if (FAILED(res))
             return make_tuple(res, "CreateSwapChain");
@@ -613,12 +629,14 @@ void Renderer11::SetPipeline(Pipeline pipeline) {
 //-----------------------------------------------------------------------------
 
 void Renderer11::AddText(const wstring& Text, win32_t Size, win32_t X, win32_t Y, COLORREF Color, DWORD Alignment, win32_t PadX, win32_t PadY, COLORREF bgColor) {
+#ifndef OPENGL_MODE
     m_vTextCommands.push_back({Text, Size, X, Y, Color, Alignment, PadX, PadY, bgColor});
+#endif
 }
 
 SIZE Renderer11::CalcTextSize(const wstring& Text, win32_t Size) {
     SIZE Result = { 0, 0 };
-
+#ifndef OPENGL_MODE
     HDC DC = GetDC(m_hWnd);
     HFONT imguiFont = imguiFont2GDI(PHIFON_compressed_data, PHIFON_compressed_size, Size);
     HFONT OldFont = (HFONT)SelectObject(DC, imguiFont);
@@ -627,12 +645,14 @@ SIZE Renderer11::CalcTextSize(const wstring& Text, win32_t Size) {
 
     SelectObject(DC, OldFont);
     ReleaseDC(m_hWnd, DC);
-
+#endif
     return Result;
 }
 
 void Renderer11::AddGDIRect(win32_t X, win32_t Y, win32_t W, win32_t H, COLORREF Color) {
+#ifndef OPENGL_MODE
     m_vTextCommands.push_back({ L"", 0, X+W/2, Y+H/2, 0x00000000, ALIGN_CENTER|ALIGN_MIDDLE, W/2, H/2, Color});
+#endif
 }
 
 static COLORREF PremultiplyARGB(COLORREF argb)
