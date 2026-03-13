@@ -425,8 +425,9 @@ void SplashScreen::UpdateState(sidx_t iPos) {
     auto& note_state = m_vState[iNote];
 
     // Turn note on
-    if (eEventType == MIDIChannelEvent::NoteOn && iVelocity > 0)
+    if (eEventType == MIDIChannelEvent::NoteOn && iVelocity > 0) {
         note_state.push_back(iPos);
+    }
     else
     {
         // binary search
@@ -1344,13 +1345,17 @@ void MainScreen::UpdateState(key_t key, const thread_work_t& work) {
             note_state.erase(note_state.begin() + pos);
         }
         else {
-            MessageBoxW(NULL, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
+            if (JumpTarget == ~0) {
+                MessageBoxW(NULL, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
+            }
         }
 
-        if (note_state.size() == 0)
+        if (note_state.size() == 0) {
             m_pNoteState[key] = -1;
-        else
+        }
+        else {
             m_pNoteState[key] = note_state.back();
+        }
     }
 }
 
@@ -1367,13 +1372,17 @@ void MainScreen::UpdateStateBackwards(key_t key, const thread_work_t& work) {
             note_state.erase(note_state.begin() + pos);
         }
         else {
-            MessageBoxW(NULL, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
+            if (JumpTarget == ~0) {
+                MessageBoxW(NULL, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
+            }
         }
 
-        if (note_state.size() == 0)
+        if (note_state.size() == 0) {
             m_pNoteState[key] = -1;
-        else
+        }
+        else {
             m_pNoteState[key] = note_state.back();
+        }
     }
 }
 

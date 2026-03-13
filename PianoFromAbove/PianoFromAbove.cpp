@@ -1917,7 +1917,7 @@ DWORD WINAPI GameThread(LPVOID lpParameter)
     if (FAILED(get<0>(init_res)))
     {
         wchar_t msg[1 << 10] = {};
-        _snwprintf_s(msg, 1024, L"Fatal error initializing D3D12.\n%S failed with code 0x%x.", get<1>(init_res), get<0>(init_res));
+        _snwprintf_s(msg, 1024, L"Fatal error initializing Direct3D. Is DirectX 11 installed properly? \n%S failed with code 0x%x. ", get<1>(init_res), get<0>(init_res));
         MessageBox(g_hWnd, msg, TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
         PostMessage(g_hWnd, WM_QUIT, 1, 0);
         return 1;
