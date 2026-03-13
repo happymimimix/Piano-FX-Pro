@@ -46,25 +46,6 @@ inline volatile bool CE_Connected = false;
 inline volatile bool CE_DoNextTick = false;
 inline volatile bool CE_Responded = false;
 
-inline void UpdateGDI(HWND hPFX, win32_t W, win32_t H, char* Frame) {
-    HDC PFXdc = GetDC(hPFX);
-    HDC MEMdc = CreateCompatibleDC(PFXdc);
-    HBITMAP BMP = CreateCompatibleBitmap(PFXdc, W, H);
-    SelectObject(MEMdc, BMP);
-    BITMAPINFO BMPinfo = {};
-    BMPinfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    BMPinfo.bmiHeader.biWidth =W;
-    BMPinfo.bmiHeader.biHeight = -H;
-    BMPinfo.bmiHeader.biPlanes = 1;
-    BMPinfo.bmiHeader.biBitCount = 32;
-    BMPinfo.bmiHeader.biCompression = BI_RGB;
-    SetDIBits(MEMdc, BMP, 0, H, Frame, &BMPinfo, DIB_RGB_COLORS);
-    BitBlt(PFXdc, 0, 0,W,H, MEMdc, 0, 0, SRCCOPY);
-    DeleteDC(MEMdc);
-    DeleteObject(BMP);
-    ReleaseDC(hPFX, PFXdc);
-}
-
 inline void GetGDI(HWND hGDI, win32_t W, win32_t H, char* Output) {
     HDC GDIdc = GetDC(hGDI);
     HDC MEMdc = CreateCompatibleDC(GDIdc);
@@ -97,7 +78,7 @@ public:
     static GameError ChangeState(GameState* pNextState, GameState** pDestObj);
 
     //Constructors
-    GameState(HWND hWnd, D3D12Renderer* pRenderer) : m_hWnd(hWnd), m_pRenderer(pRenderer), m_pNextState(NULL) {};
+    GameState(HWND hWnd, Renderer11* pRenderer) : m_hWnd(hWnd), m_pRenderer(pRenderer), m_pNextState(NULL) {};
     virtual ~GameState(void) {};
 
     // Initialize after all other game states have been deleted
@@ -116,14 +97,14 @@ public:
     GameState* NextState() { return m_pNextState; };
 
     void SetHWnd(HWND hWnd) { m_hWnd = hWnd; }
-    void SetRenderer(D3D12Renderer* pRenderer) { m_pRenderer = pRenderer; }
+    void SetRenderer(Renderer11* pRenderer) { m_pRenderer = pRenderer; }
 
 protected:
     //Windows info
     HWND m_hWnd;
 
     //Rendering device
-    D3D12Renderer* m_pRenderer;
+    Renderer11* m_pRenderer;
 
     GameState* m_pNextState;
 };
@@ -142,7 +123,7 @@ struct TrackSettings { ChannelSettings aChannels[16]; };
 class SplashScreen : public GameState
 {
 public:
-    SplashScreen(HWND hWnd, D3D12Renderer* pRenderer, bool enableSplash = true);
+    SplashScreen(HWND hWnd, Renderer11* pRenderer, bool enableSplash = true);
 
     GameError MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     GameError Init();
@@ -190,7 +171,7 @@ private:
 class IntroScreen : public GameState
 {
 public:
-    IntroScreen(HWND hWnd, D3D12Renderer* pRenderer) : GameState(hWnd, pRenderer) {}
+    IntroScreen(HWND hWnd, Renderer11* pRenderer) : GameState(hWnd, pRenderer) {}
 
     GameError MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     GameError Init();
@@ -222,7 +203,7 @@ class MainScreen : public GameState
 public:
     static const float KBPercent;
 
-    MainScreen(wstring sMIDIFile, State eGameMode, HWND hWnd, D3D12Renderer* pRenderer);
+    MainScreen(wstring sMIDIFile, State eGameMode, HWND hWnd, Renderer11* pRenderer);
 
     // GameState functions
     GameError MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -273,10 +254,10 @@ private:
     float GetNoteX(key_t iNote);
     void RenderKeys();
     void RenderText();
-    void RenderStatusLine(unsigned char line, const char* left, const char* format, ...);
+    void RenderStatusLine(unsigned char line, const wchar_t* left, const wchar_t* format, ...);
     void RenderStatus(LPRECT prcPos);
-    void RenderMarker(const char* str);
-    void RenderMessage(LPRECT prcMsg, const char* sMsg);
+    void RenderMarker(const wstring& str);
+    void RenderMessage(LPRECT prcMsg, const wstring& sMsg);
 
     // MIDI info
     MIDI m_MIDI; // The song to display
@@ -295,7 +276,7 @@ private:
     mms_t m_llLastTempoTime; // Tempo
     bpm_t m_CurBeat, m_iBeatsPerMeasure, m_iBeatType, m_iClocksPerMet; // Time signature
     mtk_t m_iLastSignatureTick;
-    string m_sMarker; // Current marker to display on the screen
+    wstring m_sMarker; // Current marker to display on the screen
     unsigned char* m_pMarkerData = nullptr; // Used for refreshing marker data when changing encoding on the fly
     msgln_t m_iMarkerSize = 0;
     uint8_t m_iCurEncoding;

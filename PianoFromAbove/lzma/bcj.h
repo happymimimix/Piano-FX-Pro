@@ -1,4 +1,6 @@
-﻿/**
+/* SPDX-License-Identifier: 0BSD */
+
+/**
  * \file        lzma/bcj.h
  * \brief       Branch/Call/Jump conversion filters
  * \note        Never include this file directly. Use <lzma.h> instead.
@@ -6,9 +8,6 @@
 
 /*
  * Author: Lasse Collin
- *
- * This file has been put into the public domain.
- * You can do whatever you want with this file.
  */
 
 #ifndef LZMA_H_INTERNAL
@@ -53,6 +52,11 @@
  */
 #define LZMA_FILTER_ARM64       LZMA_VLI_C(0x0A)
 
+/**
+ * \brief       Filter for RISC-V binaries
+ */
+#define LZMA_FILTER_RISCV       LZMA_VLI_C(0x0B)
+
 
 /**
  * \brief       Options for BCJ filters
@@ -75,20 +79,117 @@
  *              LZMA_SYNC_FLUSH predictably.
  */
 typedef struct {
-    /**
-     * \brief       Start offset for conversions
-     *
-     * This setting is useful only when the same filter is used
-     * _separately_ for multiple sections of the same executable file,
-     * and the sections contain cross-section branch/call/jump
-     * instructions. In that case it is beneficial to set the start
-     * offset of the non-first sections so that the relative addresses
-     * of the cross-section branch/call/jump instructions will use the
-     * same absolute addresses as in the first section.
-     *
-     * When the pointer to options is NULL, the default value (zero)
-     * is used.
-     */
-    uint32_t start_offset;
+	/**
+	 * \brief       Start offset for conversions
+	 *
+	 * This setting is useful only when the same filter is used
+	 * _separately_ for multiple sections of the same executable file,
+	 * and the sections contain cross-section branch/call/jump
+	 * instructions. In that case it is beneficial to set the start
+	 * offset of the non-first sections so that the relative addresses
+	 * of the cross-section branch/call/jump instructions will use the
+	 * same absolute addresses as in the first section.
+	 *
+	 * When the pointer to options is NULL, the default value (zero)
+	 * is used.
+	 */
+	uint32_t start_offset;
 
 } lzma_options_bcj;
+
+
+/**
+ * \brief       Raw ARM64 BCJ encoder
+ *
+ * This is for special use cases only.
+ *
+ * \param       start_offset  The lowest 32 bits of the offset in the
+ *                            executable being filtered. For the ARM64
+ *                            filter, this must be a multiple of four.
+ *                            For the very best results, this should also
+ *                            be in sync with 4096-byte page boundaries
+ *                            in the executable due to how ARM64's ADRP
+ *                            instruction works.
+ * \param       buf           Buffer to be filtered in place
+ * \param       size          Size of the buffer
+ *
+ * \return      Number of bytes that were processed in `buf`. This is at most
+ *              `size`. With the ARM64 filter, the return value is always
+ *              a multiple of 4, and at most 3 bytes are left unfiltered.
+ *
+ * \since       5.7.1alpha
+ */
+extern LZMA_API(size_t) lzma_bcj_arm64_encode(
+		uint32_t start_offset, uint8_t *buf, size_t size) lzma_nothrow;
+
+/**
+ * \brief       Raw ARM64 BCJ decoder
+ *
+ * See lzma_bcj_arm64_encode().
+ *
+ * \since       5.7.1alpha
+ */
+extern LZMA_API(size_t) lzma_bcj_arm64_decode(
+		uint32_t start_offset, uint8_t *buf, size_t size) lzma_nothrow;
+
+
+/**
+ * \brief       Raw RISC-V BCJ encoder
+ *
+ * This is for special use cases only.
+ *
+ * \param       start_offset  The lowest 32 bits of the offset in the
+ *                            executable being filtered. For the RISC-V
+ *                            filter, this must be a multiple of 2.
+ * \param       buf           Buffer to be filtered in place
+ * \param       size          Size of the buffer
+ *
+ * \return      Number of bytes that were processed in `buf`. This is at most
+ *              `size`. With the RISC-V filter, the return value is always
+ *              a multiple of 2, and at most 7 bytes are left unfiltered.
+ *
+ * \since       5.7.1alpha
+ */
+extern LZMA_API(size_t) lzma_bcj_riscv_encode(
+		uint32_t start_offset, uint8_t *buf, size_t size) lzma_nothrow;
+
+/**
+ * \brief       Raw RISC-V BCJ decoder
+ *
+ * See lzma_bcj_riscv_encode().
+ *
+ * \since       5.7.1alpha
+ */
+extern LZMA_API(size_t) lzma_bcj_riscv_decode(
+		uint32_t start_offset, uint8_t *buf, size_t size) lzma_nothrow;
+
+
+/**
+ * \brief       Raw x86 BCJ encoder
+ *
+ * This is for special use cases only.
+ *
+ * \param       start_offset  The lowest 32 bits of the offset in the
+ *                            executable being filtered. For the x86
+ *                            filter, all values are valid.
+ * \param       buf           Buffer to be filtered in place
+ * \param       size          Size of the buffer
+ *
+ * \return      Number of bytes that were processed in `buf`. This is at most
+ *              `size`. For the x86 filter, the return value is always
+ *              a multiple of 1, and at most 4 bytes are left unfiltered.
+ *
+ * \since       5.7.1alpha
+ */
+extern LZMA_API(size_t) lzma_bcj_x86_encode(
+		uint32_t start_offset, uint8_t *buf, size_t size) lzma_nothrow;
+
+/**
+ * \brief       Raw x86 BCJ decoder
+ *
+ * See lzma_bcj_x86_encode().
+ *
+ * \since       5.7.1alpha
+ */
+extern LZMA_API(size_t) lzma_bcj_x86_decode(
+		uint32_t start_offset, uint8_t *buf, size_t size) lzma_nothrow;

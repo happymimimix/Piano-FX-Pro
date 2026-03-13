@@ -7,7 +7,9 @@
 * Copyright (c) 2010 Brian Pantano. All rights reserved.
 *
 *************************************************************************************************/
-#include "d3dx12/d3dx12.h"
+#include "Globals.h"
+#include "Renderer.h"
+
 #include "RectPixelShader.h"
 #include "RectVertexShader.h"
 #include "NotePixelShader.h"
@@ -15,613 +17,210 @@
 #include "NoteVertexShaderSameWidth.h"
 #include "BackgroundPixelShader.h"
 #include "BackgroundVertexShader.h"
-#include "Globals.h"
-#include "Renderer.h"
 
 #include <ShlObj.h>
 #include <Config.h>
 
-ComPtr<IWICImagingFactory> D3D12Renderer::s_pWICFactory;
+ComPtr<IWICImagingFactory> Renderer11::s_pWICFactory;
 
-D3D12Renderer::D3D12Renderer() {}
+Renderer11::Renderer11() {}
 
-D3D12Renderer::~D3D12Renderer() {
-    if (m_hFenceEvent)
-        CloseHandle(m_hFenceEvent);
+Renderer11::~Renderer11() {
+    imguiClearFontCache();
 }
 
-tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) {
+tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
     HRESULT res;
 
     // Create DXGI factory
-    res = CreateDXGIFactory2(0, IID_PPV_ARGS(&m_pFactory));
-
+    res = CreateDXGIFactory1(IID_PPV_ARGS(&m_pFactory));
     if (FAILED(res))
-        return make_tuple(res, "CreateDXGIFactory2");
+        return make_tuple(res, "CreateDXGIFactory1");
 
     // Create device
     // TODO: Allow device selection for people with multiple GPUs
     m_hWnd = hWnd;
     m_bLimitFPS = bLimitFPS;
 #ifndef SOFTWARE_RENDER_ONLY
-    IDXGIAdapter* adapter = nullptr;
-    for (UINT i = 0; m_pFactory->EnumAdapters(i, &adapter) != DXGI_ERROR_NOT_FOUND; i++) {
-        res = adapter->QueryInterface(IID_PPV_ARGS(&m_pAdapter));
-        if (FAILED(res))
-            continue;
+    for (UINT i = 0;; i++) {
+        ComPtr<IDXGIAdapter1> adapter;
+        if (m_pFactory->EnumAdapters1(i, &adapter) == DXGI_ERROR_NOT_FOUND)
+            break;
 
-        DXGI_ADAPTER_DESC2 desc = {};
-        res = m_pAdapter->GetDesc2(&desc);
+        DXGI_ADAPTER_DESC1 desc = {};
+        res = adapter->GetDesc1(&desc);
         if (FAILED(res))
-            return make_tuple(res, "GetDesc2");
+            return make_tuple(res, "GetDesc1");
 
         if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
             continue;
 
-        res = D3D12CreateDevice(m_pAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&m_pDevice));
+        D3D_FEATURE_LEVEL featureLevel;
+        static const D3D_FEATURE_LEVEL wanted[] = { D3D_FEATURE_LEVEL_11_0 };
+        res = D3D11CreateDevice(adapter.Get(), D3D_DRIVER_TYPE_UNKNOWN, NULL,
+            D3D11_CREATE_DEVICE_BGRA_SUPPORT, wanted, _countof(wanted),
+            D3D11_SDK_VERSION, &m_pDevice, &featureLevel, &m_pContext);
         if (FAILED(res))
             continue;
+        m_pAdapter = adapter;
         break;
     }
 
-    if (m_pDevice == nullptr) //Oh we love software rendering! 
+    if (m_pDevice == nullptr) //Oh we love software rendering!
 #endif
     {
-        // !SOFTWARE_RENDER_ONLY
-        ComPtr<IDXGIAdapter> warpAdapter;
-        res = m_pFactory->EnumWarpAdapter(IID_PPV_ARGS(&warpAdapter));
+        D3D_FEATURE_LEVEL featureLevel;
+        static const D3D_FEATURE_LEVEL wanted[] = { D3D_FEATURE_LEVEL_11_0 };
+        res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_WARP, NULL,
+            D3D11_CREATE_DEVICE_BGRA_SUPPORT, wanted, _countof(wanted),
+            D3D11_SDK_VERSION, &m_pDevice, &featureLevel, &m_pContext);
         if (FAILED(res))
-            return make_tuple(res, "EnumWarpAdapter");
-        res = D3D12CreateDevice(warpAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&m_pDevice));
-        if (FAILED(res))
-            return make_tuple(res, "D3D12CreateDevice");
+            return make_tuple(res, "D3D11CreateDevice (WARP)");
     }
 
-    // Create command queue
-    D3D12_COMMAND_QUEUE_DESC queue_desc = {
-        .Type = D3D12_COMMAND_LIST_TYPE_DIRECT,
-        .Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL,
-        .Flags = D3D12_COMMAND_QUEUE_FLAG_NONE,
-        .NodeMask = 0,
-    };
-    res = m_pDevice->CreateCommandQueue(&queue_desc, IID_PPV_ARGS(&m_pCommandQueue));
-    if (FAILED(res))
-        return make_tuple(res, "CreateCommandQueue");
+    // Create shaders
+    res = m_pDevice->CreateVertexShader(g_pRectVertexShader, sizeof(g_pRectVertexShader), NULL, &m_pRectVS);
+    if (FAILED(res)) return make_tuple(res, "CreateVertexShader (rect)");
+    res = m_pDevice->CreatePixelShader(g_pRectPixelShader, sizeof(g_pRectPixelShader), NULL, &m_pRectPS);
+    if (FAILED(res)) return make_tuple(res, "CreatePixelShader (rect)");
 
-    // Create render target view descriptor heap
-    D3D12_DESCRIPTOR_HEAP_DESC rtv_heap_desc = {
-        .Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV,
-        .NumDescriptors = FrameCount,
-        .Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE,
-        .NodeMask = 0,
+    // Create rect input layout
+    D3D11_INPUT_ELEMENT_DESC rect_input[] = {
+        { "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT,  0, 0,                            D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "COLOR",    0, DXGI_FORMAT_B8G8R8A8_UNORM, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
     };
-    res = m_pDevice->CreateDescriptorHeap(&rtv_heap_desc, IID_PPV_ARGS(&m_pRTVDescriptorHeap));
-    if (FAILED(res))
-        return make_tuple(res, "CreateDescriptorHeap (RTV)");
-    m_uRTVDescriptorSize = m_pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+    res = m_pDevice->CreateInputLayout(rect_input, _countof(rect_input), g_pRectVertexShader, sizeof(g_pRectVertexShader), &m_pRectInputLayout);
+    if (FAILED(res)) return make_tuple(res, "CreateInputLayout (rect)");
 
-    // Create depth stencil view descriptor heap
-    D3D12_DESCRIPTOR_HEAP_DESC dsv_heap_desc = {
-        .Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV,
-        .NumDescriptors = 1,
-        .Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE,
-        .NodeMask = 0,
-    };
-    res = m_pDevice->CreateDescriptorHeap(&dsv_heap_desc, IID_PPV_ARGS(&m_pDSVDescriptorHeap));
-    if (FAILED(res))
-        return make_tuple(res, "CreateDescriptorHeap (DSV)");
-    m_uDSVDescriptorSize = m_pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+    // Create note shaders
+    res = m_pDevice->CreateVertexShader(g_pNoteVertexShader, sizeof(g_pNoteVertexShader), NULL, &m_pNoteVS);
+    if (FAILED(res)) return make_tuple(res, "CreateVertexShader (note)");
+    res = m_pDevice->CreateVertexShader(g_pNoteVertexShaderSameWidth, sizeof(g_pNoteVertexShaderSameWidth), NULL, &m_pNoteSameWidthVS);
+    if (FAILED(res)) return make_tuple(res, "CreateVertexShader (same width note)");
+    res = m_pDevice->CreatePixelShader(g_pNotePixelShader, sizeof(g_pNotePixelShader), NULL, &m_pNotePS);
+    if (FAILED(res)) return make_tuple(res, "CreatePixelShader (note)");
 
-    // Create shader resource view heap
-    D3D12_DESCRIPTOR_HEAP_DESC srv_heap_desc = {
-        .Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
-        .NumDescriptors = FrameCount + 3,
-        .Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,
-        .NodeMask = 0,
-    };
-    res = m_pDevice->CreateDescriptorHeap(&srv_heap_desc, IID_PPV_ARGS(&m_pSRVDescriptorHeap));
-    if (FAILED(res))
-        return make_tuple(res, "CreateDescriptorHeap (SRV)");
-    m_uSRVDescriptorSize = m_pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+    // Create background shaders
+    res = m_pDevice->CreateVertexShader(g_pBackgroundVertexShader, sizeof(g_pBackgroundVertexShader), NULL, &m_pBackgroundVS);
+    if (FAILED(res)) return make_tuple(res, "CreateVertexShader (background)");
+    res = m_pDevice->CreatePixelShader(g_pBackgroundPixelShader, sizeof(g_pBackgroundPixelShader), NULL, &m_pBackgroundPS);
+    if (FAILED(res)) return make_tuple(res, "CreatePixelShader (background)");
 
-    // Allocate note shader resource views
-    D3D12_CPU_DESCRIPTOR_HANDLE srv_handle = m_pSRVDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-    for (uint32_t i = 0; i < FrameCount; i++) {
-        D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc = {
-            .Format = DXGI_FORMAT_UNKNOWN,
-            .ViewDimension = D3D12_SRV_DIMENSION_BUFFER,
-            .Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
-            .Buffer = {
-                .FirstElement = 0,
-                .NumElements = NotesPerPass,
-                .StructureByteStride = sizeof(NoteData),
-                .Flags = D3D12_BUFFER_SRV_FLAG_NONE,
-            }
-        };
+    // Create blend state
+    // PFA is weird and inverts blending operations (0 is opaque, 255 is transparent)
+    D3D11_BLEND_DESC bd = {};
+    bd.RenderTarget[0] = {
+        TRUE,
+        D3D11_BLEND_INV_SRC_ALPHA, D3D11_BLEND_SRC_ALPHA, D3D11_BLEND_OP_ADD,
+        D3D11_BLEND_INV_SRC_ALPHA, D3D11_BLEND_SRC_ALPHA, D3D11_BLEND_OP_ADD,
+        D3D11_COLOR_WRITE_ENABLE_ALL
+    };
+    res = m_pDevice->CreateBlendState(&bd, &m_pBlendState);
+    if (FAILED(res)) return make_tuple(res, "CreateBlendState");
 
-        m_pDevice->CreateShaderResourceView(m_pNoteBuffers[i].Get(), &srv_desc, srv_handle);
-        srv_handle.ptr += m_uSRVDescriptorSize;
-    }
-    D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc = {
-        .Format = DXGI_FORMAT_UNKNOWN,
-        .ViewDimension = D3D12_SRV_DIMENSION_BUFFER,
-        .Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
-        .Buffer = {
-            .FirstElement = 0,
-            .NumElements = 1,
-            .StructureByteStride = sizeof(FixedSizeConstants),
-            .Flags = D3D12_BUFFER_SRV_FLAG_NONE,
-        }
-    };
-    m_pDevice->CreateShaderResourceView(m_pGenericUpload.Get(), &srv_desc, srv_handle);
-    srv_desc.Buffer.StructureByteStride = GenericUploadSize;
-    srv_handle.ptr += m_uSRVDescriptorSize;
-    m_pDevice->CreateShaderResourceView(m_pFixedBuffer.Get(), &srv_desc, srv_handle);
-    srv_desc.Buffer.StructureByteStride = MaxTrackColors * 16 * sizeof(TrackColor);
-    srv_handle.ptr += m_uSRVDescriptorSize;
-    m_pDevice->CreateShaderResourceView(m_pTrackColorBuffer.Get(), &srv_desc, srv_handle);
+    // Create rasterizer state
+    D3D11_RASTERIZER_DESC rd = {};
+    rd.FillMode = D3D11_FILL_SOLID;
+    rd.CullMode = D3D11_CULL_NONE;
+    rd.DepthClipEnable = TRUE;
+    res = m_pDevice->CreateRasterizerState(&rd, &m_pRasterizerState);
+    if (FAILED(res)) return make_tuple(res, "CreateRasterizerState");
 
-    // Create ImGui shader resource view heap
-    D3D12_DESCRIPTOR_HEAP_DESC imgui_srv_heap_desc = {
-        .Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
-        .NumDescriptors = 1,
-        .Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,
-        .NodeMask = 0,
-    };
-    res = m_pDevice->CreateDescriptorHeap(&imgui_srv_heap_desc, IID_PPV_ARGS(&m_pImGuiSRVDescriptorHeap));
-    if (FAILED(res))
-        return make_tuple(res, "CreateDescriptorHeap (ImGui SRV)");
+    // Create depth stencil states
+    D3D11_DEPTH_STENCIL_DESC dd = {};
+    res = m_pDevice->CreateDepthStencilState(&dd, &m_pDepthDisabledState);
+    if (FAILED(res)) return make_tuple(res, "CreateDepthStencilState (disabled)");
 
-    // Create texture shader resource view heap
-    D3D12_DESCRIPTOR_HEAP_DESC texture_srv_heap_desc = {
-        .Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
-        .NumDescriptors = 1,
-        .Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,
-        .NodeMask = 0,
-    };
-    res = m_pDevice->CreateDescriptorHeap(&texture_srv_heap_desc, IID_PPV_ARGS(&m_pTextureSRVDescriptorHeap));
-    if (FAILED(res))
-        return make_tuple(res, "CreateDescriptorHeap (Texture SRV)");
-    m_uTextureSRVDescriptorSize = m_pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+    dd.DepthEnable = TRUE;
+    dd.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+    dd.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+    res = m_pDevice->CreateDepthStencilState(&dd, &m_pDepthLessEqualState);
+    if (FAILED(res)) return make_tuple(res, "CreateDepthStencilState (less-equal)");
 
-    // Create command allocators
-    for (uint32_t i = 0; i < FrameCount; i++) {
-        res = m_pDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_pCommandAllocator[i]));
-        if (FAILED(res))
-            return make_tuple(res, "CreateCommandAllocator (direct)");
-    }
+    dd.DepthFunc = D3D11_COMPARISON_LESS;
+    res = m_pDevice->CreateDepthStencilState(&dd, &m_pDepthLessState);
+    if (FAILED(res)) return make_tuple(res, "CreateDepthStencilState (less)");
 
-    // Create root signature
-    ComPtr<ID3DBlob> rect_serialized;
-    D3D12_ROOT_PARAMETER root_sig_params[] = {
-        {
-            .ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS,
-            .Constants = {
-                .ShaderRegister = 0,
-                .RegisterSpace = 0,
-                .Num32BitValues = sizeof(RootConstants) / 4,
-            },
-            .ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL
-        },
-        // The rect shader doesn't actually use any of this, but I have to put it here because of Intel's shit iGPU drivers
-        {
-            .ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV,
-            .Descriptor = {
-                .ShaderRegister = 1,
-                .RegisterSpace = 0,
-            },
-            .ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX
-        },
-        {
-            .ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV,
-            .Descriptor = {
-                .ShaderRegister = 2,
-                .RegisterSpace = 0,
-            },
-            .ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX
-        },
-        {
-            .ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV,
-            .Descriptor = {
-                .ShaderRegister = 3,
-                .RegisterSpace = 0,
-            },
-            .ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX
-        },
-    };
-    D3D12_ROOT_SIGNATURE_DESC root_sig_desc = {
-        .NumParameters = _countof(root_sig_params),
-        .pParameters = root_sig_params,
-        .Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
-                    D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
-                    D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
-                    D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS,
-    };
-    res = D3D12SerializeRootSignature(&root_sig_desc, D3D_ROOT_SIGNATURE_VERSION_1, &rect_serialized, nullptr);
-    if (FAILED(res))
-        return make_tuple(res, "D3D12SerializeRootSignature (rectangle)");
-    res = m_pDevice->CreateRootSignature(0, rect_serialized->GetBufferPointer(), rect_serialized->GetBufferSize(), IID_PPV_ARGS(&m_pRectRootSignature));
-    if (FAILED(res))
-        return make_tuple(res, "CreateRootSignature (rectangle)");
+    // Create background sampler
+    D3D11_SAMPLER_DESC sd = {};
+    sd.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+    sd.AddressU = sd.AddressV = sd.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+    sd.MaxLOD = D3D11_FLOAT32_MAX;
+    res = m_pDevice->CreateSamplerState(&sd, &m_pBackgroundSampler);
+    if (FAILED(res)) return make_tuple(res, "CreateSamplerState");
 
-    // Create rect pipeline
-    D3D12_INPUT_ELEMENT_DESC rect_vertex_input[] = {
-        {
-            .SemanticName = "POSITION",
-            .SemanticIndex = 0,
-            .Format = DXGI_FORMAT_R32G32_FLOAT,
-            .InputSlot = 0,
-            .AlignedByteOffset = 0,
-            .InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
-            .InstanceDataStepRate = 0,
-        },
-        {
-            .SemanticName = "COLOR",
-            .SemanticIndex = 0,
-            .Format = DXGI_FORMAT_B8G8R8A8_UNORM,
-            .InputSlot = 0,
-            .AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT,
-            .InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
-            .InstanceDataStepRate = 0,
-        },
-    };
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC rect_pipeline_desc = {
-        .pRootSignature = m_pRectRootSignature.Get(),
-        .VS = {
-            .pShaderBytecode = g_pRectVertexShader,
-            .BytecodeLength = sizeof(g_pRectVertexShader),
-        },
-        .PS = {
-            .pShaderBytecode = g_pRectPixelShader,
-            .BytecodeLength = sizeof(g_pRectPixelShader),
-        },
-        .BlendState = {
-            .AlphaToCoverageEnable = FALSE,
-            .IndependentBlendEnable = FALSE,
-            .RenderTarget = {
-                {
-                    // PFA is weird and inverts blending operations (0 is opaque, 255 is transparent)
-                    .BlendEnable = TRUE,
-                    .LogicOpEnable = FALSE,
-                    .SrcBlend = D3D12_BLEND_INV_SRC_ALPHA,
-                    .DestBlend = D3D12_BLEND_SRC_ALPHA,
-                    .BlendOp = D3D12_BLEND_OP_ADD,
-                    .SrcBlendAlpha = D3D12_BLEND_INV_SRC_ALPHA,
-                    .DestBlendAlpha = D3D12_BLEND_SRC_ALPHA,
-                    .BlendOpAlpha = D3D12_BLEND_OP_ADD,
-                    .LogicOp = D3D12_LOGIC_OP_NOOP,
-                    .RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL,
-                }
-            }
-        },
-        .SampleMask = UINT_MAX,
-        .RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT),
-        .DepthStencilState = {
-            .DepthEnable = FALSE,
-            .StencilEnable = FALSE,
-        },
-        .InputLayout = {
-            .pInputElementDescs = rect_vertex_input,
-            .NumElements = _countof(rect_vertex_input),
-        },
-        .IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED,
-        .PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
-        .NumRenderTargets = 1,
-        .RTVFormats = {
-            DXGI_FORMAT_B8G8R8A8_UNORM,
-        },
-        .DSVFormat = DXGI_FORMAT_D32_FLOAT,
-        .SampleDesc = {
-            .Count = 1
-        },
-    };
-    res = m_pDevice->CreateGraphicsPipelineState(&rect_pipeline_desc, IID_PPV_ARGS(&m_pRectPipelineState));
-    if (FAILED(res))
-        return make_tuple(res, "CreateGraphicsPipelineState (rect)");
+    // Create constant buffer (replaces DX12 root constants)
+    D3D11_BUFFER_DESC cbDesc = {};
+    cbDesc.ByteWidth = (sizeof(RootConstants) + 15) & ~15;
+    cbDesc.Usage = D3D11_USAGE_DYNAMIC;
+    cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    res = m_pDevice->CreateBuffer(&cbDesc, NULL, &m_pConstantBuffer);
+    if (FAILED(res)) return make_tuple(res, "CreateBuffer (constant buffer)");
 
-    // Create note root signature
-    ComPtr<ID3DBlob> note_serialized;
-    res = D3D12SerializeRootSignature(&root_sig_desc, D3D_ROOT_SIGNATURE_VERSION_1, &note_serialized, nullptr);
-    if (FAILED(res))
-        return make_tuple(res, "D3D12SerializeRootSignature (note)");
-    res = m_pDevice->CreateRootSignature(0, note_serialized->GetBufferPointer(), note_serialized->GetBufferSize(), IID_PPV_ARGS(&m_pNoteRootSignature));
-    if (FAILED(res))
-        return make_tuple(res, "CreateRootSignature (note)");
+    // Create fixed size constants structured buffer
+    D3D11_BUFFER_DESC fixedDesc = {};
+    fixedDesc.ByteWidth = sizeof(FixedSizeConstants);
+    fixedDesc.Usage = D3D11_USAGE_DEFAULT;
+    fixedDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    fixedDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+    fixedDesc.StructureByteStride = sizeof(FixedSizeConstants);
+    res = m_pDevice->CreateBuffer(&fixedDesc, NULL, &m_pFixedBuffer);
+    if (FAILED(res)) return make_tuple(res, "CreateBuffer (fixed buffer)");
 
-    ComPtr<ID3DBlob> same_width_note_serialized;
-    res = D3D12SerializeRootSignature(&root_sig_desc, D3D_ROOT_SIGNATURE_VERSION_1, &same_width_note_serialized, nullptr);
-    if (FAILED(res))
-        return make_tuple(res, "D3D12SerializeRootSignature (same width note)");
-    res = m_pDevice->CreateRootSignature(0, same_width_note_serialized->GetBufferPointer(), same_width_note_serialized->GetBufferSize(), IID_PPV_ARGS(&m_pNoteSameWidthRootSignature));
-    if (FAILED(res))
-        return make_tuple(res, "CreateRootSignature (same width note)");
+    D3D11_SHADER_RESOURCE_VIEW_DESC fixedSrvDesc = {};
+    fixedSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
+    fixedSrvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+    fixedSrvDesc.Buffer.NumElements = 1;
+    res = m_pDevice->CreateShaderResourceView(m_pFixedBuffer.Get(), &fixedSrvDesc, &m_pFixedSRV);
+    if (FAILED(res)) return make_tuple(res, "CreateSRV (fixed buffer)");
 
-    ComPtr<ID3DBlob> noteOR_serialized;
-    res = D3D12SerializeRootSignature(&root_sig_desc, D3D_ROOT_SIGNATURE_VERSION_1, &noteOR_serialized, nullptr);
-    if (FAILED(res))
-        return make_tuple(res, "D3D12SerializeRootSignature (note OR)");
-    res = m_pDevice->CreateRootSignature(0, noteOR_serialized->GetBufferPointer(), noteOR_serialized->GetBufferSize(), IID_PPV_ARGS(&m_pNoteRootSignatureOR));
-    if (FAILED(res))
-        return make_tuple(res, "CreateRootSignature (note OR)");
+    // Create track color structured buffer
+    D3D11_BUFFER_DESC trackDesc = {};
+    trackDesc.ByteWidth = MaxTrackColors * 16 * sizeof(TrackColor);
+    trackDesc.Usage = D3D11_USAGE_DEFAULT;
+    trackDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    trackDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+    trackDesc.StructureByteStride = sizeof(TrackColor);
+    res = m_pDevice->CreateBuffer(&trackDesc, NULL, &m_pTrackColorBuffer);
+    if (FAILED(res)) return make_tuple(res, "CreateBuffer (track color buffer)");
 
-    ComPtr<ID3DBlob> same_width_noteOR_serialized;
-    res = D3D12SerializeRootSignature(&root_sig_desc, D3D_ROOT_SIGNATURE_VERSION_1, &same_width_noteOR_serialized, nullptr);
-    if (FAILED(res))
-        return make_tuple(res, "D3D12SerializeRootSignature (same width note OR)");
-    res = m_pDevice->CreateRootSignature(0, same_width_noteOR_serialized->GetBufferPointer(), same_width_noteOR_serialized->GetBufferSize(), IID_PPV_ARGS(&m_pNoteSameWidthRootSignatureOR));
-    if (FAILED(res))
-        return make_tuple(res, "CreateRootSignature (same width note OR)");
+    D3D11_SHADER_RESOURCE_VIEW_DESC trackSrvDesc = {};
+    trackSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
+    trackSrvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+    trackSrvDesc.Buffer.NumElements = MaxTrackColors * MaxChannelColors;
+    res = m_pDevice->CreateShaderResourceView(m_pTrackColorBuffer.Get(), &trackSrvDesc, &m_pTrackColorSRV);
+    if (FAILED(res)) return make_tuple(res, "CreateSRV (track color buffer)");
 
-    // Create note pipeline
-    auto note_pipeline_desc = rect_pipeline_desc;
-    note_pipeline_desc.pRootSignature = m_pNoteRootSignature.Get();
-    note_pipeline_desc.VS = {
-        .pShaderBytecode = g_pNoteVertexShader,
-        .BytecodeLength = sizeof(g_pNoteVertexShader),
-    };
-    note_pipeline_desc.PS = {
-        .pShaderBytecode = g_pNotePixelShader,
-        .BytecodeLength = sizeof(g_pNotePixelShader),
-    };
-    note_pipeline_desc.DepthStencilState = {
-        .DepthEnable = TRUE,
-        .DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL,
-        .DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL,
-    };
-    note_pipeline_desc.InputLayout = {
-        .NumElements = 0,
-    };
-    res = m_pDevice->CreateGraphicsPipelineState(&note_pipeline_desc, IID_PPV_ARGS(&m_pNotePipelineState));
-    if (FAILED(res))
-        return make_tuple(res, "CreateGraphicsPipelineState (note)");
+    // Create dynamic rect vertex buffer
+    D3D11_BUFFER_DESC vbDesc = {};
+    vbDesc.ByteWidth = RectsPerPass * 4 * sizeof(RectVertex);
+    vbDesc.Usage = D3D11_USAGE_DYNAMIC;
+    vbDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    vbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    res = m_pDevice->CreateBuffer(&vbDesc, NULL, &m_pRectVertexBuffer);
+    if (FAILED(res)) return make_tuple(res, "CreateBuffer (rect vertex buffer)");
 
-    auto same_width_note_pipeline_desc = note_pipeline_desc;
-    same_width_note_pipeline_desc.pRootSignature = m_pNoteSameWidthRootSignature.Get();
-    same_width_note_pipeline_desc.VS = {
-        .pShaderBytecode = g_pNoteVertexShaderSameWidth,
-        .BytecodeLength = sizeof(g_pNoteVertexShaderSameWidth),
-    };
-    same_width_note_pipeline_desc.DepthStencilState = {
-        .DepthEnable = FALSE
-    };
-    res = m_pDevice->CreateGraphicsPipelineState(&same_width_note_pipeline_desc, IID_PPV_ARGS(&m_pNoteSameWidthPipelineState));
-    if (FAILED(res))
-        return make_tuple(res, "CreateGraphicsPipelineState (same width note)");
+    // Create dynamic note structured buffer
+    D3D11_BUFFER_DESC noteDesc = {};
+    noteDesc.ByteWidth = NotesPerPass * sizeof(NoteData);
+    noteDesc.Usage = D3D11_USAGE_DYNAMIC;
+    noteDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    noteDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    noteDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+    noteDesc.StructureByteStride = sizeof(NoteData);
+    res = m_pDevice->CreateBuffer(&noteDesc, NULL, &m_pNoteBuffer);
+    if (FAILED(res)) return make_tuple(res, "CreateBuffer (note buffer)");
 
-    auto noteOR_pipeline_desc = rect_pipeline_desc;
-    noteOR_pipeline_desc.pRootSignature = m_pNoteRootSignatureOR.Get();
-    noteOR_pipeline_desc.VS = {
-        .pShaderBytecode = g_pNoteVertexShader,
-        .BytecodeLength = sizeof(g_pNoteVertexShader),
-    };
-    noteOR_pipeline_desc.PS = {
-        .pShaderBytecode = g_pNotePixelShader,
-        .BytecodeLength = sizeof(g_pNotePixelShader),
-    };
-    noteOR_pipeline_desc.DepthStencilState = {
-        .DepthEnable = TRUE,
-        .DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL,
-        .DepthFunc = D3D12_COMPARISON_FUNC_LESS,
-    };
-    noteOR_pipeline_desc.InputLayout = {
-        .NumElements = 0,
-    };
-    res = m_pDevice->CreateGraphicsPipelineState(&noteOR_pipeline_desc, IID_PPV_ARGS(&m_pNotePipelineStateOR));
-    if (FAILED(res))
-        return make_tuple(res, "CreateGraphicsPipelineState (note OR)");
-
-    auto same_width_noteOR_pipeline_desc = noteOR_pipeline_desc;
-    same_width_noteOR_pipeline_desc.pRootSignature = m_pNoteSameWidthRootSignatureOR.Get();
-    same_width_noteOR_pipeline_desc.VS = {
-        .pShaderBytecode = g_pNoteVertexShaderSameWidth,
-        .BytecodeLength = sizeof(g_pNoteVertexShaderSameWidth),
-    };
-    res = m_pDevice->CreateGraphicsPipelineState(&same_width_noteOR_pipeline_desc, IID_PPV_ARGS(&m_pNoteSameWidthPipelineStateOR));
-    if (FAILED(res))
-        return make_tuple(res, "CreateGraphicsPipelineState (same width note OR)");
-
-    // Create background root signature
-    D3D12_DESCRIPTOR_RANGE descriptor_ranges[] = {
-        {
-            .RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
-            .NumDescriptors = 1,
-            .BaseShaderRegister = 0,
-            .RegisterSpace = 0,
-            .OffsetInDescriptorsFromTableStart = 0,
-        }
-    };
-    ComPtr<ID3DBlob> background_serialized;
-    D3D12_ROOT_PARAMETER background_root_sig_params[] = {
-        {
-            .ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE,
-            .DescriptorTable = {
-                .NumDescriptorRanges = 1,
-                .pDescriptorRanges = descriptor_ranges,
-            },
-            .ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL,
-        },
-    };
-    D3D12_STATIC_SAMPLER_DESC background_root_sig_samplers[] = {
-        {
-            .Filter = D3D12_FILTER_MIN_MAG_MIP_POINT,
-            .AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP,
-            .AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP,
-            .AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP,
-            .MipLODBias = 0,
-            .MaxAnisotropy = 0,
-            .ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER,
-            .BorderColor = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK,
-            .MinLOD = 0,
-            .MaxLOD = D3D12_FLOAT32_MAX,
-            .ShaderRegister = 0,
-            .RegisterSpace = 0,
-            .ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL,
-        }
-    };
-    D3D12_ROOT_SIGNATURE_DESC background_root_sig_desc = {
-        .NumParameters = _countof(background_root_sig_params),
-        .pParameters = background_root_sig_params,
-        .NumStaticSamplers = _countof(background_root_sig_samplers),
-        .pStaticSamplers = background_root_sig_samplers,
-        .Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
-                    D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
-                    D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
-                    D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS,
-    };
-    res = D3D12SerializeRootSignature(&background_root_sig_desc, D3D_ROOT_SIGNATURE_VERSION_1, &background_serialized, nullptr);
-    if (FAILED(res))
-        return make_tuple(res, "D3D12SerializeRootSignature (background)");
-    res = m_pDevice->CreateRootSignature(0, background_serialized->GetBufferPointer(), background_serialized->GetBufferSize(), IID_PPV_ARGS(&m_pBackgroundRootSignature));
-    if (FAILED(res))
-        return make_tuple(res, "CreateRootSignature (background)");
-
-    // Create background pipeline
-    auto background_pipeline_desc = rect_pipeline_desc;
-    background_pipeline_desc.pRootSignature = m_pBackgroundRootSignature.Get();
-    background_pipeline_desc.VS = {
-        .pShaderBytecode = g_pBackgroundVertexShader,
-        .BytecodeLength = sizeof(g_pBackgroundVertexShader),
-    };
-    background_pipeline_desc.PS = {
-        .pShaderBytecode = g_pBackgroundPixelShader,
-        .BytecodeLength = sizeof(g_pBackgroundPixelShader),
-    };
-    background_pipeline_desc.InputLayout = {
-        .NumElements = 0,
-    };
-    res = m_pDevice->CreateGraphicsPipelineState(&background_pipeline_desc, IID_PPV_ARGS(&m_pBackgroundPipelineState));
-    if (FAILED(res))
-        return make_tuple(res, "CreateGraphicsPipelineState (background)");
-
-    // Create command list
-    //res = m_pDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(&m_pCommandList));
-    res = m_pDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_pCommandAllocator[m_uFrameIndex].Get(), nullptr, IID_PPV_ARGS(&m_pCommandList));
-    if (FAILED(res))
-        return make_tuple(res, "CreateCommandList");
-    res = m_pCommandList->Close();
-    if (FAILED(res))
-        return make_tuple(res, "Closing command list");
-
-    // Create synchronization fence
-    res = m_pDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_pFence));
-    if (FAILED(res))
-        return make_tuple(res, "CreateFence");
-    m_pFenceValues[m_uFrameIndex]++;
-
-    // Create synchronization fence event
-    m_hFenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-
-    // Create generic upload buffer
-    auto generic_upload_desc = CD3DX12_RESOURCE_DESC::Buffer(GenericUploadSize);
-    auto upload_heap = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-    auto default_heap = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-    res = m_pDevice->CreateCommittedResource(
-        &upload_heap,
-        D3D12_HEAP_FLAG_NONE,
-        &generic_upload_desc,
-        D3D12_RESOURCE_STATE_GENERIC_READ,
-        nullptr,
-        IID_PPV_ARGS(&m_pGenericUpload)
-    );
-    if (FAILED(res))
-        return make_tuple(res, "CreateCommittedResource (generic upload buffer)");
-
-    // Create fixed size constants buffer
-    auto fixed_desc = CD3DX12_RESOURCE_DESC::Buffer(sizeof(FixedSizeConstants));
-    res = m_pDevice->CreateCommittedResource(
-        &default_heap,
-        D3D12_HEAP_FLAG_NONE,
-        &fixed_desc,
-        D3D12_RESOURCE_STATE_COMMON,
-        nullptr,
-        IID_PPV_ARGS(&m_pFixedBuffer)
-    );
-    if (FAILED(res))
-        return make_tuple(res, "CreateCommittedResource (fixed buffer)");
-
-    // Create track color buffer
-    auto track_color_desc = CD3DX12_RESOURCE_DESC::Buffer(MaxTrackColors * 16 * sizeof(TrackColor));
-    res = m_pDevice->CreateCommittedResource(
-        &default_heap,
-        D3D12_HEAP_FLAG_NONE,
-        &track_color_desc,
-        D3D12_RESOURCE_STATE_COMMON,
-        nullptr,
-        IID_PPV_ARGS(&m_pTrackColorBuffer)
-    );
-    if (FAILED(res))
-        return make_tuple(res, "CreateCommittedResource (track color buffer)");
-
-    // Create dynamic rect vertex buffers
-    // Each in-flight frame has its own vertex buffer
-    auto vertex_buffer_desc = CD3DX12_RESOURCE_DESC::Buffer(RectsPerPass * 6 * sizeof(RectVertex));
-    for (uint32_t i = 0; i < FrameCount; i++) {
-        res = m_pDevice->CreateCommittedResource(
-            &upload_heap,
-            D3D12_HEAP_FLAG_NONE,
-            &vertex_buffer_desc,
-            D3D12_RESOURCE_STATE_GENERIC_READ,
-            nullptr,
-            IID_PPV_ARGS(&m_pVertexBuffers[i])
-        );
-        if (FAILED(res))
-            return make_tuple(res, "CreateCommittedResource (vertex buffer)");
-        m_pVertexBuffers[i]->SetName(L"Vertex buffer");
-        m_VertexBufferViews[i].BufferLocation = m_pVertexBuffers[i]->GetGPUVirtualAddress();
-        m_VertexBufferViews[i].SizeInBytes = vertex_buffer_desc.Width;
-        m_VertexBufferViews[i].StrideInBytes = sizeof(RectVertex);
-    }
-
-    // Create dynamic note buffers
-    auto note_buffer_desc = CD3DX12_RESOURCE_DESC::Buffer(NotesPerPass * sizeof(NoteData));
-    for (uint32_t i = 0; i < FrameCount; i++) {
-        res = m_pDevice->CreateCommittedResource(
-            &upload_heap,
-            D3D12_HEAP_FLAG_NONE,
-            &note_buffer_desc,
-            D3D12_RESOURCE_STATE_GENERIC_READ,
-            nullptr,
-            IID_PPV_ARGS(&m_pNoteBuffers[i])
-        );
-        if (FAILED(res))
-            return make_tuple(res, "CreateCommittedResource (note buffer)");
-        m_pNoteBuffers[i]->SetName(L"Note buffer");
-    }
+    D3D11_SHADER_RESOURCE_VIEW_DESC noteSrvDesc = {};
+    noteSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
+    noteSrvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+    noteSrvDesc.Buffer.NumElements = NotesPerPass;
+    res = m_pDevice->CreateShaderResourceView(m_pNoteBuffer.Get(), &noteSrvDesc, &m_pNoteSRV);
+    if (FAILED(res)) return make_tuple(res, "CreateSRV (note buffer)");
 
     // Create index buffer
-    auto index_buffer_desc = CD3DX12_RESOURCE_DESC::Buffer(IndexBufferCount * sizeof(uint32_t));
-    res = m_pDevice->CreateCommittedResource(
-        &default_heap,
-        D3D12_HEAP_FLAG_NONE,
-        &index_buffer_desc,
-        D3D12_RESOURCE_STATE_COMMON,
-        nullptr,
-        IID_PPV_ARGS(&m_pIndexBuffer)
-    );
-    if (FAILED(res))
-        return make_tuple(res, "CreateCommittedResource (index buffer)");
-    m_pIndexBuffer->SetName(L"Index buffer");
-    m_IndexBufferView.BufferLocation = m_pIndexBuffer->GetGPUVirtualAddress();
-    m_IndexBufferView.Format = DXGI_FORMAT_R32_UINT;
-    m_IndexBufferView.SizeInBytes = index_buffer_desc.Width;
-
-    // Create index upload buffer
-    ComPtr<ID3D12Resource> index_buffer_upload = nullptr;
-    res = m_pDevice->CreateCommittedResource(
-        &upload_heap,
-        D3D12_HEAP_FLAG_NONE,
-        &index_buffer_desc,
-        D3D12_RESOURCE_STATE_GENERIC_READ,
-        nullptr,
-        IID_PPV_ARGS(&index_buffer_upload)
-    );
-    if (FAILED(res))
-        return make_tuple(res, "CreateCommittedResource (index upload buffer)");
-    index_buffer_upload->SetName(L"Index upload buffer");
-
-    // Generate index buffer data
-    vector<uint32_t> index_buffer_vec;
-    index_buffer_vec.resize(IndexBufferCount);
+    vector<uint32_t> index_buffer_vec(IndexBufferCount);
     for (uint32_t i = 0; i < IndexBufferCount / 6; i++) {
         index_buffer_vec[i * 6] = i * 4;
         index_buffer_vec[i * 6 + 1] = i * 4 + 1;
@@ -631,274 +230,116 @@ tuple<HRESULT, const char*> D3D12Renderer::Init(HWND hWnd, bool bLimitFPS) {
         index_buffer_vec[i * 6 + 5] = i * 4 + 3;
     }
 
-    // Reset the command list
-    m_pCommandAllocator[m_uFrameIndex]->Reset();
-    m_pCommandList->Reset(m_pCommandAllocator[m_uFrameIndex].Get(), nullptr);
-
-    // Upload index buffer to GPU
-    D3D12_SUBRESOURCE_DATA index_buffer_data = {
-        .pData = index_buffer_vec.data(),
-        .RowPitch = (LONG_PTR)(index_buffer_vec.size() * sizeof(uint32_t)),
-        .SlicePitch = (LONG_PTR)(index_buffer_vec.size() * sizeof(uint32_t)),
-    };
-    UpdateSubresources<1>(m_pCommandList.Get(), m_pIndexBuffer.Get(), index_buffer_upload.Get(), 0, 0, 1, &index_buffer_data);
-
-    // Finalize index buffer
-    auto index_buffer_barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_pIndexBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_INDEX_BUFFER);
-    m_pCommandList->ResourceBarrier(1, &index_buffer_barrier);
-
-    // Close the command list
-    res = m_pCommandList->Close();
-    if (FAILED(res))
-        return make_tuple(res, "Closing command list for initial buffer upload");
-
-    // Execute the command list
-    ID3D12CommandList* command_lists[] = { m_pCommandList.Get() };
-    m_pCommandQueue->ExecuteCommandLists(1, command_lists);
-
-    // Wait for everything to finish
-    if (FAILED(WaitForGPU()))
-        return make_tuple(res, "WaitForGPU");
+    D3D11_BUFFER_DESC ibDesc = {};
+    ibDesc.ByteWidth = IndexBufferCount * sizeof(uint32_t);
+    ibDesc.Usage = D3D11_USAGE_IMMUTABLE;
+    ibDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+    D3D11_SUBRESOURCE_DATA ibData = { index_buffer_vec.data() };
+    res = m_pDevice->CreateBuffer(&ibDesc, &ibData, &m_pIndexBuffer);
+    if (FAILED(res)) return make_tuple(res, "CreateBuffer (index buffer)");
 
     // Make the swap chain
     auto res2 = CreateWindowDependentObjects(hWnd);
     if (FAILED(get<0>(res2)))
         return res2;
 
-    // Initialize ImGui
-    auto imgui_heap = m_pImGuiSRVDescriptorHeap.Get();
-    ImGui::CreateContext();
-
-    // Set up font and disable imgui.ini
-    ImGuiIO& io = ImGui::GetIO();
-    ImFontConfig font_config = {};
-    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1 << 5, &font_config, io.Fonts->GetGlyphRangesDefault());
-    font_config.MergeMode = true;
-    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1 << 5, &font_config, io.Fonts->GetGlyphRangesJapanese());
-    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1 << 5, &font_config, io.Fonts->GetGlyphRangesChineseFull());
-    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1 << 5, &font_config, io.Fonts->GetGlyphRangesVietnamese());
-    io.Fonts->AddFontFromMemoryCompressedTTF(PHIFON_compressed_data, PHIFON_compressed_size, 1 << 5, &font_config, io.Fonts->GetGlyphRangesCyrillic());
-    io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\malgun.ttf", 1 << 5, &font_config, io.Fonts->GetGlyphRangesKorean());
-    io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\tahoma.ttf", 1 << 5, &font_config, io.Fonts->GetGlyphRangesThai());
-    io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\sylfaen.ttf", 1 << 5, &font_config, io.Fonts->GetGlyphRangesGreek());
-    io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\segoeui.ttf", 1 << 5, &font_config, io.Fonts->GetGlyphRangesDefault());
-    io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\segoeui.ttf", 1 << 5, &font_config, io.Fonts->GetGlyphRangesJapanese());
-    io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\segoeui.ttf", 1 << 5, &font_config, io.Fonts->GetGlyphRangesChineseFull());
-    io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\segoeui.ttf", 1 << 5, &font_config, io.Fonts->GetGlyphRangesVietnamese());
-    io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\segoeui.ttf", 1 << 5, &font_config, io.Fonts->GetGlyphRangesCyrillic());
-    io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\segoeui.ttf", 1 << 5, &font_config, io.Fonts->GetGlyphRangesKorean());
-    io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\segoeui.ttf", 1 << 5, &font_config, io.Fonts->GetGlyphRangesThai());
-    io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\segoeui.ttf", 1 << 5, &font_config, io.Fonts->GetGlyphRangesGreek());
-    io.Fonts->Build();
-    io.IniFilename = nullptr;
-
-    // Theme tweaks
-    auto& style = ImGui::GetStyle();
-    style.WindowMinSize = ImVec2(1, 1);
-    style.WindowBorderSize = 0.0f;
-    style.WindowPadding = ImVec2(6, 6);
-    style.Colors[ImGuiCol_WindowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.50f);
-
-    ImGui_ImplWin32_Init(hWnd);
-    ImGui_ImplDX12_Init(m_pDevice.Get(), FrameCount, DXGI_FORMAT_B8G8R8A8_UNORM, imgui_heap, imgui_heap->GetCPUDescriptorHandleForHeapStart(), imgui_heap->GetGPUDescriptorHandleForHeapStart());
-
-    m_pDrawList = new ImDrawList(ImGui::GetDrawListSharedData());
-
     return make_tuple(S_OK, "");
 }
 
-tuple<HRESULT, const char*> D3D12Renderer::CreateWindowDependentObjects(HWND hWnd) {
+tuple<HRESULT, const char*> Renderer11::CreateWindowDependentObjects(HWND hWnd) {
     HRESULT res;
     if (m_pSwapChain) {
-        // Wait for the GPU to finish any remaining work
-        WaitForGPU();
-
-        // Release the current render target views
-        for (uint32_t i = 0; i < FrameCount; i++) {
-            m_pRenderTargets[i].Reset();
-            m_pFenceValues[i] = m_pFenceValues[m_uFrameIndex];
-        }
+        // Release window-dependent objects
+        m_pContext->OMSetRenderTargets(0, nullptr, nullptr);
+        m_pContext->Flush();
+        m_pRenderTargetView.Reset();
+        m_pBackBuffer.Reset();
+        m_pBackBufferSurface.Reset();
+        m_pDepthStencilView.Reset();
+        m_pDepthBuffer.Reset();
 
         // Resize the swap chain
-        res = m_pSwapChain->ResizeBuffers(FrameCount, 0, 0, DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING);
+        res = m_pSwapChain->ResizeBuffers(1, 0, 0, DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_GDI_COMPATIBLE);
         if (FAILED(res))
             return make_tuple(res, "ResizeBuffers");
     }
     else {
-        // Create swap chain
-        IDXGISwapChain1* temp_swapchain = nullptr;
-        DXGI_SWAP_CHAIN_DESC1 swap_chain_desc = {
-            .Width = 0,
-            .Height = 0,
-            .Format = DXGI_FORMAT_B8G8R8A8_UNORM,
-            .Stereo = FALSE,
-            .SampleDesc = {
-                .Count = 1,
-            },
-            .BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT,
-            .BufferCount = FrameCount,
-            .Scaling = DXGI_SCALING_NONE,
-            .SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD,
-            .AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED,
-            .Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING,
-        };
-        res = m_pFactory->CreateSwapChainForHwnd(m_pCommandQueue.Get(), hWnd, &swap_chain_desc, nullptr, nullptr, &temp_swapchain);
+        // Create swap chain with GDI compatibility
+        DXGI_SWAP_CHAIN_DESC scd = {};
+        scd.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+        scd.SampleDesc.Count = 1;
+        scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+        scd.BufferCount = 1;
+        scd.OutputWindow = hWnd;
+        scd.Windowed = TRUE;
+        scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+        scd.Flags = DXGI_SWAP_CHAIN_FLAG_GDI_COMPATIBLE;
+        res = m_pFactory->CreateSwapChain(m_pDevice.Get(), &scd, &m_pSwapChain);
         if (FAILED(res))
-            return make_tuple(res, "CreateSwapChainForHwnd");
-        res = temp_swapchain->QueryInterface(IID_PPV_ARGS(&m_pSwapChain));
-        if (FAILED(res))
-            return make_tuple(res, "IDXGISwapChain1 -> IDXGISwapChain3");
+            return make_tuple(res, "CreateSwapChain");
+
+        // Disable ALT+ENTER
+        // TODO: Make fullscreen work
+        m_pFactory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER);
     }
+
+    // Get backbuffer and its GDI-compatible surface
+    res = m_pSwapChain->GetBuffer(0, IID_PPV_ARGS(&m_pBackBuffer));
+    if (FAILED(res))
+        return make_tuple(res, "GetBuffer");
+    res = m_pBackBuffer.As(&m_pBackBufferSurface);
+    if (FAILED(res))
+        return make_tuple(res, "QueryInterface (IDXGISurface1)");
 
     // Read backbuffer width and height
-    // TODO: Handle resizing
-    DXGI_SWAP_CHAIN_DESC1 actual_swap_desc = {};
-    res = m_pSwapChain->GetDesc1(&actual_swap_desc);
+    D3D11_TEXTURE2D_DESC bbDesc = {};
+    m_pBackBuffer->GetDesc(&bbDesc);
+    m_iBufferWidth = static_cast<win32_t>(bbDesc.Width);
+    m_iBufferHeight = static_cast<win32_t>(bbDesc.Height);
+
+    // Create render target view
+    res = m_pDevice->CreateRenderTargetView(m_pBackBuffer.Get(), nullptr, &m_pRenderTargetView);
     if (FAILED(res))
-        return make_tuple(res, "GetDesc1");
-    m_iBufferWidth = actual_swap_desc.Width;
-    m_iBufferHeight = actual_swap_desc.Height;
+        return make_tuple(res, "CreateRenderTargetView");
 
-    // Disable ALT+ENTER
-    // TODO: Make fullscreen work
-    m_pFactory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER);
-
-    // Create render target views
-    D3D12_CPU_DESCRIPTOR_HANDLE rtv_handle = m_pRTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-    for (uint32_t i = 0; i < FrameCount; i++) {
-        res = m_pSwapChain->GetBuffer(i, IID_PPV_ARGS(&m_pRenderTargets[i]));
-        if (FAILED(res))
-            return make_tuple(res, "GetBuffer");
-        m_pDevice->CreateRenderTargetView(m_pRenderTargets[i].Get(), nullptr, rtv_handle);
-        m_pRenderTargets[i]->SetName(L"Render target");
-        rtv_handle.ptr += m_uRTVDescriptorSize;
-    }
-
-    // Create depth buffer view
-    D3D12_CPU_DESCRIPTOR_HANDLE dsv_handle = m_pDSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-    auto dsv_heap = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-    auto dsv_res_desc = CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D32_FLOAT, m_iBufferWidth, m_iBufferHeight, 1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
-    D3D12_DEPTH_STENCIL_VIEW_DESC dsv_desc = {
-        .Format = DXGI_FORMAT_D32_FLOAT,
-        .ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D,
-        .Flags = D3D12_DSV_FLAG_NONE,
-    };
-    D3D12_CLEAR_VALUE clear_value = {
-        .Format = DXGI_FORMAT_D32_FLOAT,
-        .DepthStencil = {
-            .Depth = 1.0f,
-            .Stencil = 0,
-        }
-    };
-    res = m_pDevice->CreateCommittedResource(
-        &dsv_heap,
-        D3D12_HEAP_FLAG_NONE,
-        &dsv_res_desc,
-        D3D12_RESOURCE_STATE_DEPTH_WRITE,
-        &clear_value,
-        IID_PPV_ARGS(&m_pDepthBuffer)
-    );
+    // Create depth buffer
+    D3D11_TEXTURE2D_DESC depthDesc = {};
+    depthDesc.Width = m_iBufferWidth;
+    depthDesc.Height = m_iBufferHeight;
+    depthDesc.MipLevels = 1;
+    depthDesc.ArraySize = 1;
+    depthDesc.Format = DXGI_FORMAT_D32_FLOAT;
+    depthDesc.SampleDesc.Count = 1;
+    depthDesc.Usage = D3D11_USAGE_DEFAULT;
+    depthDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+    res = m_pDevice->CreateTexture2D(&depthDesc, NULL, &m_pDepthBuffer);
     if (FAILED(res))
-        return make_tuple(res, "CreateCommittedResource (depth buffer)");
-    m_pDevice->CreateDepthStencilView(m_pDepthBuffer.Get(), &dsv_desc, dsv_handle);
-
-    // Reset the current frame index
-    m_uFrameIndex = m_pSwapChain->GetCurrentBackBufferIndex();
-
-    // Get backbuffer pitch
-    auto desc = m_pRenderTargets[m_uFrameIndex]->GetDesc();
-    m_pDevice->GetCopyableFootprints(&desc, 0, 1, 0, nullptr, nullptr, &m_ullScreenshotPitch, nullptr);
-
-    // Round up the pitch to a multiple of 256
-    // Not sure if this is required, just got it from DirectXTK12 ScreenGrab.cpp
-    m_ullScreenshotPitch = (m_ullScreenshotPitch + 255) & ~0xFFu;
-
-    // Create screenshot staging buffer
-    CD3DX12_HEAP_PROPERTIES readback_heap(D3D12_HEAP_TYPE_READBACK);
-    D3D12_RESOURCE_DESC screenshot_staging_desc = {
-        .Dimension = D3D12_RESOURCE_DIMENSION_BUFFER,
-        .Alignment = 0,
-        .Width = m_ullScreenshotPitch * m_iBufferHeight,
-        .Height = 1,
-        .DepthOrArraySize = 1,
-        .MipLevels = 1,
-        .Format = DXGI_FORMAT_UNKNOWN,
-        .SampleDesc = {
-            .Count = 1,
-        },
-        .Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR,
-        .Flags = D3D12_RESOURCE_FLAG_NONE,
-    };
-    res = m_pDevice->CreateCommittedResource(
-        &readback_heap,
-        D3D12_HEAP_FLAG_NONE,
-        &screenshot_staging_desc,
-        D3D12_RESOURCE_STATE_COPY_DEST,
-        nullptr,
-        IID_PPV_ARGS(&m_pScreenshotStaging)
-    );
+        return make_tuple(res, "CreateTexture2D (depth buffer)");
+    res = m_pDevice->CreateDepthStencilView(m_pDepthBuffer.Get(), NULL, &m_pDepthStencilView);
     if (FAILED(res))
-        return make_tuple(res, "CreateCommittedResource (screenshot staging buffer)");
-    m_pScreenshotStaging->SetName(L"Screenshot staging buffer");
+        return make_tuple(res, "CreateDepthStencilView");
 
-    // Resize screenshot target buffer
-    m_vScreenshotOutput.resize(m_iBufferWidth * m_iBufferHeight * 4);
+    // Resize screenshot output buffer (BGR24)
+    m_vScreenshotOutput.resize(static_cast<size_t>(m_iBufferWidth) * m_iBufferHeight * ScreenshotBytesPerPixel);
 
     // Create background image texture
-    CD3DX12_HEAP_PROPERTIES default_heap(D3D12_HEAP_TYPE_DEFAULT);
-    D3D12_RESOURCE_DESC texture_desc = {
-        .Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D,
-        .Alignment = 0,
-        .Width = (UINT64)m_iBufferWidth,
-        .Height = (UINT)m_iBufferHeight,
-        .DepthOrArraySize = 1,
-        .MipLevels = 1,
-        .Format = DXGI_FORMAT_R8G8B8A8_UNORM,
-        .SampleDesc = {
-            .Count = 1,
-        },
-        .Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN,
-        .Flags = D3D12_RESOURCE_FLAG_NONE,
-    };
-    res = m_pDevice->CreateCommittedResource(
-        &default_heap,
-        D3D12_HEAP_FLAG_NONE,
-        &texture_desc,
-        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
-        nullptr,
-        IID_PPV_ARGS(&m_pTextureBuffer)
-    );
+    m_pBackgroundTexture.Reset();
+    m_pBackgroundTextureSRV.Reset();
+    D3D11_TEXTURE2D_DESC bgDesc = {};
+    bgDesc.Width = m_iBufferWidth;
+    bgDesc.Height = m_iBufferHeight;
+    bgDesc.MipLevels = 1;
+    bgDesc.ArraySize = 1;
+    bgDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    bgDesc.SampleDesc.Count = 1;
+    bgDesc.Usage = D3D11_USAGE_DEFAULT;
+    bgDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    res = m_pDevice->CreateTexture2D(&bgDesc, NULL, &m_pBackgroundTexture);
     if (FAILED(res))
-        return make_tuple(res, "CreateCommittedResource (background texture)");
-    m_pTextureBuffer->SetName(L"Background texture");
-
-    // Create texture SRV
-    D3D12_SHADER_RESOURCE_VIEW_DESC texture_view_desc = {
-        .Format = DXGI_FORMAT_R8G8B8A8_UNORM,
-        .ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D,
-        .Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
-        .Texture2D {
-            .MipLevels = 1,
-        }
-    };
-    m_pDevice->CreateShaderResourceView(m_pTextureBuffer.Get(), &texture_view_desc, m_pTextureSRVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
-
-    // Create background image upload buffer
-    UINT64 texture_upload_size = 0;
-    m_pDevice->GetCopyableFootprints(&texture_desc, 0, 1, 0, NULL, NULL, NULL, &texture_upload_size);
-    CD3DX12_HEAP_PROPERTIES upload_heap(D3D12_HEAP_TYPE_UPLOAD);
-    auto texture_upload_desc = CD3DX12_RESOURCE_DESC::Buffer(texture_upload_size);
-    res = m_pDevice->CreateCommittedResource(
-        &upload_heap,
-        D3D12_HEAP_FLAG_NONE,
-        &texture_upload_desc,
-        D3D12_RESOURCE_STATE_GENERIC_READ,
-        nullptr,
-        IID_PPV_ARGS(&m_pTextureUpload)
-    );
+        return make_tuple(res, "CreateTexture2D (background texture)");
+    res = m_pDevice->CreateShaderResourceView(m_pBackgroundTexture.Get(), nullptr, &m_pBackgroundTextureSRV);
     if (FAILED(res))
-        return make_tuple(res, "CreateCommittedResource (background texture upload buffer)");
-    m_pTextureUpload->SetName(L"Background texture upload buffer");
+        return make_tuple(res, "CreateSRV (background texture)");
 
     // Scale and upload background image
     UploadBackgroundBitmap();
@@ -906,102 +347,80 @@ tuple<HRESULT, const char*> D3D12Renderer::CreateWindowDependentObjects(HWND hWn
     // Set up root constants
     // https://github.com/ocornut/imgui/blob/master/backends/imgui_impl_dx12.cpp#L99
     float L = 0;
-    float R = m_iBufferWidth;
+    float R = (float)m_iBufferWidth;
     float T = 0;
-    float B = m_iBufferHeight;
+    float B = (float)m_iBufferHeight;
     float mvp[4][4] = {
-        { 2.0f / (R - L),   0.0f,           0.0f,       0.0f },
-        { 0.0f,         2.0f / (T - B),     0.0f,       0.0f },
-        { 0.0f,         0.0f,           0.5f,       0.0f },
-        { (R + L) / (L - R),  (T + B) / (B - T),    0.5f,       1.0f },
+        {2.0f / (R - L), 0.0f, 0.0f, 0.0f},
+        {0.0f, 2.0f / (T - B), 0.0f, 0.0f},
+        {0.0f, 0.0f, 0.5f, 0.0f},
+        {(R + L) / (L - R), (T + B) / (B - T), 0.5f, 1.0f},
     };
     memcpy(m_RootConstants.proj, mvp, sizeof(mvp));
 
     return make_tuple(S_OK, "");
 }
 
-HRESULT D3D12Renderer::ResetDeviceIfNeeded() {
+HRESULT Renderer11::ResetDeviceIfNeeded() {
     HRESULT hr = m_pDevice->GetDeviceRemovedReason();
     if (FAILED(hr)) { return ResetDevice(); }
     return S_OK;
 }
 
-HRESULT D3D12Renderer::ResetDevice() {
+HRESULT Renderer11::ResetDevice() {
     auto res = CreateWindowDependentObjects(m_hWnd);
     if (FAILED(get<0>(res)))
         return get<0>(res);
     return S_OK;
 }
 
-HRESULT D3D12Renderer::ClearAndBeginScene(DWORD color) {
+HRESULT Renderer11::ClearAndBeginScene(DWORD color) {
     // Clear the intermediate buffers
     m_vRectsIntermediate.clear();
     m_vNotesIntermediate.clear();
+    m_vTextCommands.clear();
     m_iRectSplit = -1;
 
-    // Reset the command list
-    m_pCommandAllocator[m_uFrameIndex]->Reset();
-    m_pCommandList->Reset(m_pCommandAllocator[m_uFrameIndex].Get(), m_pRectPipelineState.Get());
+    // Upload constant buffer
+    D3D11_MAPPED_SUBRESOURCE mapped;
+    if (SUCCEEDED(m_pContext->Map(m_pConstantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped))) {
+        memcpy(mapped.pData, &m_RootConstants, sizeof(m_RootConstants));
+        m_pContext->Unmap(m_pConstantBuffer.Get(), 0);
+    }
+    m_pContext->VSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
+    m_pContext->PSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
 
-    // Set up render state
-    SetPipeline(Pipeline::Rect);
-    SetupCommandList();
+    // Upload fixed constants if changed
     if (memcmp(&m_FixedConstants, &m_OldFixedConstants, sizeof(FixedSizeConstants))) {
         memcpy(&m_OldFixedConstants, &m_FixedConstants, sizeof(FixedSizeConstants));
-
-        // Transition the fixed size data buffer to an upload target
-        auto fixed_barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_pFixedBuffer.Get(), D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_COPY_DEST);
-        m_pCommandList->ResourceBarrier(1, &fixed_barrier);
-
-        // Upload the new fixed upload data to the GPU
-        D3D12_SUBRESOURCE_DATA fixed_upload_data = {
-            .pData = &m_FixedConstants,
-            .RowPitch = (LONG_PTR)(sizeof(m_FixedConstants)),
-            .SlicePitch = (LONG_PTR)(sizeof(m_FixedConstants)),
-        };
-        UpdateSubresources(m_pCommandList.Get(), m_pFixedBuffer.Get(), m_pGenericUpload.Get(), 0, 0, 1, &fixed_upload_data);
-
-        // Transition the fixed size data buffer back to the original state
-        fixed_barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_pFixedBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-        m_pCommandList->ResourceBarrier(1, &fixed_barrier);
+        m_pContext->UpdateSubresource(m_pFixedBuffer.Get(), 0, NULL, &m_FixedConstants, 0, 0);
     }
     if (memcmp(&m_TrackColors, &m_OldTrackColors, sizeof(m_TrackColors))) {
         memcpy(&m_OldTrackColors, &m_TrackColors, sizeof(m_TrackColors));
-
-        // Transition the track color buffer to an upload target
-        auto fixed_barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_pTrackColorBuffer.Get(), D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_COPY_DEST);
-        m_pCommandList->ResourceBarrier(1, &fixed_barrier);
-
-        // Upload the new fixed upload data to the GPU
-        D3D12_SUBRESOURCE_DATA track_color_upload_data = {
-            .pData = &m_TrackColors,
-            .RowPitch = (LONG_PTR)(sizeof(m_TrackColors)),
-            .SlicePitch = (LONG_PTR)(sizeof(m_TrackColors)),
-        };
-        UpdateSubresources(m_pCommandList.Get(), m_pTrackColorBuffer.Get(), m_pGenericUpload.Get(), sizeof(m_FixedConstants), 0, 1, &track_color_upload_data);
-
-        // Transition the fixed size data buffer back to the original state
-        fixed_barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_pTrackColorBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-        m_pCommandList->ResourceBarrier(1, &fixed_barrier);
+        m_pContext->UpdateSubresource(m_pTrackColorBuffer.Get(), 0, NULL, &m_TrackColors, 0, 0);
     }
 
-    // Transition backbuffer state to render target
-    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_pRenderTargets[m_uFrameIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-    m_pCommandList->ResourceBarrier(1, &barrier);
+    // Set up render state
+    m_pContext->OMSetRenderTargets(1, m_pRenderTargetView.GetAddressOf(), m_pDepthStencilView.Get());
+    D3D11_VIEWPORT vp = { 0, 0, (float)m_iBufferWidth, (float)m_iBufferHeight, 0.0f, 1.0f };
+    m_pContext->RSSetViewports(1, &vp);
+    m_pContext->RSSetState(m_pRasterizerState.Get());
+    float bf[4] = {};
+    m_pContext->OMSetBlendState(m_pBlendState.Get(), bf, 0xFFFFFFFF);
+    m_pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    m_pContext->IASetIndexBuffer(m_pIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
     // Send a clear render target command
-    CD3DX12_CPU_DESCRIPTOR_HANDLE rtv(m_pRTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), m_uFrameIndex, m_uRTVDescriptorSize);
-    CD3DX12_CPU_DESCRIPTOR_HANDLE dsv(m_pDSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
     float float_color[4] = { (float)((color >> 16) & 0xFF) / 255.0f, (float)((color >> 8) & 0xFF) / 255.0f, (float)(color & 0xFF) / 255.0f, 1.0f };
     if (!Config::GetConfig().GetVideoSettings().bSameWidth || Config::GetConfig().GetVideoSettings().bOR) {
-        m_pCommandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+        m_pContext->ClearDepthStencilView(m_pDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
     }
-    m_pCommandList->ClearRenderTargetView(rtv, float_color, 0, nullptr);
+    m_pContext->ClearRenderTargetView(m_pRenderTargetView.Get(), float_color);
 
     return S_OK;
 }
 
-__forceinline void D3D12Renderer::AutoSetNotePipeline(bool inloop) {
+__forceinline void Renderer11::AutoSetNotePipeline(bool inloop) {
     static Config& config = Config::GetConfig();
     static const VideoSettings& cVideo = config.GetVideoSettings();
     if (cVideo.bSameWidth) {
@@ -1022,440 +441,95 @@ __forceinline void D3D12Renderer::AutoSetNotePipeline(bool inloop) {
     }
 }
 
-__forceinline void D3D12Renderer::AutoSetRectPipeline(bool inloop) {
+__forceinline void Renderer11::AutoSetRectPipeline(bool inloop) {
     SetPipeline(Pipeline::Rect);
-    m_pCommandList->IASetVertexBuffers(0, 1, &m_VertexBufferViews[m_uFrameIndex]);
 }
 
-HRESULT D3D12Renderer::EndScene(bool draw_bg) {
-    /*
-    // Generate ImGui render data
-    ImGui::Render();
-    ImGui::GetDrawData()->AddDrawList(m_pDrawList);
+HRESULT Renderer11::DrawRectRange(size_t startVert, size_t endVert) {
+    if (startVert >= endVert) return S_OK;
+    SetPipeline(Pipeline::Rect);
+    HRESULT res = S_OK;
+    for (size_t i = startVert; i < endVert; i += (size_t)RectsPerPass * 4) {
+        size_t count = min(endVert - i, (size_t)RectsPerPass * 4);
+
+        D3D11_MAPPED_SUBRESOURCE mapped;
+        res = m_pContext->Map(m_pRectVertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+        if (FAILED(res)) return res;
+        memcpy(mapped.pData, m_vRectsIntermediate.data() + i, count * sizeof(RectVertex));
+        m_pContext->Unmap(m_pRectVertexBuffer.Get(), 0);
+
+        UINT stride = sizeof(RectVertex), offset = 0;
+        m_pContext->IASetVertexBuffers(0, 1, m_pRectVertexBuffer.GetAddressOf(), &stride, &offset);
+        m_pContext->DrawIndexed((UINT)(count / 4 * 6), 0, 0);
+    }
+    return res;
+}
+
+HRESULT Renderer11::EndScene(bool draw_bg) {
+    HRESULT res = S_OK;
 
     // Draw background
     if (draw_bg) {
         SetPipeline(Pipeline::Background);
-        m_pCommandList->DrawIndexedInstanced(3, 1, 0, 0, 0);
-        AutoSetRectPipeline();
-    }
-
-    size_t start = 0;
-    size_t end = 0;
-    size_t passsize = 0;
-    size_t datasize = 0;
-    char* source = nullptr;
-    ComPtr<ID3D12Resource>* buffer = nullptr;
-    ComPtr<ID3D12PipelineState>* state = nullptr;
-    size_t multiplier = 0;
-    void (D3D12Renderer:: * pipeline)(bool) = nullptr;
-    volatile uint8_t ReturnLocation = 0;
-
-    // Flush the intermediate rect buffer
-    // TODO: Handle more than RectsPerPass
-    HRESULT res = S_OK;
-    auto rect_count = m_vRectsIntermediate.size();
-    auto rect_split = min(m_iRectSplit < 0 ? rect_count : m_iRectSplit, rect_count);
-    if (!m_vRectsIntermediate.empty()) {
-        start = 0;
-        end = rect_split;
-        passsize = RectsPerPass;
-        datasize = sizeof(RectVertex);
-        source = reinterpret_cast<char*>(m_vRectsIntermediate.data());
-        buffer = m_pVertexBuffers;
-        state = &m_pRectPipelineState;
-        multiplier = 4;
-        pipeline = &D3D12Renderer::AutoSetRectPipeline;
-        ReturnLocation = 1;
-        goto NoSetup;
-    Location1:
-        ;
-    }
-
-    // Flush the intermediate note buffer
-    if (!m_vNotesIntermediate.empty()) {
-        start = 0;
-        end = m_vNotesIntermediate.size();
-        passsize = NotesPerPass;
-        datasize = sizeof(NoteData);
-        source = reinterpret_cast<char*>(m_vNotesIntermediate.data());
-        buffer = m_pNoteBuffers;
-        state = &m_pNotePipelineState;
-        multiplier = 1;
-        pipeline = &D3D12Renderer::AutoSetNotePipeline;
-        ReturnLocation = 2;
-
-    Draw:
-        (this->*pipeline)(false);
-    NoSetup:
-        for (size_t i = start; i < end; i += passsize * multiplier) {
-            volatile size_t remaining = end - i;
-            size_t count = min(remaining, passsize * multiplier);
-
-            D3D12_RANGE range = {
-                .Begin = 0,
-                .End = count * datasize,
-            };
-            void* vertices = nullptr;
-            res = buffer[m_uFrameIndex]->Map(0, &range, &vertices);
-            if (FAILED(res))
-                return res;
-            memcpy(vertices, source + i * datasize, count * datasize);
-            buffer[m_uFrameIndex]->Unmap(0, &range);
-
-            // Draw the notes
-            m_pCommandList->DrawIndexedInstanced(count / multiplier * 6, 1, 0, 0, 0);
-
-            if (remaining == count) goto loopend;
-            // Still more notes to go! Render the current batch and wait for the GPU to finish rendering it
-            // Close the command list
-            res = m_pCommandList->Close();
-            if (FAILED(res))
-                return res;
-
-            // Execute the command list
-            ID3D12CommandList* command_lists[] = { m_pCommandList.Get() };
-            m_pCommandQueue->ExecuteCommandLists(1, command_lists);
-
-            // Wait for the GPU to finish rendering the frame
-            res = WaitForGPU();
-            if (FAILED(res))
-                return res;
-
-            // Reset the command list
-            m_pCommandAllocator[m_uFrameIndex]->Reset();
-            m_pCommandList->Reset(m_pCommandAllocator[m_uFrameIndex].Get(), state->Get());
-
-            // Set up the state again
-            (this->*pipeline)(true);
-            SetupCommandList();
-        }
-    loopend:
-        switch (ReturnLocation) {
-        case 1:
-            goto Location1;
-        case 2:
-            goto Location2;
-        case 3:
-            goto Location3;
-        default:
-            throw "Undefined return address!";
-        }
-    Location2:
-        ;
-    }
-
-    // Draw the second rect batch
-    if (rect_count > rect_split) {
-        start = rect_split;
-        end = rect_count;
-        passsize = RectsPerPass;
-        datasize = sizeof(RectVertex);
-        source = reinterpret_cast<char*>(m_vRectsIntermediate.data());
-        buffer = m_pVertexBuffers;
-        state = &m_pRectPipelineState;
-        multiplier = 4;
-        pipeline = &D3D12Renderer::AutoSetRectPipeline;
-        ReturnLocation = 3;
-        goto Draw;
-    Location3:
-        ;
-    }
-
-    // Draw ImGui
-    ID3D12DescriptorHeap* heaps[] = { m_pImGuiSRVDescriptorHeap.Get() };
-    m_pCommandList->SetDescriptorHeaps(_countof(heaps), heaps);
-    ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), m_pCommandList.Get());
-
-    // Transition backbuffer state to present
-    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_pRenderTargets[m_uFrameIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-    m_pCommandList->ResourceBarrier(1, &barrier);
-
-    // Close the command list
-    res = m_pCommandList->Close();
-    if (FAILED(res))
-        return res;
-
-    // Execute the command list
-    ID3D12CommandList* command_lists[] = { m_pCommandList.Get() };
-    m_pCommandQueue->ExecuteCommandLists(1, command_lists);
-
-    return S_OK;
-    */
-    // Generate ImGui render data
-    ImGui::Render();
-    ImGui::GetDrawData()->AddDrawList(m_pDrawList);
-
-    // Draw background
-    if (draw_bg) {
-        SetPipeline(Pipeline::Background);
-        m_pCommandList->DrawIndexedInstanced(3, 1, 0, 0, 0);
-        SetPipeline(Pipeline::Rect);
-        m_pCommandList->IASetVertexBuffers(0, 1, &m_VertexBufferViews[m_uFrameIndex]);
+        m_pContext->Draw(3, 0);
     }
 
     // Flush the intermediate rect buffer
-    // TODO: Handle more than RectsPerPass
-    HRESULT res = S_OK;
-    auto rect_count = min(m_vRectsIntermediate.size(), RectsPerPass * 4);
-    auto rect_split = min(m_iRectSplit < 0 ? rect_count : m_iRectSplit, RectsPerPass * 4);
-    if (!m_vRectsIntermediate.empty()) {
-        D3D12_RANGE rect_range = {
-            .Begin = 0,
-            .End = rect_count * sizeof(RectVertex),
-        };
-        RectVertex* vertices = nullptr;
-        res = m_pVertexBuffers[m_uFrameIndex]->Map(0, &rect_range, (void**)&vertices);
-        if (FAILED(res))
-            return res;
-        memcpy(vertices, m_vRectsIntermediate.data(), rect_count * sizeof(RectVertex));
-        m_pVertexBuffers[m_uFrameIndex]->Unmap(0, &rect_range);
+    size_t rect_count = m_vRectsIntermediate.size();
+    size_t rect_split = min(m_iRectSplit < 0 ? rect_count : (size_t)m_iRectSplit, rect_count);
 
-        // Draw the first rect batch
-        m_pCommandList->DrawIndexedInstanced(rect_split / 4 * 6, 1, 0, 0, 0);
-    }
+    // First rect batch (before notes)
+    res = DrawRectRange(0, rect_split);
+    if (FAILED(res)) return res;
 
     // Flush the intermediate note buffer
     if (!m_vNotesIntermediate.empty()) {
         for (idx_t i = 0; i < m_vNotesIntermediate.size(); i += NotesPerPass) {
-            if (i == 0) {
-                if (Config::GetConfig().GetVideoSettings().bSameWidth) {
-                    if (Config::GetConfig().GetVideoSettings().bOR) {
-                        SetPipeline(Pipeline::SameWidthNoteOR);
-                    }
-                    else {
-                        SetPipeline(Pipeline::SameWidthNote);
-                    }
-                }
-                else {
-                    if (Config::GetConfig().GetVideoSettings().bOR) {
-                        SetPipeline(Pipeline::NoteOR);
-                    }
-                    else {
-                        SetPipeline(Pipeline::Note);
-                    }
-                }
-            }
+            if (i == 0) AutoSetNotePipeline();
 
             auto remaining = m_vNotesIntermediate.size() - i;
-            auto note_count = min(remaining, NotesPerPass);
-            D3D12_RANGE note_range = {
-                .Begin = 0,
-                .End = note_count * sizeof(NoteData),
-            };
-            NoteData* notes = nullptr;
-            res = m_pNoteBuffers[m_uFrameIndex]->Map(0, &note_range, (void**)&notes);
-            if (FAILED(res))
-                return res;
-            memcpy(notes, &m_vNotesIntermediate[i], note_count * sizeof(NoteData));
-            m_pNoteBuffers[m_uFrameIndex]->Unmap(0, &note_range);
+            auto note_count = min(remaining, (size_t)NotesPerPass);
+
+            // Unbind SRV before mapping (DX11 best practice)
+            ID3D11ShaderResourceView* null_srv = nullptr;
+            m_pContext->VSSetShaderResources(3, 1, &null_srv);
+
+            D3D11_MAPPED_SUBRESOURCE mapped;
+            res = m_pContext->Map(m_pNoteBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+            if (FAILED(res)) return res;
+            memcpy(mapped.pData, &m_vNotesIntermediate[i], note_count * sizeof(NoteData));
+            m_pContext->Unmap(m_pNoteBuffer.Get(), 0);
+
+            // Rebind SRV
+            m_pContext->VSSetShaderResources(3, 1, m_pNoteSRV.GetAddressOf());
 
             // Draw the notes
-            m_pCommandList->DrawIndexedInstanced(note_count * 6, 1, 0, 0, 0);
-
-            if (remaining - note_count != 0) {
-                // Still more notes to go! Render the current batch and wait for the GPU to finish rendering it
-                // Close the command list
-                res = m_pCommandList->Close();
-                if (FAILED(res))
-                    return res;
-
-                // Execute the command list
-                ID3D12CommandList* command_lists[] = { m_pCommandList.Get() };
-                m_pCommandQueue->ExecuteCommandLists(1, command_lists);
-
-                // Wait for the GPU to finish rendering the frame
-                res = WaitForGPU();
-                if (FAILED(res))
-                    return res;
-
-                // Reset the command list
-                m_pCommandAllocator[m_uFrameIndex]->Reset();
-                m_pCommandList->Reset(m_pCommandAllocator[m_uFrameIndex].Get(), m_pRectPipelineState.Get());
-
-                // Set up the state again
-                if (Config::GetConfig().GetVideoSettings().bSameWidth) {
-                    if (Config::GetConfig().GetVideoSettings().bOR) {
-                        SetPipeline(Pipeline::SameWidthNoteOR);
-                    }
-                    else {
-                        SetPipeline(Pipeline::SameWidthNote);
-                    }
-                }
-                else {
-                    if (Config::GetConfig().GetVideoSettings().bOR) {
-                        SetPipeline(Pipeline::NoteOR);
-                    }
-                    else {
-                        SetPipeline(Pipeline::Note);
-                    }
-                }
-                SetupCommandList();
-            }
+            m_pContext->DrawIndexed((UINT)(note_count * 6), 0, 0);
         }
     }
 
-    // Draw the second rect batch
-    if (rect_count > rect_split) {
-        SetPipeline(Pipeline::Rect);
-        m_pCommandList->IASetVertexBuffers(0, 1, &m_VertexBufferViews[m_uFrameIndex]);
-        m_pCommandList->DrawIndexedInstanced((rect_count - rect_split) / 4 * 6, 1, rect_split / 4 * 6, 0, 0);
-    }
+    // Draw the second rect batch (after notes)
+    res = DrawRectRange(rect_split, rect_count);
+    if (FAILED(res)) return res;
 
-    // Draw ImGui
-    ID3D12DescriptorHeap* heaps[] = { m_pImGuiSRVDescriptorHeap.Get() };
-    m_pCommandList->SetDescriptorHeaps(_countof(heaps), heaps);
-    ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), m_pCommandList.Get());
+    // Unbind render target before acquiring GDI DC
+    ID3D11RenderTargetView* nullRT = nullptr;
+    m_pContext->OMSetRenderTargets(1, &nullRT, nullptr);
+    m_pContext->Flush();
 
-    // Transition backbuffer state to present
-    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_pRenderTargets[m_uFrameIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-    m_pCommandList->ResourceBarrier(1, &barrier);
-
-    // Close the command list
-    res = m_pCommandList->Close();
-    if (FAILED(res))
-        return res;
-
-    // Execute the command list
-    ID3D12CommandList* command_lists[] = { m_pCommandList.Get() };
-    m_pCommandQueue->ExecuteCommandLists(1, command_lists);
-
-    return S_OK;
+    // Flush queued text last — GDI draws on top of everything
+    return FlushText();
 }
 
-HRESULT D3D12Renderer::EndSplashScene() {
-    // Generate ImGui render data
-    ImGui::Render();
-    ImGui::GetDrawData()->AddDrawList(m_pDrawList);
-
-    // Flush the intermediate rect buffer
-    HRESULT res = S_OK;
-    if (!m_vRectsIntermediate.empty()) {
-        for (idx_t i = 0; i < m_vRectsIntermediate.size(); i += RectsPerPass * 4) {
-            if (i == 0) {
-                SetPipeline(Pipeline::Rect);
-            }
-
-            auto remaining = m_vRectsIntermediate.size() - i;
-            auto rect_count = min(remaining, RectsPerPass * 4);
-            D3D12_RANGE rect_range = {
-                .Begin = 0,
-                .End = rect_count * sizeof(RectVertex),
-            };
-            RectVertex* vertices = nullptr;
-            res = m_pVertexBuffers[m_uFrameIndex]->Map(0, &rect_range, (void**)&vertices);
-            if (FAILED(res))
-                return res;
-            memcpy(vertices, reinterpret_cast<char*>(m_vRectsIntermediate.data()) + i * sizeof(RectVertex), rect_count * sizeof(RectVertex));
-            m_pVertexBuffers[m_uFrameIndex]->Unmap(0, &rect_range);
-
-            // Draw the first rect batch
-            m_pCommandList->DrawIndexedInstanced(rect_count / 4 * 6, 1, 0, 0, 0);
-
-            if (remaining - rect_count != 0) {
-                // Still more notes to go! Render the current batch and wait for the GPU to finish rendering it
-                // Close the command list
-                res = m_pCommandList->Close();
-                if (FAILED(res))
-                    return res;
-
-                // Execute the command list
-                ID3D12CommandList* command_lists[] = { m_pCommandList.Get() };
-                m_pCommandQueue->ExecuteCommandLists(1, command_lists);
-
-                // Wait for the GPU to finish rendering the frame
-                res = WaitForGPU();
-                if (FAILED(res))
-                    return res;
-
-                // Reset the command list
-                m_pCommandAllocator[m_uFrameIndex]->Reset();
-                m_pCommandList->Reset(m_pCommandAllocator[m_uFrameIndex].Get(), m_pRectPipelineState.Get());
-
-                // Set up the state again
-                SetPipeline(Pipeline::Rect);
-                SetupCommandList();
-            }
-        }
-    }
-
-    // Draw ImGui
-    ID3D12DescriptorHeap* heaps[] = { m_pImGuiSRVDescriptorHeap.Get() };
-    m_pCommandList->SetDescriptorHeaps(_countof(heaps), heaps);
-    ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), m_pCommandList.Get());
-
-    // Transition backbuffer state to present
-    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_pRenderTargets[m_uFrameIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-    m_pCommandList->ResourceBarrier(1, &barrier);
-
-    // Close the command list
-    res = m_pCommandList->Close();
-    if (FAILED(res))
-        return res;
-
-    // Execute the command list
-    ID3D12CommandList* command_lists[] = { m_pCommandList.Get() };
-    m_pCommandQueue->ExecuteCommandLists(1, command_lists);
-
-    return S_OK;
+HRESULT Renderer11::Present() {
+    return m_pSwapChain->Present(m_bLimitFPS ? 1 : 0, 0);
 }
 
-HRESULT D3D12Renderer::Present() {
-    // Present the frame
-    HRESULT res;
-    if (m_bLimitFPS)
-        res = m_pSwapChain->Present(1, 0);
-    else
-        res = m_pSwapChain->Present(0, DXGI_PRESENT_ALLOW_TEARING);
-    if (FAILED(res))
-        return res;
-
-    // Signal the fence
-    const UINT64 cur_fence_value = m_pFenceValues[m_uFrameIndex];
-    res = m_pCommandQueue->Signal(m_pFence.Get(), cur_fence_value);
-    if (FAILED(res))
-        return res;
-
-    // Update frame index
-    m_uFrameIndex = m_pSwapChain->GetCurrentBackBufferIndex();
-
-    // Wait for the next frame to be ready
-    // TODO: Rework this to have better CPU and GPU parallelism
-    if (m_pFence->GetCompletedValue() < m_pFenceValues[m_uFrameIndex]) {
-        res = m_pFence->SetEventOnCompletion(m_pFenceValues[m_uFrameIndex], m_hFenceEvent);
-        if (FAILED(res))
-            return res;
-
-        // HACK: There's a race condition between the hWnd being destroyed and this wait
-        while (WaitForSingleObjectEx(m_hFenceEvent, 1000, FALSE) == WAIT_TIMEOUT) {
-            if (g_bGfxDestroyed)
-                break;
-        }
-    }
-
-    // Set the fence value for the next frame
-    m_pFenceValues[m_uFrameIndex] = cur_fence_value + 1;
-    return S_OK;
-}
-
-HRESULT D3D12Renderer::BeginText() {
-    ImGui::Render();
-    m_pDrawList->_ResetForNewFrame();
-    m_pDrawList->PushClipRectFullScreen();
-    m_pDrawList->PushTextureID(ImGui::GetIO().Fonts->TexID);
-    return S_OK;
-}
-
-HRESULT D3D12Renderer::EndText() {
-    // TODO
-    return S_OK;
-}
-
-HRESULT D3D12Renderer::DrawRect(float x, float y, float cx, float cy, DWORD color, float flipcenter, bool flip) {
+HRESULT Renderer11::DrawRect(float x, float y, float cx, float cy, DWORD color, float flipcenter, bool flip) {
     return DrawRect(x, y, cx, cy, color, color, color, color, flipcenter, flip);
 }
 
-HRESULT D3D12Renderer::DrawRect(float x, float y, float cx, float cy, DWORD c1, DWORD c2, DWORD c3, DWORD c4, float flipcenter, bool flip) {
+HRESULT Renderer11::DrawRect(float x, float y, float cx, float cy, DWORD c1, DWORD c2, DWORD c3, DWORD c4, float flipcenter, bool flip) {
     m_vRectsIntermediate.insert(m_vRectsIntermediate.end(), {
         {x, y, c1},
         {x + cx, y, c2},
@@ -1465,11 +539,11 @@ HRESULT D3D12Renderer::DrawRect(float x, float y, float cx, float cy, DWORD c1, 
     return S_OK;
 }
 
-HRESULT D3D12Renderer::DrawSkew(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, DWORD color, float flipcenter, bool flip) {
+HRESULT Renderer11::DrawSkew(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, DWORD color, float flipcenter, bool flip) {
     return DrawSkew(x1, y1, x2, y2, x3, y3, x4, y4, color, color, color, color, flipcenter, flip);
 }
 
-HRESULT D3D12Renderer::DrawSkew(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, DWORD c1, DWORD c2, DWORD c3, DWORD c4, float flipcenter, bool flip) {
+HRESULT Renderer11::DrawSkew(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, DWORD c1, DWORD c2, DWORD c3, DWORD c4, float flipcenter, bool flip) {
     m_vRectsIntermediate.insert(m_vRectsIntermediate.end(), {
         {x1, y1, c1},
         {x2, y2, c2},
@@ -1479,180 +553,192 @@ HRESULT D3D12Renderer::DrawSkew(float x1, float y1, float x2, float y2, float x3
     return S_OK;
 }
 
-HRESULT D3D12Renderer::SetLimitFPS(bool bLimitFPS) {
-    m_bLimitFPS = bLimitFPS;
-    return S_OK;
-}
-
-wstring D3D12Renderer::GetAdapterName() {
-    if (m_pAdapter) {
-        DXGI_ADAPTER_DESC2 desc = {};
-        if (FAILED(m_pAdapter->GetDesc2(&desc)))
-            return L"GetDesc2 failed";
-        return desc.Description;
-    }
-    return L"None";
-}
-
-HRESULT D3D12Renderer::WaitForGPU() {
-    // Signal the command queue
-    HRESULT res = m_pCommandQueue->Signal(m_pFence.Get(), m_pFenceValues[m_uFrameIndex]);
-    if (FAILED(res))
-        return res;
-
-    auto val = m_pFence->GetCompletedValue();
-    if (val < m_pFenceValues[m_uFrameIndex]) {
-        // Wait for the fence
-        res = m_pFence->SetEventOnCompletion(m_pFenceValues[m_uFrameIndex], m_hFenceEvent);
-        if (FAILED(res))
-            return res;
-        WaitForSingleObjectEx(m_hFenceEvent, INFINITE, FALSE);
-    }
-
-    // Increment the fence value for the current frame
-    m_pFenceValues[m_uFrameIndex]++;
-
-    return S_OK;
-}
-
-void D3D12Renderer::SetPipeline(Pipeline pipeline) {
+void Renderer11::SetPipeline(Pipeline pipeline) {
     switch (pipeline) {
     case Pipeline::Rect:
-        m_pCommandList->SetPipelineState(m_pRectPipelineState.Get());
-        m_pCommandList->SetGraphicsRootSignature(m_pRectRootSignature.Get());
-        m_pCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        m_pCommandList->IASetVertexBuffers(0, 1, &m_VertexBufferViews[m_uFrameIndex]);
-        m_pCommandList->IASetIndexBuffer(&m_IndexBufferView);
-        m_pCommandList->SetGraphicsRoot32BitConstants(0, sizeof(m_RootConstants) / 4, &m_RootConstants, 0);
+        m_pContext->VSSetShader(m_pRectVS.Get(), NULL, 0);
+        m_pContext->PSSetShader(m_pRectPS.Get(), NULL, 0);
+        m_pContext->IASetInputLayout(m_pRectInputLayout.Get());
+        m_pContext->OMSetDepthStencilState(m_pDepthDisabledState.Get(), 0);
         break;
     case Pipeline::Note:
-        m_pCommandList->SetPipelineState(m_pNotePipelineState.Get());
-        m_pCommandList->SetGraphicsRootSignature(m_pNoteRootSignature.Get());
-        m_pCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        m_pCommandList->IASetVertexBuffers(0, 0, nullptr);
-        m_pCommandList->IASetIndexBuffer(&m_IndexBufferView);
-        m_pCommandList->SetGraphicsRootShaderResourceView(1, m_pFixedBuffer->GetGPUVirtualAddress());
-        m_pCommandList->SetGraphicsRootShaderResourceView(2, m_pTrackColorBuffer->GetGPUVirtualAddress());
-        m_pCommandList->SetGraphicsRootShaderResourceView(3, m_pNoteBuffers[m_uFrameIndex]->GetGPUVirtualAddress());
+        m_pContext->VSSetShader(m_pNoteVS.Get(), NULL, 0);
+        m_pContext->PSSetShader(m_pNotePS.Get(), NULL, 0);
+        m_pContext->IASetInputLayout(NULL);
+        m_pContext->OMSetDepthStencilState(m_pDepthLessEqualState.Get(), 0);
+        m_pContext->VSSetShaderResources(1, 1, m_pFixedSRV.GetAddressOf());
+        m_pContext->VSSetShaderResources(2, 1, m_pTrackColorSRV.GetAddressOf());
+        m_pContext->VSSetShaderResources(3, 1, m_pNoteSRV.GetAddressOf());
         break;
     case Pipeline::SameWidthNote:
-        m_pCommandList->SetPipelineState(m_pNoteSameWidthPipelineState.Get());
-        m_pCommandList->SetGraphicsRootSignature(m_pNoteSameWidthRootSignature.Get());
-        m_pCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        m_pCommandList->IASetVertexBuffers(0, 0, nullptr);
-        m_pCommandList->IASetIndexBuffer(&m_IndexBufferView);
-        m_pCommandList->SetGraphicsRootShaderResourceView(1, m_pFixedBuffer->GetGPUVirtualAddress());
-        m_pCommandList->SetGraphicsRootShaderResourceView(2, m_pTrackColorBuffer->GetGPUVirtualAddress());
-        m_pCommandList->SetGraphicsRootShaderResourceView(3, m_pNoteBuffers[m_uFrameIndex]->GetGPUVirtualAddress());
+        m_pContext->VSSetShader(m_pNoteSameWidthVS.Get(), NULL, 0);
+        m_pContext->PSSetShader(m_pNotePS.Get(), NULL, 0);
+        m_pContext->IASetInputLayout(NULL);
+        m_pContext->OMSetDepthStencilState(m_pDepthDisabledState.Get(), 0);
+        m_pContext->VSSetShaderResources(1, 1, m_pFixedSRV.GetAddressOf());
+        m_pContext->VSSetShaderResources(2, 1, m_pTrackColorSRV.GetAddressOf());
+        m_pContext->VSSetShaderResources(3, 1, m_pNoteSRV.GetAddressOf());
         break;
     case Pipeline::NoteOR:
-        m_pCommandList->SetPipelineState(m_pNotePipelineStateOR.Get());
-        m_pCommandList->SetGraphicsRootSignature(m_pNoteRootSignatureOR.Get());
-        m_pCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        m_pCommandList->IASetVertexBuffers(0, 0, nullptr);
-        m_pCommandList->IASetIndexBuffer(&m_IndexBufferView);
-        m_pCommandList->SetGraphicsRootShaderResourceView(1, m_pFixedBuffer->GetGPUVirtualAddress());
-        m_pCommandList->SetGraphicsRootShaderResourceView(2, m_pTrackColorBuffer->GetGPUVirtualAddress());
-        m_pCommandList->SetGraphicsRootShaderResourceView(3, m_pNoteBuffers[m_uFrameIndex]->GetGPUVirtualAddress());
+        m_pContext->VSSetShader(m_pNoteVS.Get(), NULL, 0);
+        m_pContext->PSSetShader(m_pNotePS.Get(), NULL, 0);
+        m_pContext->IASetInputLayout(NULL);
+        m_pContext->OMSetDepthStencilState(m_pDepthLessState.Get(), 0);
+        m_pContext->VSSetShaderResources(1, 1, m_pFixedSRV.GetAddressOf());
+        m_pContext->VSSetShaderResources(2, 1, m_pTrackColorSRV.GetAddressOf());
+        m_pContext->VSSetShaderResources(3, 1, m_pNoteSRV.GetAddressOf());
         break;
     case Pipeline::SameWidthNoteOR:
-        m_pCommandList->SetPipelineState(m_pNoteSameWidthPipelineStateOR.Get());
-        m_pCommandList->SetGraphicsRootSignature(m_pNoteSameWidthRootSignatureOR.Get());
-        m_pCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        m_pCommandList->IASetVertexBuffers(0, 0, nullptr);
-        m_pCommandList->IASetIndexBuffer(&m_IndexBufferView);
-        m_pCommandList->SetGraphicsRootShaderResourceView(1, m_pFixedBuffer->GetGPUVirtualAddress());
-        m_pCommandList->SetGraphicsRootShaderResourceView(2, m_pTrackColorBuffer->GetGPUVirtualAddress());
-        m_pCommandList->SetGraphicsRootShaderResourceView(3, m_pNoteBuffers[m_uFrameIndex]->GetGPUVirtualAddress());
+        m_pContext->VSSetShader(m_pNoteSameWidthVS.Get(), NULL, 0);
+        m_pContext->PSSetShader(m_pNotePS.Get(), NULL, 0);
+        m_pContext->IASetInputLayout(NULL);
+        m_pContext->OMSetDepthStencilState(m_pDepthLessState.Get(), 0);
+        m_pContext->VSSetShaderResources(1, 1, m_pFixedSRV.GetAddressOf());
+        m_pContext->VSSetShaderResources(2, 1, m_pTrackColorSRV.GetAddressOf());
+        m_pContext->VSSetShaderResources(3, 1, m_pNoteSRV.GetAddressOf());
         break;
     case Pipeline::Background:
-        ID3D12DescriptorHeap* heaps[] = { m_pTextureSRVDescriptorHeap.Get() };
-        m_pCommandList->SetDescriptorHeaps(_countof(heaps), heaps);
-        m_pCommandList->SetPipelineState(m_pBackgroundPipelineState.Get());
-        m_pCommandList->SetGraphicsRootSignature(m_pBackgroundRootSignature.Get());
-        m_pCommandList->SetGraphicsRootDescriptorTable(0, m_pTextureSRVDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
-        m_pCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        m_pCommandList->IASetVertexBuffers(0, 0, nullptr);
-        m_pCommandList->IASetIndexBuffer(&m_IndexBufferView);
+        m_pContext->VSSetShader(m_pBackgroundVS.Get(), NULL, 0);
+        m_pContext->PSSetShader(m_pBackgroundPS.Get(), NULL, 0);
+        m_pContext->IASetInputLayout(NULL);
+        m_pContext->OMSetDepthStencilState(m_pDepthDisabledState.Get(), 0);
+        m_pContext->PSSetShaderResources(0, 1, m_pBackgroundTextureSRV.GetAddressOf());
+        m_pContext->PSSetSamplers(0, 1, m_pBackgroundSampler.GetAddressOf());
         break;
     }
 }
 
-void D3D12Renderer::SetupCommandList() {
-    // Set initial state
-    D3D12_VIEWPORT viewport = {
-        .TopLeftX = 0,
-        .TopLeftY = 0,
-        .Width = (float)m_iBufferWidth,
-        .Height = (float)m_iBufferHeight,
-        .MinDepth = 0.0,
-        .MaxDepth = 1.0,
-    };
-    D3D12_RECT scissor = { 0, 0, m_iBufferWidth, m_iBufferHeight };
-    m_pCommandList->RSSetViewports(1, &viewport);
-    m_pCommandList->RSSetScissorRects(1, &scissor);
-    m_pCommandList->SetGraphicsRoot32BitConstants(0, sizeof(m_RootConstants) / 4, &m_RootConstants, 0);
+//-----------------------------------------------------------------------------
+// Text rendering
+//-----------------------------------------------------------------------------
 
-    // Bind to output merger
-    CD3DX12_CPU_DESCRIPTOR_HANDLE rtv(m_pRTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), m_uFrameIndex, m_uRTVDescriptorSize);
-    CD3DX12_CPU_DESCRIPTOR_HANDLE dsv(m_pDSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
-    m_pCommandList->OMSetRenderTargets(1, &rtv, FALSE, &dsv);
+void Renderer11::AddText(const wstring& Text, win32_t Size, win32_t X, win32_t Y, COLORREF Color, DWORD Alignment, win32_t PadX, win32_t PadY, COLORREF bgColor) {
+    m_vTextCommands.push_back({Text, Size, X, Y, Color, Alignment, PadX, PadY, bgColor});
 }
 
-char* D3D12Renderer::Screenshot() {
-    // Reset the command list
-    m_pCommandAllocator[m_uFrameIndex]->Reset();
-    m_pCommandList->Reset(m_pCommandAllocator[m_uFrameIndex].Get(), m_pRectPipelineState.Get());
+SIZE Renderer11::CalcTextSize(const wstring& Text, win32_t Size) {
+    SIZE Result = { 0, 0 };
 
-    // Transition backbuffer state to copy source
-    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_pRenderTargets[m_uFrameIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_COPY_SOURCE);
-    m_pCommandList->ResourceBarrier(1, &barrier);
+    HDC DC = GetDC(m_hWnd);
+    HFONT imguiFont = imguiFont2GDI(PHIFON_compressed_data, PHIFON_compressed_size, Size);
+    HFONT OldFont = (HFONT)SelectObject(DC, imguiFont);
 
-    // Copy the backbuffer to the staging texture
-    D3D12_PLACED_SUBRESOURCE_FOOTPRINT footprint = {
-        .Offset = 0,
-        .Footprint = {
-            .Format = DXGI_FORMAT_B8G8R8A8_UNORM,
-            .Width = (UINT)m_iBufferWidth,
-            .Height = (UINT)m_iBufferHeight,
-            .Depth = 1,
-            .RowPitch = (UINT)m_ullScreenshotPitch,
-        },
-    };
-    CD3DX12_TEXTURE_COPY_LOCATION copy_dst(m_pScreenshotStaging.Get(), footprint);
-    CD3DX12_TEXTURE_COPY_LOCATION copy_src(m_pRenderTargets[m_uFrameIndex].Get(), 0);
-    m_pCommandList->CopyTextureRegion(&copy_dst, 0, 0, 0, &copy_src, nullptr);
+    GetTextExtentPoint32W(DC, Text.c_str(), Text.size(), &Result);
 
-    // Transition backbuffer state to present
-    barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_pRenderTargets[m_uFrameIndex].Get(), D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_PRESENT);
-    m_pCommandList->ResourceBarrier(1, &barrier);
+    SelectObject(DC, OldFont);
+    ReleaseDC(m_hWnd, DC);
 
-    // Execute the command list
-    m_pCommandList->Close();
-    ID3D12CommandList* command_lists[] = { m_pCommandList.Get() };
-    m_pCommandQueue->ExecuteCommandLists(1, command_lists);
-
-    // Wait for the GPU
-    // TODO: Definitely need some actual error handling here
-    if (FAILED(WaitForGPU()))
-        return nullptr;
-
-    // Copy the staging buffer to system memory
-    D3D12_RANGE staging_range = {
-        .Begin = 0,
-        .End = static_cast<size_t>(m_ullScreenshotPitch * m_iBufferHeight),
-    };
-    char* staging = nullptr;
-    if (FAILED(m_pScreenshotStaging->Map(0, &staging_range, (void**)&staging)))
-        return nullptr;
-    for (int y = 0; y < m_iBufferHeight; y++)
-        memcpy(&m_vScreenshotOutput[y * m_iBufferWidth * 4], &staging[y * m_ullScreenshotPitch], m_iBufferWidth * 4);
-    m_pScreenshotStaging->Unmap(0, &staging_range);
-
-    return m_vScreenshotOutput.data();
+    return Result;
 }
 
-bool D3D12Renderer::LoadBackgroundBitmap(wstring path) {
+void Renderer11::AddGDIRect(win32_t X, win32_t Y, win32_t W, win32_t H, COLORREF Color) {
+    m_vTextCommands.push_back({ L"", 0, X+W/2, Y+H/2, 0x00000000, ALIGN_CENTER|ALIGN_MIDDLE, W/2, H/2, Color});
+}
+
+HRESULT Renderer11::FlushText() {
+    if (m_vTextCommands.empty()) return S_OK;
+
+    HDC DXDC = NULL;
+    HRESULT res = m_pBackBufferSurface->GetDC(FALSE, &DXDC);
+    if (FAILED(res)) return res;
+
+    SetBkMode(DXDC, TRANSPARENT);
+
+    for (const TextCommand& CMD : m_vTextCommands) {
+        HFONT imguiFont = (CMD.Text.empty() || CMD.Size<=0) ? NULL : imguiFont2GDI(PHIFON_compressed_data, PHIFON_compressed_size, CMD.Size);
+        HFONT OldFont = CMD.Text.empty() ? NULL : (HFONT)SelectObject(DXDC, imguiFont);
+        SetTextColor(DXDC, CMD.Color & 0x00FFFFFF);
+
+        // Measure text for alignment
+        SIZE TextSize = {0,0};
+        if (!CMD.Text.empty()) {
+            GetTextExtentPoint32W(DXDC, CMD.Text.c_str(), CMD.Text.size(), &TextSize);
+        }
+
+        // Apply horizontal alignment
+        win32_t TextX;
+        switch (CMD.Alignment & 0xFF00) {
+        default:
+        case ALIGN_LEFT: TextX = CMD.X; break;
+        case ALIGN_CENTER: TextX = CMD.X - TextSize.cx / 2; break;
+        case ALIGN_RIGHT: TextX = CMD.X - TextSize.cx; break;
+        }
+
+        // Apply vertical alignment
+        win32_t TextY;
+        switch (CMD.Alignment & 0x00FF) {
+        default:
+        case ALIGN_TOP: TextY = CMD.Y; break;
+        case ALIGN_MIDDLE: TextY = CMD.Y - TextSize.cy / 2; break;
+        case ALIGN_BOTTOM: TextY = CMD.Y - TextSize.cy; break;
+        }
+
+        if (CMD.bgColor & 0xFF000000) {
+            HDC MEMdc = CreateCompatibleDC(DXDC);
+            HBITMAP BMP = CreateCompatibleBitmap(DXDC, 1, 1);
+            SelectObject(MEMdc, BMP);
+            HBRUSH Brush = CreateSolidBrush(CMD.bgColor & 0x00FFFFFF);
+            SelectObject(MEMdc, Brush);
+            PatBlt(MEMdc, 0, 0, 1, 1, PATCOPY);
+            union
+            {
+                DWORD Bits;
+                BLENDFUNCTION Func;
+            } BlendFunc;
+            BlendFunc.Bits = (CMD.bgColor & 0xFF000000) >> 8;
+            AlphaBlend(DXDC, TextX - CMD.PadX, TextY - CMD.PadY, TextSize.cx + 2 * CMD.PadX, TextSize.cy + 2 * CMD.PadY, MEMdc, 0, 0, 1, 1, BlendFunc.Func);
+            DeleteDC(MEMdc);
+            DeleteObject(BMP);
+            DeleteObject(Brush);
+        }
+        if (!CMD.Text.empty()) {
+            TextOutW(DXDC, TextX, TextY, CMD.Text.c_str(), CMD.Text.size());
+            SelectObject(DXDC, OldFont);
+        }
+    }
+
+    m_vTextCommands.clear();
+    m_pBackBufferSurface->ReleaseDC(nullptr);
+
+    return S_OK;
+}
+
+//-----------------------------------------------------------------------------
+// Screenshot (BitBlt from back buffer surface, BGR24 output)
+//-----------------------------------------------------------------------------
+
+HRESULT Renderer11::Screenshot(char* Output) {
+    if (!m_pBackBufferSurface) return E_FAIL;
+
+    // Back buffer is already flushed and RT unbound from FlushText
+    HDC DXDC = NULL;
+    HRESULT hr = m_pBackBufferSurface->GetDC(FALSE, &DXDC);
+    if (FAILED(hr)) return hr;
+
+    HDC MEMdc = CreateCompatibleDC(DXDC);
+    HBITMAP BMP = CreateCompatibleBitmap(DXDC, m_iBufferWidth, m_iBufferHeight);
+    SelectObject(MEMdc, BMP);
+    BitBlt(MEMdc, 0, 0, m_iBufferWidth, m_iBufferHeight, DXDC, 0, 0, SRCCOPY);
+    BITMAPINFO bmpInfo = {};
+    bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bmpInfo.bmiHeader.biWidth = m_iBufferWidth;
+    bmpInfo.bmiHeader.biHeight = -m_iBufferHeight;
+    bmpInfo.bmiHeader.biPlanes = 1;
+    bmpInfo.bmiHeader.biBitCount = 32;
+    bmpInfo.bmiHeader.biCompression = BI_RGB;
+    GetDIBits(MEMdc, BMP, 0, m_iBufferHeight, Output, &bmpInfo, DIB_RGB_COLORS);
+    DeleteDC(MEMdc);
+    DeleteObject(BMP);
+
+    m_pBackBufferSurface->ReleaseDC(nullptr);
+    return S_OK;
+}
+
+//-----------------------------------------------------------------------------
+// Background image
+//-----------------------------------------------------------------------------
+
+bool Renderer11::LoadBackgroundBitmap(wstring path) {
     // Initialize the WIC factory if it hasn't been initialized yet
     if (!s_pWICFactory) {
         if (FAILED(CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&s_pWICFactory))))
@@ -1696,9 +782,9 @@ bool D3D12Renderer::LoadBackgroundBitmap(wstring path) {
     return UploadBackgroundBitmap();
 }
 
-bool D3D12Renderer::UploadBackgroundBitmap() {
+bool Renderer11::UploadBackgroundBitmap() {
     // Don't bother if an image wasn't loaded in the first place
-    if (!m_pUnscaledBackground)
+    if (!m_pUnscaledBackground || !m_pBackgroundTexture)
         return false;
 
     // Create a WIC bitmap scaler
@@ -1716,32 +802,8 @@ bool D3D12Renderer::UploadBackgroundBitmap() {
     if (FAILED(scaler->CopyPixels(NULL, m_iBufferWidth * 4, scaled.size(), scaled.data())))
         return false;
 
-    // Wait for the GPU to finish any work it's doing
-    WaitForGPU();
-
-    // Reset the command list
-    m_pCommandAllocator[m_uFrameIndex]->Reset();
-    m_pCommandList->Reset(m_pCommandAllocator[m_uFrameIndex].Get(), nullptr);
-
-    // Upload the new texture data
-    D3D12_SUBRESOURCE_DATA texture_data = {
-        .pData = scaled.data(),
-        .RowPitch = m_iBufferWidth * 4,
-        .SlicePitch = (LONG_PTR)scaled.size(),
-    };
-    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_pTextureBuffer.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_COPY_DEST);
-    m_pCommandList->ResourceBarrier(1, &barrier);
-    UpdateSubresources(m_pCommandList.Get(), m_pTextureBuffer.Get(), m_pTextureUpload.Get(), 0, 0, 1, &texture_data);
-    barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_pTextureBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-    m_pCommandList->ResourceBarrier(1, &barrier);
-
-    // Execute the command list
-    m_pCommandList->Close();
-    ID3D12CommandList* command_lists[] = { m_pCommandList.Get() };
-    m_pCommandQueue->ExecuteCommandLists(1, command_lists);
-
-    // Wait for the GPU to finish
-    WaitForGPU();
+    // Upload to GPU
+    m_pContext->UpdateSubresource(m_pBackgroundTexture.Get(), 0, NULL, scaled.data(), m_iBufferWidth * 4, 0);
 
     return true;
 }

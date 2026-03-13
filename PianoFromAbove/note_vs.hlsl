@@ -15,7 +15,6 @@ struct FixedSizeData {
     float bends[16];
 };
 
-ConstantBuffer<RootSignatureData> root : register(b0);
 StructuredBuffer<FixedSizeData> fixed : register(t1);
 StructuredBuffer<TrackColor> colors : register(t2);
 StructuredBuffer<NoteData> note_data : register(t3);

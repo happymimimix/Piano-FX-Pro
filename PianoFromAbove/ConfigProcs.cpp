@@ -18,11 +18,9 @@
 #include "Globals.h"
 #include "resource.h"
 #include "LanguagePacks.hpp"
-#include "imgui/Fonts.h"
-#include "imgui/imguiCompressedFont2GDI.h"
 #include "GameState.h"
-
-HFONT PHIFON_GDI;
+#include <Fonts.h>
+#include <imguiCompressedFont2GDI.h>
 
 VOID DoPreferences(HWND hWndOwner)
 {
@@ -106,9 +104,7 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         FillRect(pdis->hDC, &pdis->rcItem, (HBRUSH)GetStockObject(DC_BRUSH));
         if (IsDlgButtonChecked(hWnd, IDC_RANDOMIZE) && pdis->CtlID >= IDC_COLOR1 && pdis->CtlID <= IDC_COLOR16)
         {
-            if (!PHIFON_GDI) {
-                PHIFON_GDI = imguiFont2GDI(PHIFON_compressed_data, PHIFON_compressed_size, -MulDiv(LargeFontSize, GetDeviceCaps(pdis->hDC, LOGPIXELSY), 72));
-            }
+            HFONT PHIFON_GDI = imguiFont2GDI(PHIFON_compressed_data, PHIFON_compressed_size, -MulDiv(LargeFontSize, GetDeviceCaps(pdis->hDC, LOGPIXELSY), 72));
             SelectObject(pdis->hDC, PHIFON_GDI);
             DrawText(pdis->hDC, L"?", -1, &pdis->rcItem, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
         }

@@ -103,36 +103,16 @@ GameState::GameError IntroScreen::Render() {
     color_t G = (iColor >> 8) & 0xFF;
     color_t B = (iColor >> 16) & 0xFF;
     if (FAILED(m_pRenderer->ClearAndBeginScene(D3DCOLOR_XRGB(R, G, B)))) return DirectXError;
-    auto draw_list = m_pRenderer->GetDrawList();
-    if (FAILED(m_pRenderer->BeginText())) return DirectXError;
-    uint16_t TextSize = 1 << 5;
-    string MyTradeMark = WStringToUtf8(StatisticsText1);
-    MyTradeMark += " v";
-    MyTradeMark += WStringToUtf8(VersionString);
-    draw_list->AddText(
-        NULL,
-        TextSize,
-        ImVec2(12, 12),
-        0xFF404040,
-        MyTradeMark.c_str()
-    );
-    draw_list->AddText(
-        NULL,
-        TextSize,
-        ImVec2(10, 10),
-        0xFFFFFFFF,
-        MyTradeMark.c_str()
-    );
-    if (FAILED(m_pRenderer->EndText())) return DirectXError;
+    win32_t TextSize = 1 << 5;
+    wstring MyTradeMark = StatisticsText1;
+    MyTradeMark += L" v";
+    MyTradeMark += VersionString;
+    m_pRenderer->AddText(MyTradeMark, TextSize, 12, 12, 0xFF404040);
+    m_pRenderer->AddText(MyTradeMark, TextSize, 10, 10, 0xFFFFFFFF);
 
     // Present the backbuffer contents to the display
     if (FAILED(m_pRenderer->EndScene())) return DirectXError;
     if (FAILED(m_pRenderer->Present())) return DirectXError;
-
-    // Get the current frame
-    auto* Frame = m_pRenderer->Screenshot();
-    //Don't let BitBlt capture a blank screen! 
-    UpdateGDI(g_hWndGfx, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(), Frame);
 
     return Success;
 }
@@ -152,7 +132,7 @@ sidx_t LocateElement(const vector<sidx_t>& vec, sidx_t value) {
     return -1;
 }
 
-SplashScreen::SplashScreen(HWND hWnd, D3D12Renderer* pRenderer, bool enableSplash) : GameState(hWnd, pRenderer) {
+SplashScreen::SplashScreen(HWND hWnd, Renderer11* pRenderer, bool enableSplash) : GameState(hWnd, pRenderer) {
     if (enableSplash) {
         HRSRC hResInfo = FindResource(NULL, MAKEINTRESOURCE(IDR_SPLASHMIDI), TEXT("MIDI"));
         HGLOBAL hRes = LoadResource(NULL, hResInfo);
@@ -383,9 +363,6 @@ GameState::GameError SplashScreen::MsgProc(HWND, UINT msg, WPARAM wParam, LPARAM
 }
 
 GameState::GameError SplashScreen::Logic() {
-    // Start new ImGui frame
-    m_pRenderer->ImGuiStartFrame();
-
     static Config& config = Config::GetConfig();
     static PlaybackSettings& cPlayback = config.GetPlaybackSettings();
 
@@ -475,36 +452,16 @@ GameState::GameError SplashScreen::Render() {
     int B = (iColor >> 16) & 0xFF;
     if (FAILED(m_pRenderer->ClearAndBeginScene(D3DCOLOR_XRGB(R, G, B)))) return DirectXError;
     RenderNotes();
-    auto draw_list = m_pRenderer->GetDrawList();
-    if (FAILED(m_pRenderer->BeginText())) return DirectXError;
-    uint16_t TextSize = 1 << 5;
-    string MyTradeMark = WStringToUtf8(StatisticsText1);
-    MyTradeMark += " v";
-    MyTradeMark += WStringToUtf8(VersionString);
-    draw_list->AddText(
-        NULL,
-        TextSize,
-        ImVec2(12, 12),
-        0xFF404040,
-        MyTradeMark.c_str()
-    );
-    draw_list->AddText(
-        NULL,
-        TextSize,
-        ImVec2(10, 10),
-        0xFFFFFFFF,
-        MyTradeMark.c_str()
-    );
-    if (FAILED(m_pRenderer->EndText())) return DirectXError;
+    win32_t TextSize = 1 << 5;
+    wstring MyTradeMark = StatisticsText1;
+    MyTradeMark += L" v";
+    MyTradeMark += VersionString;
+    m_pRenderer->AddText(MyTradeMark, TextSize, 12, 12, 0xFF404040);
+    m_pRenderer->AddText(MyTradeMark, TextSize, 10, 10, 0xFFFFFFFF);
 
     // Present the backbuffer contents to the display
-    if (FAILED(m_pRenderer->EndSplashScene())) return DirectXError;
+    if (FAILED(m_pRenderer->EndScene())) return DirectXError;
     if (FAILED(m_pRenderer->Present())) return DirectXError;
-
-    // Get the current frame
-    auto* Frame = m_pRenderer->Screenshot();
-    //Don't let BitBlt capture a blank screen! 
-    UpdateGDI(g_hWndGfx, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(),Frame);
 
     return Success;
 }
@@ -650,7 +607,7 @@ wstring GetExePath(void) {
     return szFilePath;
 }
 
-MainScreen::MainScreen(wstring sMIDIFile, State eGameMode, HWND hWnd, D3D12Renderer* pRenderer) :
+MainScreen::MainScreen(wstring sMIDIFile, State eGameMode, HWND hWnd, Renderer11* pRenderer) :
     GameState(hWnd, pRenderer), m_MIDI(sMIDIFile), m_eGameMode(eGameMode) {
     // Finish off midi processing
     if (!m_MIDI.IsValid()) return;
@@ -1064,9 +1021,6 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
 }
 
 GameState::GameError MainScreen::Logic(void) {
-    // Start new ImGui frame
-    m_pRenderer->ImGuiStartFrame();
-
     static Config& config = Config::GetConfig();
     static PlaybackSettings& cPlayback = config.GetPlaybackSettings();
     static const ViewSettings& cView = config.GetViewSettings();
@@ -1121,7 +1075,7 @@ GameState::GameError MainScreen::Logic(void) {
     m_bSameWidth = cVideo.bSameWidth;
     m_bRemoveOverlaps = cVideo.bOR;
     m_bMapVel = cVideo.bMapVel;
-    if (FAILED(m_pRenderer->SetLimitFPS(cVideo.bLimitFPS))) return DirectXError;
+    m_pRenderer->SetLimitFPS(cVideo.bLimitFPS);
     if (cVisual.iBkgColor != m_csBackground.iOrigBGR) m_csBackground.SetColor(cVisual.iBkgColor, 0.7f, 1.3f);
 
     if (cVideo.eMarkerEncoding != m_iCurEncoding) {
@@ -1580,6 +1534,7 @@ void MainScreen::ApplyColor(MIDIMetaEvent* event) {
         }
     }
 }
+
 void MainScreen::ApplyMarker(unsigned char* data, msgln_t size) {
     m_pMarkerData = data;
     m_iMarkerSize = size;
@@ -1593,27 +1548,17 @@ void MainScreen::ApplyMarker(unsigned char* data, msgln_t size) {
         memcpy(temp_str, data, size);
         temp_str[size] = '\0';
 
-        if (codepages[cVideo.eMarkerEncoding] != CP_UTF8) {
-            // Yes, I have to convert to wide and then back to UTF-8...
-            win32_t wide_len = MultiByteToWideChar(codepages[cVideo.eMarkerEncoding], 0, temp_str, size + 1, NULL, 0);
-            auto wide_temp_str = new WCHAR[wide_len];
-            MultiByteToWideChar(codepages[cVideo.eMarkerEncoding], 0, temp_str, size + 1, wide_temp_str, wide_len);
+        auto wide_len = MultiByteToWideChar(codepages[cVideo.eMarkerEncoding], 0, temp_str, size + 1, NULL, 0);
+        auto wide_temp_str = new WCHAR[wide_len];
+        MultiByteToWideChar(codepages[cVideo.eMarkerEncoding], 0, temp_str, size + 1, wide_temp_str, wide_len);
 
-            auto utf8_len = WideCharToMultiByte(CP_UTF8, 0, wide_temp_str, -1, 0, 0, 0, 0);
-            auto utf8_temp_str = new char[utf8_len];
-            WideCharToMultiByte(CP_UTF8, 0, wide_temp_str, -1, utf8_temp_str, utf8_len, 0, 0);
+        m_sMarker = wstring(wide_temp_str);
 
-            m_sMarker = string(utf8_temp_str);
-            delete[] wide_temp_str;
-            delete[] utf8_temp_str;
-        }
-        else {
-            m_sMarker = temp_str;
-        }
+        delete[] wide_temp_str;
         delete[] temp_str;
     }
     else {
-        m_sMarker = string();
+        m_sMarker = wstring();
     }
 }
 
@@ -1862,25 +1807,13 @@ GameState::GameError MainScreen::Render()
         RenderNotes();
         if (m_bShowKB) RenderKeys();
     }
-    if (FAILED(m_pRenderer->BeginText())) return DirectXError;
     RenderText();
-    if (FAILED(m_pRenderer->EndText())) return DirectXError;
 
     // Present the backbuffer contents to the display
     if (FAILED(m_pRenderer->EndScene(m_bBackgroundLoaded))) return DirectXError;
 
-    // Get the current frame
-    auto* Frame = m_pRenderer->Screenshot();
-    HWND hGDI = FindWindowW(L"PFXGDI", NULL);
-    if (!m_bDumpFrames) { //Stop wasting time on GDI shit when rendering to video. 
-        //Don't let BitBlt capture a blank screen! 
-        UpdateGDI(g_hWndGfx, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(), Frame);
-    }
+    // Frame dump!
     if (config.m_bManualTimer && CE_Connected) {
-        if (IsWindow(hGDI) && m_bDumpFrames && !cPlayback.GetPaused()) {
-            // This is a special case where we need to update GDI even in render mode. 
-            UpdateGDI(g_hWndGfx, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(), Frame);
-        }
         // Send a signal to CE and wait for CE to do its job...
         CE_DoNextTick = true;
         while (!CE_Responded) { _mm_pause(); }
@@ -1890,16 +1823,17 @@ GameState::GameError MainScreen::Render()
     // Dump frame!!!!
     if (m_bDumpFrames && !cPlayback.GetPaused()) {
         // Write to pipe
-        if (IsWindow(hGDI) && CE_Connected) {
-            char* Output = new char[m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4];
-            // Capture what CE has drawn
-            GetGDI(hGDI, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(), Output);
-            // Write to pipe
-            WriteFile(m_hVideoPipe, Output, static_cast<DWORD>(m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4), nullptr, nullptr);
-            // Free memory
-            delete[] Output;
-        }else{
+        HWND hGDI = FindWindowW(L"PFXGDI", NULL);
+        if (CE_Connected && IsWindow(hGDI)) {
+            char* Frame = new char[m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4];
+            GetGDI(hGDI, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(), Frame);
             WriteFile(m_hVideoPipe, Frame, static_cast<DWORD>(m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4), nullptr, nullptr);
+            delete[] Frame;
+        }else{
+            char* Frame = new char[m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4];
+            if (FAILED(m_pRenderer->Screenshot(Frame))) return DirectXError;
+            WriteFile(m_hVideoPipe, Frame, static_cast<DWORD>(m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4), nullptr, nullptr);
+            delete[] Frame;
         }
     }
     if (FAILED(m_pRenderer->Present())) return DirectXError;
@@ -2446,36 +2380,34 @@ void MainScreen::RenderText() {
         RenderMarker(m_sMarker.c_str());
     }
     if (m_bZoomMove) {
-        RenderMessage(&rcMsg, WStringToUtf8(ZoomMoveMsg).c_str());
+        RenderMessage(&rcMsg, ZoomMoveMsg);
     }
     if (strlen(CheatEngineCaption) > 0) {
         if (strlen(CheatEngineCaption) < sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0])) {
-            RenderMessage(&rcMsg, static_cast<string>(CheatEngineCaption).c_str());
+            RenderMessage(&rcMsg, Utf8ToWString(CheatEngineCaption));
         }
         else {
-            RenderMessage(&rcMsg, ("The caption has exceeded the maximum acceptable length of " + to_string(sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0])) + " characters. \nAs a result, this caption has been blocked from showing in order to prevent crashing. \nPlease consider writing something slightly shorter. ").c_str());
+            RenderMessage(&rcMsg, Utf8ToWString("The caption has exceeded the maximum acceptable length of " + to_string(sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0])) + " characters. \nAs a result, this caption has been blocked from showing in order to prevent crashing. \nPlease consider writing something slightly shorter. "));
         }
     }
 }
 
-void MainScreen::RenderStatusLine(unsigned char line, const char* left, const char* format, ...) {
-    va_list varargs;
-    va_start(varargs, format);
-
+void MainScreen::RenderStatusLine(unsigned char line, const wchar_t* left, const wchar_t* format, ...) {
     if (Config::GetConfig().GetVideoSettings().bDisableUI) return;
 
-    char buf[1 << 10] = {};
-    vsnprintf_s(buf, sizeof(buf), format, varargs);
-
-    auto draw_list = m_pRenderer->GetDrawList();
-    ImVec2 left_pos = ImVec2(m_pRenderer->GetBufferWidth() - (StatisticsWidth - 5), 3 + line * 16);
-    ImVec2 right_pos = ImVec2(m_pRenderer->GetBufferWidth() - ImGui::CalcTextSize(buf, NULL, false, -1.0f, 1 << 4).x - 6, 3 + line * 16);
-    draw_list->AddText(NULL, 1 << 4, ImVec2(left_pos.x + 2, left_pos.y + 1), 0xFF404040, left);
-    draw_list->AddText(NULL, 1 << 4, ImVec2(left_pos.x, left_pos.y), 0xFFFFFFFF, left);
-    draw_list->AddText(NULL, 1 << 4, ImVec2(right_pos.x + 2, right_pos.y + 1), 0xFF404040, buf);
-    draw_list->AddText(NULL, 1 << 4, ImVec2(right_pos.x, right_pos.y), 0xFFFFFFFF, buf);
-
+    wchar_t buf[1 << 10] = {};
+    va_list varargs;
+    va_start(varargs, format);
+    vswprintf_s(buf, _countof(buf), format, varargs);
     va_end(varargs);
+
+    win32_t TextY = 3 + line * 16;
+    win32_t LeftTextX = m_pRenderer->GetBufferWidth() - (StatisticsWidth - 5);
+    win32_t RightTextX = m_pRenderer->GetBufferWidth() - 6;
+    m_pRenderer->AddText(left, 1 << 4, LeftTextX + 2, TextY + 1, 0x404040, ALIGN_LEFT | ALIGN_TOP);
+    m_pRenderer->AddText(left, 1 << 4, LeftTextX, TextY, 0xFFFFFF, ALIGN_LEFT|ALIGN_TOP);
+    m_pRenderer->AddText(buf, 1 << 4, RightTextX + 2, TextY + 1, 0x404040, ALIGN_RIGHT | ALIGN_TOP);
+    m_pRenderer->AddText(buf, 1 << 4, RightTextX, TextY, 0xFFFFFF, ALIGN_RIGHT | ALIGN_TOP);
 }
 
 void MainScreen::RenderStatus(LPRECT prcStatus) {
@@ -2499,7 +2431,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
     uint8_t cur_line = 0;
 
     if (!cVideo.bDisableUI) {
-        m_pRenderer->GetDrawList()->AddRectFilled(ImVec2(prcStatus->left, prcStatus->top), ImVec2(prcStatus->right, prcStatus->bottom), 0x80000000);
+        m_pRenderer->AddGDIRect(prcStatus->left, prcStatus->top, prcStatus->right - prcStatus->left, prcStatus->bottom - prcStatus->top, 0x80000000);
     }
 
     llStartTimeFormatted = to_string(abs(m_llStartTime));
@@ -2527,19 +2459,19 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
     for (signed short i = passedFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
         passedFormatted.insert(i, ",");
 
-    RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText1).c_str(), WStringToUtf8(L"v" VersionString).c_str());
-    RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText2).c_str(), "");
-    RenderStatusLine(cur_line++, "", "");
-    RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText3).c_str(), "%s%lld:%02d.%d / %lld:%02d.%d",
-        m_llStartTime >= 0 ? "" : "-",
+    RenderStatusLine(cur_line++, StatisticsText1, L"%s", L"v" VersionString);
+    RenderStatusLine(cur_line++, StatisticsText2, L"");
+    RenderStatusLine(cur_line++, L"", L"");
+    RenderStatusLine(cur_line++, StatisticsText3, L"%s%lld:%02d.%d / %lld:%02d.%d",
+        m_llStartTime >= 0 ? L"" : L"-",
         min, sec, cs,
         tmin, tsec, tcs);
-    if (!(m_MIDI.GetInfo().iDivision & 0x8000)) RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText4).c_str(), "%d/%d", m_iStartTick, resolution);
+    if (!(m_MIDI.GetInfo().iDivision & 0x8000)) RenderStatusLine(cur_line++, StatisticsText4, L"%d/%d", m_iStartTick, resolution);
     if (cVideo.bDebug) {
-        RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText5).c_str(), llStartTimeFormatted.c_str());
+        RenderStatusLine(cur_line++, StatisticsText5, L"%s", Utf8ToWString(llStartTimeFormatted).c_str());
     }
     if (!cControls.bDumpFrames) {
-        RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText6).c_str(), "%.2lf", m_dFPS);
+        RenderStatusLine(cur_line++, StatisticsText6, L"%.2lf", m_dFPS);
     }
     if (m_MIDI.GetInfo().iDivision & 0x8000) {
         unsigned short iFramesPerSec = static_cast<unsigned short>(-static_cast<signed char>(m_MIDI.GetInfo().iDivision >> 8)) * static_cast<unsigned short>(100);
@@ -2549,76 +2481,76 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         unsigned char iTicksPerFrame = m_MIDI.GetInfo().iDivision & 0xFF;
         iFramesPerSec |= !iFramesPerSec;// Clamp to > 0
         iTicksPerFrame |= !iTicksPerFrame;// Clamp to > 0
-        RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText7).c_str(), "%d TPF @%.2f FPS", iTicksPerFrame, static_cast<float>(iFramesPerSec)/100.0f);
+        RenderStatusLine(cur_line++, StatisticsText7, L"%d TPF @%.2f FPS", iTicksPerFrame, static_cast<float>(iFramesPerSec)/100.0f);
     }
     else {
-        RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText7).c_str(), "%.3lf BPM", tempo);
+        RenderStatusLine(cur_line++, StatisticsText7, L"%.3lf BPM", tempo);
     }
     if (cControls.bPhigros) {
-        RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText8).c_str(), passedFormatted.c_str());
-        RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText9).c_str(), npsFormatted.c_str());
-        RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText10).c_str(), polyFormatted.c_str());
+        RenderStatusLine(cur_line++, StatisticsText8, L"%s", Utf8ToWString(passedFormatted).c_str());
+        RenderStatusLine(cur_line++, StatisticsText9, L"%s", Utf8ToWString(npsFormatted).c_str());
+        RenderStatusLine(cur_line++, StatisticsText10, L"%s", Utf8ToWString(polyFormatted).c_str());
     }
     else {
-        RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText11).c_str(), passedFormatted.c_str());
-        RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText12).c_str(), npsFormatted.c_str());
-        RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText13).c_str(), polyFormatted.c_str());
+        RenderStatusLine(cur_line++, StatisticsText11, L"%s", Utf8ToWString(passedFormatted).c_str());
+        RenderStatusLine(cur_line++, StatisticsText12, L"%s", Utf8ToWString(npsFormatted).c_str());
+        RenderStatusLine(cur_line++, StatisticsText13, L"%s", Utf8ToWString(polyFormatted).c_str());
     }
     if (cVideo.bDebug) {
-        RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText14).c_str(), "%lld", m_pRenderer->GetRenderedNotesCount());
+        RenderStatusLine(cur_line++, StatisticsText14, L"%lld", m_pRenderer->GetRenderedNotesCount());
         if (m_bMute) {
-            RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText15).c_str(), WStringToUtf8(StatisticsText16).c_str());
+            RenderStatusLine(cur_line++, StatisticsText15, L"%s", StatisticsText16);
         }
         else {
-            RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText15).c_str(), "%.0lf%%", cPlayback.GetVolume() * 100);
+            RenderStatusLine(cur_line++, StatisticsText15, L"%.0lf%%", cPlayback.GetVolume() * 100);
         }
     }
     if (cControls.bDumpFrames) {
         if (cVideo.bDebug) {
-            RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText17).c_str(), "%.0lf%%", cPlayback.GetSpeed() * 100);
+            RenderStatusLine(cur_line++, StatisticsText17, L"%.0lf%%", cPlayback.GetSpeed() * 100);
         }
     }
     else {
         if (cVideo.bDebug) {
             if (m_Timer.m_bManualTimer) {
-                RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText17).c_str(), "%.0lf%%", cPlayback.GetSpeed() * (m_dFPS / m_Timer.m_dFramerate) * 100);
+                RenderStatusLine(cur_line++, StatisticsText17, L"%.0lf%%", cPlayback.GetSpeed() * (m_dFPS / m_Timer.m_dFramerate) * 100);
             }
             else {
-                RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText17).c_str(), "%.0lf%%", cPlayback.GetSpeed() * 100);
+                RenderStatusLine(cur_line++, StatisticsText17, L"%.0lf%%", cPlayback.GetSpeed() * 100);
             }
         }
         else {
             if (m_Timer.m_bManualTimer) {
-                RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText17).c_str(), "%.0lf%%", (m_dFPS / m_Timer.m_dFramerate) * 100);
+                RenderStatusLine(cur_line++, StatisticsText17, L"%.0lf%%", (m_dFPS / m_Timer.m_dFramerate) * 100);
             }
         }
     }
     if (cVideo.bDebug) {
-        RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText18).c_str(), "%f", cPlayback.GetNSpeed());
-        RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText19).c_str(), "%f", cView.GetOffsetX() + m_fTempOffsetX);
-        RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText20).c_str(), "%f", cView.GetOffsetY() + m_fTempOffsetY);
-        RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText21).c_str(), "%f", cView.GetZoomX() * m_fTempZoomX);
-        RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText22).c_str(), "%d*%d", width, height);
-        RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText23).c_str(), "%d~%d", m_bFlipKeyboard ? m_iEndNote : m_iStartNote, m_bFlipKeyboard ? m_iStartNote : m_iEndNote);
-        RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText24).c_str(), "%d", cControls.iVelocityThreshold);
+        RenderStatusLine(cur_line++, StatisticsText18, L"%f", cPlayback.GetNSpeed());
+        RenderStatusLine(cur_line++, StatisticsText19, L"%f", cView.GetOffsetX() + m_fTempOffsetX);
+        RenderStatusLine(cur_line++, StatisticsText20, L"%f", cView.GetOffsetY() + m_fTempOffsetY);
+        RenderStatusLine(cur_line++, StatisticsText21, L"%f", cView.GetZoomX() * m_fTempZoomX);
+        RenderStatusLine(cur_line++, StatisticsText22, L"%d*%d", width, height);
+        RenderStatusLine(cur_line++, StatisticsText23, L"%d~%d", m_bFlipKeyboard ? m_iEndNote : m_iStartNote, m_bFlipKeyboard ? m_iStartNote : m_iEndNote);
+        RenderStatusLine(cur_line++, StatisticsText24, L"%d", cControls.iVelocityThreshold);
     }
     if (cControls.bPhigros) {
-        RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText25).c_str(), "%07.0f", (passed == TotalNC ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(TotalNC) * 1000000)));
-        RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText26).c_str(), Difficulty);
-        RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText27).c_str(), WStringToUtf8(StatisticsText28).c_str());
+        RenderStatusLine(cur_line++, StatisticsText25, L"%07.0f", (passed == TotalNC ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(TotalNC) * 1000000)));
+        RenderStatusLine(cur_line++, StatisticsText26, L"%s", Utf8ToWString(Difficulty).c_str());
+        RenderStatusLine(cur_line++, StatisticsText27, L"%s", StatisticsText28 L" ");
         if (static_cast<float>(passed == TotalNC ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(TotalNC) * 1000000)) == static_cast<float>(1000000)) {
-            RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText29).c_str(), "");
+            RenderStatusLine(cur_line++, StatisticsText29, L"");
         }
         else if (static_cast<float>(passed == TotalNC ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(TotalNC) * 1000000)) < static_cast<float>(1000000)) {
             if (!cPlayback.GetPaused()) {
-                RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText30).c_str(), "");
+                RenderStatusLine(cur_line++, StatisticsText30, L"");
             }
             else {
-                RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText31).c_str(), "");
+                RenderStatusLine(cur_line++, StatisticsText31, L"");
             }
         }
         else if (static_cast<float>(passed == TotalNC ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(TotalNC) * 1000000)) > static_cast<float>(1000000)) {
-            RenderStatusLine(cur_line++, WStringToUtf8(StatisticsText32).c_str(), "");
+            RenderStatusLine(cur_line++, StatisticsText32, L"");
         }
     }
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -2855,52 +2787,14 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
     FrameCount++;
 }
 
-void MainScreen::RenderMarker(const char* str) {
-    ImVec2 size = ImGui::CalcTextSize(str, NULL, false, -1.0f, (1 << 4) + (1 << 2));
-    size.x += 12;
-    size.y += 6;
-
-    auto draw_list = m_pRenderer->GetDrawList();
-    draw_list->AddRectFilled(ImVec2(0, 0), size, 0x80000000);
-    draw_list->AddText(NULL, (1 << 4) + (1 << 2), ImVec2(6 + 2, 3 + 1), 0xFF404040, str);
-    draw_list->AddText(NULL, (1 << 4) + (1 << 2), ImVec2(6, 3), 0xFFFFFFFF, str);
+void MainScreen::RenderMarker(const wstring& str) {
+    m_pRenderer->AddText(str, (1 << 4) + (1 << 2), 6 + 2, 3 + 1, 0xFF404040, ALIGN_LEFT | ALIGN_TOP, 6, 3, 0x80000000);
+    m_pRenderer->AddText(str, (1 << 4) + (1 << 2), 6, 3, 0xFFFFFFFF, ALIGN_LEFT | ALIGN_TOP);
 }
 
-void MainScreen::RenderMessage(LPRECT prcMsg, const char* sMsg) {
+void MainScreen::RenderMessage(LPRECT prcMsg, const wstring& sMsg) {
     uint16_t fontsize = (1 << 5) - (1 << 2);
-    while (
-        (
-            ImGui::CalcTextSize(sMsg, NULL, false, -1.0f, fontsize).x >= m_pRenderer->GetBufferWidth()
-            ||
-            ImGui::CalcTextSize(sMsg, NULL, false, -1.0f, fontsize).y >= m_pRenderer->GetBufferHeight()
-            )
-        &&
-        fontsize > (1 << 3)
-        ) {
-        fontsize--;
-    }
-    ImVec2 textSize = ImGui::CalcTextSize(sMsg, NULL, false, -1.0f, fontsize);
-    ImVec2 messageSize;
-    messageSize.x = prcMsg->left + (prcMsg->right - prcMsg->left - textSize.x) / 2;
-    messageSize.y = prcMsg->top + (prcMsg->bottom - prcMsg->top - textSize.y) / 2;
-    auto draw_list = m_pRenderer->GetDrawList();
-    draw_list->AddRectFilled(
-        ImVec2(messageSize.x - 6, messageSize.y - 3),
-        ImVec2(messageSize.x + textSize.x + 6, messageSize.y + textSize.y + 3),
-        0x80000000
-    );
-    draw_list->AddText(
-        NULL,
-        fontsize,
-        ImVec2(messageSize.x + 2, messageSize.y + 1),
-        0xFF404040,
-        sMsg
-    );
-    draw_list->AddText(
-        NULL,
-        fontsize,
-        ImVec2(messageSize.x, messageSize.y),
-        0xFFFFFFFF,
-        sMsg
-    );
+    while ((m_pRenderer->CalcTextSize(sMsg, fontsize).cx >= prcMsg->right - prcMsg->left || m_pRenderer->CalcTextSize(sMsg, fontsize).cy >= prcMsg->bottom - prcMsg->top) && fontsize > (1 << 3)) { fontsize--; }
+    m_pRenderer->AddText(sMsg, fontsize, (prcMsg->right - prcMsg->left)/2 + prcMsg->left + 2, (prcMsg->bottom - prcMsg->top)/2 + prcMsg->top + 1, 0xFF404040, ALIGN_CENTER | ALIGN_MIDDLE, 6, 3, 0x80000000);
+    m_pRenderer->AddText(sMsg, fontsize, (prcMsg->right - prcMsg->left) / 2 + prcMsg->left, (prcMsg->bottom - prcMsg->top) / 2 + prcMsg->top, 0xFFFFFFFF, ALIGN_CENTER | ALIGN_MIDDLE);
 }

@@ -10,19 +10,25 @@
 #pragma once
 
 #include <Windows.h>
-#include <d3d12.h>
-#include <dxgi1_6.h>
+#include <d3d11.h>
+#include <dxgi.h>
 #include <wrl/client.h>
 #include <string>
 #include <vector>
 #include <wincodec.h>
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_dx12.h"
-#include "imgui/imgui_impl_win32.h"
-#include "imgui/Fonts.h"
+#include <Fonts.h>
+#include <imguiCompressedFont2GDI.h>
 #include <Misc.h>
 
 using Microsoft::WRL::ComPtr;
+
+// Text alignment flags
+constexpr DWORD ALIGN_LEFT   = 0x0100;
+constexpr DWORD ALIGN_CENTER = 0x0200;
+constexpr DWORD ALIGN_RIGHT  = 0x0300;
+constexpr DWORD ALIGN_TOP    = 0x0001;
+constexpr DWORD ALIGN_MIDDLE = 0x0002;
+constexpr DWORD ALIGN_BOTTOM = 0x0003;
 
 enum class Pipeline : uint8_t {
     Rect,
@@ -76,33 +82,31 @@ constexpr unsigned long MaxTrackColors = 0xFFFF; //Theoretic maximum number of t
 #endif
 constexpr unsigned long MaxChannelColors = 1<<4; //Theoretic maximum number of channels possible in MIDI format
 
-class D3D12Renderer {
+class Renderer11 {
 public:
-    D3D12Renderer();
-    ~D3D12Renderer();
+    Renderer11();
+    ~Renderer11();
 
     tuple<HRESULT, const char*> Init(HWND hWnd, bool bLimitFPS);
     HRESULT ResetDeviceIfNeeded();
     HRESULT ResetDevice();
     HRESULT ClearAndBeginScene(DWORD color);
     HRESULT EndScene(bool draw_bg = false);
-    HRESULT EndSplashScene();
     HRESULT Present();
-    HRESULT BeginText();
-    HRESULT EndText();
+    void AddText(const wstring& Text, win32_t Size, win32_t X, win32_t Y, COLORREF Color, DWORD Alignment = ALIGN_LEFT|ALIGN_TOP, win32_t PadX=0, win32_t PadY=0, COLORREF bgColor=0x00000000);
+    SIZE CalcTextSize(const wstring& Text, win32_t Size);
+    void AddGDIRect(win32_t X, win32_t Y, win32_t W, win32_t H, COLORREF Color);
     HRESULT DrawRect(float x, float y, float cx, float cy, DWORD color, float flipcenter = 0.0f, bool flip = false);
     HRESULT DrawRect(float x, float y, float cx, float cy, DWORD c1, DWORD c2, DWORD c3, DWORD c4, float flipcenter = 0.0f, bool flip = false);
     HRESULT DrawSkew(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, DWORD color, float flipcenter = 0.0f, bool flip = false);
     HRESULT DrawSkew(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, DWORD c1, DWORD c2, DWORD c3, DWORD c4, float flipcenter = 0.0f, bool flip = false);
 
     bool GetLimitFPS() const { return m_bLimitFPS; }
-    HRESULT SetLimitFPS(bool bLimitFPS);
+    void SetLimitFPS(bool bLimitFPS) { m_bLimitFPS = bLimitFPS; }
 
     win32_t GetBufferWidth() const { return m_iBufferWidth; }
     win32_t GetBufferHeight() const { return m_iBufferHeight; }
 
-    HRESULT WaitForGPU();
-    wstring GetAdapterName();
     void SetPipeline(Pipeline pipeline);
     __forceinline void AutoSetNotePipeline(bool inloop = false);
     __forceinline void AutoSetRectPipeline(bool inloop = false);
@@ -115,26 +119,18 @@ public:
     idx_t GetRenderedNotesCount() { return m_vNotesIntermediate.size(); };
     void SplitRect() { m_iRectSplit = m_vRectsIntermediate.size(); }
 
-    char* Screenshot();
+    HRESULT Screenshot(char* Output);
     bool LoadBackgroundBitmap(wstring path);
-
-    void ImGuiStartFrame() {
-        ImGui_ImplDX12_NewFrame();
-        ImGui_ImplWin32_NewFrame();
-        ImGui::NewFrame();
-    }
-    ImDrawList* GetDrawList() { return m_pDrawList; }
 
 private:
     tuple<HRESULT, const char*> CreateWindowDependentObjects(HWND hWnd);
-    void SetupCommandList();
+    HRESULT DrawRectRange(size_t startVert, size_t endVert);
+    HRESULT FlushText();
     bool UploadBackgroundBitmap();
 
-    static constexpr unsigned FrameCount = 1 << 2;
     static constexpr unsigned RectsPerPass = 1 << (1 << 4);
     static constexpr unsigned NotesPerPass = 1 << (1 << 4) << 4;
     static constexpr unsigned IndexBufferCount = max(RectsPerPass, NotesPerPass) * 6;
-    static constexpr unsigned GenericUploadSize = sizeof(FixedSizeConstants) + MaxTrackColors * 16 * sizeof(TrackColor);
 
     static ComPtr<IWICImagingFactory> s_pWICFactory;
 
@@ -143,66 +139,64 @@ private:
     bool m_bLimitFPS = false;
 
     HWND m_hWnd = NULL;
-    ComPtr<IDXGIFactory4> m_pFactory;
-    ComPtr<IDXGIAdapter4> m_pAdapter;
-    ComPtr<ID3D12Device> m_pDevice;
-    ComPtr<ID3D12CommandQueue> m_pCommandQueue;
-    ComPtr<IDXGISwapChain3> m_pSwapChain;
-    ComPtr<ID3D12DescriptorHeap> m_pRTVDescriptorHeap;
-    UINT m_uRTVDescriptorSize = 0;
-    ComPtr<ID3D12DescriptorHeap> m_pDSVDescriptorHeap;
-    UINT m_uDSVDescriptorSize = 0;
-    ComPtr<ID3D12DescriptorHeap> m_pSRVDescriptorHeap;
-    UINT m_uSRVDescriptorSize = 0;
-    ComPtr<ID3D12DescriptorHeap> m_pImGuiSRVDescriptorHeap;
-    ComPtr<ID3D12DescriptorHeap> m_pTextureSRVDescriptorHeap;
-    UINT m_uTextureSRVDescriptorSize = 0;
-    ComPtr<ID3D12Resource> m_pRenderTargets[FrameCount];
-    ComPtr<ID3D12Resource> m_pDepthBuffer;
-    ComPtr<ID3D12CommandAllocator> m_pCommandAllocator[FrameCount];
-    ComPtr<ID3D12RootSignature> m_pRectRootSignature;
-    ComPtr<ID3D12PipelineState> m_pRectPipelineState;
-    ComPtr<ID3D12RootSignature> m_pNoteRootSignature;
-    ComPtr<ID3D12PipelineState> m_pNotePipelineState;
-    ComPtr<ID3D12RootSignature> m_pNoteSameWidthRootSignature;
-    ComPtr<ID3D12PipelineState> m_pNoteSameWidthPipelineState;
-    ComPtr<ID3D12RootSignature> m_pNoteRootSignatureOR;
-    ComPtr<ID3D12PipelineState> m_pNotePipelineStateOR;
-    ComPtr<ID3D12RootSignature> m_pNoteSameWidthRootSignatureOR;
-    ComPtr<ID3D12PipelineState> m_pNoteSameWidthPipelineStateOR;
-    ComPtr<ID3D12RootSignature> m_pBackgroundRootSignature;
-    ComPtr<ID3D12PipelineState> m_pBackgroundPipelineState;
-    ComPtr<ID3D12GraphicsCommandList> m_pCommandList;
-    ComPtr<ID3D12Fence> m_pFence;
-    HANDLE m_hFenceEvent = NULL;
-    ComPtr<ID3D12Resource> m_pIndexBuffer;
-    D3D12_INDEX_BUFFER_VIEW m_IndexBufferView;
-    ComPtr<ID3D12Resource> m_pVertexBuffers[FrameCount];
-    D3D12_VERTEX_BUFFER_VIEW m_VertexBufferViews[FrameCount];
-    ComPtr<ID3D12Resource> m_pNoteBuffers[FrameCount];
-    ComPtr<ID3D12Resource> m_pGenericUpload;
-    ComPtr<ID3D12Resource> m_pFixedBuffer;
-    ComPtr<ID3D12Resource> m_pTrackColorBuffer;
+    ComPtr<IDXGIFactory1> m_pFactory;
+    ComPtr<IDXGIAdapter1> m_pAdapter;
+    ComPtr<ID3D11Device> m_pDevice;
+    ComPtr<ID3D11DeviceContext> m_pContext;
+    ComPtr<IDXGISwapChain> m_pSwapChain;
+    ComPtr<ID3D11Texture2D> m_pBackBuffer;
+    ComPtr<IDXGISurface1> m_pBackBufferSurface;
+    ComPtr<ID3D11RenderTargetView> m_pRenderTargetView;
+    ComPtr<ID3D11Texture2D> m_pDepthBuffer;
+    ComPtr<ID3D11DepthStencilView> m_pDepthStencilView;
+    ComPtr<ID3D11VertexShader> m_pRectVS;
+    ComPtr<ID3D11PixelShader> m_pRectPS;
+    ComPtr<ID3D11InputLayout> m_pRectInputLayout;
+    ComPtr<ID3D11VertexShader> m_pNoteVS;
+    ComPtr<ID3D11VertexShader> m_pNoteSameWidthVS;
+    ComPtr<ID3D11PixelShader> m_pNotePS;
+    ComPtr<ID3D11VertexShader> m_pBackgroundVS;
+    ComPtr<ID3D11PixelShader> m_pBackgroundPS;
+    ComPtr<ID3D11BlendState> m_pBlendState;
+    ComPtr<ID3D11RasterizerState> m_pRasterizerState;
+    ComPtr<ID3D11DepthStencilState> m_pDepthDisabledState;
+    ComPtr<ID3D11DepthStencilState> m_pDepthLessEqualState;
+    ComPtr<ID3D11DepthStencilState> m_pDepthLessState;
+    ComPtr<ID3D11SamplerState> m_pBackgroundSampler;
+    ComPtr<ID3D11Buffer> m_pIndexBuffer;
+    ComPtr<ID3D11Buffer> m_pRectVertexBuffer;
+    ComPtr<ID3D11Buffer> m_pNoteBuffer;
+    ComPtr<ID3D11Buffer> m_pConstantBuffer;
+    ComPtr<ID3D11Buffer> m_pFixedBuffer;
+    ComPtr<ID3D11Buffer> m_pTrackColorBuffer;
+    ComPtr<ID3D11ShaderResourceView> m_pFixedSRV;
+    ComPtr<ID3D11ShaderResourceView> m_pTrackColorSRV;
+    ComPtr<ID3D11ShaderResourceView> m_pNoteSRV;
+
     RootConstants m_RootConstants = {};
     FixedSizeConstants m_FixedConstants = {};
     FixedSizeConstants m_OldFixedConstants = {};
     TrackColor m_TrackColors[MaxTrackColors * MaxChannelColors] = {};
     TrackColor m_OldTrackColors[MaxTrackColors * MaxChannelColors] = {};
 
-    UINT m_uFrameIndex = 0;
-    UINT64 m_pFenceValues[FrameCount] = {};
-
-    ComPtr<ID3D12Resource> m_pScreenshotStaging;
-    vector<char> m_vScreenshotOutput;
-    UINT64 m_ullScreenshotPitch;
-
-    ComPtr<ID3D12Resource> m_pTextureUpload;
-    ComPtr<ID3D12Resource> m_pTextureBuffer;
+    ComPtr<ID3D11Texture2D> m_pBackgroundTexture;
+    ComPtr<ID3D11ShaderResourceView> m_pBackgroundTextureSRV;
     ComPtr<IWICBitmapSource> m_pUnscaledBackground;
 
     vector<RectVertex> m_vRectsIntermediate;
     vector<NoteData> m_vNotesIntermediate;
     sidx_t m_iRectSplit = -1;
-
-    ImDrawList* m_pDrawList;
+    
+    struct TextCommand {
+        wstring Text;
+        win32_t Size;
+        win32_t X;
+        win32_t Y;
+        COLORREF Color;
+        DWORD Alignment;
+        win32_t PadX;
+        win32_t PadY;
+        COLORREF bgColor;
+    };
+    vector<TextCommand> m_vTextCommands;
 };

@@ -189,6 +189,32 @@ bool TSQueue<T>::Pop(T& tElement)
     return true;
 }
 
+inline wstring Utf8ToWString(const string& u8str)
+{
+    if (u8str.empty()) return {};
+
+    size_t size_needed = MultiByteToWideChar(
+        CP_UTF8,
+        0,
+        u8str.data(),
+        (win32_t)u8str.size(),
+        nullptr,
+        0
+    );
+
+    wstring result(size_needed, 0);
+    MultiByteToWideChar(
+        CP_UTF8,
+        0,
+        u8str.data(),
+        (win32_t)u8str.size(),
+        &result[0],
+        size_needed
+    );
+
+    return result;
+}
+
 inline string WStringToUtf8(const wstring& wstr)
 {
     if (wstr.empty()) return {};
@@ -197,7 +223,7 @@ inline string WStringToUtf8(const wstring& wstr)
         CP_UTF8,
         0,
         wstr.data(),
-        (int)wstr.size(),
+        (win32_t)wstr.size(),
         nullptr,
         0,
         nullptr,
@@ -209,7 +235,7 @@ inline string WStringToUtf8(const wstring& wstr)
         CP_UTF8,
         0,
         wstr.data(),
-        (int)wstr.size(),
+        (win32_t)wstr.size(),
         &result[0],
         size_needed,
         nullptr,
