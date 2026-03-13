@@ -417,7 +417,7 @@ key_t MIDI::aWhiteCount[MIDI::KEYS + 1];
 
 void MIDI::InitArrays()
 {
-    wchar_t buf[1<<2];
+    wchar_t buf[1<<3];
     wchar_t cNote = L'C';
     int16_t iOctave = -1;
     bool bIsSharp = false;
@@ -452,7 +452,7 @@ void MIDI::InitArrays()
             eNote = static_cast<MIDI::Note>(eNote + 1);
     }
     aWhiteCount[0] = 0;
-    for (key_t i = 1; i < MIDI::KEYS + 1; i++)
+    for (key_t i = 1; i <= MIDI::KEYS; i++)
         aWhiteCount[i] = aWhiteCount[i - 1] + !aIsSharp[i - 1];
     aNoteNames[MIDI::KEYS] = L"Invalid";
 }

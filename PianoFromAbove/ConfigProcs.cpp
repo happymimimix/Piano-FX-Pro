@@ -104,7 +104,7 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         FillRect(pdis->hDC, &pdis->rcItem, (HBRUSH)GetStockObject(DC_BRUSH));
         if (IsDlgButtonChecked(hWnd, IDC_RANDOMIZE) && pdis->CtlID >= IDC_COLOR1 && pdis->CtlID <= IDC_COLOR16)
         {
-            HFONT PHIFON_GDI = imguiFont2GDI(PHIFON_compressed_data, PHIFON_compressed_size, -MulDiv(LargeFontSize, GetDeviceCaps(pdis->hDC, LOGPIXELSY), 72));
+            HFONT PHIFON_GDI = imguiFont2GDI(PHIFON_compressed_data, PHIFON_compressed_size, -MulDiv(LargeFontSize, GetDeviceCaps(pdis->hDC, LOGPIXELSY), 100));
             SelectObject(pdis->hDC, PHIFON_GDI);
             DrawText(pdis->hDC, L"?", -1, &pdis->rcItem, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
         }

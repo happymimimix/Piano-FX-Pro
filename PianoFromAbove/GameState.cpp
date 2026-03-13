@@ -107,8 +107,8 @@ GameState::GameError IntroScreen::Render() {
     wstring MyTradeMark = StatisticsText1;
     MyTradeMark += L" v";
     MyTradeMark += VersionString;
-    m_pRenderer->AddText(MyTradeMark, TextSize, 12, 12, 0xFF404040);
-    m_pRenderer->AddText(MyTradeMark, TextSize, 10, 10, 0xFFFFFFFF);
+    m_pRenderer->AddText(MyTradeMark, TextSize, 10, 8, 0xFF404040);
+    m_pRenderer->AddText(MyTradeMark, TextSize, 8, 6, 0xFFFFFFFF);
 
     // Present the backbuffer contents to the display
     if (FAILED(m_pRenderer->EndScene())) return DirectXError;
@@ -456,8 +456,8 @@ GameState::GameError SplashScreen::Render() {
     wstring MyTradeMark = StatisticsText1;
     MyTradeMark += L" v";
     MyTradeMark += VersionString;
-    m_pRenderer->AddText(MyTradeMark, TextSize, 12, 12, 0xFF404040);
-    m_pRenderer->AddText(MyTradeMark, TextSize, 10, 10, 0xFFFFFFFF);
+    m_pRenderer->AddText(MyTradeMark, TextSize, 10, 8, 0xFF404040);
+    m_pRenderer->AddText(MyTradeMark, TextSize, 8, 6, 0xFFFFFFFF);
 
     // Present the backbuffer contents to the display
     if (FAILED(m_pRenderer->EndScene())) return DirectXError;
@@ -2387,7 +2387,7 @@ void MainScreen::RenderText() {
             RenderMessage(&rcMsg, Utf8ToWString(CheatEngineCaption));
         }
         else {
-            RenderMessage(&rcMsg, Utf8ToWString("The caption has exceeded the maximum acceptable length of " + to_string(sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0])) + " characters. \nAs a result, this caption has been blocked from showing in order to prevent crashing. \nPlease consider writing something slightly shorter. "));
+            RenderMessage(&rcMsg, Utf8ToWString("The caption has exceeded the maximum acceptable length of " + to_string(sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0])) + " characters. \r\nAs a result, this caption has been blocked from showing in order to prevent crashing. \r\nPlease consider writing something slightly shorter. "));
         }
     }
 }
@@ -2404,10 +2404,10 @@ void MainScreen::RenderStatusLine(unsigned char line, const wchar_t* left, const
     win32_t TextY = 3 + line * 16;
     win32_t LeftTextX = m_pRenderer->GetBufferWidth() - (StatisticsWidth - 5);
     win32_t RightTextX = m_pRenderer->GetBufferWidth() - 6;
-    m_pRenderer->AddText(left, 1 << 4, LeftTextX + 2, TextY + 1, 0x404040, ALIGN_LEFT | ALIGN_TOP);
-    m_pRenderer->AddText(left, 1 << 4, LeftTextX, TextY, 0xFFFFFF, ALIGN_LEFT|ALIGN_TOP);
-    m_pRenderer->AddText(buf, 1 << 4, RightTextX + 2, TextY + 1, 0x404040, ALIGN_RIGHT | ALIGN_TOP);
-    m_pRenderer->AddText(buf, 1 << 4, RightTextX, TextY, 0xFFFFFF, ALIGN_RIGHT | ALIGN_TOP);
+    m_pRenderer->AddText(left, 1 << 4, LeftTextX+2, TextY, 0x404040, ALIGN_LEFT | ALIGN_TOP);
+    m_pRenderer->AddText(left, 1 << 4, LeftTextX, TextY-2, 0xFFFFFF, ALIGN_LEFT|ALIGN_TOP);
+    m_pRenderer->AddText(buf, 1 << 4, RightTextX+2, TextY, 0x404040, ALIGN_RIGHT | ALIGN_TOP);
+    m_pRenderer->AddText(buf, 1 << 4, RightTextX, TextY-2, 0xFFFFFF, ALIGN_RIGHT | ALIGN_TOP);
 }
 
 void MainScreen::RenderStatus(LPRECT prcStatus) {
@@ -2788,13 +2788,13 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
 }
 
 void MainScreen::RenderMarker(const wstring& str) {
-    m_pRenderer->AddText(str, (1 << 4) + (1 << 2), 6 + 2, 3 + 1, 0xFF404040, ALIGN_LEFT | ALIGN_TOP, 6, 3, 0x80000000);
-    m_pRenderer->AddText(str, (1 << 4) + (1 << 2), 6, 3, 0xFFFFFFFF, ALIGN_LEFT | ALIGN_TOP);
+    m_pRenderer->AddText(str, (1 << 4) + (1 << 2), 6, 3, 0xFF404040, ALIGN_LEFT | ALIGN_TOP, 6, 3, 0x80000000);
+    m_pRenderer->AddText(str, (1 << 4) + (1 << 2), 6-2, 3-2, 0xFFFFFFFF, ALIGN_LEFT | ALIGN_TOP);
 }
 
 void MainScreen::RenderMessage(LPRECT prcMsg, const wstring& sMsg) {
     uint16_t fontsize = (1 << 5) - (1 << 2);
     while ((m_pRenderer->CalcTextSize(sMsg, fontsize).cx >= prcMsg->right - prcMsg->left || m_pRenderer->CalcTextSize(sMsg, fontsize).cy >= prcMsg->bottom - prcMsg->top) && fontsize > (1 << 3)) { fontsize--; }
-    m_pRenderer->AddText(sMsg, fontsize, (prcMsg->right - prcMsg->left)/2 + prcMsg->left + 2, (prcMsg->bottom - prcMsg->top)/2 + prcMsg->top + 1, 0xFF404040, ALIGN_CENTER | ALIGN_MIDDLE, 6, 3, 0x80000000);
-    m_pRenderer->AddText(sMsg, fontsize, (prcMsg->right - prcMsg->left) / 2 + prcMsg->left, (prcMsg->bottom - prcMsg->top) / 2 + prcMsg->top, 0xFFFFFFFF, ALIGN_CENTER | ALIGN_MIDDLE);
+    m_pRenderer->AddText(sMsg, fontsize, (prcMsg->right - prcMsg->left)/2 + prcMsg->left, (prcMsg->bottom - prcMsg->top)/2 + prcMsg->top, 0xFF404040, ALIGN_CENTER | ALIGN_MIDDLE, 6, 3, 0x80000000);
+    m_pRenderer->AddText(sMsg, fontsize, (prcMsg->right - prcMsg->left) / 2 + prcMsg->left-2, (prcMsg->bottom - prcMsg->top) / 2 + prcMsg->top-2, 0xFFFFFFFF, ALIGN_CENTER | ALIGN_MIDDLE);
 }

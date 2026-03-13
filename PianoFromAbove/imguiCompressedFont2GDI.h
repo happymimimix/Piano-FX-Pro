@@ -205,11 +205,11 @@ inline HFONT imguiFont2GDI(const void* compressed_ttf_data, int compressed_ttf_s
     if (it != FontCache.end()) { return it->second; }
     else {
         LOGFONT lf = {};
-        lf.lfHeight = cHeight;
+        lf.lfHeight = -cHeight;
         lf.lfWidth = 0;
         lf.lfEscapement = 0;
         lf.lfOrientation = 0;
-        lf.lfWeight = 0;
+        lf.lfWeight = FW_MEDIUM;
         lf.lfItalic = 0;
         lf.lfUnderline = 0;
         lf.lfStrikeOut = 0;

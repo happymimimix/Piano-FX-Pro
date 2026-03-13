@@ -319,9 +319,6 @@ tuple<HRESULT, const char*> Renderer11::CreateWindowDependentObjects(HWND hWnd) 
     if (FAILED(res))
         return make_tuple(res, "CreateDepthStencilView");
 
-    // Resize screenshot output buffer (BGR24)
-    m_vScreenshotOutput.resize(static_cast<size_t>(m_iBufferWidth) * m_iBufferHeight * ScreenshotBytesPerPixel);
-
     // Create background image texture
     m_pBackgroundTexture.Reset();
     m_pBackgroundTextureSRV.Reset();
@@ -685,7 +682,7 @@ HRESULT Renderer11::FlushText() {
                 DWORD Bits;
                 BLENDFUNCTION Func;
             } BlendFunc;
-            BlendFunc.Bits = (CMD.bgColor & 0xFF000000) >> 8;
+            BlendFunc.Bits = 0x00ff0000;
             AlphaBlend(DXDC, TextX - CMD.PadX, TextY - CMD.PadY, TextSize.cx + 2 * CMD.PadX, TextSize.cy + 2 * CMD.PadY, MEMdc, 0, 0, 1, 1, BlendFunc.Func);
             DeleteDC(MEMdc);
             DeleteObject(BMP);
