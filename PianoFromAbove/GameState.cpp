@@ -2813,6 +2813,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         pos.X = 0;
         pos.Y = 0;
         SetConsoleCursorPosition(hConsole, pos);
+        GetConsoleScreenBufferInfo(hConsole, &csbi);
         SMALL_RECT windowSize;
         windowSize.Left = 0;
         windowSize.Top = 0;

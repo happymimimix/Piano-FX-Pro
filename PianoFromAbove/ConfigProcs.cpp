@@ -30,7 +30,7 @@ VOID DoPreferences(HWND hWndOwner)
     PROPSHEETPAGE psp[sizeof(pDialogs) / sizeof(win32_t)];
     PROPSHEETHEADER psh;
 
-    for (win32_t i = 0; i < sizeof(psp) / sizeof(PROPSHEETPAGE); i++)
+    for (win32_t i = 0; i < static_cast<win32_t>(sizeof(psp) / sizeof(PROPSHEETPAGE)); i++)
     {
         psp[i].dwSize = sizeof(PROPSHEETPAGE);
         psp[i].dwFlags = PSP_USETITLE;
@@ -616,7 +616,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
         LVCOLUMN lvc = {};
         lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT;
-        for (win32_t i = 0; i < sizeof(aFmt) / sizeof(win32_t); i++)
+        for (win32_t i = 0; i < static_cast<win32_t>(sizeof(aFmt) / sizeof(win32_t)); i++)
         {
             lvc.fmt = aFmt[i];
             lvc.cx = aCx[i];
@@ -672,7 +672,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         if (GetWindowLongPtr(hWndTracks, GWL_STYLE) & WS_VSCROLL)
             SendMessage(hWndTracks, LVM_SETCOLUMNWIDTH, 1, aCx[1] - 17);
 
-        RECT rcItem = { LVIR_BOUNDS };
+        RECT rcItem = { LVIR_BOUNDS,LVIR_BOUNDS,LVIR_BOUNDS,LVIR_BOUNDS };
         SendMessage(hWndTracks, LVM_GETITEMRECT, 0, (LPARAM)&rcItem);
 
         if (Config::GetConfig().GetControlsSettings().bDumpFrames) {
@@ -743,11 +743,11 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             {
                 // Have to manually figure out the corresponding item. Silly.
                 LPNMITEMACTIVATE lpnmia = (LPNMITEMACTIVATE)lpnmhdr;
-                LVHITTESTINFO lvhti = { lpnmia->ptAction };
+                LVHITTESTINFO lvhti = { lpnmia->ptAction,NULL,NULL,NULL,NULL };
                 SendMessage(lpnmia->hdr.hwndFrom, LVM_SUBITEMHITTEST, 0, (LPARAM)&lvhti);
                 if (lvhti.iItem < 0 || (win32_t)lvhti.iItem >= (win32_t)vMuted.size()) return FALSE;
 
-                RECT rcItem = { LVIR_BOUNDS };
+                RECT rcItem = { LVIR_BOUNDS,LVIR_BOUNDS,LVIR_BOUNDS,LVIR_BOUNDS };
                 SendMessage(lpnmia->hdr.hwndFrom, LVM_GETITEMRECT, lvhti.iItem, (LPARAM)&rcItem);
                 switch (lvhti.iSubItem)
                 {
@@ -786,7 +786,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 RECT rcTracks;
                 GetClientRect(hWndTracks, &rcTracks);
                 win32_t aCx[6] = { 40, rcTracks.right - 50 * 5, 60, 50, 50, 50 };
-                for (win32_t i = 0; i < sizeof(aCx) / sizeof(win32_t); i++) {
+                for (win32_t i = 0; i < static_cast<win32_t>(sizeof(aCx) / sizeof(win32_t)); i++) {
                     SendMessage(hWndTracks, LVM_SETCOLUMNWIDTH, i, aCx[i]); //Please don't resize this, it makes the interface look very ridiculous! 
                 }
                 switch (lpnmcd->dwDrawStage)

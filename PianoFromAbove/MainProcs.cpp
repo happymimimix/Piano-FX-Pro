@@ -11,9 +11,9 @@
 #include <shlobj.h>
 #include <Dbt.h>
 #include <psapi.h>
-
 #include <set>
 #include <thread>
+#include <Uxtheme.h>
 
 #include "MainProcs.h"
 #include "ConfigProcs.h"
@@ -454,7 +454,10 @@ LRESULT WINAPI BarProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
     switch (msg)
     {
-        // WM_HSCROLL doesn't percolate up, so got to handle it here
+    case WM_THEMECHANGED:
+        CallWindowProc(g_pPrevBarProc, hWnd, msg, wParam, lParam);
+        SendMessage(hWnd, TB_SETBUTTONSIZE, 0, MAKELONG(1 << 5, 1 << 5));
+        return 0;
     case WM_HSCROLL:
     {
         winword_t iCode = LOWORD(wParam);
@@ -572,7 +575,7 @@ HWND CreateRebar(HWND hWndOwner)
     SendMessage(hWndToolbar, TB_BUTTONSTRUCTSIZE, sizeof(TBBUTTON), 0);
     SendMessage(hWndToolbar, TB_ADDBUTTONS, sizeof(tbButtons) / sizeof(TBBUTTON), (LPARAM)&tbButtons);
     SendMessage(hWndToolbar, TB_SETBUTTONSIZE, 0, MAKELONG(1 << 5, 1 << 5));
-    TBBUTTONINFO tbbi = { sizeof(TBBUTTONINFO) };
+    TBBUTTONINFO tbbi = { sizeof(TBBUTTONINFO), NULL, NULL, NULL,NULL, NULL, NULL, NULL, NULL, NULL };
     tbbi.dwMask = TBIF_SIZE;
     tbbi.cx = 100;
     SendMessage(hWndToolbar, TB_SETBUTTONINFO, hWndVolumePlaceholder, (LPARAM)&tbbi);
@@ -901,7 +904,7 @@ INT_PTR CALLBACK AboutProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM)
 
 VOID HandOffMsg(UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    MSG msgGameThread = { g_hWndGfx, msg, wParam, lParam };
+    MSG msgGameThread = { g_hWndGfx, msg, wParam, lParam, NULL, {NULL, NULL} };
     g_MsgQueue.ForcePush(msgGameThread);
 }
 
@@ -1026,10 +1029,10 @@ VOID SetPlayMode(INT ePlayMode)
     BOOL bPractice = (ePlayMode == GameState::Practice);
 
     win32_t iPlayButtons[] = { ID_PLAY_PLAY, ID_PLAY_PAUSE, ID_PLAY_STOP };
-    for (win32_t i = 0; i < sizeof(iPlayButtons) / sizeof(win32_t); i++)
+    for (win32_t i = 0; i < static_cast<win32_t>(sizeof(iPlayButtons) / sizeof(win32_t)); i++)
         SendMessage(hWndToolbar, TB_ENABLEBUTTON, iPlayButtons[i], bPractice);
     win32_t iPracticeButtons[] = { ID_PLAY_SKIPFWD, ID_PLAY_SKIPBACK };
-    for (win32_t i = 0; i < sizeof(iPracticeButtons) / sizeof(win32_t); i++)
+    for (win32_t i = 0; i < static_cast<win32_t>(sizeof(iPracticeButtons) / sizeof(win32_t)); i++)
         SendMessage(hWndToolbar, TB_ENABLEBUTTON, iPracticeButtons[i], bPractice);
 
     SendMessage(hWndToolbar, TB_PRESSBUTTON, ID_PLAY_PLAY, TRUE);
@@ -1039,7 +1042,7 @@ VOID SetPlayMode(INT ePlayMode)
                             { 4, bPractice, ID_PLAY_PLAYPAUSE, ID_PLAY_STOP, ID_VIEW_MOVEANDZOOM, ID_VIEW_RESETMOVEANDZOOM },
                             { 2, bPractice, ID_PLAY_SKIPFWD, ID_PLAY_SKIPBACK },
                             { 3, true, ID_PLAY_INCREASERATE, ID_PLAY_DECREASERATE, ID_PLAY_RESETRATE } };
-    for (win32_t i = 0; i < sizeof(iMenuItems) / sizeof(iMenuItems[0]); i++)
+    for (win32_t i = 0; i < static_cast<win32_t>(sizeof(iMenuItems) / sizeof(iMenuItems[0])); i++)
     {
         UINT uEnable = (iMenuItems[i][1] ? MF_ENABLED : MF_GRAYED);
         for (win32_t j = 0; j < iMenuItems[i][0]; j++)
