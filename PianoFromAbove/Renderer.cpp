@@ -542,6 +542,11 @@ HRESULT Renderer11::DrawRect(float x, float y, float cx, float cy, DWORD color, 
 }
 
 HRESULT Renderer11::DrawRect(float x, float y, float cx, float cy, DWORD c1, DWORD c2, DWORD c3, DWORD c4, float flipcenter, bool flip) {
+    if (flip) {
+        y = -(y - flipcenter) + flipcenter - cy;
+        swap(c1, c4);
+        swap(c2, c3);
+    }
     m_vRectsIntermediate.insert(m_vRectsIntermediate.end(), {
         {x, y, c1},
         {x + cx, y, c2},
@@ -556,6 +561,18 @@ HRESULT Renderer11::DrawSkew(float x1, float y1, float x2, float y2, float x3, f
 }
 
 HRESULT Renderer11::DrawSkew(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, DWORD c1, DWORD c2, DWORD c3, DWORD c4, float flipcenter, bool flip) {
+    if (flip) {
+        y1 = -(y1 - flipcenter) + flipcenter;
+        y2 = -(y2 - flipcenter) + flipcenter;
+        y3 = -(y3 - flipcenter) + flipcenter;
+        y4 = -(y4 - flipcenter) + flipcenter;
+        swap(x1, x4);
+        swap(y1, y4);
+        swap(c1, c4);
+        swap(x2, x3);
+        swap(y2, y3);
+        swap(c2, c3);
+    }
     m_vRectsIntermediate.insert(m_vRectsIntermediate.end(), {
         {x1, y1, c1},
         {x2, y2, c2},
@@ -624,9 +641,9 @@ void Renderer11::SetPipeline(Pipeline pipeline) {
 // Text rendering
 //-----------------------------------------------------------------------------
 
-void Renderer11::AddText(const wstring& Text, win32_t Size, win32_t X, win32_t Y, COLORREF Color, DWORD Alignment, win32_t PadX, win32_t PadY, COLORREF bgColor) {
+void Renderer11::AddText(const wstring& Text, win32_t Size, win32_t X, win32_t Y, COLORREF Color, DWORD Alignment, win32_t OffsetX, win32_t OffsetY, win32_t PadX, win32_t PadY, COLORREF bgColor) {
 #ifndef OPENGL_MODE
-    m_vTextCommands.push_back({Text, Size, X, Y, Color, Alignment, PadX, PadY, bgColor});
+    m_vTextCommands.push_back({Text, Size, X, Y, Color, Alignment, OffsetX, OffsetY, PadX, PadY, bgColor});
 #endif
 }
 
@@ -647,7 +664,7 @@ SIZE Renderer11::CalcTextSize(const wstring& Text, win32_t Size) {
 
 void Renderer11::AddGDIRect(win32_t X, win32_t Y, win32_t W, win32_t H, COLORREF Color) {
 #ifndef OPENGL_MODE
-    m_vTextCommands.push_back({ L"", 0, X+W/2, Y+H/2, 0x00000000, ALIGN_CENTER|ALIGN_MIDDLE, W/2, H/2, Color});
+    m_vTextCommands.push_back({ L"", 0, X + W / 2, Y + H / 2, 0x00000000, ALIGN_CENTER | ALIGN_MIDDLE, 0, 0, W / 2, H / 2, Color });
 #endif
 }
 
@@ -736,7 +753,7 @@ HRESULT Renderer11::FlushText() {
         }
 
         if (CMD.bgColor & 0xFF000000) {
-            AlphaFillRect(DXDC, TextX - CMD.PadX, TextY - CMD.PadY, TextSize.cx + 2 * CMD.PadX, TextSize.cy + 2 * CMD.PadY, CMD.bgColor);
+            AlphaFillRect(DXDC, TextX - CMD.PadX + CMD.OffsetX, TextY - CMD.PadY + CMD.OffsetY, TextSize.cx + 2 * CMD.PadX, TextSize.cy + 2 * CMD.PadY, CMD.bgColor);
         }
         if (!CMD.Text.empty()) {
             TextOutW(DXDC, TextX, TextY, CMD.Text.c_str(), CMD.Text.size());

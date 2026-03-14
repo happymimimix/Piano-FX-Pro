@@ -218,7 +218,7 @@ string GettersAndSetters(string VariableName, string Type, bool IsReadOnly, stri
     return Code;
 }
 
-string StringTypeGettersAndSetters(string VariableName, size_t Size, bool IsReadOnly, string DebugList) {
+string StringTypeGettersAndSetters(string VariableName, size_t Size, bool IsReadOnly, string DebugList, bool IsCaption = false) {
     string Code = "";
     Code += "function Get" + VariableName + "()\n";
     Code += "return readString(" + VariableName + ")\n";
@@ -229,6 +229,22 @@ string StringTypeGettersAndSetters(string VariableName, size_t Size, bool IsRead
         Code += "if #VAL<" + to_string(Size) + " then\n";
         Code += "writeShortInteger(getAddress(" + VariableName + ")+#VAL,0)\n";
         Code += "writeString(" + VariableName + ",VAL)\n";
+        Code += "end\n";
+        Code += "end\n";
+    }
+    if (IsCaption) { //CE Caption need a special alignment setting
+        Code += "function Set" + VariableName + "Alignment(VAL)\n";
+        Code += "if VAL==ALIGN_LEFT then\n";
+        Code += DebugList + "Add(\"" + VariableName + "Alignment -> \\\"L\\\"\")\n";
+        Code += "writeString(" + VariableName + "Alignment,\"L\")\n";
+        Code += "end\n";
+        Code += "if VAL==ALIGN_CENTER then\n";
+        Code += DebugList + "Add(\"" + VariableName + "Alignment -> \\\"C\\\"\")\n";
+        Code += "writeString(" + VariableName + "Alignment,\"C\")\n";
+        Code += "end\n";
+        Code += "if VAL==ALIGN_RIGHT then\n";
+        Code += DebugList + "Add(\"" + VariableName + "Alignment -> \\\"R\\\"\")\n";
+        Code += "writeString(" + VariableName + "Alignment,\"R\")\n";
         Code += "end\n";
         Code += "end\n";
     }
@@ -1531,7 +1547,8 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += DefineMemoryAddress("RemoveOverlaps", GetAddress(cVideo.bOR));
                 Code += DefineMemoryAddress("LimitFPS", GetAddress(cVideo.bLimitFPS));
                 Code += DefineMemoryAddress("VelocityThreshold", GetAddress(cControls.iVelocityThreshold));
-                Code += DefineMemoryAddress("Caption", GetAddress(CheatEngineCaption));
+                Code += DefineMemoryAddress("Caption", GetAddress(CheatEngineCaption[1]));
+                Code += DefineMemoryAddress("CaptionAlignment", GetAddress(CheatEngineCaption));
                 Code += DefineMemoryAddress("DifficultyText", GetAddress(Difficulty));
                 Code += "-- FFMPEG Video Export\n";
                 Code += DefineMemoryAddress("CE_VideoOutput", GetAddress(cControls.bDumpFrames));
@@ -1579,7 +1596,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += GettersAndSetters("RemoveOverlaps", IntSizeToCE(sizeof(cVideo.bOR)), false, "History");
                 Code += GettersAndSetters("LimitFPS", IntSizeToCE(sizeof(cVideo.bLimitFPS)), false, "History");
                 Code += GettersAndSetters("VelocityThreshold", IntSizeToCE(sizeof(cControls.iVelocityThreshold)), false, "History");
-                Code += StringTypeGettersAndSetters("Caption", sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]), false, "History");
+                Code += StringTypeGettersAndSetters("Caption", sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0])-1, false, "History", true);
                 Code += StringTypeGettersAndSetters("DifficultyText", sizeof(Difficulty) / sizeof(Difficulty[0]), false, "History");
                 Code += EasingFunctions();
                 Code += WaitUntil(false, "Pending");
@@ -1621,9 +1638,9 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += "SetStartKey(0)\n";
                 Code += "SetEndKey(127)\n";
                 Code += "SetKeyMode(0)\n";
-                Code += "SetOffsetX(0.00)\n";
-                Code += "SetOffsetY(0.00)\n";
-                Code += "SetZoom(0.00)\n";
+                Code += "SetOffsetX(CenterX(0))\n";
+                Code += "SetOffsetY(CenterY(0))\n";
+                Code += "SetZoom(0)\n";
                 Code += "SetSameWidth(0)\n";
                 Code += "SetVelocityMapping(0)\n";
                 Code += "SetPaused(0)\n";
@@ -1636,6 +1653,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += "SetRemoveOverlaps(0)\n";
                 Code += "SetLimitFPS(0)\n";
                 Code += "SetVelocityThreshold(1)\n";
+                Code += "SetCaptionAlignment(ALIGN_CENTER)\n";
                 Code += "SetCaption(\"Welcome to Piano-FX Pro\")\n";
                 Code += "-- If you feel the default difficulty is inappropriate, change it with the following code: \n";
                 Code += "SetDifficultyText(\"IN Lv.12\")\n";

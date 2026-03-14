@@ -93,7 +93,7 @@ public:
     HRESULT ClearAndBeginScene(DWORD color);
     HRESULT EndScene(bool draw_bg = false);
     HRESULT Present();
-    void AddText(const wstring& Text, win32_t Size, win32_t X, win32_t Y, COLORREF Color, DWORD Alignment = ALIGN_LEFT|ALIGN_TOP, win32_t PadX=0, win32_t PadY=0, COLORREF bgColor=0x00000000);
+    void AddText(const wstring& Text, win32_t Size, win32_t X, win32_t Y, COLORREF Color, DWORD Alignment = ALIGN_LEFT|ALIGN_TOP, win32_t OffsetX = 0, win32_t OffsetY = 0, win32_t PadX = 0, win32_t PadY = 0, COLORREF bgColor=0x00000000);
     SIZE CalcTextSize(const wstring& Text, win32_t Size);
     void AddGDIRect(win32_t X, win32_t Y, win32_t W, win32_t H, COLORREF Color);
     HRESULT DrawRect(float x, float y, float cx, float cy, DWORD color, float flipcenter = 0.0f, bool flip = false);
@@ -116,8 +116,8 @@ public:
     TrackColor* GetTrackColors() { return m_TrackColors; };
 
     inline void PushNoteData(NoteData data) { m_vNotesIntermediate.push_back(data); };
-    idx_t GetRenderedNotesCount() { return m_vNotesIntermediate.size(); };
-    void SplitRect() { m_iRectSplit = m_vRectsIntermediate.size(); }
+    idx_t GetRenderedNotesCount() { return static_cast<idx_t>(m_vNotesIntermediate.size()+ m_vRectsIntermediate.size()); };
+    void SplitRect() { m_iRectSplit = static_cast<sidx_t>(m_vRectsIntermediate.size()); }
 
     HRESULT Screenshot(char* Output);
     bool LoadBackgroundBitmap(wstring path);
@@ -194,6 +194,8 @@ private:
         win32_t Y;
         COLORREF Color;
         DWORD Alignment;
+        win32_t OffsetX;
+        win32_t OffsetY;
         win32_t PadX;
         win32_t PadY;
         COLORREF bgColor;

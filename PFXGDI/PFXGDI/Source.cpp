@@ -21,7 +21,7 @@ bool IsDirectlyAbove(HWND hwndTop, HWND hwndBottom) {
     while ((hwnd = GetNextWindow(hwnd, GW_HWNDNEXT)) != NULL) {
         if (hwnd == hwndBottom)
             return true;
-        if (IsWindowVisible(hwnd))
+        if (IsWindowVisible(hwnd) && !IsIconic(hwnd))
             return false;
     }
     return false;

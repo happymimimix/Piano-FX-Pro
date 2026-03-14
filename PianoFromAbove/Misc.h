@@ -34,7 +34,7 @@ typedef signed int win32_t; // Classic signed 32bit integer, aka dword, used for
 typedef signed short winword_t; // Classic signed 16bit integer, aka word, used for interfacing with Win32 API (should not appear in any game logic)
 
 template <typename T>
-string GetAddress(const T& Variable) {
+__forceinline string GetAddress(const T& Variable) {
     HMODULE ProcessBaseAddress = GetModuleHandle(NULL);
     uintptr_t VariableAddress = reinterpret_cast<uintptr_t>(&Variable);
     uintptr_t OffsetAddress = VariableAddress - reinterpret_cast<uintptr_t>(ProcessBaseAddress);
@@ -43,7 +43,7 @@ string GetAddress(const T& Variable) {
     return sout.str();
 }
 
-inline string IntSizeToCE(uint8_t Size) {
+__forceinline string IntSizeToCE(uint8_t Size) {
     if (Size == 1) {
         return "ShortInteger";
     }
@@ -59,7 +59,7 @@ inline string IntSizeToCE(uint8_t Size) {
     return "Bytes";
 }
 
-inline string FloatSizeToCE(uint8_t Size) {
+__forceinline string FloatSizeToCE(uint8_t Size) {
     if (Size == 4) {
         return "Float";
     }

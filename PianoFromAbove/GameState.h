@@ -24,27 +24,28 @@ inline mms_t m_llStartTime;
 inline mms_t m_llRndStartTime;
 inline mtk_t m_iStartTick;
 inline idx_t* m_vNCTable = nullptr;
-inline string llStartTimeFormatted;
 inline idx_t polyphony;
-inline string polyFormatted;
+inline wstring polyFormatted;
 inline idx_t nps;
-inline string npsFormatted;
+inline wstring npsFormatted;
 inline idx_t passed;
-inline string passedFormatted;
+inline wstring passedFormatted;
 inline idx_t TotalNC;
 inline win32_t width = -1;
 inline win32_t height = -1;
 inline uint16_t resolution = -1;
-inline char CheatEngineCaption[(1 << 7) * (1 << 10)] = {};
+inline char CheatEngineCaption[1 << 19] = {'C'};
+inline char* CaptionContent = CheatEngineCaption + 1;
 inline mms_t TotalTime;
 inline string TotalTimeFormatted;
+inline string llStartTimeFormatted;
 inline char Difficulty[1 << 10] = {};
 inline bool UpdateNotePos = true;
 inline static const mms_t MS = 1e+3;
 inline static const mms_t S = 1e+6;
-inline volatile bool CE_Connected = false;
-inline volatile bool CE_DoNextTick = false;
-inline volatile bool CE_Responded = false;
+inline bool CE_Connected = false;
+inline bool CE_DoNextTick = false;
+inline bool CE_Responded = false;
 
 inline HRESULT GetGDI(HWND hGDI, win32_t W, win32_t H, char* Output) {
 #ifndef OPENGL_MODE
@@ -265,7 +266,7 @@ private:
     void RenderStatusLine(unsigned char line, const wchar_t* left, const wchar_t* format, ...);
     void RenderStatus(LPRECT prcPos);
     void RenderMarker(const wstring& str);
-    void RenderMessage(LPRECT prcMsg, const wstring& sMsg);
+    void RenderMessage(LPRECT prcMsg, LPRECT prcScr, const wstring& sMsg, char lnAlign);
 
     // MIDI info
     MIDI m_MIDI; // The song to display

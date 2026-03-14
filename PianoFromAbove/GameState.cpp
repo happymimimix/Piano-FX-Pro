@@ -103,12 +103,8 @@ GameState::GameError IntroScreen::Render() {
     color_t G = (iColor >> 8) & 0xFF;
     color_t B = (iColor >> 16) & 0xFF;
     if (FAILED(m_pRenderer->ClearAndBeginScene(D3DCOLOR_XRGB(R, G, B)))) return DirectXError;
-    win32_t TextSize = 1 << 5;
-    wstring MyTradeMark = StatisticsText1;
-    MyTradeMark += L" v";
-    MyTradeMark += VersionString;
-    m_pRenderer->AddText(MyTradeMark, TextSize, 10, 8, 0xFF404040);
-    m_pRenderer->AddText(MyTradeMark, TextSize, 8, 6, 0xFFFFFFFF);
+    m_pRenderer->AddText(StatisticsText1 L" v" VersionString, 1 << 5, 16, 6, 0xFF404040);
+    m_pRenderer->AddText(StatisticsText1 L" v" VersionString, 1 << 5, 14, 4, 0xFFFFFFFF);
 
     // Present the backbuffer contents to the display
     if (FAILED(m_pRenderer->EndScene())) return DirectXError;
@@ -453,12 +449,8 @@ GameState::GameError SplashScreen::Render() {
     int B = (iColor >> 16) & 0xFF;
     if (FAILED(m_pRenderer->ClearAndBeginScene(D3DCOLOR_XRGB(R, G, B)))) return DirectXError;
     RenderNotes();
-    win32_t TextSize = 1 << 5;
-    wstring MyTradeMark = StatisticsText1;
-    MyTradeMark += L" v";
-    MyTradeMark += VersionString;
-    m_pRenderer->AddText(MyTradeMark, TextSize, 10, 8, 0xFF404040);
-    m_pRenderer->AddText(MyTradeMark, TextSize, 8, 6, 0xFFFFFFFF);
+    m_pRenderer->AddText(StatisticsText1 L" v" VersionString, 1 << 5, 16, 6, 0xFF404040);
+    m_pRenderer->AddText(StatisticsText1 L" v" VersionString, 1 << 5, 14, 4, 0xFFFFFFFF);
 
     // Present the backbuffer contents to the display
     if (FAILED(m_pRenderer->EndScene())) return DirectXError;
@@ -1994,7 +1986,7 @@ void MainScreen::RenderLines() {
 
 void MainScreen::RenderNotes() {
     sidx_t iStartPos = m_dNSpeed < 0 ? m_iStartPos - (m_iEndPos - m_iStartPos) + 1 : m_iStartPos;
-    sidx_t iEndPos = m_dNSpeed < 0 ? m_iEndPos - (m_iEndPos - m_iStartPos) : m_iEndPos;
+    sidx_t iEndPos = m_dNSpeed < 0 ? m_iEndPos - (m_iEndPos - m_iStartPos) - 1 : m_iEndPos;
 
     if (iStartPos < 0 || iEndPos >= m_vEvents.size()) return; // the note speed has been changed after processing these positions but before reaching here. 
 
@@ -2187,11 +2179,14 @@ void MainScreen::RenderKeys() {
             if (m_pNoteState[i] == -1)
             {
                 m_pRenderer->DrawRect(fCurX + fKeyGap1, fCurY, m_fWhiteCX - fKeyGap, fTopCY + fNearCY,
-                    m_csKBWhite.iDarkRGB, m_csKBWhite.iDarkRGB, m_csKBWhite.iPrimaryRGB, m_csKBWhite.iPrimaryRGB);
+                    m_csKBWhite.iDarkRGB, m_csKBWhite.iDarkRGB, m_csKBWhite.iPrimaryRGB, m_csKBWhite.iPrimaryRGB,
+                    fKeysY + (fKeysCY - fTransitionCY - fRedCY - fSpacerCY) / 2, m_fZoomX * m_fTempZoomX < 0);
                 m_pRenderer->DrawRect(fCurX + fKeyGap1, fCurY + fTopCY, m_fWhiteCX - fKeyGap, fNearCY,
-                    m_csKBWhite.iDarkRGB, m_csKBWhite.iDarkRGB, m_csKBWhite.iVeryDarkRGB, m_csKBWhite.iVeryDarkRGB);
+                    m_csKBWhite.iDarkRGB, m_csKBWhite.iDarkRGB, m_csKBWhite.iVeryDarkRGB, m_csKBWhite.iVeryDarkRGB,
+                    fKeysY + (fKeysCY - fTransitionCY - fRedCY - fSpacerCY) / 2, m_fZoomX * m_fTempZoomX < 0);
                 m_pRenderer->DrawRect(fCurX + fKeyGap1, fCurY + fTopCY, m_fWhiteCX - fKeyGap, 2.0f,
-                    m_csKBBackground.iDarkRGB, m_csKBBackground.iDarkRGB, m_csKBWhite.iVeryDarkRGB, m_csKBWhite.iVeryDarkRGB);
+                    m_csKBBackground.iDarkRGB, m_csKBBackground.iDarkRGB, m_csKBWhite.iVeryDarkRGB, m_csKBWhite.iVeryDarkRGB,
+                    fKeysY + (fKeysCY - fTransitionCY - fRedCY - fSpacerCY) / 2, m_fZoomX * m_fTempZoomX < 0);
             }
             else {
                 // Draw one layer of blank keys first
@@ -2220,8 +2215,10 @@ void MainScreen::RenderKeys() {
                         }
                     }
                     m_pRenderer->DrawRect(fCurX + fKeyGap1, fCurY, m_fWhiteCX - fKeyGap, fTopCY + fNearCY - 2.0f,
-                        csKBWhite.iDarkRGB, csKBWhite.iDarkRGB, csKBWhite.iPrimaryRGB, csKBWhite.iPrimaryRGB);
-                    m_pRenderer->DrawRect(fCurX + fKeyGap1, fCurY + fTopCY + fNearCY - 2.0f, m_fWhiteCX - fKeyGap, 2.0f, csKBWhite.iDarkRGB);
+                        csKBWhite.iDarkRGB, csKBWhite.iDarkRGB, csKBWhite.iPrimaryRGB, csKBWhite.iPrimaryRGB,
+                        fKeysY + (fKeysCY - fTransitionCY - fRedCY - fSpacerCY) / 2, m_fZoomX * m_fTempZoomX < 0);
+                    m_pRenderer->DrawRect(fCurX + fKeyGap1, fCurY + fTopCY + fNearCY - 2.0f, m_fWhiteCX - fKeyGap, 2.0f, csKBWhite.iDarkRGB,
+                        fKeysY + (fKeysCY - fTransitionCY - fRedCY - fSpacerCY) / 2, m_fZoomX * m_fTempZoomX < 0);
 
                     if (!layer1drawn) {
                         // Finished drawing blank keys
@@ -2238,7 +2235,8 @@ void MainScreen::RenderKeys() {
                 ;  //Expected statement? Fine, I'll give you a statement. Say hello to THE SEMICOLON! 
             }
             m_pRenderer->DrawRect(floor(fCurX + fKeyGap1 + m_fWhiteCX - fKeyGap + 0.5f), fCurY, fKeyGap, fTopCY + fNearCY,
-                m_csKBBackground.iVeryDarkRGB, m_csKBBackground.iPrimaryRGB, m_csKBBackground.iPrimaryRGB, m_csKBBackground.iVeryDarkRGB);
+                m_csKBBackground.iVeryDarkRGB, m_csKBBackground.iPrimaryRGB, m_csKBBackground.iPrimaryRGB, m_csKBBackground.iVeryDarkRGB,
+                fKeysY + (fKeysCY - fTransitionCY - fRedCY - fSpacerCY) / 2, m_fZoomX * m_fTempZoomX < 0);
 
             fCurX += m_fWhiteCX;
         }
@@ -2266,26 +2264,32 @@ void MainScreen::RenderKeys() {
                 m_pRenderer->DrawSkew(fSharpTopX1, fCurY + fSharpCY - fNearCY,
                     fSharpTopX2, fCurY + fSharpCY - fNearCY,
                     x + cx, fCurY + fSharpCY, x, fCurY + fSharpCY,
-                    m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iVeryDarkRGB, m_csKBSharp.iVeryDarkRGB);
+                    m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iVeryDarkRGB, m_csKBSharp.iVeryDarkRGB,
+                    fKeysY + (fKeysCY - fTransitionCY - fRedCY - fSpacerCY) / 2, m_fZoomX * m_fTempZoomX < 0);
                 m_pRenderer->DrawSkew(fSharpTopX1, fCurY - fNearCY,
                     fSharpTopX1, fCurY + fSharpCY - fNearCY,
                     x, fCurY + fSharpCY, x, fCurY,
-                    m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iVeryDarkRGB, m_csKBSharp.iVeryDarkRGB);
+                    m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iVeryDarkRGB, m_csKBSharp.iVeryDarkRGB,
+                    fKeysY + (fKeysCY - fTransitionCY - fRedCY - fSpacerCY) / 2, m_fZoomX * m_fTempZoomX < 0);
                 m_pRenderer->DrawSkew(fSharpTopX2, fCurY + fSharpCY - fNearCY,
                     fSharpTopX2, fCurY - fNearCY,
                     x + cx, fCurY, x + cx, fCurY + fSharpCY,
-                    m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iVeryDarkRGB, m_csKBSharp.iVeryDarkRGB);
-                m_pRenderer->DrawRect(fSharpTopX1, fCurY - fNearCY, fSharpTopX2 - fSharpTopX1, fSharpCY, m_csKBSharp.iVeryDarkRGB);
+                    m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iVeryDarkRGB, m_csKBSharp.iVeryDarkRGB,
+                    fKeysY + (fKeysCY - fTransitionCY - fRedCY - fSpacerCY) / 2, m_fZoomX * m_fTempZoomX < 0);
+                m_pRenderer->DrawRect(fSharpTopX1, fCurY - fNearCY, fSharpTopX2 - fSharpTopX1, fSharpCY, m_csKBSharp.iVeryDarkRGB,
+                    fKeysY + (fKeysCY - fTransitionCY - fRedCY - fSpacerCY) / 2, m_fZoomX* m_fTempZoomX < 0);
                 m_pRenderer->DrawSkew(fSharpTopX1, fCurY - fNearCY,
                     fSharpTopX2, fCurY - fNearCY,
                     fSharpTopX2, fCurY - fNearCY + fSharpCY * 0.45f,
                     fSharpTopX1, fCurY - fNearCY + fSharpCY * 0.35f,
-                    m_csKBSharp.iDarkRGB, m_csKBSharp.iDarkRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB);
+                    m_csKBSharp.iDarkRGB, m_csKBSharp.iDarkRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB,
+                    fKeysY + (fKeysCY - fTransitionCY - fRedCY - fSpacerCY) / 2, m_fZoomX* m_fTempZoomX < 0);
                 m_pRenderer->DrawSkew(fSharpTopX1, fCurY - fNearCY + fSharpCY * 0.35f,
                     fSharpTopX2, fCurY - fNearCY + fSharpCY * 0.45f,
                     fSharpTopX2, fCurY - fNearCY + fSharpCY * 0.65f,
                     fSharpTopX1, fCurY - fNearCY + fSharpCY * 0.55f,
-                    m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iVeryDarkRGB, m_csKBSharp.iVeryDarkRGB);
+                    m_csKBSharp.iPrimaryRGB, m_csKBSharp.iPrimaryRGB, m_csKBSharp.iVeryDarkRGB, m_csKBSharp.iVeryDarkRGB,
+                    fKeysY + (fKeysCY - fTransitionCY - fRedCY - fSpacerCY) / 2, m_fZoomX* m_fTempZoomX < 0);
             }
             else {
                 const float fNewNear = fNearCY * 0.25f;
@@ -2319,26 +2323,32 @@ void MainScreen::RenderKeys() {
                     m_pRenderer->DrawSkew(fSharpTopX1, fCurY + fSharpCY - fNewNear,
                         fSharpTopX2, fCurY + fSharpCY - fNewNear,
                         x + cx, fCurY + fSharpCY, x, fCurY + fSharpCY,
-                        csKBSharp.iPrimaryRGB, csKBSharp.iPrimaryRGB, csKBSharp.iDarkRGB, csKBSharp.iDarkRGB);
+                        csKBSharp.iPrimaryRGB, csKBSharp.iPrimaryRGB, csKBSharp.iDarkRGB, csKBSharp.iDarkRGB,
+                        fKeysY + (fKeysCY - fTransitionCY - fRedCY - fSpacerCY) / 2, m_fZoomX* m_fTempZoomX < 0);
                     m_pRenderer->DrawSkew(fSharpTopX1, fCurY - fNewNear,
                         fSharpTopX1, fCurY + fSharpCY - fNewNear,
                         x, fCurY + fSharpCY, x, fCurY,
-                        csKBSharp.iPrimaryRGB, csKBSharp.iPrimaryRGB, csKBSharp.iDarkRGB, csKBSharp.iDarkRGB);
+                        csKBSharp.iPrimaryRGB, csKBSharp.iPrimaryRGB, csKBSharp.iDarkRGB, csKBSharp.iDarkRGB,
+                        fKeysY + (fKeysCY - fTransitionCY - fRedCY - fSpacerCY) / 2, m_fZoomX* m_fTempZoomX < 0);
                     m_pRenderer->DrawSkew(fSharpTopX2, fCurY + fSharpCY - fNewNear,
                         fSharpTopX2, fCurY - fNewNear,
                         x + cx, fCurY, x + cx, fCurY + fSharpCY,
-                        csKBSharp.iPrimaryRGB, csKBSharp.iPrimaryRGB, csKBSharp.iDarkRGB, csKBSharp.iDarkRGB);
-                    m_pRenderer->DrawRect(fSharpTopX1, fCurY - fNewNear, fSharpTopX2 - fSharpTopX1, fSharpCY, csKBSharp.iDarkRGB);
+                        csKBSharp.iPrimaryRGB, csKBSharp.iPrimaryRGB, csKBSharp.iDarkRGB, csKBSharp.iDarkRGB,
+                        fKeysY + (fKeysCY - fTransitionCY - fRedCY - fSpacerCY) / 2, m_fZoomX* m_fTempZoomX < 0);
+                    m_pRenderer->DrawRect(fSharpTopX1, fCurY - fNewNear, fSharpTopX2 - fSharpTopX1, fSharpCY, csKBSharp.iDarkRGB,
+                        fKeysY + (fKeysCY - fTransitionCY - fRedCY - fSpacerCY) / 2, m_fZoomX* m_fTempZoomX < 0);
                     m_pRenderer->DrawSkew(fSharpTopX1, fCurY - fNewNear,
                         fSharpTopX2, fCurY - fNewNear,
                         fSharpTopX2, fCurY - fNewNear + fSharpCY * 0.35f,
                         fSharpTopX1, fCurY - fNewNear + fSharpCY * 0.25f,
-                        csKBSharp.iPrimaryRGB, csKBSharp.iPrimaryRGB, csKBSharp.iPrimaryRGB, csKBSharp.iPrimaryRGB);
+                        csKBSharp.iPrimaryRGB, csKBSharp.iPrimaryRGB, csKBSharp.iPrimaryRGB, csKBSharp.iPrimaryRGB,
+                        fKeysY + (fKeysCY - fTransitionCY - fRedCY - fSpacerCY) / 2, m_fZoomX * m_fTempZoomX < 0);
                     m_pRenderer->DrawSkew(fSharpTopX1, fCurY - fNewNear + fSharpCY * 0.25f,
                         fSharpTopX2, fCurY - fNewNear + fSharpCY * 0.35f,
                         fSharpTopX2, fCurY - fNewNear + fSharpCY * 0.75f,
                         fSharpTopX1, fCurY - fNewNear + fSharpCY * 0.65f,
-                        csKBSharp.iPrimaryRGB, csKBSharp.iPrimaryRGB, csKBSharp.iDarkRGB, csKBSharp.iDarkRGB);
+                        csKBSharp.iPrimaryRGB, csKBSharp.iPrimaryRGB, csKBSharp.iDarkRGB, csKBSharp.iDarkRGB,
+                        fKeysY + (fKeysCY - fTransitionCY - fRedCY - fSpacerCY) / 2, m_fZoomX * m_fTempZoomX < 0);
 
                     if (!layer1drawn) {
                         // Finished drawing blank keys
@@ -2392,12 +2402,9 @@ void MainScreen::RenderText() {
     }
 
     // Screen info
-    RECT rcStatus = { m_pRenderer->GetBufferWidth() - StatisticsWidth, 0, m_pRenderer->GetBufferWidth(), 16 * Lines + 10 };
-
-    LONG iMsgCY = 200;
-    RECT rcMsg = { 0, static_cast<LONG>(m_pRenderer->GetBufferHeight() * (1.0f - KBPercent) - iMsgCY) / 2 };
-    rcMsg.right = m_pRenderer->GetBufferWidth();
-    rcMsg.bottom = rcMsg.top + iMsgCY;
+    RECT rcStatus = { m_pRenderer->GetBufferWidth() - StatisticsWidth, 0, m_pRenderer->GetBufferWidth(), 16 * Lines + 8 };
+    RECT rcMsg = { max(0,min(m_pRenderer->GetBufferWidth(),static_cast<LONG>(m_fNotesX))), max(0,min(m_pRenderer->GetBufferHeight(),static_cast<LONG>(m_fNotesY))), max(0,min(m_pRenderer->GetBufferWidth(),static_cast<LONG>(m_fNotesCX + m_fNotesX))), max(0,min(m_pRenderer->GetBufferHeight(),static_cast<LONG>(m_fNotesCY + m_fNotesY))) };
+    RECT rcScr = { 0, 0, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight() };
 
     // Draw the text
     RenderStatus(&rcStatus);
@@ -2405,14 +2412,17 @@ void MainScreen::RenderText() {
         RenderMarker(m_sMarker.c_str());
     }
     if (m_bZoomMove) {
-        RenderMessage(&rcMsg, ZoomMoveMsg);
+        RenderMessage(&rcMsg, &rcScr, ZoomMoveMsg,'L');
     }
-    if (strlen(CheatEngineCaption) > 0) {
-        if (strlen(CheatEngineCaption) < sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0])) {
-            RenderMessage(&rcMsg, Utf8ToWString(CheatEngineCaption));
+    if (CheatEngineCaption[0] != 'C' && CheatEngineCaption[0] != 'L' && CheatEngineCaption[0] != 'R') {
+        CheatEngineCaption[0] = 'C';
+    }
+    if (strnlen(CheatEngineCaption, sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0])) > 1) {
+        if (strnlen(CheatEngineCaption, sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0])) < sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0])) {
+            RenderMessage(&rcMsg, &rcScr, Utf8ToWString(CaptionContent), CheatEngineCaption[0]);
         }
         else {
-            RenderMessage(&rcMsg, Utf8ToWString("The caption has exceeded the maximum acceptable length of " + to_string(sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0])) + " characters. \nAs a result, this caption has been blocked from showing in order to prevent crashing. \nPlease consider writing something slightly shorter. "));
+            RenderMessage(&rcMsg, &rcScr, Utf8ToWString("The caption has exceeded the maximum acceptable length of " + to_string(sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]) - 2) + " characters. \nAs a result, this caption has been blocked from showing in order to prevent crashing. \nPlease consider writing something slightly shorter. "),'L');
         }
     }
 }
@@ -2426,8 +2436,8 @@ void MainScreen::RenderStatusLine(unsigned char line, const wchar_t* left, const
     vswprintf_s(buf, _countof(buf), format, varargs);
     va_end(varargs);
 
-    win32_t TextY = 3 + line * 16;
-    win32_t LeftTextX = m_pRenderer->GetBufferWidth() - (StatisticsWidth - 5);
+    win32_t TextY = 2 + line * 16;
+    win32_t LeftTextX = m_pRenderer->GetBufferWidth() - (StatisticsWidth - 6);
     win32_t RightTextX = m_pRenderer->GetBufferWidth() - 6;
     m_pRenderer->AddText(left, 1 << 4, LeftTextX+2, TextY, 0x404040, ALIGN_LEFT | ALIGN_TOP);
     m_pRenderer->AddText(left, 1 << 4, LeftTextX, TextY-2, 0xFFFFFF, ALIGN_LEFT|ALIGN_TOP);
@@ -2459,30 +2469,32 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         m_pRenderer->AddGDIRect(prcStatus->left, prcStatus->top, prcStatus->right - prcStatus->left, prcStatus->bottom - prcStatus->top, 0x80000000);
     }
 
+    TotalTimeFormatted = to_string(TotalTime);
+    uint8_t Splits = 0;
+    for (signed short i = TotalTimeFormatted.length() - 3; Splits < 2 && i > 0; i -= 3, Splits++)
+        TotalTimeFormatted.insert(i, " ");
+
     llStartTimeFormatted = to_string(abs(m_llStartTime));
-    for (signed short i = llStartTimeFormatted.length() - 3; i > 0; i -= 3)
+    Splits = 0;
+    for (signed short i = llStartTimeFormatted.length() - 3; Splits < 2 && i > 0; i -= 3, Splits++)
         llStartTimeFormatted.insert(i, " ");
     if (m_llStartTime < 0)
         llStartTimeFormatted.insert(0, "-");
 
-    TotalTimeFormatted = to_string(TotalTime);
-    for (signed short i = TotalTimeFormatted.length() - 3; i > 0; i -= 3)
-        TotalTimeFormatted.insert(i, " ");
-
     polyphony = transform_reduce(begin(m_vState), end(m_vState), 0, plus<>(), [](const vector<sidx_t>& state) {return state.size(); });
-    polyFormatted = to_string(polyphony);
+    polyFormatted = to_wstring(polyphony);
     for (signed short i = polyFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
-        polyFormatted.insert(i, ",");
+        polyFormatted.insert(i, L",");
 
     nps = m_vNCTable[min(max(m_llStartTime / MS, 0LL), iMaxMS)] - m_vNCTable[min(max((m_llStartTime - S) / MS, 0LL), iMaxMS)];
-    npsFormatted = to_string(nps);
+    npsFormatted = to_wstring(nps);
     for (signed short i = npsFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
-        npsFormatted.insert(i, ",");
+        npsFormatted.insert(i, L",");
 
     passed = m_vNCTable[min(max(m_llStartTime / MS, 0LL), iMaxMS)];
-    passedFormatted = to_string(passed);
+    passedFormatted = to_wstring(passed);
     for (signed short i = passedFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
-        passedFormatted.insert(i, ",");
+        passedFormatted.insert(i, L",");
 
     RenderStatusLine(cur_line++, StatisticsText1, L"%s", L"v" VersionString);
     RenderStatusLine(cur_line++, StatisticsText2, L"");
@@ -2493,7 +2505,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         tmin, tsec, tcs);
     if (!(m_MIDI.GetInfo().iDivision & 0x8000)) RenderStatusLine(cur_line++, StatisticsText4, L"%d/%d", m_iStartTick, resolution);
     if (cVideo.bDebug) {
-        RenderStatusLine(cur_line++, StatisticsText5, L"%s", Utf8ToWString(llStartTimeFormatted).c_str());
+        RenderStatusLine(cur_line++, StatisticsText5, L"%d", m_llStartTime);
     }
     if (!cControls.bDumpFrames) {
         RenderStatusLine(cur_line++, StatisticsText6, L"%.2lf", m_dFPS);
@@ -2512,17 +2524,17 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         RenderStatusLine(cur_line++, StatisticsText7, L"%.3lf BPM", tempo);
     }
     if (cControls.bPhigros) {
-        RenderStatusLine(cur_line++, StatisticsText8, L"%s", Utf8ToWString(passedFormatted).c_str());
-        RenderStatusLine(cur_line++, StatisticsText9, L"%s", Utf8ToWString(npsFormatted).c_str());
-        RenderStatusLine(cur_line++, StatisticsText10, L"%s", Utf8ToWString(polyFormatted).c_str());
+        RenderStatusLine(cur_line++, StatisticsText8, L"%s", passedFormatted.c_str());
+        RenderStatusLine(cur_line++, StatisticsText9, L"%s", npsFormatted.c_str());
+        RenderStatusLine(cur_line++, StatisticsText10, L"%s", polyFormatted.c_str());
     }
     else {
-        RenderStatusLine(cur_line++, StatisticsText11, L"%s", Utf8ToWString(passedFormatted).c_str());
-        RenderStatusLine(cur_line++, StatisticsText12, L"%s", Utf8ToWString(npsFormatted).c_str());
-        RenderStatusLine(cur_line++, StatisticsText13, L"%s", Utf8ToWString(polyFormatted).c_str());
+        RenderStatusLine(cur_line++, StatisticsText11, L"%s", passedFormatted.c_str());
+        RenderStatusLine(cur_line++, StatisticsText12, L"%s", npsFormatted.c_str());
+        RenderStatusLine(cur_line++, StatisticsText13, L"%s", polyFormatted.c_str());
     }
     if (cVideo.bDebug) {
-        RenderStatusLine(cur_line++, StatisticsText14, L"%lld", m_pRenderer->GetRenderedNotesCount());
+        RenderStatusLine(cur_line++, StatisticsText14, L"%d", m_pRenderer->GetRenderedNotesCount());
         if (m_bMute) {
             RenderStatusLine(cur_line++, StatisticsText15, L"%s", StatisticsText16);
         }
@@ -2578,248 +2590,301 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
             RenderStatusLine(cur_line++, StatisticsText32, L"");
         }
     }
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    COORD pos;
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
-    uint8_t line;
-    GetConsoleScreenBufferInfo(hConsole, &csbi);
-    if (FrameCount % (1 << 4) == 0) {
+    if (IsWindowVisible(GetConsoleWindow()) && !IsIconic(GetConsoleWindow()) && (FrameCount & 0x0F) == 0) {
+        HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+        COORD pos;
+        CONSOLE_SCREEN_BUFFER_INFO csbi;
+        uint8_t line;
+        GetConsoleScreenBufferInfo(hConsole, &csbi);
         line = 0;
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         pos.X = 0;
         pos.Y = line; line++;
-        SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
         SetConsoleCursorPosition(hConsole, pos);
         cout << "  "; for (uint8_t i = 0; i < (csbi.dwSize.X - (1 << 4)) / 2; i++) cout << "="; cout << " Debug Info "; for (uint8_t i = 0; i < (csbi.dwSize.X - (1 << 4)) / 2; i++) cout << "="; cout << "  ";
+        pos.X = csbi.dwSize.X-1;
+        SetConsoleCursorPosition(hConsole, pos);
+        cout << "\n";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    SongLength: " << TotalTimeFormatted << " (" << IntSizeToCE(sizeof(TotalTime)) << " +" + GetAddress(TotalTime) + ")[Read Only]";
+        cout << "    SongLength: " + TotalTimeFormatted + " (" + IntSizeToCE(sizeof(TotalTime)) + " +" + GetAddress(TotalTime) + ")[Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Microseconds: " << llStartTimeFormatted << " (" << IntSizeToCE(sizeof(m_llStartTime)) << " +" + GetAddress(m_llStartTime) + ") [Read / Write]";
+        cout << "    Microseconds: " + llStartTimeFormatted + " (" + IntSizeToCE(sizeof(m_llStartTime)) + " +" + GetAddress(m_llStartTime) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Ticks: " << m_iStartTick << " (" << IntSizeToCE(sizeof(m_iStartTick)) << " +" + GetAddress(m_iStartTick) + ")[Read Only]";
+        cout << "    Ticks: " + to_string(m_iStartTick) + " (" + IntSizeToCE(sizeof(m_iStartTick)) + " +" + GetAddress(m_iStartTick) + ")[Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Resolution: " << resolution << " (" << IntSizeToCE(sizeof(resolution)) << " +" + GetAddress(resolution) + ") [Read Only]";
+        cout << "    Resolution: " + to_string(resolution) + " (" + IntSizeToCE(sizeof(resolution)) + " +" + GetAddress(resolution) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    NoteCount: " << TotalNC << " (" << IntSizeToCE(sizeof(TotalNC)) << " +" + GetAddress(TotalNC) + ") [Read Only]";
+        cout << "    NoteCount: " + to_string(TotalNC) + " (" + IntSizeToCE(sizeof(TotalNC)) + " +" + GetAddress(TotalNC) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    NotesPerSecond: " << nps << " (" << IntSizeToCE(sizeof(nps)) << " +" + GetAddress(nps) + ") [Read Only]";
+        cout << "    NotesPerSecond: " + to_string(nps) + " (" + IntSizeToCE(sizeof(nps)) + " +" + GetAddress(nps) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Polyphony: " << polyphony << " (" << IntSizeToCE(sizeof(polyphony)) << " +" + GetAddress(polyphony) + ") [Read Only]";
+        cout << "    Polyphony: " + to_string(polyphony) + " (" + IntSizeToCE(sizeof(polyphony)) + " +" + GetAddress(polyphony) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Passed: " << passed << " (" << IntSizeToCE(sizeof(passed)) << " +" + GetAddress(passed) + ") [Read Only]";
+        cout << "    Passed: " + to_string(passed) + " (" + IntSizeToCE(sizeof(passed)) + " +" + GetAddress(passed) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Volume: " << cPlayback.GetVolume() << " (" << FloatSizeToCE(cPlayback.GetVolumeSize()) << " +" + cPlayback.GetVolumeAddress() + ") [Read / Write]";
+        cout << "    Volume: " + to_string(cPlayback.GetVolume()) + " (" + FloatSizeToCE(cPlayback.GetVolumeSize()) + " +" + cPlayback.GetVolumeAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Mute: " << cPlayback.GetMute() << " (" << IntSizeToCE(cPlayback.GetMuteSize()) << " +" + cPlayback.GetMuteAddress() + ") [Read / Write]";
+        cout << "    Mute: " + to_string(cPlayback.GetMute()) + " (" + IntSizeToCE(cPlayback.GetMuteSize()) + " +" + cPlayback.GetMuteAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    PlaybackSpeed: " << cPlayback.GetSpeed() << " (" << FloatSizeToCE(cPlayback.GetSpeedSize()) << " +" + cPlayback.GetSpeedAddress() + ") [Read / Write]";
+        cout << "    PlaybackSpeed: " + to_string(cPlayback.GetSpeed()) + " (" + FloatSizeToCE(cPlayback.GetSpeedSize()) + " +" + cPlayback.GetSpeedAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    NoteSpeed: " << cPlayback.GetNSpeed() << " (" << FloatSizeToCE(cPlayback.GetNSpeedSize()) << " +" + cPlayback.GetNSpeedAddress() + ") [Read / Write]";
+        cout << "    NoteSpeed: " + to_string(cPlayback.GetNSpeed()) + " (" + FloatSizeToCE(cPlayback.GetNSpeedSize()) + " +" + cPlayback.GetNSpeedAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    OffsetX: " << cView.GetOffsetX() << " (" << FloatSizeToCE(cView.GetOffsetXSize()) << " +" + cView.GetOffsetXAddress() + ") [Read / Write]";
+        cout << "    OffsetX: " + to_string(cView.GetOffsetX()) + " (" + FloatSizeToCE(cView.GetOffsetXSize()) + " +" + cView.GetOffsetXAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    OffsetY: " << cView.GetOffsetY() << " (" << FloatSizeToCE(cView.GetOffsetYSize()) << " +" + cView.GetOffsetYAddress() + ") [Read / Write]";
+        cout << "    OffsetY: " + to_string(cView.GetOffsetY()) + " (" + FloatSizeToCE(cView.GetOffsetYSize()) + " +" + cView.GetOffsetYAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Zoom: " << cView.GetZoomX() << " (" << FloatSizeToCE(cView.GetZoomXSize()) << " +" + cView.GetZoomXAddress() + ") [Read / Write]";
+        cout << "    Zoom: " + to_string(cView.GetZoomX()) + " (" + FloatSizeToCE(cView.GetZoomXSize()) + " +" + cView.GetZoomXAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    SameWidthNotes: " << cVideo.bSameWidth << " (" << IntSizeToCE(sizeof(cVideo.bSameWidth)) << " +" + GetAddress(cVideo.bSameWidth) + ") [Read / Write]";
+        cout << "    SameWidthNotes: " + to_string(cVideo.bSameWidth) + " (" + IntSizeToCE(sizeof(cVideo.bSameWidth)) + " +" + GetAddress(cVideo.bSameWidth) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    NoteVelocityMapping: " << cVideo.bMapVel << " (" << IntSizeToCE(sizeof(cVideo.bMapVel)) << " +" + GetAddress(cVideo.bMapVel) + ") [Read / Write]";
+        cout << "    NoteVelocityMapping: " + to_string(cVideo.bMapVel) + " (" + IntSizeToCE(sizeof(cVideo.bMapVel)) + " +" + GetAddress(cVideo.bMapVel) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    KeyRange: " << static_cast<short>(cVisual.iFirstKey) << "~" << static_cast<short>(cVisual.iLastKey) << " (" << IntSizeToCE(sizeof(cVisual.iFirstKey)) << " +" + GetAddress(cVisual.iFirstKey) + " ~ " << IntSizeToCE(sizeof(cVisual.iLastKey)) << " +" + GetAddress(cVisual.iLastKey) + ") [Read / Write]";
+        cout << "    KeyRange: " + to_string(cVisual.iFirstKey) + "~" + to_string(cVisual.iLastKey) + " (" + IntSizeToCE(sizeof(cVisual.iFirstKey)) + " +" + GetAddress(cVisual.iFirstKey) + " ~ " + IntSizeToCE(sizeof(cVisual.iLastKey)) + " +" + GetAddress(cVisual.iLastKey) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    KeyMode: " << static_cast<short>(cVisual.eKeysShown) << " (" << IntSizeToCE(sizeof(cVisual.eKeysShown)) << " +" + GetAddress(cVisual.eKeysShown) + ") [Read / Write]";
+        cout << "    KeyMode: " + to_string(cVisual.eKeysShown) + " (" + IntSizeToCE(sizeof(cVisual.eKeysShown)) + " +" + GetAddress(cVisual.eKeysShown) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    WindowSize: " << width << "*" << height << " (" << IntSizeToCE(sizeof(width)) << " +" + GetAddress(width) + " * " << IntSizeToCE(sizeof(height)) << " +" + GetAddress(height) + ") [Read Only]";
+        cout << "    WindowSize: " + to_string(width) + "*" + to_string(height) + " (" + IntSizeToCE(sizeof(width)) + " +" + GetAddress(width) + " * " + IntSizeToCE(sizeof(height)) + " +" + GetAddress(height) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Paused: " << cPlayback.GetPaused() << " (" << IntSizeToCE(cPlayback.GetPausedSize()) << " +" + cPlayback.GetPausedAddress() + ") [Read / Write]";
+        cout << "    Paused: " + to_string(cPlayback.GetPaused()) + " (" + IntSizeToCE(cPlayback.GetPausedSize()) + " +" + cPlayback.GetPausedAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Keyboard: " << cView.GetKeyboard() << " (" << IntSizeToCE(cView.GetKeyboardVarSize()) << " +" + cView.GetKeyboardAddress() + ") [Read / Write]";
+        cout << "    Keyboard: " + to_string(cView.GetKeyboard()) + " (" + IntSizeToCE(cView.GetKeyboardVarSize()) + " +" + cView.GetKeyboardAddress() + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    VisualizePitchBends: " << cVideo.bVisualizePitchBends << " (" << IntSizeToCE(sizeof(cVideo.bVisualizePitchBends)) << " +" + GetAddress(cVideo.bVisualizePitchBends) + ")[Read / Write]";
+        cout << "    VisualizePitchBends: " + to_string(cVideo.bVisualizePitchBends) + " (" + IntSizeToCE(sizeof(cVideo.bVisualizePitchBends)) + " +" + GetAddress(cVideo.bVisualizePitchBends) + ")[Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    PhigrosMode: " << cControls.bPhigros << " (" << IntSizeToCE(sizeof(cControls.bPhigros)) << " +" + GetAddress(cControls.bPhigros) + ") [Read / Write]";
+        cout << "    PhigrosMode: " + to_string(cControls.bPhigros) + " (" + IntSizeToCE(sizeof(cControls.bPhigros)) + " +" + GetAddress(cControls.bPhigros) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    ShowMarkers: " << cVideo.bShowMarkers << " (" << IntSizeToCE(sizeof(cVideo.bShowMarkers)) << " +" + GetAddress(cVideo.bShowMarkers) + ") [Read / Write]";
+        cout << "    ShowMarkers: " + to_string(cVideo.bShowMarkers) + " (" + IntSizeToCE(sizeof(cVideo.bShowMarkers)) + " +" + GetAddress(cVideo.bShowMarkers) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    TickBased: " << cVideo.bTickBased << " (" << IntSizeToCE(sizeof(cVideo.bTickBased)) << " +" + GetAddress(cVideo.bTickBased) + ") [Read / Write]";
+        cout << "    TickBased: " + to_string(cVideo.bTickBased) + " (" + IntSizeToCE(sizeof(cVideo.bTickBased)) + " +" + GetAddress(cVideo.bTickBased) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    HideStatistics: " << cVideo.bDisableUI << " (" << IntSizeToCE(sizeof(cVideo.bDisableUI)) << " +" + GetAddress(cVideo.bDisableUI) + ") [Read / Write]";
+        cout << "    HideStatistics: " + to_string(cVideo.bDisableUI) + " (" + IntSizeToCE(sizeof(cVideo.bDisableUI)) + " +" + GetAddress(cVideo.bDisableUI) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    RemoveOverlaps: " << cVideo.bOR << " (" << IntSizeToCE(sizeof(cVideo.bOR)) << " +" + GetAddress(cVideo.bOR) + ") [Read / Write]";
+        cout << "    RemoveOverlaps: " + to_string(cVideo.bOR) + " (" + IntSizeToCE(sizeof(cVideo.bOR)) + " +" + GetAddress(cVideo.bOR) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    LimitFPS: " << m_pRenderer->GetLimitFPS() << " (" << IntSizeToCE(sizeof(cVideo.bLimitFPS)) << " +" + GetAddress(cVideo.bLimitFPS) + ") [Read / Write]";
+        cout << "    LimitFPS: " + to_string(m_pRenderer->GetLimitFPS()) + " (" + IntSizeToCE(sizeof(cVideo.bLimitFPS)) + " +" + GetAddress(cVideo.bLimitFPS) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    VelocityThreshold: " << static_cast<short>(cControls.iVelocityThreshold & 0x7F) << " (" << IntSizeToCE(sizeof(cControls.iVelocityThreshold)) << " +" + GetAddress(cControls.iVelocityThreshold) + ") [Read / Write]";
+        cout << "    VelocityThreshold: " + to_string(cControls.iVelocityThreshold & 0x7F) + " (" + IntSizeToCE(sizeof(cControls.iVelocityThreshold)) + " +" + GetAddress(cControls.iVelocityThreshold) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Caption: \"" << (strlen(CheatEngineCaption) < sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]) ? CheatEngineCaption : "MAXIMUM LENGTH EXCEEDED! ") << "\" (String[" << sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]) << "] +" + GetAddress(CheatEngineCaption) + ") [Read / Write]";
+        cout << "    Caption: \"" + string(strlen(CheatEngineCaption) < sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]) ? CaptionContent : "MAXIMUM LENGTH EXCEEDED! ") + "\" (String[" + to_string(sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0])-1) + "] +" + GetAddress(CheatEngineCaption[1]) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    DifficultyText: \"" << (strlen(Difficulty) < sizeof(Difficulty) / sizeof(Difficulty[0]) ? Difficulty : "MAXIMUM LENGTH EXCEEDED! ") << "\" (String[" << sizeof(Difficulty) / sizeof(Difficulty[0]) << "] +" + GetAddress(Difficulty) + ") [Read / Write]";
+        cout << "    CaptionAlignment: '" + string(1,CheatEngineCaption[0]) + "' (String[1] +" + GetAddress(CheatEngineCaption) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X, ' ');
+        cout << string(csbi.dwSize.X-1, ' ') << "\n";
+        SetConsoleCursorPosition(hConsole, pos);
+        cout << "    DifficultyText: \"" + string(strlen(Difficulty) < sizeof(Difficulty) / sizeof(Difficulty[0]) ? Difficulty : "MAXIMUM LENGTH EXCEEDED! ") + "\" (String[" + to_string(sizeof(Difficulty) / sizeof(Difficulty[0])) + "] +" + GetAddress(Difficulty) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
-        cout << string(csbi.dwSize.X - 1, ' ');
+        cout << string(csbi.dwSize.X-1, ' ');
+        pos.X = 0;
+        pos.Y = 0;
+        SetConsoleCursorPosition(hConsole, pos);
+        SMALL_RECT windowSize;
+        windowSize.Left = 0;
+        windowSize.Top = 0;
+        windowSize.Right = csbi.dwSize.X - 1;
+        windowSize.Bottom = line - 1;
+        COORD bufferSize;
+        bufferSize.X = csbi.dwSize.X;
+        bufferSize.Y = line;
+        SetConsoleWindowInfo(GetStdHandle(STD_OUTPUT_HANDLE), TRUE, &windowSize);
+        SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), bufferSize);
     }
-    pos.X = 0;
-    pos.Y = 0;
-    SetConsoleCursorPosition(hConsole, pos);
-    SMALL_RECT windowSize;
-    windowSize.Left = 0;
-    windowSize.Top = 0;
-    windowSize.Right = csbi.dwSize.X - 1;
-    windowSize.Bottom = line - 1;
-    COORD bufferSize;
-    bufferSize.X = csbi.dwSize.X;
-    bufferSize.Y = max(line, csbi.dwSize.Y);
-    SetConsoleWindowInfo(GetStdHandle(STD_OUTPUT_HANDLE), TRUE, &windowSize);
-    SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), bufferSize);
     FrameCount++;
 }
 
 void MainScreen::RenderMarker(const wstring& str) {
-    m_pRenderer->AddText(str, (1 << 4) + (1 << 2), 6, 3, 0xFF404040, ALIGN_LEFT | ALIGN_TOP, 6, 3, 0x80000000);
-    m_pRenderer->AddText(str, (1 << 4) + (1 << 2), 6-2, 3-2, 0xFFFFFFFF, ALIGN_LEFT | ALIGN_TOP);
+    m_pRenderer->AddText(str, (1 << 4) + (1 << 2), 5, 1, 0xFF404040, ALIGN_LEFT | ALIGN_TOP, -1, -1 ,4, 0, 0x80000000);
+    m_pRenderer->AddText(str, (1 << 4) + (1 << 2), 3, -1, 0xFFFFFFFF, ALIGN_LEFT | ALIGN_TOP);
 }
 
-void MainScreen::RenderMessage(LPRECT prcMsg, const wstring& sMsg) {
+void MainScreen::RenderMessage(LPRECT prcMsg, LPRECT prcScr, const wstring& sMsg, char lnAlign) {
+    vector<wstring> Lines;
+    {
+        size_t s = 0;
+        while (s <= sMsg.size()) {
+            size_t e = sMsg.find(L'\n', s);
+            if (e == wstring::npos) e = sMsg.size();
+            Lines.push_back(sMsg.substr(s, e - s));
+            s = e + 1;
+        }
+    }
+    const win32_t RectW = (prcMsg->right - prcMsg->left + 3 * (prcScr->right - prcScr->left)) / 4;
+    const win32_t RectH = (prcMsg->bottom - prcMsg->top + 3 * (prcScr->bottom - prcScr->top)) / 4;
+    const win32_t CenterX = (prcMsg->left + prcMsg->right + 3 * (prcScr->left + prcScr->right)) / 8;
+    const win32_t CenterY = (prcMsg->top + prcMsg->bottom + 3 * (prcScr->top + prcScr->bottom)) / 8;
+    const win32_t PadX = 6, PadY = 3;
+    auto MeasureBlock = [&](uint16_t Size, win32_t& W, win32_t& H) {
+        W = 0; H = 0;
+        for (auto& Line : Lines) {
+            SIZE LineSize = m_pRenderer->CalcTextSize(Line.empty() ? L" " : Line, Size);
+            W = max(W, LineSize.cx);
+            H += LineSize.cy;
+        }
+    };
     uint16_t fontsize = (1 << 5) - (1 << 2);
-    while ((m_pRenderer->CalcTextSize(sMsg, fontsize).cx >= prcMsg->right - prcMsg->left || m_pRenderer->CalcTextSize(sMsg, fontsize).cy >= prcMsg->bottom - prcMsg->top) && fontsize > (1 << 3)) { fontsize--; }
-    m_pRenderer->AddText(sMsg, fontsize, (prcMsg->right - prcMsg->left)/2 + prcMsg->left, (prcMsg->bottom - prcMsg->top)/2 + prcMsg->top, 0xFF404040, ALIGN_CENTER | ALIGN_MIDDLE, 6, 3, 0x80000000);
-    m_pRenderer->AddText(sMsg, fontsize, (prcMsg->right - prcMsg->left) / 2 + prcMsg->left-2, (prcMsg->bottom - prcMsg->top) / 2 + prcMsg->top-2, 0xFFFFFFFF, ALIGN_CENTER | ALIGN_MIDDLE);
+    win32_t BlockW, BlockH;
+    MeasureBlock(fontsize, BlockW, BlockH);
+    while ((BlockW >= RectW || BlockH >= RectH) && fontsize > (1 << 3)) {
+        fontsize--; 
+        MeasureBlock(fontsize, BlockW, BlockH);
+    }
+    m_pRenderer->AddGDIRect(CenterX - BlockW / 2 - PadX, CenterY - BlockH / 2 - PadY, BlockW + 2 * PadX, BlockH + 2 * PadY, 0x80000000);
+    win32_t CurX = CenterX;
+    win32_t CurY = CenterY - BlockH / 2;
+    DWORD Alignment = ALIGN_CENTER | ALIGN_TOP;
+    if (lnAlign == 'C') {
+        CurX = CenterX;
+        Alignment = ALIGN_CENTER | ALIGN_TOP;
+    }
+    if (lnAlign == 'L') {
+        CurX = CenterX - BlockW / 2;
+        Alignment = ALIGN_LEFT | ALIGN_TOP;
+    }
+    if (lnAlign == 'R') {
+        CurX = CenterX + BlockW / 2;
+        Alignment = ALIGN_RIGHT | ALIGN_TOP;
+    }
+    for (auto& Line : Lines) {
+        SIZE LineSize = m_pRenderer->CalcTextSize(Line.empty() ? L" " : Line, fontsize);
+        if (!Line.empty()) {
+            m_pRenderer->AddText(Line, fontsize, CurX + 2, CurY + 1, 0xFF404040, Alignment);
+            m_pRenderer->AddText(Line, fontsize, CurX, CurY, 0xFFFFFFFF, Alignment);
+        }
+        CurY += LineSize.cy;
+    }
 }
