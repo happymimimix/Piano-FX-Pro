@@ -1265,8 +1265,8 @@ GameState::GameError MainScreen::Logic() {
         goto AdvanceEnd;
         DoneAdvance:
         m_iEndPos += (m_iStartPos - m_iEndPos) * 2;
-        m_iPrevStartPos = m_iStartPos;
     }
+    m_iPrevStartPos = m_iStartPos;
 
     AdvanceIterators(m_llStartTime, false);
 
