@@ -5,20 +5,11 @@
 #define MainWindowTitle4 L"Now rendering: "
 #define MainWindowTitle5 L"None"
 #define MainWindowTitle6 L"Splash MIDI"
-#ifdef SOFTWARE_RENDER_ONLY
-#define MainWindowTitle7 L"  (Enforced Software Rendering)"
-#else
-#define MainWindowTitle7 L""
-#endif
+#define MainWindowTitle7 L"(Software Rendering)"
 #ifdef LIMIT_COLORS
-#define MainWindowTitle8 L"  (Limited Track Coloring)"
+#define MainWindowTitle8 L"(Limited Track Coloring)"
 #else
 #define MainWindowTitle8 L""
-#endif
-#ifdef OPENGL_MODE
-#define MainWindowTitle9 L"  (WineD3D Wrapped)"
-#else
-#define MainWindowTitle9 L""
 #endif
 #define WelcomeText L"Welcome to Piano-FX Pro"
 #define StartupStage1Text L"Preparing..."

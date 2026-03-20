@@ -189,7 +189,7 @@ bool TSQueue<T>::Pop(T& tElement)
     return true;
 }
 
-inline wstring Utf8ToWString(const string& u8str)
+__forceinline wstring Utf8ToWString(const string& u8str)
 {
     if (u8str.empty()) return {};
 
@@ -215,7 +215,7 @@ inline wstring Utf8ToWString(const string& u8str)
     return result;
 }
 
-inline string WStringToUtf8(const wstring& wstr)
+__forceinline string WStringToUtf8(const wstring& wstr)
 {
     if (wstr.empty()) return {};
 
@@ -243,4 +243,52 @@ inline string WStringToUtf8(const wstring& wstr)
     );
 
     return result;
+}
+
+struct NoteColor
+{
+    color_t iPrimaryRGB, iDarkRGB, iVeryDarkRGB;
+};
+
+__forceinline uint64_t Div255_64(uint64_t Input, uint64_t AddPattern, uint64_t LaneMask) {
+    return ((Input + AddPattern) + (((Input + AddPattern) >> 8) & LaneMask)) >> 8;
+}
+
+__forceinline uint32_t Div255_32(uint32_t Input, uint32_t AddPattern, uint32_t LaneMask) {
+    return ((Input + AddPattern) + (((Input + AddPattern) >> 8) & LaneMask)) >> 8;
+}
+
+__forceinline void BlendNoteColor(NoteColor* Dst, NoteColor* Src) {
+    uint8_t InvertAlpha = (Src->iPrimaryRGB >> 24) & 0xFF;
+    if (InvertAlpha == 0xFF) { return; }
+    else if (InvertAlpha == 0x00) {
+        memcpy(Dst, Src, sizeof(NoteColor));
+        return;
+    }
+    uint8_t Alpha = InvertAlpha ^ 0xFF;
+    uint64_t* P64Src = reinterpret_cast<uint64_t*>(Src);
+    uint64_t* P64Dst = reinterpret_cast<uint64_t*>(Dst);
+    static constexpr uint64_t MASK01 = 0x00FF00FF00FF00FF;
+    static constexpr uint64_t PLUS01 = 0x0080008000800080;
+    static constexpr uint64_t MASK02 = 0x0000FF000000FF00;
+    static constexpr uint64_t PLUS02 = 0x0000800080008000;
+    static constexpr uint32_t MASK03 = 0xFF000000;
+    static constexpr uint32_t MASK04 = 0x00FF00FF;
+    static constexpr uint32_t PLUS04 = 0x00800080;
+    static constexpr uint64_t MASK05 = 0x0000FF00FF00FF00;
+    uint64_t sRPBPRDBD = *P64Src & MASK01;
+    uint64_t sGPGVGD = *P64Src & MASK02;
+    uint32_t* P32Src = reinterpret_cast<uint32_t*>(reinterpret_cast<uint8_t*>(P64Src) + 6);
+    sGPGVGD |= *P32Src & MASK03;
+    uint32_t sRVBV = Src->iVeryDarkRGB & MASK04;
+    uint64_t dRPBPRDBD = *P64Dst & MASK01;
+    uint64_t dGPGVGD = *P64Dst & MASK02;
+    uint32_t* P32Dst = reinterpret_cast<uint32_t*>(reinterpret_cast<uint8_t*>(P64Dst) + 6);
+    dGPGVGD |= *P32Dst & MASK03;
+    uint32_t dRVBV = Dst->iVeryDarkRGB & MASK04;
+    *P64Dst = Div255_64(sRPBPRDBD * Alpha + dRPBPRDBD * InvertAlpha, PLUS01, MASK01) & MASK01;
+    uint64_t Tmp02 = Div255_64(sGPGVGD * Alpha + dGPGVGD * InvertAlpha, PLUS02, MASK05) & MASK05;
+    *P64Dst |= Tmp02 & MASK02;
+    Dst->iVeryDarkRGB = Div255_32(sRVBV * Alpha + dRVBV * InvertAlpha, PLUS04, MASK04) & MASK04;
+    Dst->iVeryDarkRGB |= static_cast<uint32_t>((Tmp02 >> 16) & 0x0000FF00);
 }

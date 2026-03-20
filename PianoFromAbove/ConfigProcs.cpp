@@ -17,7 +17,7 @@
 #include "MainProcs.h"
 #include "Globals.h"
 #include "resource.h"
-#include "LanguagePacks.hpp"
+#include "PackWrapper.hpp"
 #include "GameState.h"
 #include <Fonts.h>
 #include <imguiCompressedFont2GDI.h>

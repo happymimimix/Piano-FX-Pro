@@ -84,8 +84,16 @@ constexpr unsigned long MaxChannelColors = 1<<4; //Theoretic maximum number of c
 
 class Renderer11 {
 public:
-    Renderer11();
-    ~Renderer11();
+    Renderer11() {
+        if (RendererActive) {
+            MessageBoxW(NULL, L"Multiple renderer instance is active at once! Unexpected behaviors may occur.", L"D3D11 Error", MB_OK);
+        }
+        RendererActive = true;
+    }
+    ~Renderer11() {
+        imguiClearFontCache();
+        RendererActive = false;
+    }
 
     tuple<HRESULT, const char*> Init(HWND hWnd, bool bLimitFPS);
     HRESULT ResetDeviceIfNeeded();
@@ -140,7 +148,6 @@ private:
 
     HWND m_hWnd = NULL;
     ComPtr<IDXGIFactory1> m_pFactory;
-    ComPtr<IDXGIAdapter1> m_pAdapter;
     ComPtr<ID3D11Device> m_pDevice;
     ComPtr<ID3D11DeviceContext> m_pContext;
     ComPtr<IDXGISwapChain> m_pSwapChain;

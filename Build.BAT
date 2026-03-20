@@ -22,8 +22,6 @@ copy .\Release\Piano-FX-Pro.exe .\Piano-FX-Pro.exe /v /y
 copy .\Release\Piano-FX-Pro-EnforcedSoftwareRendering.exe .\Piano-FX-Pro-EnforcedSoftwareRendering.exe /v /y
 "%~dp1msbuild.exe" .\Piano-FX-Pro.sln -t:Rebuild -p:Configuration=LimitedColor /p:Platform=x64
 copy .\Release\Piano-FX-Pro-LimitedTrackColoring.exe .\Piano-FX-Pro-LimitedTrackColoring.exe /v /y
-"%~dp1msbuild.exe" .\Piano-FX-Pro.sln -t:Rebuild -p:Configuration=OpenGL /p:Platform=x64
-copy .\Release\Piano-FX-Pro-WineHQ.exe .\Piano-FX-Pro-WineHQ.exe /v /y
 "%~dp1msbuild.exe" .\Piano-FX-Pro.sln -t:Rebuild -p:Configuration=Chinese /p:Platform=x64
 copy .\Release\Piano-FX-Pro-CHN.exe .\Piano-FX-Pro-CHN.exe /v /y
 "%~dp1msbuild.exe" .\Piano-FX-Pro.sln -t:Rebuild -p:Configuration=Japanese /p:Platform=x64

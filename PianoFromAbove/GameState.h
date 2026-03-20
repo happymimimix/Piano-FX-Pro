@@ -34,7 +34,7 @@ inline idx_t TotalNC;
 inline win32_t width = -1;
 inline win32_t height = -1;
 inline uint16_t resolution = -1;
-inline char CheatEngineCaption[1 << 19] = {'C'};
+inline char CheatEngineCaption[1 << 19] = { 'C' };
 inline char* CaptionContent = CheatEngineCaption + 1;
 inline mms_t TotalTime;
 inline string TotalTimeFormatted;
@@ -48,7 +48,6 @@ inline bool CE_DoNextTick = false;
 inline bool CE_Responded = false;
 
 inline HRESULT GetGDI(HWND hGDI, win32_t W, win32_t H, char* Output) {
-#ifndef OPENGL_MODE
     if (!hGDI) return E_FAIL;
     HDC GDIdc = GetDC(hGDI);
     BITMAPINFO BMPinfo = {};
@@ -70,16 +69,13 @@ inline HRESULT GetGDI(HWND hGDI, win32_t W, win32_t H, char* Output) {
     DeleteObject(BMP);
     ReleaseDC(hGDI, GDIdc);
     return S_OK;
-#else
-    return E_NOTIMPL;
-#endif
 }
 
 //Abstract base class
 class GameState
 {
 public:
-    enum GameError : uint8_t { Success = 0, BadPointer, OutOfMemory, DirectXError};
+    enum GameError : uint8_t { Success = 0, BadPointer, OutOfMemory, DirectXError };
     enum State : uint8_t { Intro = 0, Splash, Practice };
 
     //Static methods
@@ -88,7 +84,7 @@ public:
 
     //Constructors
     GameState(HWND hWnd, Renderer11* pRenderer) : m_hWnd(hWnd), m_pRenderer(pRenderer), m_pNextState(NULL) {};
-    virtual ~GameState(void) {};
+    virtual ~GameState() {};
 
     // Initialize after all other game states have been deleted
     virtual GameError Init() = 0;
@@ -140,12 +136,12 @@ public:
     GameError Render();
 
 private:
-    void InitNotes(const vector< MIDIEvent* >& vEvents);
+    void InitNotes(const vector<MIDIEvent*>& vEvents);
     void InitState();
     void ColorChannel(track_t iTrack, chan_t iChannel, color_t iColor, bool bRandom = false);
     void SetChannelSettings(const vector<bool>& vMuted, const vector<bool>& vHidden, const vector<color_t>& vColor);
 
-    void UpdateState(sidx_t iPos);
+    void UpdateState(idx_t idx, idx_t sister_idx);
 
     void RenderGlobals();
     void RenderNotes();
@@ -155,9 +151,9 @@ private:
 
     // MIDI info
     MIDI m_MIDI; // The song to display
-    vector< MIDIChannelEvent* > m_vEvents; // The channel events of the song
+    vector<MIDIChannelEvent*> m_vEvents; // The channel events of the song
     sidx_t m_iStartPos, m_iEndPos;
-    vector<sidx_t> m_vState[128];  // The notes that are on at time m_llStartTime.
+    vector<idx_t> m_vState;  // The notes that are on at time m_llStartTime.
     Timer m_Timer; // Frame timers
     double m_dVolume;
     bool m_bMute;
@@ -202,17 +198,12 @@ public:
     }
 };
 
-typedef struct {
-    sidx_t idx;
-    sidx_t sister_idx;
-} thread_work_t;
-
 class MainScreen : public GameState
 {
 public:
     static const float KBPercent;
 
-    MainScreen(wstring sMIDIFile, State eGameMode, HWND hWnd, Renderer11* pRenderer);
+    MainScreen(wstring sMIDIFile, HWND hWnd, Renderer11* pRenderer);
 
     // GameState functions
     GameError MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -236,8 +227,8 @@ private:
     void InitState();
 
     // Logic
-    void UpdateState(key_t key, const thread_work_t& work);
-    void UpdateStateBackwards(key_t key, const thread_work_t& work);
+    void UpdateState(idx_t idx, idx_t sister_idx);
+    void UpdateStateBackwards(idx_t idx, idx_t sister_idx);
     void JumpTo(mms_t llStartTime, boolean loadingMode = false);
     void ApplyMarker(unsigned char* data, msgln_t size);
     void ApplyColor(MIDIMetaEvent* event);
@@ -291,17 +282,29 @@ private:
     uint8_t m_iCurEncoding;
 
     // color events and bend range and such
-    bool Next_is_PBS[16] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
-    short m_pBendsRange[16] = {12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12};
+    bool Next_is_PBS[16] = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
+    short m_pBendsRange[16] = { 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12 };
 
     // Playback
-    State m_eGameMode;
     sidx_t m_iStartPos, m_iEndPos, m_iPrevStartPos; // Postions of the start and end events that occur in the current window
     mms_t m_llTimeSpan;  // Times of the start and end events of the current window
     mms_t m_llPrevTime;
-    vector<sidx_t> m_vState[128];  // The notes that are on at time m_llStartTime.
-    vector<thread_work_t> m_vThreadWork[128];
-    sidx_t m_pNoteState[128]; // The last note that was turned on
+    vector<idx_t> m_vState;  // The notes that are on at time m_llStartTime.
+    NoteColor m_pKeyColors[128]; // Per-key blended color for keyboard rendering.
+    __uint128_t m_bKeyPressed; // Is key pressed?
+    __forceinline bool IsPressed(key_t Key) { return m_bKeyPressed & (static_cast<__uint128_t>(1) << Key); }
+    __forceinline void PushKey(key_t Key) { m_bKeyPressed |= (static_cast<__uint128_t>(1) << Key); }
+    __forceinline void InitKeyColor() {
+        m_bKeyPressed = 0;
+        for (key_t i = 0; i < 12; i++) {
+            const ChannelSettings& cs = MIDI::IsSharp(i) ? m_csKBSharp : m_csKBWhite;
+            m_pKeyColors[i] = { cs.iPrimaryRGB, cs.iDarkRGB, cs.iVeryDarkRGB };
+        }
+        memcpy(m_pKeyColors + 12, m_pKeyColors, 12 * sizeof(NoteColor));
+        memcpy(m_pKeyColors + 24, m_pKeyColors, 24 * sizeof(NoteColor));
+        memcpy(m_pKeyColors + 48, m_pKeyColors, 48 * sizeof(NoteColor));
+        memcpy(m_pKeyColors + 96, m_pKeyColors, 32 * sizeof(NoteColor));
+    }
     double m_dSpeed; // Speed multiplier
     bool IsLastFrameReversed = false;
     bool IsReversedStateInitialized = false;

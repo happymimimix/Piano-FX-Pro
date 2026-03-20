@@ -235,12 +235,12 @@ public:
     static uint32_t MakeNextEvent(MIDI& midi, const unsigned char* pcData, msgln_t iMaxSize, track_t iTrack, MIDIEvent** pOutEvent);
 
     //Accessors
-    EventType GetEventType() const { return (EventType)m_eEventType; }
-    msg_t GetEventCode() const { return m_iEventCode; }
-    track_t GetTrack() const { return m_iTrack; }
-    mtk_t GetAbsT() const { return m_iAbsT; }
-    mms_t GetAbsMicroSec() const { return m_llAbsMicroSec; }
-    void SetAbsMicroSec(mms_t llAbsMicroSec) { m_llAbsMicroSec = llAbsMicroSec; };
+    __forceinline EventType GetEventType() const { return (EventType)m_eEventType; }
+    __forceinline msg_t GetEventCode() const { return m_iEventCode; }
+    __forceinline track_t GetTrack() const { return m_iTrack; }
+    __forceinline mtk_t GetAbsT() const { return m_iAbsT; }
+    __forceinline mms_t GetAbsMicroSec() const { return m_llAbsMicroSec; }
+    __forceinline void SetAbsMicroSec(mms_t llAbsMicroSec) { m_llAbsMicroSec = llAbsMicroSec; };
 
     mms_t m_llAbsMicroSec;
     mtk_t m_iAbsT;
@@ -260,31 +260,31 @@ public:
     uint32_t ParseEvent(const unsigned char* pcData, msgln_t iMaxSize);
 
     //Accessors
-    ChannelEventType GetChannelEventType() const { return static_cast<ChannelEventType>(m_iEventCode >> 4); }
-    void SetChannelEventType(ChannelEventType type) { m_iEventCode = (m_iEventCode & 0x0F) | (static_cast<msg_t>(type) << 4); }
-    chan_t GetChannel() const { return m_cChannel & 0x0F; }
-    key_t GetParam1() const { return m_cParam1 & 0x7F; }
-    key_t GetParam2() const { return m_cParam2 & 0x7F; }
-    MIDIChannelEvent* GetSister(const vector<MIDIChannelEvent*>& events) const {
+    __forceinline ChannelEventType GetChannelEventType() const { return static_cast<ChannelEventType>(m_iEventCode >> 4); }
+    __forceinline void SetChannelEventType(ChannelEventType type) { m_iEventCode = (m_iEventCode & 0x0F) | (static_cast<msg_t>(type) << 4); }
+    __forceinline chan_t GetChannel() const { return m_cChannel & 0x0F; }
+    __forceinline key_t GetParam1() const { return m_cParam1 & 0x7F; }
+    __forceinline key_t GetParam2() const { return m_cParam2 & 0x7F; }
+    __forceinline MIDIChannelEvent* GetSister(const vector<MIDIChannelEvent*>& events) const {
         return m_iSisterIdx == IDX_MAX ? nullptr : events[m_iSisterIdx];
     }
-    MIDIChannelEvent* GetSister(const vector<MIDIEvent*>& events) const {
+    __forceinline MIDIChannelEvent* GetSister(const vector<MIDIEvent*>& events) const {
         return m_iSisterIdx == IDX_MAX ? nullptr : (MIDIChannelEvent*)events[m_iSisterIdx];
     }
-    idx_t GetSisterIdx() const { return m_iSisterIdx; }
-    idx_t GetSimultaneous() const { return m_iSimultaneous; }
-    ums_t GetLength() const { return m_uLength; }
-    bool GetPassDone() const { return m_bPassDone; }
+    __forceinline idx_t GetSisterIdx() const { return m_iSisterIdx; }
+    __forceinline idx_t GetSimultaneous() const { return m_iSimultaneous; }
+    __forceinline ums_t GetLength() const { return m_uLength; }
+    __forceinline bool GetPassDone() const { return m_bPassDone; }
 
-    void SetChannel(chan_t channel) { m_cChannel = channel; }
-    void SetParam1(key_t param1) { m_cParam1 = param1; }
-    void SetParam2(key_t param2) { m_cParam2 = param2; }
-    void SetSisterIdx(idx_t iSisterIdx) { m_iSisterIdx = iSisterIdx; }
-    void SetSimultaneous(idx_t iSimultaneous) { m_iSimultaneous = iSimultaneous; }
-    void SetLength(ums_t length) { m_uLength = length; }
-    void SetPassDone(bool done) { m_bPassDone = done; }
+    __forceinline void SetChannel(chan_t channel) { m_cChannel = channel; }
+    __forceinline void SetParam1(key_t param1) { m_cParam1 = param1; }
+    __forceinline void SetParam2(key_t param2) { m_cParam2 = param2; }
+    __forceinline void SetSisterIdx(idx_t iSisterIdx) { m_iSisterIdx = iSisterIdx; }
+    __forceinline void SetSimultaneous(idx_t iSimultaneous) { m_iSimultaneous = iSimultaneous; }
+    __forceinline void SetLength(ums_t length) { m_uLength = length; }
+    __forceinline void SetPassDone(bool done) { m_bPassDone = done; }
 
-    bool HasSister() const { return m_iSisterIdx != IDX_MAX; }
+    __forceinline bool HasSister() const { return m_iSisterIdx != IDX_MAX; }
 
 private:
     idx_t m_iSisterIdx;
@@ -311,9 +311,9 @@ public:
     uint32_t ParseEvent(const unsigned char* pcData, msgln_t iMaxSize);
 
     //Accessors
-    MetaEventType GetMetaEventType() const { return m_eMetaEventType; }
-    msgln_t GetDataLen() const { return m_iDataLen; }
-    unsigned char* GetData() const { return m_pcData; }
+    __forceinline MetaEventType GetMetaEventType() const { return m_eMetaEventType; }
+    __forceinline msgln_t GetDataLen() const { return m_iDataLen; }
+    __forceinline unsigned char* GetData() const { return m_pcData; }
 
 private:
     MetaEventType m_eMetaEventType;
@@ -328,7 +328,7 @@ public:
     MIDISysExEvent() : m_pcData(0) { }
     ~MIDISysExEvent() { if (m_pcData) delete[] m_pcData; }
 
-    uint32_t ParseEvent(const unsigned char* pcData, msgln_t iMaxSize);
+    __forceinline uint32_t ParseEvent(const unsigned char* pcData, msgln_t iMaxSize);
 
 private:
     uint32_t m_iDataLen;

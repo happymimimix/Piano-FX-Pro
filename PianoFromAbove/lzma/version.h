@@ -65,9 +65,9 @@
  *              the version number of Igor Pavlov's LZMA SDK.
  */
 #define LZMA_VERSION (LZMA_VERSION_MAJOR * UINT32_C(10000000) \
-		+ LZMA_VERSION_MINOR * UINT32_C(10000) \
-		+ LZMA_VERSION_PATCH * UINT32_C(10) \
-		+ LZMA_VERSION_STABILITY)
+        + LZMA_VERSION_MINOR * UINT32_C(10000) \
+        + LZMA_VERSION_PATCH * UINT32_C(10) \
+        + LZMA_VERSION_STABILITY)
 
 
 /*
@@ -84,10 +84,10 @@
 #endif
 
 #define LZMA_VERSION_STRING_C_(major, minor, patch, stability, commit) \
-		#major "." #minor "." #patch stability commit
+        #major "." #minor "." #patch stability commit
 
 #define LZMA_VERSION_STRING_C(major, minor, patch, stability, commit) \
-		LZMA_VERSION_STRING_C_(major, minor, patch, stability, commit)
+        LZMA_VERSION_STRING_C_(major, minor, patch, stability, commit)
 
 
 /**
@@ -100,9 +100,9 @@
  * in LZMA_VERSION macro.
  */
 #define LZMA_VERSION_STRING LZMA_VERSION_STRING_C( \
-		LZMA_VERSION_MAJOR, LZMA_VERSION_MINOR, \
-		LZMA_VERSION_PATCH, LZMA_VERSION_STABILITY_STRING, \
-		LZMA_VERSION_COMMIT)
+        LZMA_VERSION_MAJOR, LZMA_VERSION_MINOR, \
+        LZMA_VERSION_PATCH, LZMA_VERSION_STABILITY_STRING, \
+        LZMA_VERSION_COMMIT)
 
 
 /* #ifndef is needed for use with windres (MinGW-w64 or Cygwin). */
@@ -117,7 +117,7 @@
  * \return The value of LZMA_VERSION macro at the compile time of liblzma
  */
 extern LZMA_API(uint32_t) lzma_version_number(void)
-		lzma_nothrow lzma_attr_const;
+        lzma_nothrow lzma_attr_const;
 
 
 /**
@@ -129,6 +129,6 @@ extern LZMA_API(uint32_t) lzma_version_number(void)
  * \return      Run-time version of liblzma
  */
 extern LZMA_API(const char *) lzma_version_string(void)
-		lzma_nothrow lzma_attr_const;
+        lzma_nothrow lzma_attr_const;
 
 #endif

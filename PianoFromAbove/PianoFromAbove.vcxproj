@@ -17,10 +17,6 @@
       <Configuration>DPRK</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="OpenGL|x64">
-      <Configuration>OpenGL</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="SoftwareRender|x64">
       <Configuration>SoftwareRender</Configuration>
       <Platform>x64</Platform>
@@ -155,15 +151,6 @@
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
-    <EnableASAN>false</EnableASAN>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -222,9 +209,6 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'" Label="PropertySheets">
@@ -314,14 +298,6 @@
     <OutDir>$(SolutionDir)\Release\</OutDir>
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro-EnforcedSoftwareRendering</TargetName>
-    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">
-    <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)\Release\</OutDir>
-    <IntDir>Release\</IntDir>
-    <TargetName>Piano-FX-Pro-WineHQ</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
@@ -1209,92 +1185,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
       <PreprocessorDefinitions>ENG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">
-    <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;LZMA_API_STATIC;OPENGL_MODE;INCLUDE_FFMPEG;ENG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <FloatingPointModel>Fast</FloatingPointModel>
-      <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <GuardSignedReturns>false</GuardSignedReturns>
-      <OpenMPSupport>false</OpenMPSupport>
-      <WarningLevel>Level4</WarningLevel>
-      <CallingConvention>FastCall</CallingConvention>
-      <PrecompiledHeaderFile>
-      </PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>
-      </PrecompiledHeaderOutputFile>
-      <DiagnosticsFormat>Caret</DiagnosticsFormat>
-      <DebugInformationFormat>None</DebugInformationFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
-      <ShowIncludes>true</ShowIncludes>
-      <ExceptionHandling>Async</ExceptionHandling>
-      <OmitFramePointers>true</OmitFramePointers>
-      <BufferSecurityCheck>false</BufferSecurityCheck>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>liblzma.lib;dxgi.lib;d3d11.lib;Psapi.lib;Shlwapi.lib;Dwmapi.lib;Comctl32.lib;WinMM.lib;UxTheme.lib;Advapi32.lib;Msimg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <Version>
-      </Version>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention>false</DataExecutionPrevention>
-      <AdditionalManifestDependencies>"type='Win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'";%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
-    </Link>
-    <PreBuildEvent>
-      <Command>cd /d "$(ProjectDir)"
-del .\PianoFromAbove.vcxproj.user /f /q
-del ..\Release /f /s /q
-rmdir ..\Release /s /q
-msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
-msbuild ..\Colorizer\Colorizer.sln -t:Clean -p:Configuration=Release /p:Platform=x64
-msbuild ..\PFXGDI\PFXGDI.sln -t:Clean -p:Configuration=Release /p:Platform=x86
-del .\Colorizer.exe /f /q
-del .\Colorizer.exe.h /f /q
-del .\PFXGDI.exe /f /q
-del .\PFXGDI.exe.h /f /q
-del .\Widths.h /f /q
-msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
-msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
-xxd -i Colorizer.exe &gt; Colorizer.exe.h
-xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
-clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.h ^|.\tmp.exe ^&gt;.\Widths.h
-del .\tmp.exe /f /q
-del .\tmp.obj /f /q
-Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encoding Unicode | Set-Content -Encoding UTF8 LanguagePacks.hpp"
-</Command>
-    </PreBuildEvent>
-    <PostBuildEvent>
-      <Command>cd /d "$(ProjectDir)"
-copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
-msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
-del .\PianoFromAbove.vcxproj.user /f /q
-del ..\.vs /f /s /q
-rmdir ..\.vs /s /q
-del .\Release /f /s /q
-rmdir .\Release /s /q
-del ..\Release /f /s /q
-rmdir ..\Release /s /q
-mkdir ..\Release
-move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
-</Command>
-    </PostBuildEvent>
-    <ResourceCompile>
-      <ShowProgress>true</ShowProgress>
-      <PreprocessorDefinitions>ENG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ResourceCompile>
-  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -1508,7 +1398,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -1536,7 +1425,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -1588,7 +1476,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">true</ExcludedFromBuild>
@@ -1656,10 +1543,8 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <Culture Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">0x0411</Culture>
       <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">false</SuppressStartupBanner>
       <Culture Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">0x0411</Culture>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">0x0411</Culture>
       <Culture Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">0x0411</Culture>
       <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">false</SuppressStartupBanner>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">false</SuppressStartupBanner>
       <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">false</SuppressStartupBanner>
       <Culture Condition="'$(Configuration)|$(Platform)'=='Release|x64'">0x0411</Culture>
       <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</SuppressStartupBanner>
@@ -1702,7 +1587,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">Pixel</ShaderType>
@@ -1716,7 +1600,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">5.0</ShaderModel>
@@ -1730,7 +1613,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">g_pBackgroundPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">g_pBackgroundPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">g_pBackgroundPixelShader</VariableName>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">g_pBackgroundPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">g_pBackgroundPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_pBackgroundPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">g_pBackgroundPixelShader</VariableName>
@@ -1744,7 +1626,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
@@ -1768,8 +1649,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">
       </ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">
-      </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -1788,7 +1667,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">Vertex</ShaderType>
@@ -1802,7 +1680,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">5.0</ShaderModel>
@@ -1816,7 +1693,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
@@ -1840,8 +1716,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">
       </ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">
-      </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -1858,14 +1732,12 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">g_pBackgroundVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">g_pBackgroundVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">g_pBackgroundVertexShader</VariableName>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">g_pBackgroundVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">g_pBackgroundVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_pBackgroundVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">g_pBackgroundVertexShader</VariableName>
     </FxCompile>
     <FxCompile Include="note_vs_samewidth.hlsl">
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">5.0</ShaderModel>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
@@ -1880,7 +1752,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">Vertex</ShaderType>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
@@ -1892,11 +1763,8 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">g_pNoteVertexShaderSameWidth</VariableName>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">g_pNoteVertexShaderSameWidth</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">g_pNoteVertexShaderSameWidth</VariableName>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">
-      </ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">
       </ObjectFileOutput>
@@ -1928,7 +1796,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">
       </ObjectFileOutput>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">Vertex</ShaderType>
@@ -1960,7 +1827,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">Pixel</ShaderType>
@@ -1974,7 +1840,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
@@ -1998,8 +1863,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">
       </ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">
-      </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -2016,7 +1879,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">g_pNotePixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">g_pNotePixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">g_pNotePixelShader</VariableName>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">g_pNotePixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">g_pNotePixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_pNotePixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">g_pNotePixelShader</VariableName>
@@ -2030,7 +1892,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">5.0</ShaderModel>
@@ -2046,7 +1907,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">Vertex</ShaderType>
@@ -2060,7 +1920,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">g_pNoteVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">g_pNoteVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">g_pNoteVertexShader</VariableName>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">g_pNoteVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">g_pNoteVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_pNoteVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">g_pNoteVertexShader</VariableName>
@@ -2084,8 +1943,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">
       </ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">
-      </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -2102,7 +1959,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
@@ -2116,7 +1972,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">5.0</ShaderModel>
@@ -2132,7 +1987,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">Pixel</ShaderType>
@@ -2146,7 +2000,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">g_pRectPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">g_pRectPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">g_pRectPixelShader</VariableName>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">g_pRectPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">g_pRectPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_pRectPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">g_pRectPixelShader</VariableName>
@@ -2160,7 +2013,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
@@ -2184,8 +2036,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">
       </ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">
-      </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -2202,7 +2052,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">5.0</ShaderModel>
@@ -2218,7 +2067,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">Vertex</ShaderType>
@@ -2232,7 +2080,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">g_pRectVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">g_pRectVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">g_pRectVertexShader</VariableName>
-      <VariableName Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">g_pRectVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">g_pRectVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_pRectVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">g_pRectVertexShader</VariableName>
@@ -2246,7 +2093,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
@@ -2270,8 +2116,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">
       </ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">
-      </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -2288,7 +2132,6 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">5.0</ShaderModel>

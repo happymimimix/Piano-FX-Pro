@@ -1,7 +1,7 @@
 #pragma code_page(65001)
 #include "resource.h"
 #include "matrices.h"
-#include "LanguagePacks.h"
+#include "PackWrapper.h"
 #include "afxres.h"
 
 /////////////////////////////////////////////////////////////////////////////

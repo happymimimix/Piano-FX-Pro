@@ -24,12 +24,6 @@
 
 ComPtr<IWICImagingFactory> Renderer11::s_pWICFactory;
 
-Renderer11::Renderer11() {}
-
-Renderer11::~Renderer11() {
-    imguiClearFontCache();
-}
-
 tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
     HRESULT res;
 
@@ -42,31 +36,28 @@ tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
     // TODO: Allow device selection for people with multiple GPUs
     m_hWnd = hWnd;
     m_bLimitFPS = bLimitFPS;
+    IsWrapRenderer = true;
 #ifndef SOFTWARE_RENDER_ONLY
     for (UINT i = 0;; i++) {
         ComPtr<IDXGIAdapter1> adapter;
-        if (m_pFactory->EnumAdapters1(i, &adapter) == DXGI_ERROR_NOT_FOUND)
-            break;
+        if (m_pFactory->EnumAdapters1(i, &adapter) == DXGI_ERROR_NOT_FOUND) break;
 
         DXGI_ADAPTER_DESC1 desc = {};
         res = adapter->GetDesc1(&desc);
-        if (FAILED(res))
-            return make_tuple(res, "GetDesc1");
+        if (FAILED(res)) return make_tuple(res, "GetDesc1");
 
-        if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
-            continue;
+        if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) continue;
 
         D3D_FEATURE_LEVEL featureLevel;
         static const D3D_FEATURE_LEVEL wanted[] = { D3D_FEATURE_LEVEL_11_0 };
         res = D3D11CreateDevice(adapter.Get(), D3D_DRIVER_TYPE_UNKNOWN, NULL,
             D3D11_CREATE_DEVICE_BGRA_SUPPORT, wanted, _countof(wanted),
             D3D11_SDK_VERSION, &m_pDevice, &featureLevel, &m_pContext);
-        if (FAILED(res))
-            continue;
-        m_pAdapter = adapter;
+        if (FAILED(res)) continue;
+        IsWrapRenderer = false;
         break;
     }
-    if (m_pDevice == nullptr) //Oh we love software rendering!
+    if (IsWrapRenderer) //Oh we love software rendering!
 #endif
     {
         D3D_FEATURE_LEVEL featureLevel;
@@ -74,8 +65,7 @@ tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
         res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_WARP, NULL,
             D3D11_CREATE_DEVICE_BGRA_SUPPORT, wanted, _countof(wanted),
             D3D11_SDK_VERSION, &m_pDevice, &featureLevel, &m_pContext);
-        if (FAILED(res))
-            return make_tuple(res, "D3D11CreateDevice (WARP)");
+        if (FAILED(res)) return make_tuple(res, "D3D11CreateDevice (WARP)");
     }
 
     // Create shaders
@@ -107,7 +97,8 @@ tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
     if (FAILED(res)) return make_tuple(res, "CreatePixelShader (background)");
 
     // Create blend state
-    // PFA is weird and inverts blending operations (0 is opaque, 255 is transparent)
+    // Inverted alpha blending inherited from the original PianoFromAbove codebase created by BrianPantano. (0 is opaque, 255 is transparent)
+    // This is the most stupid design decision ever but changing this is way too much work.
     D3D11_BLEND_DESC bd = {};
     bd.RenderTarget[0] = {
         TRUE,
@@ -257,15 +248,9 @@ tuple<HRESULT, const char*> Renderer11::CreateWindowDependentObjects(HWND hWnd) 
         m_pBackBufferSurface.Reset();
         m_pDepthStencilView.Reset();
         m_pDepthBuffer.Reset();
-
         // Resize the swap chain
-#ifndef OPENGL_MODE
         res = m_pSwapChain->ResizeBuffers(1, 0, 0, DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_GDI_COMPATIBLE);
-#else
-        res = m_pSwapChain->ResizeBuffers(1, 0, 0, DXGI_FORMAT_B8G8R8A8_UNORM, 0);
-#endif
-        if (FAILED(res))
-            return make_tuple(res, "ResizeBuffers");
+        if (FAILED(res)) return make_tuple(res, "ResizeBuffers");
     }
     else {
         // Create swap chain with GDI compatibility
@@ -277,30 +262,18 @@ tuple<HRESULT, const char*> Renderer11::CreateWindowDependentObjects(HWND hWnd) 
         scd.OutputWindow = hWnd;
         scd.Windowed = TRUE;
         scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-#ifndef OPENGL_MODE
         scd.Flags = DXGI_SWAP_CHAIN_FLAG_GDI_COMPATIBLE;
-#else
-        scd.Flags = 0;
-#endif
         res = m_pFactory->CreateSwapChain(m_pDevice.Get(), &scd, &m_pSwapChain);
-        if (FAILED(res))
-            return make_tuple(res, "CreateSwapChain");
-
-        // Disable ALT+ENTER
-        // TODO: Make fullscreen work
+        if (FAILED(res)) return make_tuple(res, "CreateSwapChain");
         m_pFactory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER);
     }
 
     // Get backbuffer and its GDI-compatible surface
     res = m_pSwapChain->GetBuffer(0, IID_PPV_ARGS(&m_pBackBuffer));
-    if (FAILED(res))
-        return make_tuple(res, "GetBuffer");
+    if (FAILED(res)) return make_tuple(res, "GetBuffer");
 
-#ifndef OPENGL_MODE
     res = m_pBackBuffer.As(&m_pBackBufferSurface);
-    if (FAILED(res))
-        return make_tuple(res, "QueryInterface (IDXGISurface1)");
-#endif
+    if (FAILED(res)) return make_tuple(res, "QueryInterface (IDXGISurface1)");
 
     // Read backbuffer width and height
     D3D11_TEXTURE2D_DESC bbDesc = {};
@@ -310,8 +283,7 @@ tuple<HRESULT, const char*> Renderer11::CreateWindowDependentObjects(HWND hWnd) 
 
     // Create render target view
     res = m_pDevice->CreateRenderTargetView(m_pBackBuffer.Get(), nullptr, &m_pRenderTargetView);
-    if (FAILED(res))
-        return make_tuple(res, "CreateRenderTargetView");
+    if (FAILED(res)) return make_tuple(res, "CreateRenderTargetView");
 
     // Create depth buffer
     D3D11_TEXTURE2D_DESC depthDesc = {};
@@ -324,11 +296,9 @@ tuple<HRESULT, const char*> Renderer11::CreateWindowDependentObjects(HWND hWnd) 
     depthDesc.Usage = D3D11_USAGE_DEFAULT;
     depthDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
     res = m_pDevice->CreateTexture2D(&depthDesc, NULL, &m_pDepthBuffer);
-    if (FAILED(res))
-        return make_tuple(res, "CreateTexture2D (depth buffer)");
+    if (FAILED(res)) return make_tuple(res, "CreateTexture2D (depth buffer)");
     res = m_pDevice->CreateDepthStencilView(m_pDepthBuffer.Get(), NULL, &m_pDepthStencilView);
-    if (FAILED(res))
-        return make_tuple(res, "CreateDepthStencilView");
+    if (FAILED(res)) return make_tuple(res, "CreateDepthStencilView");
 
     // Create background image texture
     m_pBackgroundTexture.Reset();
@@ -343,21 +313,18 @@ tuple<HRESULT, const char*> Renderer11::CreateWindowDependentObjects(HWND hWnd) 
     bgDesc.Usage = D3D11_USAGE_DEFAULT;
     bgDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     res = m_pDevice->CreateTexture2D(&bgDesc, NULL, &m_pBackgroundTexture);
-    if (FAILED(res))
-        return make_tuple(res, "CreateTexture2D (background texture)");
+    if (FAILED(res)) return make_tuple(res, "CreateTexture2D (background texture)");
     res = m_pDevice->CreateShaderResourceView(m_pBackgroundTexture.Get(), nullptr, &m_pBackgroundTextureSRV);
-    if (FAILED(res))
-        return make_tuple(res, "CreateSRV (background texture)");
+    if (FAILED(res)) return make_tuple(res, "CreateSRV (background texture)");
 
     // Scale and upload background image
     UploadBackgroundBitmap();
 
     // Set up root constants
-    // https://github.com/ocornut/imgui/blob/master/backends/imgui_impl_dx12.cpp#L99
     float L = 0;
-    float R = (float)m_iBufferWidth;
+    float R = m_iBufferWidth;
     float T = 0;
-    float B = (float)m_iBufferHeight;
+    float B = m_iBufferHeight;
     float mvp[4][4] = {
         {2.0f / (R - L), 0.0f, 0.0f, 0.0f},
         {0.0f, 2.0f / (T - B), 0.0f, 0.0f},
@@ -377,8 +344,7 @@ HRESULT Renderer11::ResetDeviceIfNeeded() {
 
 HRESULT Renderer11::ResetDevice() {
     auto res = CreateWindowDependentObjects(m_hWnd);
-    if (FAILED(get<0>(res)))
-        return get<0>(res);
+    if (FAILED(get<0>(res))) { return get<0>(res); }
     return S_OK;
 }
 
@@ -491,36 +457,33 @@ HRESULT Renderer11::EndScene(bool draw_bg) {
     if (FAILED(res)) return res;
 
     // Flush the intermediate note buffer
-    if (!m_vNotesIntermediate.empty()) {
-        for (idx_t i = 0; i < m_vNotesIntermediate.size(); i += NotesPerPass) {
-            if (i == 0) AutoSetNotePipeline();
+    for (size_t i = 0; i < m_vNotesIntermediate.size(); i += (size_t)NotesPerPass) {
+        if (i == 0) AutoSetNotePipeline();
 
-            auto remaining = m_vNotesIntermediate.size() - i;
-            auto note_count = min(remaining, (size_t)NotesPerPass);
+        auto remaining = m_vNotesIntermediate.size() - i;
+        auto note_count = min(remaining, (size_t)NotesPerPass);
 
-            // Unbind SRV before mapping (DX11 best practice)
-            ID3D11ShaderResourceView* null_srv = nullptr;
-            m_pContext->VSSetShaderResources(3, 1, &null_srv);
+        // Unbind SRV before mapping (DX11 best practice)
+        ID3D11ShaderResourceView* null_srv = nullptr;
+        m_pContext->VSSetShaderResources(3, 1, &null_srv);
 
-            D3D11_MAPPED_SUBRESOURCE mapped;
-            res = m_pContext->Map(m_pNoteBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
-            if (FAILED(res)) return res;
-            memcpy(mapped.pData, &m_vNotesIntermediate[i], note_count * sizeof(NoteData));
-            m_pContext->Unmap(m_pNoteBuffer.Get(), 0);
+        D3D11_MAPPED_SUBRESOURCE mapped;
+        res = m_pContext->Map(m_pNoteBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+        if (FAILED(res)) return res;
+        memcpy(mapped.pData, &m_vNotesIntermediate[i], note_count * sizeof(NoteData));
+        m_pContext->Unmap(m_pNoteBuffer.Get(), 0);
 
-            // Rebind SRV
-            m_pContext->VSSetShaderResources(3, 1, m_pNoteSRV.GetAddressOf());
+        // Rebind SRV
+        m_pContext->VSSetShaderResources(3, 1, m_pNoteSRV.GetAddressOf());
 
-            // Draw the notes
-            m_pContext->DrawIndexed((UINT)(note_count * 6), 0, 0);
-        }
+        // Draw the notes
+        m_pContext->DrawIndexed((UINT)(note_count * 6), 0, 0);
     }
 
     // Draw the second rect batch (after notes)
     res = DrawRectRange(rect_split, rect_count);
     if (FAILED(res)) return res;
 
-#ifndef OPENGL_MODE
     // Unbind render target before acquiring GDI DC
     ID3D11RenderTargetView* nullRT = nullptr;
     m_pContext->OMSetRenderTargets(1, &nullRT, nullptr);
@@ -528,9 +491,6 @@ HRESULT Renderer11::EndScene(bool draw_bg) {
 
     // Flush queued text last — GDI draws on top of everything
     return FlushText();
-#else
-    return S_OK;
-#endif // OPENGL_MODE
 }
 
 HRESULT Renderer11::Present() {
@@ -640,46 +600,37 @@ void Renderer11::SetPipeline(Pipeline pipeline) {
 //-----------------------------------------------------------------------------
 // Text rendering
 //-----------------------------------------------------------------------------
+// WARNING: ALL GDI OPERATIONS USE STANDARD ALPHA! NOT INVERTED ALPHA. (0 is transparent, 255 is opaque)
 
 void Renderer11::AddText(const wstring& Text, win32_t Size, win32_t X, win32_t Y, COLORREF Color, DWORD Alignment, win32_t OffsetX, win32_t OffsetY, win32_t PadX, win32_t PadY, COLORREF bgColor) {
-#ifndef OPENGL_MODE
     m_vTextCommands.push_back({Text, Size, X, Y, Color, Alignment, OffsetX, OffsetY, PadX, PadY, bgColor});
-#endif
 }
 
 SIZE Renderer11::CalcTextSize(const wstring& Text, win32_t Size) {
     SIZE Result = { 0, 0 };
-#ifndef OPENGL_MODE
     HDC DC = GetDC(m_hWnd);
     HFONT imguiFont = imguiFont2GDI(PHIFON_compressed_data, PHIFON_compressed_size, Size);
     HFONT OldFont = (HFONT)SelectObject(DC, imguiFont);
-
     GetTextExtentPoint32W(DC, Text.c_str(), Text.size(), &Result);
-
     SelectObject(DC, OldFont);
     ReleaseDC(m_hWnd, DC);
-#endif
     return Result;
 }
 
 void Renderer11::AddGDIRect(win32_t X, win32_t Y, win32_t W, win32_t H, COLORREF Color) {
-#ifndef OPENGL_MODE
     m_vTextCommands.push_back({ L"", 0, X + W / 2, Y + H / 2, 0x00000000, ALIGN_CENTER | ALIGN_MIDDLE, 0, 0, W / 2, H / 2, Color });
-#endif
 }
 
 static COLORREF PremultiplyARGB(COLORREF argb)
 {
-    uint8_t a = (uint8_t)(argb >> 24);
-    uint8_t r = (uint8_t)(argb >> 16);
-    uint8_t g = (uint8_t)(argb >> 8);
-    uint8_t b = (uint8_t)(argb);
-
-    r = (uint8_t)((r * a + 127) / 255);
-    g = (uint8_t)((g * a + 127) / 255);
-    b = (uint8_t)((b * a + 127) / 255);
-
-    return ((uint32_t)a << 24) | ((uint32_t)r << 16) | ((uint32_t)g << 8) | (uint32_t)b;
+    COLORREF a = (argb >> 24) & 0xFF;
+    COLORREF r = (argb >> 16) & 0xFF;
+    COLORREF g = (argb >> 8) & 0xFF;
+    COLORREF b = argb & 0xFF;
+    r = (r*a)/0xFF;
+    g = (g*a)/0xFF;
+    b = (b*a)/0xFF;
+    return (a << 24) | (r << 16) | (g << 8) | b;
 }
 
 static void AlphaFillRect(HDC DestDC, win32_t X, win32_t Y, win32_t W, win32_t H, COLORREF argb)
@@ -700,7 +651,7 @@ static void AlphaFillRect(HDC DestDC, win32_t X, win32_t Y, win32_t W, win32_t H
     
     SelectObject(SourceDC, BMP);
 
-    *(uint32_t*)Bits = PremultiplyARGB(argb);
+    *(COLORREF*)Bits = PremultiplyARGB(argb);
 
     BLENDFUNCTION BlendFunc = {};
     BlendFunc.BlendOp = AC_SRC_OVER;
@@ -772,7 +723,6 @@ HRESULT Renderer11::FlushText() {
 //-----------------------------------------------------------------------------
 
 HRESULT Renderer11::Screenshot(char* Output) {
-#ifndef OPENGL_MODE
     if (!m_pBackBufferSurface) return E_FAIL;
     HDC DXDC = NULL;
     HRESULT hr = m_pBackBufferSurface->GetDC(FALSE, &DXDC);
@@ -797,9 +747,6 @@ HRESULT Renderer11::Screenshot(char* Output) {
 
     m_pBackBufferSurface->ReleaseDC(nullptr);
     return S_OK;
-#else
-    return E_NOTIMPL;
-#endif
 }
 
 //-----------------------------------------------------------------------------

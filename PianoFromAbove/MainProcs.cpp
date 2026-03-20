@@ -19,7 +19,7 @@
 #include "ConfigProcs.h"
 #include "Globals.h"
 #include "resource.h"
-#include "LanguagePacks.hpp"
+#include "PackWrapper.hpp"
 
 #include "GameState.h"
 #include "Config.h"
@@ -1132,8 +1132,6 @@ BOOL PlayFile(const wstring& sFile)
     static ViewSettings& cView = config.GetViewSettings();
     static const ControlsSettings& cControls = config.GetControlsSettings();
 
-    const GameState::State ePlayMode = GameState::Practice;
-
     // Try loading the file
     MainScreen* pGameState = NULL;
     g_LoadingProgress.stage = MIDILoadingProgress::Stage::CopyToMem;
@@ -1141,7 +1139,7 @@ BOOL PlayFile(const wstring& sFile)
     g_LoadingProgress.progress = 0;
     g_LoadingProgress.max = 1;
     auto gamethread = thread([&]() {
-        pGameState = new MainScreen(sFile, ePlayMode, NULL, NULL);
+        pGameState = new MainScreen(sFile, NULL, NULL);
         g_LoadingProgress.stage = MIDILoadingProgress::Done;
         });
     DialogBox(NULL, MAKEINTRESOURCE(IDD_LOADING), g_hWnd, LoadingProc);
@@ -1160,7 +1158,15 @@ BOOL PlayFile(const wstring& sFile)
 
     // Success! Set up the GUI for playback
     if (!cPlayback.GetPlayable()) cPlayback.SetPlayable(true, true);
-    if (cPlayback.GetPlayMode() != ePlayMode) cPlayback.SetPlayMode(ePlayMode, true);
+    if (cPlayback.GetPlayMode()) { //Close the current file first before opening another one! 
+        cPlayback.SetPlayMode(GameState::Intro, true);
+        cPlayback.SetPlayable(false, true);
+        cPlayback.SetPosition(0);
+        SetWindowText(g_hWnd, TitleIdle);
+        HandOffMsg(WM_COMMAND, ID_CHANGESTATE, (LPARAM)new IntroScreen(NULL, NULL));
+    }else{
+        cPlayback.SetPlayMode(GameState::Practice, true);
+    }
     cPlayback.SetPaused(false, true);
     cPlayback.SetPosition(0);
     cView.SetZoomMove(false);

@@ -23,7 +23,21 @@ extern TSQueue< MSG > g_MsgQueue; // Producer/consumer to hold events for our ga
 #define ERRORANDRETURN(hwnd, msg, retval) {MessageBox((hwnd), (msg), TEXT("Error"), MB_OK | MB_ICONERROR); return (retval);}
 #define NOMINMAX
 
-#define TitlePlay MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 L"%ws" MainWindowTitle7 MainWindowTitle8
-#define TitleRender MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle4 L"%ws" MainWindowTitle7 MainWindowTitle8
-#define TitleSplash MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle6 MainWindowTitle7 MainWindowTitle8
-#define TitleIdle MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | " MainWindowTitle3 MainWindowTitle5 MainWindowTitle7 MainWindowTitle8
+inline bool IsWrapRenderer = false;
+inline bool RendererActive = false;
+#define TitleVersionInfo MainWindowTitle1 L" v" VersionString L" | " MainWindowTitle2 L" | "
+#ifdef SOFTWARE_RENDER_ONLY
+#define PF_SWR (IsWrapRenderer ? L"  " MainWindowTitle7 : L"") 
+#else
+#define PF_SWR L"  " MainWindowTitle8
+#endif
+#ifdef LIMIT_COLORS
+#define PF_COL L"  " MainWindowTitle9
+#else
+#define PF_COL
+#endif
+#define TitlePostFix PF_SWR PF_COL
+#define TitlePlay TitleVersionInfo MainWindowTitle3 L"%ws" TitlePostFix
+#define TitleRender TitleVersionInfo MainWindowTitle4 L"%ws" TitlePostFix
+#define TitleSplash TitleVersionInfo MainWindowTitle3 MainWindowTitle6 TitlePostFix
+#define TitleIdle TitleVersionInfo MainWindowTitle3 MainWindowTitle5 TitlePostFix
