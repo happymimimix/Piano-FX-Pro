@@ -7,20 +7,18 @@
 * Copyright (c) 2010 Brian Pantano. All rights reserved.
 *
 *************************************************************************************************/
-#include "Globals.h"
-#include "Renderer.h"
-#include "resource.h"
-
-#include "RectPixelShader.h"
-#include "RectVertexShader.h"
-#include "NotePixelShader.h"
-#include "NoteVertexShader.h"
-#include "NoteVertexShaderSameWidth.h"
-#include "BackgroundPixelShader.h"
-#include "BackgroundVertexShader.h"
-
 #include <ShlObj.h>
+#include <resource.h>
+#include <Globals.h>
+#include <Renderer.h>
 #include <Config.h>
+#include <RectPixelShader.h>
+#include <RectVertexShader.h>
+#include <NotePixelShader.h>
+#include <NoteVertexShader.h>
+#include <NoteVertexShaderSameWidth.h>
+#include <BackgroundPixelShader.h>
+#include <BackgroundVertexShader.h>
 
 ComPtr<IWICImagingFactory> Renderer11::s_pWICFactory;
 

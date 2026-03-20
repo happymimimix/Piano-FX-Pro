@@ -133,5 +133,5 @@
 #define IDB_BITMAP2                     1302
 
 #ifdef DBG
-#include "DebugLanguageOverride.h"
+#include <DebugLanguageOverride.h>
 #endif

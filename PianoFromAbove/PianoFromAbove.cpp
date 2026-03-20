@@ -9,7 +9,7 @@
 *
 *************************************************************************************************/
 #include <Windows.h>
-
+#include <lzma.h>
 #ifdef INCLUDE_FFMPEG
 // Do not include these files in Debug configuration as these files are too large and would cause significant lag in intellisense! 
 #include <ffmpeg1.h>
@@ -19,20 +19,16 @@
 #include <ffmpeg5.h>
 #include <ffmpeg6.h>
 #endif
-
-#include "MainProcs.h"
-#include "resource.h"
-#include "LanguagePacks.hpp"
-
-#include "Config.h"
-#include "GameState.h"
-#include "Renderer.h"
-#include "Misc.h"
-#include "lzma.h"
-
-#include "Studio.h"
-#include "Tutorials.h"
-#include "LuaCode.h"
+#include <resource.h>
+#include <PackWrapper.hpp>
+#include <MainProcs.h>
+#include <Config.h>
+#include <GameState.h>
+#include <Renderer.h>
+#include <Misc.h>
+#include <Studio.h>
+#include <Tutorials.h>
+#include <LuaCode.h>
 
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, INT nCmdShow);
 DWORD WINAPI GameThread(LPVOID lpParameter);

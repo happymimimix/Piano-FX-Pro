@@ -15,9 +15,7 @@
 #include <map>
 #include <atomic>
 #include <stdint.h>
-using namespace std;
-
-#include "Misc.h"
+#include <Misc.h>
 
 //Classes defined in this file
 class MIDI;

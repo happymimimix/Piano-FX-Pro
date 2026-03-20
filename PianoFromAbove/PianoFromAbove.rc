@@ -1,8 +1,8 @@
 #pragma code_page(65001)
-#include "resource.h"
-#include "matrices.h"
-#include "PackWrapper.h"
-#include "afxres.h"
+#include <resource.h>
+#include <matrices.h>
+#include <PackWrapper.h>
+#include <afxres.h>
 
 /////////////////////////////////////////////////////////////////////////////
 //

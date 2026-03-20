@@ -381,6 +381,8 @@ del .\Colorizer.exe /f /q
 del .\Colorizer.exe.h /f /q
 del .\PFXGDI.exe /f /q
 del .\PFXGDI.exe.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
 del .\Widths.h /f /q
 msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
@@ -391,7 +393,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encoding Unicode | Set-Content -Encoding UTF8 LanguagePacks.hpp"
-</Command>
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -467,6 +469,8 @@ del .\Colorizer.exe /f /q
 del .\Colorizer.exe.h /f /q
 del .\PFXGDI.exe /f /q
 del .\PFXGDI.exe.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
 del .\Widths.h /f /q
 msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
@@ -477,7 +481,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encoding Unicode | Set-Content -Encoding UTF8 LanguagePacks.hpp"
-</Command>
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -553,6 +557,8 @@ del .\Colorizer.exe /f /q
 del .\Colorizer.exe.h /f /q
 del .\PFXGDI.exe /f /q
 del .\PFXGDI.exe.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
 del .\Widths.h /f /q
 msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
@@ -563,7 +569,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encoding Unicode | Set-Content -Encoding UTF8 LanguagePacks.hpp"
-</Command>
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -639,6 +645,8 @@ del .\Colorizer.exe /f /q
 del .\Colorizer.exe.h /f /q
 del .\PFXGDI.exe /f /q
 del .\PFXGDI.exe.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
 del .\Widths.h /f /q
 msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
@@ -649,7 +657,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encoding Unicode | Set-Content -Encoding UTF8 LanguagePacks.hpp"
-</Command>
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -725,6 +733,8 @@ del .\Colorizer.exe /f /q
 del .\Colorizer.exe.h /f /q
 del .\PFXGDI.exe /f /q
 del .\PFXGDI.exe.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
 del .\Widths.h /f /q
 msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
@@ -735,7 +745,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encoding Unicode | Set-Content -Encoding UTF8 LanguagePacks.hpp"
-</Command>
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -811,6 +821,8 @@ del .\Colorizer.exe /f /q
 del .\Colorizer.exe.h /f /q
 del .\PFXGDI.exe /f /q
 del .\PFXGDI.exe.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
 del .\Widths.h /f /q
 msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
@@ -821,7 +833,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encoding Unicode | Set-Content -Encoding UTF8 LanguagePacks.hpp"
-</Command>
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -897,6 +909,8 @@ del .\Colorizer.exe /f /q
 del .\Colorizer.exe.h /f /q
 del .\PFXGDI.exe /f /q
 del .\PFXGDI.exe.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
 del .\Widths.h /f /q
 msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
@@ -907,7 +921,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encoding Unicode | Set-Content -Encoding UTF8 LanguagePacks.hpp"
-</Command>
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -983,6 +997,8 @@ del .\Colorizer.exe /f /q
 del .\Colorizer.exe.h /f /q
 del .\PFXGDI.exe /f /q
 del .\PFXGDI.exe.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
 del .\Widths.h /f /q
 msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
@@ -993,7 +1009,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encoding Unicode | Set-Content -Encoding UTF8 LanguagePacks.hpp"
-</Command>
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1069,6 +1085,8 @@ del .\Colorizer.exe /f /q
 del .\Colorizer.exe.h /f /q
 del .\PFXGDI.exe /f /q
 del .\PFXGDI.exe.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
 del .\Widths.h /f /q
 msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
@@ -1079,7 +1097,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encoding Unicode | Set-Content -Encoding UTF8 LanguagePacks.hpp"
-</Command>
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1153,6 +1171,8 @@ del .\Colorizer.exe /f /q
 del .\Colorizer.exe.h /f /q
 del .\PFXGDI.exe /f /q
 del .\PFXGDI.exe.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
 del .\Widths.h /f /q
 msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
@@ -1163,7 +1183,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encoding Unicode | Set-Content -Encoding UTF8 LanguagePacks.hpp"
-</Command>
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1239,6 +1259,8 @@ del .\Colorizer.exe /f /q
 del .\Colorizer.exe.h /f /q
 del .\PFXGDI.exe /f /q
 del .\PFXGDI.exe.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
 del .\Widths.h /f /q
 msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
@@ -1249,7 +1271,7 @@ start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type 
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
 Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encoding Unicode | Set-Content -Encoding UTF8 LanguagePacks.hpp"
-</Command>
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1316,7 +1338,7 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
 start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.h ^|.\tmp.exe ^&gt;.\Widths.h
 Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encoding Unicode | Set-Content -Encoding UTF8 LanguagePacks.hpp"
-</Command>
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -1374,7 +1396,7 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
 start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.h ^|.\tmp.exe ^&gt;.\Widths.h
 Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encoding Unicode | Set-Content -Encoding UTF8 LanguagePacks.hpp"
-</Command>
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -1403,6 +1425,8 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
     </ClCompile>
     <ClCompile Include="Tutorials.cpp" />
     <ClInclude Include="Background.h" />
+    <ClInclude Include="BackgroundPixelShader.h" />
+    <ClInclude Include="BackgroundVertexShader.h" />
     <ClInclude Include="ButtonStateDeclarations.h" />
     <ClInclude Include="CheatEngineTutorial.h" />
     <ClInclude Include="ClipboardTool.h" />
@@ -1480,9 +1504,16 @@ Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encodi
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="NotePixelShader.h" />
+    <ClInclude Include="NoteVertexShader.h" />
+    <ClInclude Include="NoteVertexShaderSameWidth.h" />
     <ClInclude Include="NullPtrChecker.h" />
+    <ClInclude Include="PackWrapper.h" />
+    <ClInclude Include="PackWrapper.hpp" />
     <ClInclude Include="PFXGDI.exe.h" />
     <ClInclude Include="PFXSTUDIO_Global_Imports.h" />
+    <ClInclude Include="RectPixelShader.h" />
+    <ClInclude Include="RectVertexShader.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Studio.h" />

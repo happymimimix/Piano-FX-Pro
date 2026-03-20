@@ -12,15 +12,14 @@
 #include <Uxtheme.h>
 #include <Vsstyle.h>
 #include <Dbt.h>
-
-#include "ConfigProcs.h"
-#include "MainProcs.h"
-#include "Globals.h"
-#include "resource.h"
-#include "PackWrapper.hpp"
-#include "GameState.h"
 #include <Fonts.h>
 #include <imguiCompressedFont2GDI.h>
+#include <resource.h>
+#include <PackWrapper.hpp>
+#include <ConfigProcs.h>
+#include <MainProcs.h>
+#include <Globals.h>
+#include <GameState.h>
 
 VOID DoPreferences(HWND hWndOwner)
 {

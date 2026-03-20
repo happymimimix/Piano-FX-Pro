@@ -10,12 +10,9 @@
 #include <Windows.h>
 #include <Shlobj.h>
 #include <TChar.h>
-
 #include <fstream>
-using namespace std;
-
-#include "Config.h"
-#include "Misc.h"
+#include <Config.h>
+#include <Misc.h>
 //-----------------------------------------------------------------------------
 // Main Config class
 //-----------------------------------------------------------------------------

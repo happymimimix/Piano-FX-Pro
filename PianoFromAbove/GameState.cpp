@@ -10,18 +10,16 @@
 *************************************************************************************************/
 #include <algorithm>
 #include <tchar.h>
-#include <ppl.h>
 #include <dwmapi.h>
 #include <d3d9types.h>
 #include <numeric>
-
-#include "Globals.h"
-#include "GameState.h"
-#include "Config.h"
-#include "resource.h"
-#include "PackWrapper.hpp"
-#include "ConfigProcs.h"
-#include "lzma.h"
+#include <lzma.h>
+#include <resource.h>
+#include <PackWrapper.hpp>
+#include <Globals.h>
+#include <GameState.h>
+#include <Config.h>
+#include <ConfigProcs.h>
 
 const wstring GameState::Errors[] =
 {
@@ -228,7 +226,9 @@ SplashScreen::SplashScreen(HWND hWnd, Renderer11* pRenderer, bool enableSplash) 
         }
 
         // Allocate
+        m_vTrackSettings.clear();
         m_vTrackSettings.resize(min(m_MIDI.GetInfo().iNumTracks, MaxTrackColors));
+        m_vState.clear();
         m_vState.reserve(1 << 10);
     }
     InitState();
@@ -389,20 +389,19 @@ GameState::GameError SplashScreen::Logic() {
     while (m_iStartPos < iEventCount && m_vEvents[m_iStartPos]->GetAbsMicroSec() <= m_llStartTime)
     {
         const MIDIChannelEvent* pEvent = m_vEvents[m_iStartPos];
-        if (pEvent->GetChannelEventType() != MIDIChannelEvent::NoteOn && pEvent->GetChannelEventType() != MIDIChannelEvent::NoteOff) {
+        if (IsNotNote(pEvent->GetChannelEventType())) {
             m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), pEvent->GetParam2());
         }
         else if (!m_bMute && pEvent->HasSister()) {
-            if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0) {
-                m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), static_cast<unsigned char>(m_dVolume > 1.0 ? static_cast<double>(INT8_MAX) - (static_cast<double>(INT8_MAX) - static_cast<double>(pEvent->GetParam2())) * (2.0 - m_dVolume) : static_cast<double>(pEvent->GetParam2()) * m_dVolume));
+            if (IsOn(pEvent->GetChannelEventType(),pEvent->GetParam2()) && pEvent->HasSister()) {
+                m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), NoteVelFormula(pEvent->GetParam2()));
             }
             else {
-                m_OutDevice.PlayEvent(pEvent->GetEventCode() & 0x0F | 0x90, pEvent->GetParam1(), 0x00);
+                m_OutDevice.PlayEvent(off2on(pEvent->GetEventCode()), pEvent->GetParam1(), 0x00);
             }
         }
-        bool IsOn = pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0;
-        if (IsOn && pEvent->HasSister()) {
-            UpdateState(static_cast<idx_t>(m_iStartPos), IsOn ? IDX_MAX : pEvent->GetSisterIdx());
+        if (IsNote(pEvent->GetChannelEventType()) && pEvent->HasSister()) {
+            UpdateState(static_cast<idx_t>(m_iStartPos), IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()) ? IDX_MAX : pEvent->GetSisterIdx());
         }
         m_iStartPos++;
     }
@@ -597,7 +596,9 @@ MainScreen::MainScreen(wstring sMIDIFile, HWND hWnd, Renderer11* pRenderer) : Ga
     m_vEvents.reserve(m_MIDI.GetInfo().iEventCount);
 
     // Allocate
+    m_vTrackSettings.clear();
     m_vTrackSettings.resize(min(m_MIDI.GetInfo().iNumTracks, MaxTrackColors));
+    m_vState.clear();
     m_vState.reserve(1 << 10);
 
     bool IsPostProcessOK = m_MIDI.PostProcess(m_vEvents, &m_vMetaEvents, &m_vTempo, &m_vSignature, &m_vMarkers, &m_vColors);
@@ -723,6 +724,7 @@ void MainScreen::InitState() {
         _wsystem(buf);
         ConnectNamedPipe(m_hVideoPipe, NULL);
     }
+    InitKeyColor();
     AdvanceIterators(m_llStartTime, true);
 }
 
@@ -1155,61 +1157,53 @@ GameState::GameError MainScreen::Logic() {
     LoopBody:
         {
             const MIDIChannelEvent* pEvent = m_vEvents[m_iStartPos];
-            auto type = pEvent->GetChannelEventType();
-            key_t vel = pEvent->GetParam2();
             key_t key = pEvent->GetParam1();
-            const idx_t sistidx = pEvent->GetSisterIdx();
-            const bool IsNote = type == MIDIChannelEvent::NoteOn || type == MIDIChannelEvent::NoteOff;
-            const bool IsOnOg = type == MIDIChannelEvent::NoteOn && vel > 0;
-            const bool IsPaired = pEvent->HasSister();
-            if (IsNote && IsPaired && Reverse) {
-                pEvent = m_vEvents[sistidx];
-                type = pEvent->GetChannelEventType();
+            key_t vel = pEvent->GetParam2();
+            idx_t ogsistidx = pEvent->GetSisterIdx();
+            if (IsNote(pEvent->GetChannelEventType()) && pEvent->HasSister() && Reverse) {
+                pEvent = m_vEvents[ogsistidx];
                 vel = pEvent->GetParam2();
             }
-            const chan_t chan = pEvent->GetChannel();
-            const track_t trk = pEvent->GetTrack() % MaxTrackColors;
-            const bool IsOn = type == MIDIChannelEvent::NoteOn && vel > 0;
-            if (!IsOn && IsPaired) vel = pEvent->GetSister(m_vEvents)->GetParam2();
-            const msg_t raw = pEvent->GetEventCode();
+            if (IsOff(pEvent->GetChannelEventType(), vel) && pEvent->HasSister()) {
+                vel = pEvent->GetSister(m_vEvents)->GetParam2();
+            }
 
-            if (!IsNote) {
-                if (type == MIDIChannelEvent::ProgramChange && config.m_bPianoOverride) {
+            if (IsNotNote(pEvent->GetChannelEventType())) {
+                if (pEvent->GetChannelEventType() == MIDIChannelEvent::ProgramChange && config.m_bPianoOverride) {
                     key &= 0x00;
                 }
-                if (type == MIDIChannelEvent::PitchBend) {
-                    m_pBendsValue[chan] = ((vel << 7) | key) - (1 << 13);
+                if (pEvent->GetChannelEventType() == MIDIChannelEvent::PitchBend) {
+                    m_pBendsValue[pEvent->GetChannel()] = ((vel << 7) | key) - (1 << 13);
                     goto PitchBendUpdate; // Update PB display. 
                 }
-                if (type == MIDIChannelEvent::Controller) {
+                if (pEvent->GetChannelEventType() == MIDIChannelEvent::Controller) {
                     if (key == MIDIChannelEvent::RPNType) {
-                        Next_is_PBS[chan] = (vel == MIDIChannelEvent::PBSRPNID);
+                        Next_is_PBS[pEvent->GetChannel()] = (vel == MIDIChannelEvent::PBSRPNID);
                     }
-                    if (key == MIDIChannelEvent::RPNData && Next_is_PBS[chan]) {
-                        m_pBendsRange[chan] = vel;
+                    if (key == MIDIChannelEvent::RPNData && Next_is_PBS[pEvent->GetChannel()]) {
+                        m_pBendsRange[pEvent->GetChannel()] = vel;
 
                     PitchBendUpdate: // Update PB display. 
                         float NoteWidth = (m_pRenderer->GetBufferWidth() * abs(m_fZoomX) * abs(m_fTempZoomX)) / (m_iEndNote - m_iStartNote);
-                        float ShiftAmount = m_pBendsRange[chan] == 0 ? 0 : m_pBendsValue[chan] / ((1 << 13) / m_pBendsRange[chan]);
+                        float ShiftAmount = m_pBendsRange[pEvent->GetChannel()] == 0 ? 0 : m_pBendsValue[pEvent->GetChannel()] / ((1 << 13) / m_pBendsRange[pEvent->GetChannel()]);
                         if (m_bFlipKeyboard) ShiftAmount *= -1;
                         m_pBends[pEvent->GetChannel()] = NoteWidth * ShiftAmount;
                     }
                 }
-                m_OutDevice.PlayEvent(raw, key, vel);
+                m_OutDevice.PlayEvent(pEvent->GetEventCode(), key, vel);
             }
-            else if (!m_bMute && !m_vTrackSettings[trk].aChannels[chan].bMuted && vel > velthrshld && IsPaired) {
+            else if (!m_bMute && !m_vTrackSettings[pEvent->GetTrack() % MaxTrackColors].aChannels[pEvent->GetChannel()].bMuted && vel > velthrshld && pEvent->HasSister()) {
                 // We're playing a note! 
-                if (IsOn) {
-                    m_OutDevice.PlayEvent(raw, key, static_cast<unsigned char>(m_dVolume > 1.0 ? static_cast<double>(INT8_MAX) - (static_cast<double>(INT8_MAX) - static_cast<double>(vel)) * (2.0 - m_dVolume) : static_cast<double>(vel) * m_dVolume));
+                if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2())) {
+                    m_OutDevice.PlayEvent(pEvent->GetEventCode(), key, NoteVelFormula(vel));
                 }
                 else {
-                    m_OutDevice.PlayEvent(raw & 0x0F | 0x90, key, 0x00);
+                    m_OutDevice.PlayEvent(off2on(pEvent->GetEventCode()), key, 0x00);
                 }
             }
-            if (IsNote && IsPaired)
-            {
-                idx_t idx = Reverse ? sistidx : static_cast<idx_t>(m_iStartPos);
-                idx_t sister = IsOnOg ? (Reverse ? static_cast<idx_t>(m_iStartPos) : IDX_MAX) : (Reverse ? IDX_MAX : sistidx);
+        if (IsNote(pEvent->GetChannelEventType()) && pEvent->HasSister()) {
+                idx_t idx = Reverse ? ogsistidx : static_cast<idx_t>(m_iStartPos);
+                idx_t sister = IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()) ? IDX_MAX : (Reverse ? static_cast<idx_t>(m_iStartPos) : ogsistidx);
                 if (Reverse) {
                     UpdateStateBackwards(idx, sister);
                 }
@@ -1367,54 +1361,51 @@ void MainScreen::JumpTo(mms_t llStartTime, boolean loadingMode) {
         }
     }
 
-    // Start position and current state: hard!
+    // Find start position...
     auto itBegin = m_vEvents.begin();
     auto itEnd = m_vEvents.end();
-    // Want lower bound to minimize simultaneous complexity
     auto itMiddle = lower_bound(itBegin, itEnd, llStartTime, [&](MIDIChannelEvent* lhs, const mms_t rhs) {
         return lhs->GetAbsMicroSec() < rhs;
         });
+    // We've found it! Set m_iStartPos to our latest findings now.
+    m_iStartPos = itMiddle - m_vEvents.begin();
 
-    // Start position
-    m_iStartPos = m_vEvents.size();
-    if (itMiddle != itEnd && itMiddle - m_vEvents.begin() < m_iStartPos)
-        m_iStartPos = itMiddle - m_vEvents.begin();
-
-    // Need to scan up to the next note on event
-    for (; itMiddle != itEnd; itMiddle++) {
-        if ((*itMiddle)->GetChannelEventType() == MIDIChannelEvent::NoteOn && (*itMiddle)->GetParam2() > 0)
-            break;
-    }
-
-    // Find the notes that occur simultaneously with the previous note on
+    // Find the notes that occur simultaneously with the previous note on...
     m_vState.clear();
-
-    if (itMiddle != itBegin)//SLOWEST SECTION!!! 
+    if (itMiddle != itEnd)
     {
-        // Need to scan down to the last note on event
-        auto itPrev = itMiddle - 1;
-        for (; itPrev != itBegin; itPrev--) {
-            if ((*itPrev)->GetChannelEventType() == MIDIChannelEvent::NoteOn && (*itPrev)->GetParam2() > 0)
-                break;
+        // Find the previous note on...
+        for (; itMiddle != itBegin; itMiddle--) {
+            if ((*itMiddle)->GetChannelEventType() == MIDIChannelEvent::NoteOn && (*itMiddle)->GetParam2() > 0) { break; }
         }
-
-        idx_t iFound = 0;
-        idx_t iSimultaneous = (*itPrev)->GetSimultaneous() + 1;
-        for (vector<MIDIChannelEvent*>::reverse_iterator it(itMiddle); iFound < iSimultaneous && it != m_vEvents.rend(); ++it)
-        {
-            idx_t idx = m_vEvents.size() - 1 - (it - m_vEvents.rbegin());
-            MIDIChannelEvent* pEvent = m_vEvents[idx];
-            if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0 && pEvent->HasSister()) {
-                MIDIChannelEvent* pSister = pEvent->GetSister(m_vEvents);
-                if (pSister->GetAbsMicroSec() > (*itPrev)->GetAbsMicroSec()) // > because itMiddle is the max for its time
-                    iFound++;
-                if (pSister->GetAbsMicroSec() > llStartTime) // > because we don't care about simultaneous ending notes
+        // Found it!
+        // It's totally possible that the jump lands before the first note but after a tempo, meta, or time signature event.
+        // So we must do an extra check here to ensure we REALLY found a note.
+        if ((*itMiddle)->GetChannelEventType() == MIDIChannelEvent::NoteOn && (*itMiddle)->GetParam2() > 0) {
+            MIDIChannelEvent* pTargetEvent = *itMiddle;
+            if (pTargetEvent->GetAbsMicroSec() + pTargetEvent->GetLength() > m_llStartTime) {
+                m_vState.push_back(itMiddle - m_vEvents.begin());
+            }
+            idx_t iFound = 0;
+            idx_t iSimultaneous = pTargetEvent->GetSimultaneous();
+            if (iSimultaneous > 0 && itMiddle != itBegin) {
+                for (itMiddle--; iFound < iSimultaneous && itMiddle != itBegin; itMiddle--)
                 {
-                    m_vState.push_back(idx);
+                    MIDIChannelEvent* pEvent = *itMiddle;
+                    if (pEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0) {
+                        if (pEvent->GetAbsMicroSec() + pEvent->GetLength() > pTargetEvent->GetAbsMicroSec()) { // > because itMiddle is the max for its time
+                            iFound++;
+                        }
+                        if (pEvent->GetAbsMicroSec() + pEvent->GetLength() > m_llStartTime) { // > because we don't care about simultaneous ending notes
+                            m_vState.push_back(itMiddle - m_vEvents.begin());
+                        }
+                    }
                 }
+                // If there's only one note, there's no need to reverse.
+                // So let's put this statement inside the if check.
+                reverse(m_vState.begin(), m_vState.end());
             }
         }
-        reverse(m_vState.begin(), m_vState.end());
     }
 
     AdvanceIterators(llStartTime, true);

@@ -7,13 +7,12 @@
 * Copyright (c) 2010 Brian Pantano. All rights reserved.
 *
 *************************************************************************************************/
-#include "MIDI.h"
 #include <fstream>
 #include <stack>
 #include <array>
 #include <ppl.h>
-#include "lzma.h"
-
+#include <lzma.h>
+#include <MIDI.h>
 MIDILoadingProgress g_LoadingProgress;
 
 //-----------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-#include "common.hlsl"
+#include <common.hlsl>
 
 RectPSInput main(float2 position : POSITION, float4 color : COLOR) {
     RectPSInput result;

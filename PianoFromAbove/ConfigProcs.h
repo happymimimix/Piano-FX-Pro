@@ -10,10 +10,9 @@
 #pragma once
 
 #include <Windows.h>
-
-#include "GameState.h"
-#include "Config.h"
-#include "MIDI.h"
+#include <GameState.h>
+#include <Config.h>
+#include <MIDI.h>
 
 // Message handlers for the configuration property sheets
 VOID DoPreferences(HWND hWndOwner);

@@ -1,4 +1,5 @@
 ﻿#ifdef ENG
+#define PackVersion 0xF0000001U
 #define MainWindowTitle1 L"Piano-FX Pro"
 #define MainWindowTitle2 L"Developed by: happy_mimimix"
 #define MainWindowTitle3 L"Now playing: "
@@ -6,11 +7,8 @@
 #define MainWindowTitle5 L"None"
 #define MainWindowTitle6 L"Splash MIDI"
 #define MainWindowTitle7 L"(Software Rendering)"
-#ifdef LIMIT_COLORS
-#define MainWindowTitle8 L"(Limited Track Coloring)"
-#else
-#define MainWindowTitle8 L""
-#endif
+#define MainWindowTitle8 L"(Enforced Software Rendering)"
+#define MainWindowTitle9 L"(Limited Track Coloring)"
 #define WelcomeText L"Welcome to Piano-FX Pro"
 #define StartupStage1Text L"Preparing..."
 #define StartupStage2Text L"Loading splash midi..."
@@ -146,6 +144,7 @@
 #define MenuText25 L"Preferences"
 #define MenuText26 L"About"
 #define MenuText27 L"Open Piano-FX Studio"
+#define ErrorOpenSong L"Failed to load"
 #endif
 #ifdef CHN
 #define MainWindowTitle1 L"专业の钢琴特效"

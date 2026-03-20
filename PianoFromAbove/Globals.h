@@ -10,8 +10,8 @@
 #pragma once
 
 #include <Windows.h>
-#include "Misc.h"
-#include "resource.h"
+#include <Misc.h>
+using namespace std;
 
 extern HINSTANCE g_hInstance;
 extern HWND g_hWnd;

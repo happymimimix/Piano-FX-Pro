@@ -12,13 +12,10 @@
 #include <vector>
 #include <map>
 #include <string>
-
-//#include "ProtoBuf\MetaData.pb.h"
-#include "TinyXML\tinyxml.h"
-
-#include "MIDI.h"
-#include "GameState.h"
-#include "MainProcs.h"
+#include <TinyXML/tinyxml.h>
+#include <MIDI.h>
+#include <GameState.h>
+#include <MainProcs.h>
 
 #define APPNAME "Piano From Above"
 #define APPNAMENOSPACES "PianoFromAbove"

@@ -6,11 +6,8 @@
 #define MainWindowTitle5W 17 //Text: L"None"
 #define MainWindowTitle6W 38 //Text: L"Splash MIDI"
 #define MainWindowTitle7W 69 //Text: L"(Software Rendering)"
-#ifdef LIMIT_COLORS
-#define MainWindowTitle8W 75 //Text: L"(Limited Track Coloring)"
-#else
-#define MainWindowTitle8W 0 //Text: L""
-#endif
+#define MainWindowTitle8W 100 //Text: L"(Enforced Software Rendering)"
+#define MainWindowTitle9W 75 //Text: L"(Limited Track Coloring)"
 #define WelcomeTextW 80 //Text: L"Welcome to Piano-FX Pro"
 #define StartupStage1TextW 39 //Text: L"Preparing..."
 #define StartupStage2TextW 69 //Text: L"Loading splash midi..."
@@ -145,6 +142,7 @@
 #define MenuText25W 39 //Text: L"Preferences"
 #define MenuText26W 19 //Text: L"About"
 #define MenuText27W 69 //Text: L"Open Piano-FX Studio"
+#define ErrorOpenSongW 43 //Text: L"Failed to load"
 #endif
 #ifdef CHN
 #define MainWindowTitle1W 55 //Text: L"专业の钢琴特效"

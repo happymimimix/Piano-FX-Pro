@@ -33,6 +33,13 @@ typedef signed long bpm_t; // Anything that has something to do with tempo, beat
 typedef signed int win32_t; // Classic signed 32bit integer, aka dword, used for interfacing with Win32 API (should not appear in any game logic)
 typedef signed short winword_t; // Classic signed 16bit integer, aka word, used for interfacing with Win32 API (should not appear in any game logic)
 
+#define NoteVelFormula(velvar) (static_cast<unsigned char>(m_dVolume > 1.0 ? static_cast<double>(INT8_MAX) - (static_cast<double>(INT8_MAX) - static_cast<double>(velvar)) * (2.0 - m_dVolume) : static_cast<double>(velvar) * m_dVolume))
+#define IsNote(type) (type == MIDIChannelEvent::NoteOn || type == MIDIChannelEvent::NoteOff)
+#define IsNotNote(type) (type != MIDIChannelEvent::NoteOn && type != MIDIChannelEvent::NoteOff)
+#define IsOn(type,vel) (type == MIDIChannelEvent::NoteOn && vel > 0)
+#define IsOff(type,vel) (type == MIDIChannelEvent::NoteOff || (type == MIDIChannelEvent::NoteOn && vel == 0))
+#define off2on(code) (code & 0x0F | 0x90)
+
 template <typename T>
 __forceinline string GetAddress(const T& Variable) {
     HMODULE ProcessBaseAddress = GetModuleHandle(NULL);

@@ -14,15 +14,13 @@
 #include <set>
 #include <thread>
 #include <Uxtheme.h>
-
-#include "MainProcs.h"
-#include "ConfigProcs.h"
-#include "Globals.h"
-#include "resource.h"
-#include "PackWrapper.hpp"
-
-#include "GameState.h"
-#include "Config.h"
+#include <resource.h>
+#include <PackWrapper.hpp>
+#include <MainProcs.h>
+#include <ConfigProcs.h>
+#include <Globals.h>
+#include <GameState.h>
+#include <Config.h>
 
 static WNDPROC g_pPrevBarProc; // Have to override the toolbar proc to make controls transparent
 
@@ -1146,7 +1144,7 @@ BOOL PlayFile(const wstring& sFile)
     gamethread.join();
     if (!pGameState->IsValid())
     {
-        MessageBox(g_hWnd, (L"Was not able to load " + sFile).c_str(), TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
+        MessageBox(g_hWnd, (ErrorOpenSong + sFile).c_str(), TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
         return FALSE;
     }
 
@@ -1156,17 +1154,16 @@ BOOL PlayFile(const wstring& sFile)
         return FALSE;
     }
 
-    // Success! Set up the GUI for playback
-    if (!cPlayback.GetPlayable()) cPlayback.SetPlayable(true, true);
     if (cPlayback.GetPlayMode()) { //Close the current file first before opening another one! 
         cPlayback.SetPlayMode(GameState::Intro, true);
         cPlayback.SetPlayable(false, true);
         cPlayback.SetPosition(0);
         SetWindowText(g_hWnd, TitleIdle);
         HandOffMsg(WM_COMMAND, ID_CHANGESTATE, (LPARAM)new IntroScreen(NULL, NULL));
-    }else{
-        cPlayback.SetPlayMode(GameState::Practice, true);
     }
+    // Success! Set up the GUI for playback
+    cPlayback.SetPlayable(true, true);
+    cPlayback.SetPlayMode(GameState::Practice, true);
     cPlayback.SetPaused(false, true);
     cPlayback.SetPosition(0);
     cView.SetZoomMove(false);

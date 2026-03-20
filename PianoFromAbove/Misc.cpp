@@ -10,11 +10,8 @@
 #include <Windows.h>
 #include <Wincrypt.h>
 #include <tchar.h>
-
 #include <algorithm>
-using namespace std;
-
-#include "Misc.h"
+#include <Misc.h>
 
 //-----------------------------------------------------------------------------
 // The Timer class

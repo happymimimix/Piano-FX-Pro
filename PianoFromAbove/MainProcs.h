@@ -12,8 +12,7 @@
 #include <Windows.h>
 #include <CommCtrl.h>
 #include <string>
-#include "Misc.h"
-using namespace std;
+#include <Misc.h>
 
 // Message handlers for the main windows
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

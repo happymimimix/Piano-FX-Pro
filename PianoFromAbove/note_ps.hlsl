@@ -1,4 +1,4 @@
-#include "common.hlsl"
+#include <common.hlsl>
 
 float4 main(NotePSInput input) : SV_TARGET {
     return (abs(input.position.x - input.edges.x) <= root_deflate ||

@@ -37,9 +37,6 @@
     <Filter Include="Source Files\Piano-FX Studio">
       <UniqueIdentifier>{86533545-6508-4b8a-8b4e-cb9b55466cf0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Piano-FX Studio\Embedded Files">
-      <UniqueIdentifier>{bfb735c4-31ac-4c24-b72e-f60975558e20}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Piano-FX Studio\Main">
       <UniqueIdentifier>{31d55b7e-15be-4d96-aa29-a3cebd92e35c}</UniqueIdentifier>
     </Filter>
@@ -81,6 +78,12 @@
     </Filter>
     <Filter Include="Source Files\ModdingRelated">
       <UniqueIdentifier>{fbf827eb-31a6-4d4b-a72b-c601b6ddc8bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Generated Files %28DO NOT EDIT!%29">
+      <UniqueIdentifier>{3667f09f-29bf-4e6e-a9ee-eef51fb3d8fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Embedded ffmpeg.exe">
+      <UniqueIdentifier>{bfb735c4-31ac-4c24-b72e-f60975558e20}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -158,12 +161,6 @@
     </ClInclude>
     <ClInclude Include="lzma\vli.h">
       <Filter>Header Files\lzma</Filter>
-    </ClInclude>
-    <ClInclude Include="Colorizer.exe.h">
-      <Filter>Source Files\Piano-FX Studio\Embedded Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PFXGDI.exe.h">
-      <Filter>Source Files\Piano-FX Studio\Embedded Files</Filter>
     </ClInclude>
     <ClInclude Include="Studio.h">
       <Filter>Source Files\Piano-FX Studio\Main</Filter>
@@ -262,22 +259,22 @@
       <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="ffmpeg1.h">
-      <Filter>Source Files\Piano-FX Studio\Embedded Files</Filter>
+      <Filter>Resource Files\Embedded ffmpeg.exe</Filter>
     </ClInclude>
     <ClInclude Include="ffmpeg2.h">
-      <Filter>Source Files\Piano-FX Studio\Embedded Files</Filter>
+      <Filter>Resource Files\Embedded ffmpeg.exe</Filter>
     </ClInclude>
     <ClInclude Include="ffmpeg3.h">
-      <Filter>Source Files\Piano-FX Studio\Embedded Files</Filter>
+      <Filter>Resource Files\Embedded ffmpeg.exe</Filter>
     </ClInclude>
     <ClInclude Include="ffmpeg4.h">
-      <Filter>Source Files\Piano-FX Studio\Embedded Files</Filter>
+      <Filter>Resource Files\Embedded ffmpeg.exe</Filter>
     </ClInclude>
     <ClInclude Include="ffmpeg5.h">
-      <Filter>Source Files\Piano-FX Studio\Embedded Files</Filter>
+      <Filter>Resource Files\Embedded ffmpeg.exe</Filter>
     </ClInclude>
     <ClInclude Include="ffmpeg6.h">
-      <Filter>Source Files\Piano-FX Studio\Embedded Files</Filter>
+      <Filter>Resource Files\Embedded ffmpeg.exe</Filter>
     </ClInclude>
     <ClInclude Include="ConsoleNumberSpinner.h">
       <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
@@ -286,9 +283,6 @@
       <Filter>Resource Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Widths.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
     <ClInclude Include="LanguagePacks.h">
@@ -300,14 +294,50 @@
     <ClInclude Include="ModdingAPI.h">
       <Filter>Source Files\ModdingRelated</Filter>
     </ClInclude>
-    <ClInclude Include="LanguagePacks.hpp">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
     <ClInclude Include="imguiCompressedFont2GDI.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
     <ClInclude Include="Fonts.h">
       <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PackWrapper.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LanguagePacks.hpp">
+      <Filter>Generated Files %28DO NOT EDIT!%29</Filter>
+    </ClInclude>
+    <ClInclude Include="PackWrapper.hpp">
+      <Filter>Generated Files %28DO NOT EDIT!%29</Filter>
+    </ClInclude>
+    <ClInclude Include="Widths.h">
+      <Filter>Generated Files %28DO NOT EDIT!%29</Filter>
+    </ClInclude>
+    <ClInclude Include="Colorizer.exe.h">
+      <Filter>Generated Files %28DO NOT EDIT!%29</Filter>
+    </ClInclude>
+    <ClInclude Include="PFXGDI.exe.h">
+      <Filter>Generated Files %28DO NOT EDIT!%29</Filter>
+    </ClInclude>
+    <ClInclude Include="RectPixelShader.h">
+      <Filter>Generated Files %28DO NOT EDIT!%29</Filter>
+    </ClInclude>
+    <ClInclude Include="RectVertexShader.h">
+      <Filter>Generated Files %28DO NOT EDIT!%29</Filter>
+    </ClInclude>
+    <ClInclude Include="NotePixelShader.h">
+      <Filter>Generated Files %28DO NOT EDIT!%29</Filter>
+    </ClInclude>
+    <ClInclude Include="NoteVertexShader.h">
+      <Filter>Generated Files %28DO NOT EDIT!%29</Filter>
+    </ClInclude>
+    <ClInclude Include="NoteVertexShaderSameWidth.h">
+      <Filter>Generated Files %28DO NOT EDIT!%29</Filter>
+    </ClInclude>
+    <ClInclude Include="BackgroundPixelShader.h">
+      <Filter>Generated Files %28DO NOT EDIT!%29</Filter>
+    </ClInclude>
+    <ClInclude Include="BackgroundVertexShader.h">
+      <Filter>Generated Files %28DO NOT EDIT!%29</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

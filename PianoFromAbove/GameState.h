@@ -14,11 +14,9 @@
 #include <string>
 #include <functional>
 #include <deque>
-using namespace std;
-
-#include "Renderer.h"
-#include "MIDI.h"
-#include "Misc.h"
+#include <Renderer.h>
+#include <MIDI.h>
+#include <Misc.h>
 
 inline mms_t m_llStartTime;
 inline mms_t m_llRndStartTime;

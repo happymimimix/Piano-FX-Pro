@@ -6,7 +6,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cassert>
-#include "Globals.h"
+#include <Globals.h>
 
 //-----------------------------------------------------------------------------
 // [SECTION] Decompression code

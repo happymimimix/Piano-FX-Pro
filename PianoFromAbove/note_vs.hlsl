@@ -1,4 +1,4 @@
-#include "common.hlsl"
+#include <common.hlsl>
 
 struct NoteData {
     uint packed;
@@ -27,7 +27,7 @@ NotePSInput main(uint id : SV_VertexID) {
     NotePSInput result;
     uint note_index = id / 4;
     uint vertex = id % 4;
-    
+
     uint packed = note_data[note_index].packed;
     // Unpack the note data. 
     uint note = packed & 0x7F;
@@ -79,7 +79,7 @@ NotePSInput main(uint id : SV_VertexID) {
 #else
     float cx = sharp ? root_white_cx * 0.65f : root_white_cx;
 #endif
-    float cy = max(round(root_notes_cy * note_length / root_timespan), 0)+1;
+    float cy = max(round(root_notes_cy * note_length / root_timespan), 0) + 1;
 
     float3 position = float3(x, y, 0);
     position.y -= cy * float(vertex < 2);
@@ -87,7 +87,7 @@ NotePSInput main(uint id : SV_VertexID) {
 #ifndef EQ_W
     position.z = !sharp * 0.5;
 #endif
-    
+
     result.position = colors[track * 16 + chan].colors[2] == 0xFFFFFFFF ? float4(0, 0, 0, 0) : mul(root_proj, float4(position, 1));
     result.color = float4(unpack_color(maincolor));
     result.border = float4(unpack_color(boardercolor));
