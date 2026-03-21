@@ -393,7 +393,7 @@ GameState::GameError SplashScreen::Logic() {
             m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), pEvent->GetParam2());
         }
         else if (!m_bMute && pEvent->HasSister()) {
-            if (IsOn(pEvent->GetChannelEventType(),pEvent->GetParam2())) {
+            if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2())) {
                 m_OutDevice.PlayEvent(pEvent->GetEventCode(), pEvent->GetParam1(), NoteVelFormula(pEvent->GetParam2()));
             }
             else {
@@ -401,7 +401,7 @@ GameState::GameError SplashScreen::Logic() {
             }
         }
         if (IsNote(pEvent->GetChannelEventType()) && pEvent->HasSister()) {
-            UpdateState(static_cast<idx_t>(m_iStartPos), IsOn(pEvent->GetChannelEventType(),pEvent->GetParam2()) ? IDX_MAX : pEvent->GetSisterIdx());
+            UpdateState(static_cast<idx_t>(m_iStartPos), IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()) ? IDX_MAX : pEvent->GetSisterIdx());
         }
         m_iStartPos++;
     }
@@ -488,7 +488,7 @@ void SplashScreen::RenderNotes() {
     // White falling notes
     for (sidx_t i = m_iStartPos; i <= m_iEndPos; i++) {
         MIDIChannelEvent* pEvent = m_vEvents[i];
-        if (IsOn(pEvent->GetChannelEventType(),pEvent->GetParam2()) && pEvent->HasSister() &&
+        if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()) && pEvent->HasSister() &&
             !MIDI::IsSharp(pEvent->GetParam1()) &&
             m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
             RenderNote(pEvent);
@@ -617,7 +617,7 @@ MainScreen::MainScreen(wstring sMIDIFile, HWND hWnd, Renderer11* pRenderer) : Ga
     idx_t iNC = 0;
     mms_t iLastMS = -1;
     for (auto pEvent : m_vEvents) {
-        if (IsOn(pEvent->GetChannelEventType(),pEvent->GetParam2())) {
+        if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2())) {
             iNC++;
             if (m_vNCTable) {
                 mms_t iThisMS = pEvent->GetAbsMicroSec() / MS;
@@ -1149,7 +1149,7 @@ GameState::GameError MainScreen::Logic() {
     ReversedLoopCondition:
         if (m_iStartPos > 0 && m_vEvents[m_iStartPos]->GetAbsMicroSec() >= m_llStartTime) goto LoopBody; else goto LoopEnd;
     NormalLoopCondition:
-        if (m_iStartPos < iEventCount&& m_vEvents[m_iStartPos]->GetAbsMicroSec() <= m_llStartTime) goto LoopBody; else goto LoopEnd;
+        if (m_iStartPos < iEventCount && m_vEvents[m_iStartPos]->GetAbsMicroSec() <= m_llStartTime) goto LoopBody; else goto LoopEnd;
 
         // Here comes the loop body! 
     LoopBody:
@@ -1199,7 +1199,7 @@ GameState::GameError MainScreen::Logic() {
                     m_OutDevice.PlayEvent(off2on(pEvent->GetEventCode()), key, 0x00);
                 }
             }
-        if (IsNote(pEvent->GetChannelEventType()) && pEvent->HasSister()) {
+            if (IsNote(pEvent->GetChannelEventType()) && pEvent->HasSister()) {
                 idx_t idx = Reverse ? ogsistidx : static_cast<idx_t>(m_iStartPos);
                 idx_t sister = IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()) ? IDX_MAX : (Reverse ? static_cast<idx_t>(m_iStartPos) : ogsistidx);
                 if (Reverse) {
@@ -1301,6 +1301,9 @@ void MainScreen::UpdateState(idx_t idx, idx_t sister_idx) {
         if (pos != IDX_MAX) {
             m_vState.erase(m_vState.begin() + pos);
         }
+        else {
+            MessageBoxW(NULL, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
+        }
     }
 }
 
@@ -1314,6 +1317,9 @@ void MainScreen::UpdateStateBackwards(idx_t idx, idx_t sister_idx) {
         idx_t pos = LocateElement(m_vState, sister_idx);
         if (pos != IDX_MAX) {
             m_vState.erase(m_vState.begin() + pos);
+        }
+        else {
+            MessageBoxW(NULL, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
         }
     }
 }
@@ -1360,18 +1366,21 @@ void MainScreen::JumpTo(mms_t llStartTime, boolean loadingMode) {
 
     // Find the notes that occur simultaneously with the previous note on...
     m_vState.clear();
-    if (itMiddle != itEnd)
+    if (itMiddle != itEnd && itMiddle != itBegin)
     {
+        // If we're landing exactly on a note on, look for the previous note on instead. 
+        //if (IsOn((*itMiddle)->GetChannelEventType(), (*itMiddle)->GetParam2())) { itMiddle--; }
+
         // Find the previous note on...
         for (; itMiddle != itBegin; itMiddle--) {
-            if (IsOn((*itMiddle)->GetChannelEventType(),(*itMiddle)->GetParam2())) { break; }
+            if (IsOn((*itMiddle)->GetChannelEventType(), (*itMiddle)->GetParam2())) { break; }
         }
         // Found it!
         // It's totally possible that the jump lands before the first note but after a tempo, meta, or time signature event.
         // So we must do an extra check here to ensure we REALLY found a note.
-        if (IsOn((*itMiddle)->GetChannelEventType(),(*itMiddle)->GetParam2()) && (*itMiddle)->GetAbsMicroSec() <= m_llStartTime) {
+        if (IsOn((*itMiddle)->GetChannelEventType(), (*itMiddle)->GetParam2())) {
             MIDIChannelEvent* pTargetEvent = *itMiddle;
-            if (pTargetEvent->GetSister(m_vEvents)->GetAbsMicroSec() > m_llStartTime) {
+            if (pTargetEvent->GetAbsMicroSec() + pTargetEvent->GetLength() > m_llStartTime) {
                 m_vState.push_back(itMiddle - m_vEvents.begin());
             }
             idx_t iFound = 0;
@@ -1380,11 +1389,11 @@ void MainScreen::JumpTo(mms_t llStartTime, boolean loadingMode) {
                 for (itMiddle--; iFound < iSimultaneous && itMiddle != itBegin; itMiddle--)
                 {
                     MIDIChannelEvent* pEvent = *itMiddle;
-                    if (IsOn(pEvent->GetChannelEventType(),pEvent->GetParam2())) {
-                        if (pEvent->GetSister(m_vEvents)->GetAbsMicroSec() > pTargetEvent->GetAbsMicroSec()) { // > because itMiddle is the max for its time
+                    if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2())) {
+                        if (pEvent->GetAbsMicroSec() + pEvent->GetLength() > pTargetEvent->GetAbsMicroSec()) { // > because itMiddle is the max for its time
                             iFound++;
                         }
-                        if (pEvent->GetSister(m_vEvents)->GetAbsMicroSec() > m_llStartTime) { // > because we don't care about simultaneous ending notes
+                        if (pEvent->GetAbsMicroSec() + pEvent->GetLength() > m_llStartTime) { // > because we don't care about simultaneous ending notes
                             m_vState.push_back(itMiddle - m_vEvents.begin());
                         }
                     }
@@ -1948,7 +1957,7 @@ void MainScreen::RenderNotes() {
         if (m_dNSpeed < 0) {
             for (sidx_t i = iStartPos; i <= iEndPos; i++) {
                 MIDIChannelEvent* pEvent = m_vEvents[i];
-                if (IsOff(pEvent->GetChannelEventType(),pEvent->GetParam2()) && pEvent->HasSister() &&
+                if (IsOff(pEvent->GetChannelEventType(), pEvent->GetParam2()) && pEvent->HasSister() &&
                     m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
                     RenderNote(pEvent->GetSister(m_vEvents));
                 }
@@ -1957,7 +1966,7 @@ void MainScreen::RenderNotes() {
         else {
             for (sidx_t i = iEndPos; i >= iStartPos; i--) {
                 MIDIChannelEvent* pEvent = m_vEvents[i];
-                if (IsOn(pEvent->GetChannelEventType(),pEvent->GetParam2()) && pEvent->HasSister() &&
+                if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()) && pEvent->HasSister() &&
                     m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
                     RenderNote(pEvent);
                 }
@@ -1982,7 +1991,7 @@ void MainScreen::RenderNotes() {
         if (m_dNSpeed < 0) {
             for (sidx_t i = iEndPos; i >= iStartPos; i--) {
                 MIDIChannelEvent* pEvent = m_vEvents[i];
-                if (IsOff(pEvent->GetChannelEventType(),pEvent->GetParam2()) && pEvent->HasSister() &&
+                if (IsOff(pEvent->GetChannelEventType(), pEvent->GetParam2()) && pEvent->HasSister() &&
                     m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
                     RenderNote(pEvent->GetSister(m_vEvents));
                 }
@@ -1991,7 +2000,7 @@ void MainScreen::RenderNotes() {
         else {
             for (sidx_t i = iStartPos; i <= iEndPos; i++) {
                 MIDIChannelEvent* pEvent = m_vEvents[i];
-                if (IsOn(pEvent->GetChannelEventType(),pEvent->GetParam2()) && pEvent->HasSister() &&
+                if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()) && pEvent->HasSister() &&
                     m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
                     RenderNote(pEvent);
                 }

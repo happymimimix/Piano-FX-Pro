@@ -575,8 +575,7 @@ bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
             pChannelEvent->SetSimultaneous(iSimultaneous);
             if (pChannelEvent->HasSister())
             {
-                if (pChannelEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn &&
-                    pChannelEvent->GetParam2() > 0)
+                if (IsOn(pChannelEvent->GetChannelEventType(),pChannelEvent->GetParam2()))
                 {
                     if (llFirstNote < 0) llFirstNote = llTime;
                     iSimultaneous++;
@@ -591,8 +590,7 @@ bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
                 else {
                     sister->SetSisterIdx(vChannelEvents.size());
                     sister->SetPassDone(true);
-                    if (pChannelEvent->GetChannelEventType() == MIDIChannelEvent::NoteOff ||
-                        (pChannelEvent->GetChannelEventType() == MIDIChannelEvent::NoteOn && pChannelEvent->GetParam2() == 0)) {
+                    if (IsOff(pChannelEvent->GetChannelEventType(), pChannelEvent->GetParam2())) {
                         sister->SetLength(llTime - sister->GetAbsMicroSec());
                     }
                 }
@@ -652,7 +650,7 @@ bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
 
 void MIDI::ConnectNotes()
 {
-    vector<array<stack<tuple<idx_t, MIDIChannelEvent*>>, 128>> vStacks;
+    vector<array<stack<idx_t>,128>> vStacks;
     vStacks.resize(m_vTracks.size() * 16);
 
     g_LoadingProgress.stage = MIDILoadingProgress::Stage::ConnectNotes;
@@ -665,20 +663,19 @@ void MIDI::ConnectNotes()
             if (vEvents[i]->GetEventType() == MIDIEvent::ChannelEvent)
             {
                 MIDIChannelEvent* pEvent = reinterpret_cast<MIDIChannelEvent*>(vEvents[i]);
-                MIDIChannelEvent::ChannelEventType eEventType = pEvent->GetChannelEventType();
-                chan_t iChannel = pEvent->GetChannel();
-                key_t iNote = pEvent->GetParam1();
-                auto& sStack = vStacks[track * 16 + iChannel][iNote];
+                auto& sStack = vStacks[track * 16 + pEvent->GetChannel()][pEvent->GetParam1()];
 
-                if (eEventType == MIDIChannelEvent::NoteOn && pEvent->GetParam2() > 0) {
-                    sStack.push(make_tuple(i, pEvent));
-                }
-                else if (eEventType == MIDIChannelEvent::NoteOff || eEventType == MIDIChannelEvent::NoteOn) {
-                    if (!sStack.empty()) {
-                        auto pTop = sStack.top();
-                        sStack.pop();
-                        pEvent->SetSisterIdx(get<0>(pTop));
-                        get<1>(pTop)->SetSisterIdx(i);
+                if (IsNote(pEvent->GetChannelEventType())) {
+                    if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2())) {
+                        sStack.push(i);
+                    }
+                    else {
+                        if (!sStack.empty()) {
+                            auto pTop = sStack.top();
+                            sStack.pop();
+                            pEvent->SetSisterIdx(pTop);
+                            reinterpret_cast<MIDIChannelEvent*>(vEvents[pTop])->SetSisterIdx(i);
+                        }
                     }
                 }
             }

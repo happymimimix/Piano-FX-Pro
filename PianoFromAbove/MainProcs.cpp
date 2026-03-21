@@ -1154,13 +1154,6 @@ BOOL PlayFile(const wstring& sFile)
         return FALSE;
     }
 
-    if (cPlayback.GetPlayMode()) { //Close the current file first before opening another one! 
-        cPlayback.SetPlayMode(GameState::Intro, true);
-        cPlayback.SetPlayable(false, true);
-        cPlayback.SetPosition(0);
-        SetWindowText(g_hWnd, TitleIdle);
-        HandOffMsg(WM_COMMAND, ID_CHANGESTATE, (LPARAM)new IntroScreen(NULL, NULL));
-    }
     // Success! Set up the GUI for playback
     cPlayback.SetPlayable(true, true);
     cPlayback.SetPlayMode(GameState::Practice, true);
