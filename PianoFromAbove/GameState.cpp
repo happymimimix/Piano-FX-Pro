@@ -25,6 +25,7 @@ const wstring GameState::Errors[] =
 {
     L"Success.",
     L"Invalid pointer passed. It would be nice if you could submit feedback with a description of how this happened.",
+    L"Failed to reconstruct state for the selected time. It would be nice if you could submit feedback with a description of how this happened.",
     L"Out of memory.",
     L"Error calling DirectX. It would be nice if you could submit feedback with a description of how this happened."
 };
@@ -1301,7 +1302,7 @@ void MainScreen::UpdateState(idx_t idx, idx_t sister_idx) {
         if (pos != IDX_MAX) {
             m_vState.erase(m_vState.begin() + pos);
         }
-        else {
+        else if (JumpTarget == ~0) {
             MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
         }
     }
@@ -1318,7 +1319,7 @@ void MainScreen::UpdateStateBackwards(idx_t idx, idx_t sister_idx) {
         if (pos != IDX_MAX) {
             m_vState.erase(m_vState.begin() + pos);
         }
-        else {
+        else if (JumpTarget == ~0) {
             MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
         }
     }
@@ -1407,8 +1408,8 @@ void MainScreen::JumpTo(mms_t llStartTime, boolean loadingMode) {
                 }
             }
         EndSearch:
-            if (iFound < iSimultaneous) {
-                MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
+            if (iFound != iSimultaneous) {
+                MessageBoxW(g_hWnd, Errors[GameError::JumpToFailure].c_str(), L"Error", MB_OK);
             }
             // If there's only one note, there's no need to reverse.
             // So let's put this statement inside the if check.

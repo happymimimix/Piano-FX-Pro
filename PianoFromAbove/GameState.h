@@ -73,7 +73,7 @@ inline HRESULT GetGDI(HWND hGDI, win32_t W, win32_t H, char* Output) {
 class GameState
 {
 public:
-    enum GameError : uint8_t { Success = 0, BadPointer, OutOfMemory, DirectXError };
+    enum GameError : uint8_t { Success = 0, BadPointer, JumpToFailure, OutOfMemory, DirectXError };
     enum State : uint8_t { Intro = 0, Splash, Practice };
 
     //Static methods
