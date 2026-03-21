@@ -421,7 +421,7 @@ void SplashScreen::UpdateState(idx_t idx, idx_t sister_idx) {
             m_vState.erase(m_vState.begin() + pos);
         }
         else {
-            MessageBoxW(NULL, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
+            MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
         }
     }
 }
@@ -516,7 +516,7 @@ void SplashScreen::RenderNote(MIDIChannelEvent* pNote) {
     track_t iTrack = pNote->GetTrack() % MaxTrackColors;
     chan_t iChannel = pNote->GetChannel();
     mms_t llNoteStart = pNote->GetAbsMicroSec();
-    mms_t llNoteEnd = llNoteStart + pNote->GetLength();
+    mms_t llNoteEnd = pNote->GetSister(m_vEvents)->GetAbsMicroSec();
 
     ChannelSettings& csTrack = m_vTrackSettings[iTrack].aChannels[iChannel];
     if (m_vTrackSettings[iTrack].aChannels[iChannel].bHidden) return;
@@ -1302,7 +1302,7 @@ void MainScreen::UpdateState(idx_t idx, idx_t sister_idx) {
             m_vState.erase(m_vState.begin() + pos);
         }
         else {
-            MessageBoxW(NULL, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
+            MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
         }
     }
 }
@@ -1319,7 +1319,7 @@ void MainScreen::UpdateStateBackwards(idx_t idx, idx_t sister_idx) {
             m_vState.erase(m_vState.begin() + pos);
         }
         else {
-            MessageBoxW(NULL, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
+            MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
         }
     }
 }
@@ -1368,46 +1368,54 @@ void MainScreen::JumpTo(mms_t llStartTime, boolean loadingMode) {
     m_vState.clear();
     if (itMiddle != itEnd && itMiddle != itBegin)
     {
-        // If we're landing exactly on a note on, look for the previous note on instead. 
-        //if (IsOn((*itMiddle)->GetChannelEventType(), (*itMiddle)->GetParam2())) { itMiddle--; }
-
         // Find the previous note on...
-        for (; itMiddle != itBegin; itMiddle--) {
-            if (IsOn((*itMiddle)->GetChannelEventType(), (*itMiddle)->GetParam2())) { break; }
-        }
-        // Found it!
-        // It's totally possible that the jump lands before the first note but after a tempo, meta, or time signature event.
-        // So we must do an extra check here to ensure we REALLY found a note.
-        if (IsOn((*itMiddle)->GetChannelEventType(), (*itMiddle)->GetParam2())) {
-            MIDIChannelEvent* pTargetEvent = *itMiddle;
-            if (pTargetEvent->GetAbsMicroSec() + pTargetEvent->GetLength() > m_llStartTime) {
-                m_vState.push_back(itMiddle - m_vEvents.begin());
+        while (true) {
+            itMiddle--;
+            if (IsOn((*itMiddle)->GetChannelEventType(), (*itMiddle)->GetParam2())) {
+                goto NoteOnFound;
             }
-            idx_t iFound = 0;
-            idx_t iSimultaneous = pTargetEvent->GetSimultaneous();
-            if (iSimultaneous > 0 && itMiddle != itBegin) {
-                for (itMiddle--; iFound < iSimultaneous && itMiddle != itBegin; itMiddle--)
-                {
-                    MIDIChannelEvent* pEvent = *itMiddle;
-                    if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2())) {
-                        if (pEvent->GetAbsMicroSec() + pEvent->GetLength() > pTargetEvent->GetAbsMicroSec()) { // > because itMiddle is the max for its time
-                            iFound++;
-                        }
-                        if (pEvent->GetAbsMicroSec() + pEvent->GetLength() > m_llStartTime) { // > because we don't care about simultaneous ending notes
-                            m_vState.push_back(itMiddle - m_vEvents.begin());
-                        }
+            else if (itMiddle == itBegin) {
+                // We already reached the start and it has still not been found?
+                goto SkipSearch;
+            }
+        }
+    NoteOnFound:
+        // Found it!
+        auto TargetNote = itMiddle;
+        if ((*TargetNote)->GetSister(m_vEvents)->GetAbsMicroSec() > m_llStartTime) {
+            // Push it into m_vState if it's held at this moment
+            m_vState.push_back(TargetNote - m_vEvents.begin());
+        }
+        // Search for more held notes...
+        idx_t iFound = 0;
+        idx_t iSimultaneous = (*TargetNote)->GetSimultaneous();
+        if (iSimultaneous > 0 && itMiddle != itBegin) {
+            while (true)
+            {
+                itMiddle--;
+                if (IsOn((*itMiddle)->GetChannelEventType(), (*itMiddle)->GetParam2())) {
+                    if ((*itMiddle)->GetSisterIdx() > TargetNote - m_vEvents.begin()) {
+                        iFound++;
+                    }
+                    if ((*itMiddle)->GetSister(m_vEvents)->GetAbsMicroSec() > m_llStartTime) {
+                        m_vState.push_back(itMiddle - m_vEvents.begin());
                     }
                 }
-                if (iFound != iSimultaneous) {
-                    MessageBoxW(NULL, (wstring(L"") + L"Exp: " + to_wstring(iSimultaneous) + L"\nFound:" + to_wstring(iFound)).c_str(), L"Error", MB_OK);
+                if (itMiddle == itBegin || iFound >= iSimultaneous) {
+                    // Either we've found enough or we've reached the start of the array
+                    goto EndSearch;
                 }
-                // If there's only one note, there's no need to reverse.
-                // So let's put this statement inside the if check.
-                reverse(m_vState.begin(), m_vState.end());
             }
+        EndSearch:
+            if (iFound < iSimultaneous) {
+                MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
+            }
+            // If there's only one note, there's no need to reverse.
+            // So let's put this statement inside the if check.
+            reverse(m_vState.begin(), m_vState.end());
         }
     }
-
+SkipSearch:
     AdvanceIterators(llStartTime, true);
     m_iStartTick = GetCurrentTick(m_llStartTime);
 
@@ -1933,7 +1941,7 @@ void MainScreen::RenderNotes() {
     sidx_t iStartPos = m_dNSpeed < 0 ? m_iStartPos - (m_iEndPos - m_iStartPos) + 1 : m_iStartPos;
     sidx_t iEndPos = m_dNSpeed < 0 ? m_iEndPos - (m_iEndPos - m_iStartPos) - 1 : m_iEndPos;
 
-    if (iStartPos < 0 || iEndPos >= m_vEvents.size()) return; // the note speed has been changed after processing these positions but before reaching here. 
+    if (iStartPos < 0 || iEndPos >= static_cast<sidx_t>(m_vEvents.size())) return; // the note speed has been changed after processing these positions but before reaching here. 
 
     // Ensure that any rects rendered after this point render over the notes
     m_pRenderer->SplitRect();

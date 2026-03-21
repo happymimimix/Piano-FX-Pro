@@ -86,7 +86,7 @@ class Renderer11 {
 public:
     Renderer11() {
         if (RendererActive) {
-            MessageBoxW(NULL, L"Multiple renderer instance is active at once! Unexpected behaviors may occur.", L"D3D11 Error", MB_OK);
+            MessageBoxW(g_hWnd, L"Multiple renderer instance is active at once! Unexpected behaviors may occur.", L"D3D11 Error", MB_OK);
         }
         RendererActive = true;
     }

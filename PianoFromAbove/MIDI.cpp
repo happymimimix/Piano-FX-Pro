@@ -75,8 +75,7 @@ idx_t MIDIPos::GetNextEvent(mms_t iMicroSecs, MIDIEvent** pOutEvent)
     // Get the next closest event
     idx_t iMinPos = GetMinItem(reinterpret_cast<mtk_t*>(m_pTrackTime), static_cast<idx_t>(m_vTrackPos.size()));
 
-    if (m_pTrackTime[iMinPos] == INT_MAX)
-        return 0;
+    if (m_pTrackTime[iMinPos] == INT64_MAX) return 0;
 
     MIDIEvent* pMinEvent = m_MIDI.m_vTracks[iMinPos]->m_vEvents[m_vTrackPos[iMinPos]];
 
@@ -101,7 +100,7 @@ idx_t MIDIPos::GetNextEvent(mms_t iMicroSecs, MIDIEvent** pOutEvent)
         m_iCurrTick = pMinEvent->GetAbsT();
         m_iCurrMicroSec = 0;
         m_vTrackPos[iMinPos]++;
-        m_pTrackTime[iMinPos] = m_vTrackPos[iMinPos] == m_MIDI.m_vTracks[iMinPos]->m_vEvents.size() ? INT_MAX : m_MIDI.m_vTracks[iMinPos]->m_vEvents[m_vTrackPos[iMinPos]]->GetAbsT();
+        m_pTrackTime[iMinPos] = m_vTrackPos[iMinPos] == m_MIDI.m_vTracks[iMinPos]->m_vEvents.size() ? INT64_MAX : m_MIDI.m_vTracks[iMinPos]->m_vEvents[m_vTrackPos[iMinPos]]->GetAbsT();
 
         // Change the tempo going forward if we're at a SetTempo event
         if (pMinEvent->GetEventType() == MIDIEvent::MetaEvent)
@@ -590,9 +589,6 @@ bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
                 else {
                     sister->SetSisterIdx(vChannelEvents.size());
                     sister->SetPassDone(true);
-                    if (IsOff(pChannelEvent->GetChannelEventType(), pChannelEvent->GetParam2())) {
-                        sister->SetLength(llTime - sister->GetAbsMicroSec());
-                    }
                 }
             }
             vChannelEvents.push_back(pChannelEvent);

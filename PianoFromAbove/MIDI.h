@@ -222,7 +222,7 @@ private:
 //Base Event class
 //Should really be a single class with unions for the different events. much faster that way.
 //Might be forced to convert if batch processing is too slow
-class MIDIEvent
+class __attribute__((packed)) MIDIEvent
 {
 public:
     //Event types
@@ -240,15 +240,15 @@ public:
     __forceinline mms_t GetAbsMicroSec() const { return m_llAbsMicroSec; }
     __forceinline void SetAbsMicroSec(mms_t llAbsMicroSec) { m_llAbsMicroSec = llAbsMicroSec; };
 
+    track_t m_iTrack;
     mms_t m_llAbsMicroSec;
     mtk_t m_iAbsT;
-    track_t m_iTrack;
     msg_t m_eEventType;
     msg_t m_iEventCode;
 };
 
 //Channel Event: notes and whatnot
-class MIDIChannelEvent : public MIDIEvent
+class __attribute__((packed)) MIDIChannelEvent : public MIDIEvent
 {
 public:
     MIDIChannelEvent() : m_iSisterIdx(IDX_MAX), m_iSimultaneous(0), m_bPassDone(false) { }
@@ -271,7 +271,6 @@ public:
     }
     __forceinline idx_t GetSisterIdx() const { return m_iSisterIdx; }
     __forceinline idx_t GetSimultaneous() const { return m_iSimultaneous; }
-    __forceinline ums_t GetLength() const { return m_uLength; }
     __forceinline bool GetPassDone() const { return m_bPassDone; }
 
     __forceinline void SetChannel(chan_t channel) { m_cChannel = channel; }
@@ -279,23 +278,21 @@ public:
     __forceinline void SetParam2(key_t param2) { m_cParam2 = param2; }
     __forceinline void SetSisterIdx(idx_t iSisterIdx) { m_iSisterIdx = iSisterIdx; }
     __forceinline void SetSimultaneous(idx_t iSimultaneous) { m_iSimultaneous = iSimultaneous; }
-    __forceinline void SetLength(ums_t length) { m_uLength = length; }
     __forceinline void SetPassDone(bool done) { m_bPassDone = done; }
 
     __forceinline bool HasSister() const { return m_iSisterIdx != IDX_MAX; }
 
 private:
-    idx_t m_iSisterIdx;
-    idx_t m_iSimultaneous;
-    ums_t m_uLength;
-    bool m_bPassDone;
     chan_t m_cChannel;
     key_t m_cParam1;
     key_t m_cParam2;
+    idx_t m_iSisterIdx;
+    idx_t m_iSimultaneous;
+    bool m_bPassDone;
 };
 
 //Meta Event: info about the notes and whatnot
-class MIDIMetaEvent : public MIDIEvent
+class __attribute__((packed)) MIDIMetaEvent : public MIDIEvent
 {
 public:
     MIDIMetaEvent() : m_pcData(0) { }
@@ -320,7 +317,7 @@ private:
 };
 
 //SysEx Event: probably to be ignored
-class MIDISysExEvent : public MIDIEvent
+class __attribute__((packed)) MIDISysExEvent : public MIDIEvent
 {
 public:
     MIDISysExEvent() : m_pcData(0) { }
