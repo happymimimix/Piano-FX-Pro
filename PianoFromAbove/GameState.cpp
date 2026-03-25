@@ -984,8 +984,8 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
                 UINT start = GetTickCount();
                 JumpTo(JumpTarget, false);
                 JumpTarget = ~0;
-                UINT end = GetTickCount() + (1 << 2);
-                nxtdelay = max(1 << 2, min(end - start, 1 << 10));
+                UINT end = GetTickCount();
+                nxtdelay = max(1, min(end - start, 1 << 9));
             }
         }
         return Success;
