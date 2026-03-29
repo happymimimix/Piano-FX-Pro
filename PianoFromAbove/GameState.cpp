@@ -1782,7 +1782,8 @@ GameState::GameError MainScreen::Render()
             char* Frame = new char[m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4];
             HRESULT res = GetGDI(hGDI, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight(), Frame);
             if (res == S_OK) {
-                WriteFile(m_hVideoPipe, Frame, static_cast<DWORD>(m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4), nullptr, nullptr);
+                DWORD bytesWritten;
+                WriteFile(m_hVideoPipe, Frame, static_cast<DWORD>(m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4), &bytesWritten, nullptr);
                 delete[] Frame;
             }
             else if (res == E_NOTIMPL) {
@@ -1796,7 +1797,8 @@ GameState::GameError MainScreen::Render()
             char* Frame = new char[m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4];
             HRESULT res = m_pRenderer->Screenshot(Frame);
             if (res == S_OK) {
-                WriteFile(m_hVideoPipe, Frame, static_cast<DWORD>(m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4), nullptr, nullptr);
+                DWORD bytesWritten;
+                WriteFile(m_hVideoPipe, Frame, static_cast<DWORD>(m_pRenderer->GetBufferWidth() * m_pRenderer->GetBufferHeight() * 4), &bytesWritten, nullptr);
                 delete[] Frame;
             }
             else if (res == E_NOTIMPL) {

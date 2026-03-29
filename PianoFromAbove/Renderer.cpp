@@ -717,7 +717,7 @@ HRESULT Renderer11::FlushText() {
 }
 
 //-----------------------------------------------------------------------------
-// Screenshot (BitBlt from back buffer surface, BGR24 output)
+// Screenshot (BitBlt from back buffer surface, BGRA output)
 //-----------------------------------------------------------------------------
 
 HRESULT Renderer11::Screenshot(char* Output) {
