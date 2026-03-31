@@ -398,6 +398,9 @@ Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h 
       <Command>cd /d "$(ProjectDir)"
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
+del .\Widths.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
 del ..\.vs /f /s /q
 rmdir ..\.vs /s /q
 del .\Release /f /s /q
@@ -405,8 +408,7 @@ rmdir .\Release /s /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 mkdir ..\Release
-move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
-</Command>
+move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <ShowProgress>true</ShowProgress>
@@ -484,6 +486,9 @@ Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h 
       <Command>cd /d "$(ProjectDir)"
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
+del .\Widths.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
 del ..\.vs /f /s /q
 rmdir ..\.vs /s /q
 del .\Release /f /s /q
@@ -491,8 +496,7 @@ rmdir .\Release /s /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 mkdir ..\Release
-move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
-</Command>
+move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <ShowProgress>true</ShowProgress>
@@ -570,6 +574,9 @@ Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h 
       <Command>cd /d "$(ProjectDir)"
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
+del .\Widths.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
 del ..\.vs /f /s /q
 rmdir ..\.vs /s /q
 del .\Release /f /s /q
@@ -577,8 +584,7 @@ rmdir .\Release /s /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 mkdir ..\Release
-move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
-</Command>
+move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <ShowProgress>true</ShowProgress>
@@ -656,6 +662,9 @@ Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h 
       <Command>cd /d "$(ProjectDir)"
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
+del .\Widths.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
 del ..\.vs /f /s /q
 rmdir ..\.vs /s /q
 del .\Release /f /s /q
@@ -663,8 +672,7 @@ rmdir .\Release /s /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 mkdir ..\Release
-move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
-</Command>
+move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <ShowProgress>true</ShowProgress>
@@ -742,6 +750,9 @@ Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h 
       <Command>cd /d "$(ProjectDir)"
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
+del .\Widths.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
 del ..\.vs /f /s /q
 rmdir ..\.vs /s /q
 del .\Release /f /s /q
@@ -749,8 +760,7 @@ rmdir .\Release /s /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 mkdir ..\Release
-move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
-</Command>
+move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <ShowProgress>true</ShowProgress>
@@ -828,6 +838,9 @@ Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h 
       <Command>cd /d "$(ProjectDir)"
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
+del .\Widths.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
 del ..\.vs /f /s /q
 rmdir ..\.vs /s /q
 del .\Release /f /s /q
@@ -835,8 +848,7 @@ rmdir .\Release /s /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 mkdir ..\Release
-move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
-</Command>
+move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <ShowProgress>true</ShowProgress>
@@ -914,6 +926,9 @@ Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h 
       <Command>cd /d "$(ProjectDir)"
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
+del .\Widths.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
 del ..\.vs /f /s /q
 rmdir ..\.vs /s /q
 del .\Release /f /s /q
@@ -921,8 +936,7 @@ rmdir .\Release /s /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 mkdir ..\Release
-move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
-</Command>
+move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <ShowProgress>true</ShowProgress>
@@ -1000,6 +1014,9 @@ Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h 
       <Command>cd /d "$(ProjectDir)"
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
+del .\Widths.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
 del ..\.vs /f /s /q
 rmdir ..\.vs /s /q
 del .\Release /f /s /q
@@ -1007,8 +1024,7 @@ rmdir .\Release /s /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 mkdir ..\Release
-move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
-</Command>
+move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <ShowProgress>true</ShowProgress>
@@ -1086,6 +1102,9 @@ Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h 
       <Command>cd /d "$(ProjectDir)"
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
+del .\Widths.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
 del ..\.vs /f /s /q
 rmdir ..\.vs /s /q
 del .\Release /f /s /q
@@ -1093,8 +1112,7 @@ rmdir .\Release /s /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 mkdir ..\Release
-move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
-</Command>
+move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <ShowProgress>true</ShowProgress>
@@ -1170,6 +1188,9 @@ Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h 
       <Command>cd /d "$(ProjectDir)"
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
+del .\Widths.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
 del ..\.vs /f /s /q
 rmdir ..\.vs /s /q
 del .\Release /f /s /q
@@ -1177,8 +1198,7 @@ rmdir .\Release /s /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 mkdir ..\Release
-move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
-</Command>
+move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <ShowProgress>true</ShowProgress>
@@ -1256,6 +1276,9 @@ Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h 
       <Command>cd /d "$(ProjectDir)"
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
+del .\Widths.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
 del ..\.vs /f /s /q
 rmdir ..\.vs /s /q
 del .\Release /f /s /q
@@ -1263,8 +1286,7 @@ rmdir .\Release /s /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 mkdir ..\Release
-move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
-</Command>
+move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <ShowProgress>true</ShowProgress>
