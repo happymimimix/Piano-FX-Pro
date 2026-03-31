@@ -217,7 +217,7 @@ SplashScreen::SplashScreen(HWND hWnd, Renderer11* pRenderer, bool enableSplash) 
             m_MIDI.ParseMIDI(pData, iSize);
             delete[] pData;
         }
-        vector< MIDIEvent* > vEvents;
+        vector<MIDIEvent*> vEvents;
         vEvents.reserve(m_MIDI.GetInfo().iEventCount);
         m_MIDI.ConnectNotes(); // Order's important here
         bool IsPostProcessOK = m_MIDI.PostProcess(m_vEvents);
