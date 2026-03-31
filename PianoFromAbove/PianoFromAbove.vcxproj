@@ -371,7 +371,6 @@
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
-del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
@@ -399,7 +398,6 @@ Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h 
       <Command>cd /d "$(ProjectDir)"
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
-del .\PianoFromAbove.vcxproj.user /f /q
 del ..\.vs /f /s /q
 rmdir ..\.vs /s /q
 del .\Release /f /s /q
@@ -459,7 +457,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
-del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
@@ -487,7 +484,6 @@ Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h 
       <Command>cd /d "$(ProjectDir)"
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
-del .\PianoFromAbove.vcxproj.user /f /q
 del ..\.vs /f /s /q
 rmdir ..\.vs /s /q
 del .\Release /f /s /q
@@ -547,7 +543,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
-del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
@@ -575,7 +570,6 @@ Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h 
       <Command>cd /d "$(ProjectDir)"
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
-del .\PianoFromAbove.vcxproj.user /f /q
 del ..\.vs /f /s /q
 rmdir ..\.vs /s /q
 del .\Release /f /s /q
@@ -635,7 +629,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
-del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
@@ -663,7 +656,6 @@ Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h 
       <Command>cd /d "$(ProjectDir)"
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
-del .\PianoFromAbove.vcxproj.user /f /q
 del ..\.vs /f /s /q
 rmdir ..\.vs /s /q
 del .\Release /f /s /q
@@ -723,7 +715,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
-del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
@@ -751,7 +742,6 @@ Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h 
       <Command>cd /d "$(ProjectDir)"
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
-del .\PianoFromAbove.vcxproj.user /f /q
 del ..\.vs /f /s /q
 rmdir ..\.vs /s /q
 del .\Release /f /s /q
@@ -811,7 +801,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
-del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
@@ -839,7 +828,6 @@ Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h 
       <Command>cd /d "$(ProjectDir)"
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
-del .\PianoFromAbove.vcxproj.user /f /q
 del ..\.vs /f /s /q
 rmdir ..\.vs /s /q
 del .\Release /f /s /q
@@ -899,7 +887,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
-del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
@@ -927,7 +914,6 @@ Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h 
       <Command>cd /d "$(ProjectDir)"
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
-del .\PianoFromAbove.vcxproj.user /f /q
 del ..\.vs /f /s /q
 rmdir ..\.vs /s /q
 del .\Release /f /s /q
@@ -987,7 +973,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
-del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
@@ -1015,7 +1000,6 @@ Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h 
       <Command>cd /d "$(ProjectDir)"
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
-del .\PianoFromAbove.vcxproj.user /f /q
 del ..\.vs /f /s /q
 rmdir ..\.vs /s /q
 del .\Release /f /s /q
@@ -1075,7 +1059,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
-del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
@@ -1103,7 +1086,6 @@ Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h 
       <Command>cd /d "$(ProjectDir)"
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
-del .\PianoFromAbove.vcxproj.user /f /q
 del ..\.vs /f /s /q
 rmdir ..\.vs /s /q
 del .\Release /f /s /q
@@ -1161,7 +1143,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
-del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
@@ -1189,7 +1170,6 @@ Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h 
       <Command>cd /d "$(ProjectDir)"
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
-del .\PianoFromAbove.vcxproj.user /f /q
 del ..\.vs /f /s /q
 rmdir ..\.vs /s /q
 del .\Release /f /s /q
@@ -1249,7 +1229,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
-del .\PianoFromAbove.vcxproj.user /f /q
 del ..\Release /f /s /q
 rmdir ..\Release /s /q
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
@@ -1277,7 +1256,6 @@ Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h 
       <Command>cd /d "$(ProjectDir)"
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
-del .\PianoFromAbove.vcxproj.user /f /q
 del ..\.vs /f /s /q
 rmdir ..\.vs /s /q
 del .\Release /f /s /q
