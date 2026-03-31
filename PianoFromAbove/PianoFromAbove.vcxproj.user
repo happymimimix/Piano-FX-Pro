@@ -10,6 +10,9 @@
     <RemoteDebuggerAmpDefaultAccelerator> </RemoteDebuggerAmpDefaultAccelerator>
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\$(TargetName)_Debug</RemoteDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(OutputPath)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerAmpDefaultAccelerator> </LocalDebuggerAmpDefaultAccelerator>
+    <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">
     <RemoteDebuggerDeployDebugCppRuntime>true</RemoteDebuggerDeployDebugCppRuntime>
@@ -21,6 +24,9 @@
     <RemoteDebuggerAmpDefaultAccelerator> </RemoteDebuggerAmpDefaultAccelerator>
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\$(TargetName)_Debug</RemoteDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(OutputPath)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerAmpDefaultAccelerator> </LocalDebuggerAmpDefaultAccelerator>
+    <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <RemoteDebuggerDeployDebugCppRuntime>true</RemoteDebuggerDeployDebugCppRuntime>
@@ -32,6 +38,9 @@
     <RemoteDebuggerAmpDefaultAccelerator> </RemoteDebuggerAmpDefaultAccelerator>
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\$(TargetName)_Debug</RemoteDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(OutputPath)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerAmpDefaultAccelerator> </LocalDebuggerAmpDefaultAccelerator>
+    <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">
     <RemoteDebuggerDeployDebugCppRuntime>true</RemoteDebuggerDeployDebugCppRuntime>
@@ -43,6 +52,9 @@
     <RemoteDebuggerAmpDefaultAccelerator> </RemoteDebuggerAmpDefaultAccelerator>
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\$(TargetName)_Debug</RemoteDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(OutputPath)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerAmpDefaultAccelerator> </LocalDebuggerAmpDefaultAccelerator>
+    <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">
     <RemoteDebuggerDeployDebugCppRuntime>true</RemoteDebuggerDeployDebugCppRuntime>
@@ -54,6 +66,9 @@
     <RemoteDebuggerAmpDefaultAccelerator> </RemoteDebuggerAmpDefaultAccelerator>
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\$(TargetName)_Debug</RemoteDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(OutputPath)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerAmpDefaultAccelerator> </LocalDebuggerAmpDefaultAccelerator>
+    <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">
     <RemoteDebuggerDeployDebugCppRuntime>true</RemoteDebuggerDeployDebugCppRuntime>
@@ -65,6 +80,9 @@
     <RemoteDebuggerAmpDefaultAccelerator> </RemoteDebuggerAmpDefaultAccelerator>
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\$(TargetName)_Debug</RemoteDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(OutputPath)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerAmpDefaultAccelerator> </LocalDebuggerAmpDefaultAccelerator>
+    <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">
     <RemoteDebuggerDeployDebugCppRuntime>true</RemoteDebuggerDeployDebugCppRuntime>
@@ -76,6 +94,9 @@
     <RemoteDebuggerAmpDefaultAccelerator> </RemoteDebuggerAmpDefaultAccelerator>
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\$(TargetName)_Debug</RemoteDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(OutputPath)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerAmpDefaultAccelerator> </LocalDebuggerAmpDefaultAccelerator>
+    <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">
     <RemoteDebuggerDeployDebugCppRuntime>true</RemoteDebuggerDeployDebugCppRuntime>
@@ -87,6 +108,9 @@
     <RemoteDebuggerAmpDefaultAccelerator> </RemoteDebuggerAmpDefaultAccelerator>
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\$(TargetName)_Debug</RemoteDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(OutputPath)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerAmpDefaultAccelerator> </LocalDebuggerAmpDefaultAccelerator>
+    <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">
     <RemoteDebuggerDeployDebugCppRuntime>true</RemoteDebuggerDeployDebugCppRuntime>
@@ -98,6 +122,9 @@
     <RemoteDebuggerAmpDefaultAccelerator> </RemoteDebuggerAmpDefaultAccelerator>
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\$(TargetName)_Debug</RemoteDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(OutputPath)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerAmpDefaultAccelerator> </LocalDebuggerAmpDefaultAccelerator>
+    <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">
     <RemoteDebuggerDeployDebugCppRuntime>true</RemoteDebuggerDeployDebugCppRuntime>
@@ -109,6 +136,9 @@
     <RemoteDebuggerAmpDefaultAccelerator> </RemoteDebuggerAmpDefaultAccelerator>
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\$(TargetName)_Debug</RemoteDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(OutputPath)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerAmpDefaultAccelerator> </LocalDebuggerAmpDefaultAccelerator>
+    <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <RemoteDebuggerDeployDebugCppRuntime>true</RemoteDebuggerDeployDebugCppRuntime>
@@ -120,6 +150,9 @@
     <RemoteDebuggerAmpDefaultAccelerator> </RemoteDebuggerAmpDefaultAccelerator>
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\$(TargetName)_Debug</RemoteDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(OutputPath)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerAmpDefaultAccelerator> </LocalDebuggerAmpDefaultAccelerator>
+    <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">
     <RemoteDebuggerDeployDebugCppRuntime>true</RemoteDebuggerDeployDebugCppRuntime>
@@ -131,6 +164,9 @@
     <RemoteDebuggerAmpDefaultAccelerator> </RemoteDebuggerAmpDefaultAccelerator>
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\$(TargetName)_Debug</RemoteDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(OutputPath)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerAmpDefaultAccelerator> </LocalDebuggerAmpDefaultAccelerator>
+    <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">
     <RemoteDebuggerDeployDebugCppRuntime>true</RemoteDebuggerDeployDebugCppRuntime>
@@ -142,5 +178,8 @@
     <RemoteDebuggerAmpDefaultAccelerator> </RemoteDebuggerAmpDefaultAccelerator>
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\$(TargetName)_Debug</RemoteDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(OutputPath)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerAmpDefaultAccelerator> </LocalDebuggerAmpDefaultAccelerator>
+    <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
   </PropertyGroup>
 </Project>

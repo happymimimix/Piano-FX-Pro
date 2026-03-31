@@ -7,7 +7,7 @@ del .\PianoFromAbove\Release /f /s /q
 rmdir .\PianoFromAbove\Release /s /q
 del .\Piano-FX-Pro.exe /f /q
 del .\Piano-FX-Pro-SoftwareRendered.exe /f /q
-del .\Piano-FX-Pro-ExtendedAddressing.exe /f /q
+del .\Piano-FX-Pro-LimitedTrackColoring.exe /f /q
 del .\Piano-FX-Pro-CHN.exe /f /q
 del .\Piano-FX-Pro-JPN.exe /f /q
 del .\Piano-FX-Pro-KOR.exe /f /q
