@@ -100,7 +100,7 @@ This uses Git hooks via submodules to automate the build. Git 2.45.1 and later p
 | Korean | 한국어 인터페이스 |
 | Russian | Русский интерфейс |
 | Arinoglish | Language of the fictional nation of Arino. Derived from Chinese but written entirely in Hanyu Pinyin, solving the problem of complex Chinese characters. |
-| DoubleArinoglish | A revised Arinoglish standard (2023) from Arino's National Literature Committee. Uses 33 Cyrillic letters to represent the 33 Chinese finals, replacing multi-character Latin combinations. Each Chinese character takes only 3 written characters, drastically shortening text length — most visible in the Preferences dialog width. |
+| DoubleArinoglish | A revised Arinoglish standard (2023) from Arino's National Literature Committee. Uses 33 unique Cyrillic letters to represent all 24 consonants and 33 vowels, replacing multi-character Latin combinations. Each Chinese character now takes only 3 written characters, drastically shortening text length — most visible in the Preferences dialog width. |
 | DPRK | Pyongyang standard Korean. Made purely for fun — the author has no affiliation with the DPRK government. |
 
 `DebugLanguageOverride.h` is only compiled in Debug and NoOptimization configurations. It will not affect release builds.
