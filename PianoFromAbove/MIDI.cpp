@@ -12,6 +12,7 @@
 #include <array>
 #include <ppl.h>
 #include <lzma.h>
+#include <Globals.h>
 #include <MIDI.h>
 MIDILoadingProgress g_LoadingProgress;
 
@@ -180,7 +181,7 @@ MIDI::MIDI(const wstring& sFilename)
             // Get the decompressed size
             // This is a real pain in the ass for concatenated .xz files, lots of sanity checking is skipped here
             // See https://github.com/kobolabs/liblzma/blob/master/src/xz/list.c
-            char err[1 << 10] = {};
+            char err[LONG_MAX_PATH] = {};
             uint64_t decompressed_size = 0;
             lzma_stream strm = LZMA_STREAM_INIT;
             lzma_stream_flags stream_flags;

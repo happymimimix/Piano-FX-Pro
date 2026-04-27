@@ -69,6 +69,79 @@ inline HRESULT GetGDI(HWND hGDI, win32_t W, win32_t H, char* Output) {
     return S_OK;
 }
 
+struct dynamic_bitset {
+    static constexpr unsigned char WORD_SIZE = sizeof(size_t) * CHAR_BIT;
+    static constexpr unsigned char WORD_DIV_SHR = __builtin_ctz(WORD_SIZE);
+    static constexpr size_t WORD_MASK = WORD_SIZE - 1;
+    idx_t minWord = 0;
+    idx_t maxWord = 0;
+
+    dynamic_bitset(idx_t size) {
+        // This is the ONLY place where we need to modify wordCount. It should never be changed elsewhere.
+        wordCount = (size + WORD_MASK) >> WORD_DIV_SHR;
+        bits = new size_t[wordCount]();
+        minWord = wordCount;
+        maxWord = 0;
+    }
+    ~dynamic_bitset() { delete[] bits; }
+
+    idx_t Size() {
+        return wordCount;
+    }
+
+    void Clear() {
+        if (maxWord >= minWord && maxWord < wordCount) {
+            memset(&bits[minWord], 0, (maxWord - minWord + 1) * sizeof(size_t));
+        }
+        minWord = wordCount;
+        maxWord = 0;
+    }
+
+    __forceinline void Activate(idx_t idx, bool future) {
+        idx_t word = idx >> WORD_DIV_SHR;
+        bits[word] |= (size_t(1) << (idx & WORD_MASK));
+        minWord = future ? minWord : min(maxWord, word);
+        maxWord = future ? max(maxWord,word):maxWord;
+    }
+
+    __forceinline void Deactivate(idx_t idx) {
+        bits[idx >> WORD_DIV_SHR] &= ~(size_t(1) << (idx & WORD_MASK));
+    }
+
+    __forceinline bool IsActive(idx_t idx) const {
+        return bits[idx >> WORD_DIV_SHR] & (size_t(1) << (idx & WORD_MASK));
+    }
+
+    static __forceinline idx_t CTZ(size_t word) {
+        if constexpr (sizeof(size_t) == sizeof(unsigned long long)) return __builtin_ctzll(word);
+        else return __builtin_ctz(word);
+    }
+
+    static __forceinline idx_t CLZ(size_t word) {
+        if constexpr (sizeof(size_t) == sizeof(unsigned long long)) return __builtin_clzll(word);
+        else return __builtin_clz(word);
+    }
+
+    template<typename Func>
+    __forceinline void ForEach(Func&& fn) const {
+        if (minWord > maxWord) return;
+        maxWord = min(maxWord, wordCount - 1);
+        idx_t newMin = wordCount;
+        idx_t newMax = 0;
+        for (idx_t word_id = minWord; word_id <= maxWord; word_id++) {
+            word_t word = bits[word_id];
+            while (word) {
+                idx_t bit = CTZ(word);
+                fn((w << WORD_SHIFT) | bit);
+                word &= word - 1;
+            }
+        }
+    }
+private:
+    size_t* bits = nullptr;
+    idx_t wordCount = 0;
+};
+
 //Abstract base class
 class GameState
 {

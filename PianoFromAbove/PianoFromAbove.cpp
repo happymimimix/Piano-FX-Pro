@@ -43,18 +43,18 @@ HWND g_hWndGfx = NULL;
 bool g_bGfxDestroyed = false;
 TSQueue< MSG > g_MsgQueue; // Producer/consumer to hold events for our game thread
 
-string GetProcessName() {
-    char buffer[MAX_PATH] = {};
-    GetModuleFileNameA(NULL, buffer, MAX_PATH);
-    string fullPath(buffer);
-    size_t pos = fullPath.find_last_of("\\");
+wstring GetProcessName() {
+    wchar_t buffer[LONG_MAX_PATH] = {};
+    GetModuleFileNameW(NULL, buffer, LONG_MAX_PATH);
+    wstring fullPath(buffer);
+    size_t pos = fullPath.find_last_of(L"\\");
     return (pos != string::npos) ? fullPath.substr(pos + 1) : fullPath;
 }
 
-string ProgramPath() {
-    char szFilePath[MAX_PATH + 1] = {};
-    GetModuleFileNameA(NULL, szFilePath, MAX_PATH);
-    (strrchr(szFilePath, '\\'))[0] = 0;
+wstring ProgramPath() {
+    wchar_t szFilePath[LONG_MAX_PATH] = {};
+    GetModuleFileNameW(NULL, szFilePath, LONG_MAX_PATH);
+    (wcsrchr(szFilePath, L'\\'))[0] = 0;
     return szFilePath;
 }
 
@@ -195,7 +195,7 @@ string InitializeVariables() {
 
 string DefineMemoryAddress(string VariableName, string Address) {
     string Code = "";
-    Code += VariableName + "=\"" + GetProcessName() + "+" + Address + "\"\n";
+    Code += VariableName + "=\"" + WStringToUtf8(GetProcessName()) + "+" + Address + "\"\n";
     return Code;
 }
 
@@ -1930,8 +1930,8 @@ DWORD WINAPI GameThread(LPVOID lpParameter)
     auto init_res = pRenderer->Init(g_hWndGfx, Config::GetConfig().GetVideoSettings().bLimitFPS);
     if (FAILED(get<0>(init_res)))
     {
-        wchar_t msg[1 << 10] = {};
-        _snwprintf_s(msg, 1024, L"Fatal error initializing Direct3D. Is DirectX 11 installed properly? \n%S failed with code 0x%x. ", get<1>(init_res), get<0>(init_res));
+        wchar_t msg[LONG_MAX_PATH] = {};
+        _snwprintf_s(msg, LONG_MAX_PATH, L"Fatal error initializing Direct3D. Is DirectX 11 installed properly? \n%S failed with code 0x%x. ", get<1>(init_res), get<0>(init_res));
         MessageBox(g_hWnd, msg, TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
         PostMessage(g_hWnd, WM_QUIT, 1, 0);
         return 1;
@@ -1946,8 +1946,8 @@ DWORD WINAPI GameThread(LPVOID lpParameter)
         PostMessage(g_hWnd, WM_COMMAND, ID_GAMEERROR, ErrorLevel);
         }
 
-    wchar_t buf[1 << 10] = {};
-    _snwprintf_s(buf, 1 << 10, TitleSplash);
+    wchar_t buf[LONG_MAX_PATH] = {};
+    _snwprintf_s(buf, LONG_MAX_PATH, TitleSplash);
     SetWindowTextW(g_hWnd, buf);
 
     // Event, logic, render...

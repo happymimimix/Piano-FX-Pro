@@ -31,7 +31,7 @@ Config::Config()
 
 string Config::GetFolder()
 {
-    char sAppData[MAX_PATH];
+    char sAppData[LONG_MAX_PATH];
     if (FAILED(SHGetFolderPathA(NULL, CSIDL_APPDATA, NULL, SHGFP_TYPE_CURRENT, sAppData)))
         return string();
 

@@ -1,4 +1,4 @@
-#include <windows.h>
+﻿#include <windows.h>
 
 const wchar_t CLASS_NAME[] = L"PFXGDI";
 
@@ -117,13 +117,20 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 }
 
 void CreateOverlayWindow() {
-    WNDCLASS wc = {};
-    wc.lpfnWndProc = WindowProc;
-    wc.hInstance = GetModuleHandle(NULL);
-    wc.lpszClassName = CLASS_NAME;
-    wc.hbrBackground = (HBRUSH)GetStockObject(HOLLOW_BRUSH);
-    wc.style = CS_SAVEBITS;
-    RegisterClass(&wc);
+    WNDCLASSEXW wcex = {};
+    wcex.cbSize = sizeof(WNDCLASSEX);
+    wcex.style = CS_SAVEBITS;
+    wcex.lpfnWndProc = WindowProc;
+    wcex.cbClsExtra = NULL;
+    wcex.cbWndExtra = NULL;
+    wcex.hInstance = GetModuleHandle(NULL);
+    wcex.hIcon = NULL;
+    wcex.hIconSm = NULL;
+    wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
+    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wcex.lpszMenuName = NULL;
+    wcex.lpszClassName = CLASS_NAME;
+    RegisterClassExW(&wcex);
     HWND targetWindow = FindWindowW(L"PFX", NULL);
     if (targetWindow) {
         HWND targetGFXWindow = FindWindowExW(targetWindow, NULL, L"PFXGFX", NULL);
@@ -164,5 +171,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLin
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
+    UnregisterClassW(CLASS_NAME, GetModuleHandle(NULL));
     return 0;
 }

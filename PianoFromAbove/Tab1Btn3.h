@@ -53,7 +53,7 @@ void Tab1::SubViewBtn3::Open() {
     Browse->H = 0;
     Browse->OnTouch = []() {
         Tab1Graphics::Btn3Graphics::Browse(58, 13, Touched);
-        wchar_t DIR[MAX_PATH] = {};
+        wchar_t DIR[LONG_MAX_PATH] = {};
         BROWSEINFOW BI = {};
         BI.lpszTitle = L"Select FL Studio Installation DIR: ";
         BI.ulFlags = NULL;

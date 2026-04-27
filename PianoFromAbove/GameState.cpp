@@ -582,8 +582,8 @@ float SplashScreen::GetNoteX(key_t iNote) {
 //-----------------------------------------------------------------------------
 
 wstring GetExePath(void) {
-    wchar_t szFilePath[MAX_PATH + 1] = {};
-    GetModuleFileNameW(NULL, szFilePath, MAX_PATH);
+    wchar_t szFilePath[LONG_MAX_PATH] = {};
+    GetModuleFileNameW(NULL, szFilePath, LONG_MAX_PATH);
     (wcsrchr(szFilePath, '\\'))[0] = 0;
     return szFilePath;
 }
@@ -717,7 +717,7 @@ void MainScreen::InitState() {
         win32_t height = rect.bottom - rect.top;
 
         //Running ffmpeg
-        wchar_t buf[1 << 10] = {};
+        wchar_t buf[LONG_MAX_PATH] = {};
         swprintf(buf, sizeof(buf), L"cd /d \"%s\" && md \"%s\\PianoFX_Framedump\" & start cmd /k ffmpeg -r 60 -f rawvideo -s %dx%d -pix_fmt bgra -i async:\\\\.\\pipe\\PFXdump -c:v h264 -qp 19 -pix_fmt yuv420p \"%s\\PianoFX_Framedump\\Output.mp4\"", GetExePath().c_str(), GetExePath().c_str(), width, height, GetExePath().c_str());
         m_hVideoPipe = CreateNamedPipe(TEXT("\\\\.\\pipe\\PFXdump"), PIPE_ACCESS_OUTBOUND, PIPE_TYPE_BYTE | PIPE_WAIT, PIPE_UNLIMITED_INSTANCES, static_cast<DWORD>(width * height * 4 * 120), 0, 0, nullptr);
         _wsystem(buf);
@@ -854,19 +854,32 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
         winword_t iId = LOWORD(wParam);
         switch (iId)
         {
-        case ID_CHANGESTATE:
+		case ID_CHANGESTATE:
             m_pNextState = reinterpret_cast<GameState*>(lParam);
             return Success;
-        case ID_PLAY_STOP:
+		case ID_PLAY_STOP:
+        {
+            bool StartTimer = (JumpTarget == ~0);
+            JumpTarget = GetMinTime();
+            if (StartTimer) SetTimer(g_hWnd, IDC_POSNDELAY, nxtdelay, NULL); //Async JumpTo process
             JumpTo(GetMinTime());
             cPlayback.SetStopped(true);
             return Success;
+        }
         case ID_PLAY_SKIPFWD:
-            JumpTo(static_cast<mms_t>(m_llStartTime + cControls.dFwdBackSecs * 1000000));
+        {
+            bool StartTimer = (JumpTarget == ~0);
+            JumpTarget = static_cast<mms_t>(m_llStartTime + cControls.dFwdBackSecs * S);
+            if (StartTimer) SetTimer(g_hWnd, IDC_POSNDELAY, nxtdelay, NULL); //Async JumpTo process
             return Success;
-        case ID_PLAY_SKIPBACK:
-            JumpTo(static_cast<mms_t>(m_llStartTime - cControls.dFwdBackSecs * 1000000));
+        }
+		case ID_PLAY_SKIPBACK:
+        {
+            bool StartTimer = (JumpTarget == ~0);
+            JumpTarget = static_cast<mms_t>(m_llStartTime - cControls.dFwdBackSecs * S);
+            if (StartTimer) SetTimer(g_hWnd, IDC_POSNDELAY, nxtdelay, NULL); //Async JumpTo process
             return Success;
+        }
         case ID_VIEW_RESETDEVICE:
             UpdateNotePos = true;
             if (FAILED(m_pRenderer->ResetDevice())) return DirectXError;
@@ -1247,8 +1260,8 @@ GameState::GameError MainScreen::Logic() {
     // Song's over
     if (!m_bPaused && ((m_dSpeed < 0) ? (m_llStartTime < llMinTime) : (m_llStartTime > llMaxTime))) {
         if (m_bDumpFrames) {
-            wchar_t buf[1 << 10] = {};
-            swprintf(buf, sizeof(buf), L"start \"Result\" \"C:\\Windows\\Explorer.exe\" \"%s\\PianoFX_Framedump\\\"", GetExePath().c_str());
+            wchar_t buf[LONG_MAX_PATH] = {};
+            swprintf(buf, LONG_MAX_PATH, L"start \"Result\" \"C:\\Windows\\Explorer.exe\" \"%s\\PianoFX_Framedump\\\"", GetExePath().c_str());
             _wsystem(buf);
             CloseHandle(m_hVideoPipe);
             m_bDumpFrames = false;
@@ -2328,10 +2341,10 @@ void MainScreen::RenderText() {
 void MainScreen::RenderStatusLine(unsigned char line, const wchar_t* left, const wchar_t* format, ...) {
     if (Config::GetConfig().GetVideoSettings().bDisableUI) return;
 
-    wchar_t buf[1 << 10] = {};
+    wchar_t buf[LONG_MAX_PATH] = {};
     va_list varargs;
     va_start(varargs, format);
-    vswprintf_s(buf, _countof(buf), format, varargs);
+    swprintf_s(buf, _countof(buf), format, varargs);
     va_end(varargs);
 
     win32_t TextY = 2 + line * 16;

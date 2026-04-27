@@ -174,7 +174,7 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         case IDC_BACKGROUNDBROWSE:
         {
             OPENFILENAME ofn = {};
-            TCHAR sFilename[1 << 10] = { 0 };
+            TCHAR sFilename[LONG_MAX_PATH] = {};
             ofn.lStructSize = sizeof(OPENFILENAME);
             ofn.hwndOwner = hWnd;
             ofn.lpstrFilter = TEXT("Image files\0*.png;*.jpg;*.jpeg\0");
@@ -219,8 +219,8 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 cVisual.colors[i] = (color_t)GetWindowLongPtr(GetDlgItem(hWnd, IDC_COLOR1 + i), GWLP_USERDATA) & 0x00FFFFFF | (cVisual.colors[i] & 0xFF000000);
             cVisual.iBkgColor = (color_t)GetWindowLongPtr(GetDlgItem(hWnd, IDC_BKGCOLOR), GWLP_USERDATA) & 0x00FFFFFF | (cVisual.iBkgColor & 0xFF000000);
             cVisual.iBarColor = (color_t)GetWindowLongPtr(GetDlgItem(hWnd, IDC_BARCOLOR), GWLP_USERDATA) & 0x00FFFFFF | (cVisual.iBarColor & 0xFF000000);
-            wchar_t background[1 << 10]{};
-            GetWindowTextW(GetDlgItem(hWnd, IDC_BACKGROUND), background, 1 << 10);
+            wchar_t background[LONG_MAX_PATH]{};
+            GetWindowTextW(GetDlgItem(hWnd, IDC_BACKGROUND), background, LONG_MAX_PATH);
             cVisual.sBackground = background;
 
             // Report success and return
@@ -397,7 +397,7 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         HWND hWndVelStrshld = GetDlgItem(hWnd, IDC_VELSTRSHLD);
         HWND hWndVelStrshldSpin = GetDlgItem(hWnd, IDC_VELSTRSHLDSPIN);
         // Edit boxes
-        TCHAR buf[1 << 10];
+        TCHAR buf[LONG_MAX_PATH];
         _stprintf_s(buf, TEXT("%g"), cControls.dFwdBackSecs);
         SetWindowText(hWndFwdBack, buf);
         _stprintf_s(buf, TEXT("%g"), cControls.dSpeedUpPct);
@@ -419,7 +419,7 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         {
         case IDC_SPLASHBROWSE: {
             OPENFILENAME ofn = {};
-            TCHAR sFilename[1 << 10] = { 0 };
+            TCHAR sFilename[LONG_MAX_PATH] = {};
             ofn.lStructSize = sizeof(OPENFILENAME);
             ofn.hwndOwner = hWnd;
             ofn.lpstrFilter = TEXT("MIDI Files (*.mid, *.mid.xz)\0*.mid;*.xz\0");
@@ -450,11 +450,11 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             {
             case IDC_LRARROWSSPIN:
             {
-                TCHAR buf[1 << 5];
+                TCHAR buf[LONG_MAX_PATH];
                 LPNMUPDOWN lpnmud = (LPNMUPDOWN)lParam;
                 HWND hWndFwdBack = GetDlgItem(hWnd, IDC_LRARROWS);
                 double dOldVal = 0;
-                win32_t len = GetWindowText(hWndFwdBack, buf, 32);
+                win32_t len = GetWindowText(hWndFwdBack, buf, LONG_MAX_PATH);
                 if (len > 0 && _stscanf_s(buf, TEXT("%lf"), &dOldVal) == 1)
                 {
                     double dNewVal = dOldVal - lpnmud->iDelta * .1;
@@ -465,11 +465,11 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             }
             case IDC_UDARROWSSPIN:
             {
-                TCHAR buf[1 << 5];
+                TCHAR buf[LONG_MAX_PATH];
                 LPNMUPDOWN lpnmud = (LPNMUPDOWN)lParam;
                 HWND hWndSpeedPct = GetDlgItem(hWnd, IDC_UDARROWS);
                 double dOldVal = 0;
-                win32_t len = GetWindowText(hWndSpeedPct, buf, 32);
+                win32_t len = GetWindowText(hWndSpeedPct, buf, LONG_MAX_PATH);
                 if (len > 0 && _stscanf_s(buf, TEXT("%lf"), &dOldVal) == 1)
                 {
                     double dNewVal = dOldVal - lpnmud->iDelta;
@@ -488,12 +488,12 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             ControlsSettings cControls = config.GetControlsSettings();
 
             // Edit boxes
-            TCHAR buf[1 << 10];
+            TCHAR buf[LONG_MAX_PATH];
             double dEditVal = 0;
             win32_t iEditVal = 0;
 
             HWND hWndFwdBack = GetDlgItem(hWnd, IDC_LRARROWS);
-            win32_t len = GetWindowText(hWndFwdBack, buf, 32);
+            win32_t len = GetWindowText(hWndFwdBack, buf, LONG_MAX_PATH);
             if (len > 0 && _stscanf_s(buf, TEXT("%lf"), &dEditVal) == 1)
                 cControls.dFwdBackSecs = dEditVal;
             else
@@ -505,7 +505,7 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             }
 
             HWND hWndSpeedPct = GetDlgItem(hWnd, IDC_UDARROWS);
-            len = GetWindowText(hWndSpeedPct, buf, 32);
+            len = GetWindowText(hWndSpeedPct, buf, LONG_MAX_PATH);
             if (len > 0 && _stscanf_s(buf, TEXT("%lf"), &dEditVal) == 1)
                 cControls.dSpeedUpPct = dEditVal;
             else
@@ -518,12 +518,12 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
             cControls.bAlwaysShowControls = IsDlgButtonChecked(hWnd, IDC_SHOWCONTROLS);
             cControls.bPhigros = IsDlgButtonChecked(hWnd, IDC_PHIGROS);
-            wchar_t splash[1 << 10]{};
-            GetWindowTextW(GetDlgItem(hWnd, IDC_SPLASHMIDI), splash, 1 << 10);
+            wchar_t splash[LONG_MAX_PATH]{};
+            GetWindowTextW(GetDlgItem(hWnd, IDC_SPLASHMIDI), splash, LONG_MAX_PATH);
             cControls.sSplashMIDI = splash;
 
             HWND hWndVelStrshld = GetDlgItem(hWnd, IDC_VELSTRSHLD);
-            len = GetWindowText(hWndVelStrshld, buf, 32);
+            len = GetWindowText(hWndVelStrshld, buf, LONG_MAX_PATH);
             if (len > 0 && _stscanf_s(buf, TEXT("%d"), &iEditVal) == 1)
                 cControls.iVelocityThreshold = static_cast<uint8_t>(max(0, min(iEditVal, 127)));
             else
@@ -556,8 +556,7 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 BOOL GetCustomSettings(MainScreen* pGameState)
 {
-    INT_PTR iDlgResult = DialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_TRACKSETTINGS),
-        g_hWnd, TracksProc, (LPARAM)pGameState);
+    INT_PTR iDlgResult = DialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_TRACKSETTINGS), g_hWnd, TracksProc, (LPARAM)pGameState);
     return iDlgResult == IDOK;
 }
 
@@ -572,7 +571,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_INITDIALOG:
     {
         HWND hWndTracks = GetDlgItem(hWnd, IDC_TRACKS);
-        TCHAR buf[MAX_PATH];
+        TCHAR buf[LONG_MAX_PATH];
         SendMessage(hWndTracks, LVM_SETEXTENDEDLISTVIEWSTYLE, 0, LVS_EX_DOUBLEBUFFER);
 
         // Get data
@@ -852,10 +851,8 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         break;
     }
     case WM_CLOSE:
-    {
         EndDialog(hWnd, IDCANCEL);
         return TRUE;
-    }
     }
 
     return FALSE;

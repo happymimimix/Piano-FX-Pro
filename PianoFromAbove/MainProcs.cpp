@@ -32,7 +32,7 @@ INT_PTR CALLBACK SetResolutionProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM) {
         GetWindowRect(g_hWndGfx, &rect);
         win32_t width = rect.right - rect.left;
         win32_t height = rect.bottom - rect.top;
-        char buf[1 << 10] = {};
+        char buf[LONG_MAX_PATH] = {};
 
         _snprintf_s(buf, sizeof(buf), "%d", width);
         SetWindowTextA(GetDlgItem(hwnd, IDC_WIDTH), buf);
@@ -44,8 +44,9 @@ INT_PTR CALLBACK SetResolutionProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM) {
     case WM_COMMAND: {
         winword_t iId = LOWORD(wparam);
         switch (iId) {
-        case IDOK: {
-            char buf[1 << 10] = {};
+        case IDOK:
+        {
+            char buf[LONG_MAX_PATH] = {};
             GetWindowTextA(GetDlgItem(hwnd, IDC_WIDTH), buf, sizeof(buf));
             win32_t width = atoi(buf);
             GetWindowTextA(GetDlgItem(hwnd, IDC_HEIGHT), buf, sizeof(buf));
@@ -61,7 +62,8 @@ INT_PTR CALLBACK SetResolutionProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM) {
             AdjustWindowRectEx(&adjusted, GetWindowLongA(g_hWnd, GWL_STYLE), TRUE, GetWindowLongA(g_hWnd, GWL_EXSTYLE));
             SetWindowPos(g_hWnd, NULL, 0, 0, adjusted.right - adjusted.left, adjusted.bottom - adjusted.top, SWP_NOMOVE);
         }
-        case IDCANCEL: {
+        case IDCANCEL:
+        {
             EndDialog(hwnd, iId);
             return TRUE;
         }
@@ -103,15 +105,13 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         switch (iId)
         {
         case IDOK:
-        {
             return 0;
-        }
         case ID_FILE_PRACTICE:
         {
             CheckActivity(TRUE);
             // Get the file(s) to add
             OPENFILENAME ofn = {};
-            TCHAR sFilename[1 << 10] = { 0 };
+            TCHAR sFilename[LONG_MAX_PATH] = {};
             ofn.lStructSize = sizeof(OPENFILENAME);
             ofn.hwndOwner = hWnd;
             ofn.lpstrFilter = TEXT("MIDI Files (*.mid, *.mid.xz)\0*.mid;*.mid.xz\0");
@@ -215,8 +215,8 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             MessageBoxW(hWnd, GameState::Errors[lParam].c_str(), L"Error", MB_OK | MB_ICONEXCLAMATION);
             return 0;
         case ID_STUDIO:
-            wchar_t ProgramPath[MAX_PATH + 1] = {};
-            GetModuleFileNameW(NULL, ProgramPath, MAX_PATH);
+            wchar_t ProgramPath[LONG_MAX_PATH] = {};
+            GetModuleFileNameW(NULL, ProgramPath, LONG_MAX_PATH);
             wstring Command = L"start \"Piano-FX Studio v";
             Command += VersionString;
             Command += L"\" \"";
@@ -286,10 +286,8 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         // only allow 1 file
         if (DragQueryFile(drop, 0xFFFFFFFF, NULL, 0) != 1)
             return 0;
-        // it's 2020, so no MAX_PATH!
-        vector<wchar_t> filename;
-        filename.resize(DragQueryFile(drop, 0, NULL, 0) + 1);
-        DragQueryFile(drop, 0, filename.data(), filename.size());
+        wchar_t filename[LONG_MAX_PATH];
+        DragQueryFile(drop, 0, filename, LONG_MAX_PATH);
         if (cPlayback.GetPlayMode()) { //Close the current file first before opening another one! 
             cPlayback.SetPlayMode(GameState::Intro, true);
             cPlayback.SetPlayable(false, true);
@@ -297,7 +295,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             SetWindowText(g_hWnd, TitleIdle);
             HandOffMsg(WM_COMMAND, ID_CHANGESTATE, (LPARAM)new IntroScreen(NULL, NULL));
         }
-        PlayFile(filename.data());
+        PlayFile(filename);
         return 0;
     }
     return DefWindowProc(hWnd, msg, wParam, lParam);
@@ -1095,7 +1093,7 @@ INT_PTR CALLBACK LoadingProc(HWND hwnd, UINT msg, WPARAM, LPARAM) {
             return true;
         }
 
-        wchar_t buf[1 << 10];
+        wchar_t buf[LONG_MAX_PATH];
         auto prog = g_LoadingProgress.progress.load();
         auto bar = GetDlgItem(hwnd, IDC_LOADINGPROGRESS);
         SendMessage(bar, PBM_SETRANGE32, 0, g_LoadingProgress.max);
@@ -1160,7 +1158,7 @@ BOOL PlayFile(const wstring& sFile)
     cPlayback.SetPaused(false, true);
     cPlayback.SetPosition(0);
     cView.SetZoomMove(false);
-    TCHAR sTitle[1 << 10];
+    TCHAR sTitle[LONG_MAX_PATH];
     if (cControls.bDumpFrames) {
         _stprintf_s(sTitle, TitleRender, sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
     }

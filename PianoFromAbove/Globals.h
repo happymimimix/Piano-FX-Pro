@@ -22,6 +22,7 @@ extern TSQueue< MSG > g_MsgQueue; // Producer/consumer to hold events for our ga
 
 #define ERRORANDRETURN(hwnd, msg, retval) {MessageBox((hwnd), (msg), TEXT("Error"), MB_OK | MB_ICONERROR); return (retval);}
 #define NOMINMAX
+#define LONG_MAX_PATH 0x0FFF
 
 inline bool IsWrapRenderer = false;
 inline bool RendererActive = false;

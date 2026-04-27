@@ -76,6 +76,7 @@ void CreateKnob(uint8_t* ParameterList, uint8_t KnobID, uint32_t ControllerID, u
         DataSize >>= 7;
         Offset++;
     }
+    ParameterList[Offset] = static_cast<uint8_t>(DataSize & 0x7F);
     for (unsigned char Byte : LongName) {
         ParameterList[Offset] = Byte;
         Offset++;
@@ -86,6 +87,7 @@ void CreateKnob(uint8_t* ParameterList, uint8_t KnobID, uint32_t ControllerID, u
         DataSize >>= 7;
         Offset++;
     }
+    ParameterList[Offset] = static_cast<uint8_t>(DataSize & 0x7F);
     for (unsigned char Byte : ShortName) {
         ParameterList[Offset] = Byte;
         Offset++;
@@ -103,6 +105,7 @@ void DefinePage(uint8_t* ParameterList, string PageName, size_t& Offset) {
         DataSize >>= 7;
         Offset++;
     }
+    ParameterList[Offset] = static_cast<uint8_t>(DataSize & 0x7F);
     for (unsigned char Byte : PageName) {
         ParameterList[Offset] = Byte;
         Offset++;
@@ -276,29 +279,6 @@ void CreateFLP(wstring Path, uint16_t PPQ) {
 
     MessageBoxA(0, to_string(Cursor).c_str(), "Cursor:", 0);
     
-    uint8_t ID_Channel_Parameters[125];
-    for (uint8_t i = 0; i < 125; i++) ID_Channel_Parameters[i] = 0;
-    ID_Channel_Parameters[64] = 0xFF;
-    ID_Channel_Parameters[65] = 0xFF;
-    ID_Channel_Parameters[68] = 0x00; //INT32_MIN
-    ID_Channel_Parameters[69] = 0x00;
-    ID_Channel_Parameters[70] = 0x00;
-    ID_Channel_Parameters[71] = 0x80;
-    ID_Channel_Parameters[72] = 0xFF; //INT32_MAX
-    ID_Channel_Parameters[73] = 0xFF;
-    ID_Channel_Parameters[74] = 0xFF;
-    ID_Channel_Parameters[75] = 0x7F;
-    ID_Channel_Parameters[112] = 0x0C; //Pitch Range: 12
-    ID_Channel_Parameters[116] = 0xFE;
-    ID_Channel_Parameters[117] = 0xFF;
-    ID_Channel_Parameters[118] = 0xFF;
-    ID_Channel_Parameters[119] = 0xFF;
-    ID_Channel_Parameters[120] = 0xFF;
-    ID_Channel_Parameters[121] = 0xFF;
-    ID_Channel_Parameters[122] = 0xFF;
-    ID_Channel_Parameters[123] = 0xFF;
-    ID_Channel_Parameters[125] = 0x84;
-
     for (uint16_t Channel = 0; Channel < 16; Channel++) {
         ID_Plugin_Parameters[4] = Channel >= 9 ? Channel + 1 : Channel; //MIDI output channel
         Make_FL_Event(FLdt_Data, 64, ToBytes(static_cast<uint16_t>(Channel), 2));
@@ -309,7 +289,6 @@ void CreateFLP(wstring Path, uint16_t PPQ) {
         TrackName += (wchar_t)0x0000;
         Make_FL_Event(FLdt_Data, 192, vector<uint8_t>(reinterpret_cast<const uint8_t*>(TrackName.data()), reinterpret_cast<const uint8_t*>(TrackName.data() + TrackName.size())));
         Make_FL_Event(FLdt_Data, 213, vector<uint8_t>(ID_Plugin_Parameters, ID_Plugin_Parameters + 965));
-        Make_FL_Event(FLdt_Data, 215, vector<uint8_t>(ID_Channel_Parameters, ID_Channel_Parameters + 125));
     }
 
     for (uint16_t i = 0; i < 330; i++) ID_Plugin_Parameters[i] = 0;
@@ -329,7 +308,6 @@ void CreateFLP(wstring Path, uint16_t PPQ) {
         TrackName += (wchar_t)0x0000;
         Make_FL_Event(FLdt_Data, 192, vector<uint8_t>(reinterpret_cast<const uint8_t*>(TrackName.data()), reinterpret_cast<const uint8_t*>(TrackName.data() + TrackName.size())));
         Make_FL_Event(FLdt_Data, 213, vector<uint8_t>(ID_Plugin_Parameters, ID_Plugin_Parameters + 330));
-        Make_FL_Event(FLdt_Data, 215, vector<uint8_t>(ID_Channel_Parameters, ID_Channel_Parameters + 125));
     }
 
     Output_FLP.write("FLhd", 4);

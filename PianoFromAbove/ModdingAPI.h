@@ -7,10 +7,11 @@
 #include <vector>
 #include <regex>
 using namespace std;
+#define LONG_MAX_PATH 0x0FFF
 
 wstring ProgramDIR() {
-    wchar_t szFilePath[MAX_PATH + 1] = {};
-    GetModuleFileNameW(NULL, szFilePath, MAX_PATH);
+    wchar_t szFilePath[LONG_MAX_PATH] = {};
+    GetModuleFileNameW(NULL, szFilePath, LONG_MAX_PATH);
     (wcsrchr(szFilePath, '\\'))[0] = 0;
     return szFilePath;
 }

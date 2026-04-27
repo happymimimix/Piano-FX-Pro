@@ -8,6 +8,7 @@
 #include <vector>
 #include <functional>
 #include <shlobj.h>
+#define LONG_MAX_PATH 0x0FFF
 
 using namespace std;
 

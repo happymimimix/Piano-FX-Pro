@@ -34,8 +34,8 @@ void Tab2::EnableAll() {
         Btn1->OnTouch = []() {
             Tab2Graphics::Btn1(3, 2, Touched);
             Sleep(500);
-            char ProgramPath[MAX_PATH + 1] = {};
-            GetModuleFileNameA(NULL, ProgramPath, MAX_PATH);
+            char ProgramPath[LONG_MAX_PATH] = {};
+            GetModuleFileNameA(NULL, ProgramPath, LONG_MAX_PATH);
             string Command = "start \"Visualize pitch bend tutorial\" \"";
             Command += ProgramPath;
             Command += "\" ";
@@ -57,8 +57,8 @@ void Tab2::EnableAll() {
         Btn2->OnTouch = []() {
             Tab2Graphics::Btn2(3, 5, Touched);
             Sleep(500);
-            char ProgramPath[MAX_PATH + 1] = {};
-            GetModuleFileNameA(NULL, ProgramPath, MAX_PATH);
+            char ProgramPath[LONG_MAX_PATH] = {};
+            GetModuleFileNameA(NULL, ProgramPath, LONG_MAX_PATH);
             string Command = "start \"Cheat engine Lua scripting tutorial\" \"";
             Command += ProgramPath;
             Command += "\" ";
