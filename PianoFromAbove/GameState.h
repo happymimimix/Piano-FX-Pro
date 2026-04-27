@@ -75,6 +75,9 @@ struct dynamic_bitset {
     static constexpr size_t WORD_MASK = WORD_SIZE - 1;
     idx_t minWord = 0;
     idx_t maxWord = 0;
+    // Disable copying
+    dynamic_bitset(const dynamic_bitset&) = delete;
+    dynamic_bitset& operator=(const dynamic_bitset&) = delete;
 
     dynamic_bitset(idx_t size) {
         // This is the ONLY place where we need to modify wordCount. It should never be changed elsewhere.
@@ -100,8 +103,8 @@ struct dynamic_bitset {
     __forceinline void Activate(idx_t idx, bool future) {
         idx_t word = idx >> WORD_DIV_SHR;
         bits[word] |= (size_t(1) << (idx & WORD_MASK));
-        minWord = future ? minWord : min(maxWord, word);
-        maxWord = future ? max(maxWord,word):maxWord;
+        minWord = future ? minWord : min(minWord, word);
+        maxWord = future ? max(maxWord,word) : maxWord;
     }
 
     __forceinline void Deactivate(idx_t idx) {
@@ -123,19 +126,49 @@ struct dynamic_bitset {
     }
 
     template<typename Func>
-    __forceinline void ForEach(Func&& fn) const {
-        if (minWord > maxWord) return;
+    __forceinline void ForEach(Func&& FuncPtr) {
+		if (minWord > maxWord) return;
+		minWord = min(minWord, wordCount - 1);
         maxWord = min(maxWord, wordCount - 1);
         idx_t newMin = wordCount;
         idx_t newMax = 0;
         for (idx_t word_id = minWord; word_id <= maxWord; word_id++) {
-            word_t word = bits[word_id];
+            size_t word = bits[word_id];
+            if (word) {
+                if(newMin == wordCount) newMin = word_id;
+                newMax = word_id;
+            }
             while (word) {
                 idx_t bit = CTZ(word);
-                fn((w << WORD_SHIFT) | bit);
+                FuncPtr((word_id << WORD_DIV_SHR) | bit);
                 word &= word - 1;
             }
         }
+        minWord = newMin;
+        maxWord = newMax;
+    }
+
+    template<typename Func>
+    __forceinline void ForEachReversed(Func&& FuncPtr) {
+        if (minWord > maxWord) return;
+        minWord = min(minWord, wordCount - 1);
+        maxWord = min(maxWord, wordCount - 1);
+        idx_t newMin = wordCount;
+        idx_t newMax = 0;
+        for (idx_t word_id = maxWord; word_id >= minWord && word_id != IDX_MAX; word_id--) {
+            size_t word = bits[word_id];
+            if (word) {
+                newMin = word_id;
+                if (newMax == 0) newMax = word_id;
+            }
+            while (word) {
+                idx_t bit = WORD_MASK - CLZ(word);
+                FuncPtr((word_id << WORD_DIV_SHR) | bit);
+                word ^= size_t(1) << bit;
+            }
+        }
+        minWord = newMin;
+        maxWord = newMax;
     }
 private:
     size_t* bits = nullptr;

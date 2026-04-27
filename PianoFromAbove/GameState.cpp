@@ -2344,7 +2344,7 @@ void MainScreen::RenderStatusLine(unsigned char line, const wchar_t* left, const
     wchar_t buf[LONG_MAX_PATH] = {};
     va_list varargs;
     va_start(varargs, format);
-    swprintf_s(buf, _countof(buf), format, varargs);
+    vswprintf_s(buf, _countof(buf), format, varargs);
     va_end(varargs);
 
     win32_t TextY = 2 + line * 16;
