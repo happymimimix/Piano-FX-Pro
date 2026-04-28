@@ -79,7 +79,7 @@ private:
     void RestoreTree(track_t leafId);
 
     MIDI& m_MIDI;
-    vector<idx_t> m_vTrackPos;
+    idx_t* m_pTrackPos;
 
     // Tempo variables
     bool m_bIsStandard;

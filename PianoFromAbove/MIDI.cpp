@@ -28,9 +28,10 @@ MIDIPos::MIDIPos(MIDI& midi) : m_MIDI(midi)
     // Init track positions
     m_iTrackCount = static_cast<track_t>(m_MIDI.m_vTracks.size());
     m_pTrackTime = new mtk_t[m_iTrackCount];
+    m_pTrackPos = new idx_t[m_iTrackCount];
     for (track_t i = 0; i < m_iTrackCount; ++i) {
         m_pTrackTime[i] = INT64_MAX;
-        m_vTrackPos.push_back(0);
+        m_pTrackPos[i] = 0;
     }
 
     // Calculate the tournament tree size (must round up to a power of 2)
@@ -68,6 +69,7 @@ MIDIPos::MIDIPos(MIDI& midi) : m_MIDI(midi)
 
 MIDIPos::~MIDIPos() {
     delete[] m_pTrackTime;
+    delete[] m_pTrackPos;
     delete[] m_pLoserTree;
 }
 
@@ -149,7 +151,7 @@ idx_t MIDIPos::GetNextEvent(mms_t iMicroSecs, MIDIEvent** pOutEvent)
 
     const idx_t iMinPos = static_cast<idx_t>(champion);
 
-    MIDIEvent* pMinEvent = m_MIDI.m_vTracks[iMinPos]->m_vEvents[m_vTrackPos[iMinPos]];
+    MIDIEvent* pMinEvent = m_MIDI.m_vTracks[iMinPos]->m_vEvents[m_pTrackPos[iMinPos]];
 
     // Make sure the event doesn't occur after the requested time window
     mtk_t iMaxTickAllowed = m_iCurrTick;
@@ -173,8 +175,8 @@ idx_t MIDIPos::GetNextEvent(mms_t iMicroSecs, MIDIEvent** pOutEvent)
         m_iCurrMicroSec = 0;
 
         // Advance this track's head pointer + key, then re-balance the tree.
-        m_vTrackPos[iMinPos]++;
-        m_pTrackTime[iMinPos] = m_vTrackPos[iMinPos] == m_MIDI.m_vTracks[iMinPos]->m_vEvents.size() ? INT64_MAX : m_MIDI.m_vTracks[iMinPos]->m_vEvents[m_vTrackPos[iMinPos]]->GetAbsT();
+        m_pTrackPos[iMinPos]++;
+        m_pTrackTime[iMinPos] = m_pTrackPos[iMinPos] == m_MIDI.m_vTracks[iMinPos]->m_vEvents.size() ? INT64_MAX : m_MIDI.m_vTracks[iMinPos]->m_vEvents[m_pTrackPos[iMinPos]]->GetAbsT();
         RestoreTree(champion);
 
         // Change the tempo going forward if we're at a SetTempo event
@@ -555,10 +557,10 @@ idx_t MIDI::ParseTracks(const unsigned char* pcData, idx_t iMaxSize)
             delete track;
 
         iTotal += iCount;
-    } while (iMaxSize - iTotal > 0 && iCount > 0 && iTrack < 0xFFFF);
+    } while (iMaxSize - iTotal > 0 && iCount > 0 && iTrack < 0xFFFFu);
 
     // Some MIDIs lie about the amount of tracks
-    m_Info.iNumTracks = min(m_vTracks.size(), 0xFFFF);
+    m_Info.iNumTracks = min(m_vTracks.size(), 0xFFFFu);
 
     return iTotal;
 }
