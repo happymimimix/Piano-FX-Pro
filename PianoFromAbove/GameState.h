@@ -97,7 +97,7 @@ struct dynamic_bitset {
         if (maxWord >= minWord && maxWord < wordCount) {
             memset(&bits[minWord], 0, (maxWord - minWord + 1) * sizeof(size_t));
         }
-        minWord = wordCount;
+        minWord = wordCount - 1;
         maxWord = 0;
     }
 
@@ -131,7 +131,7 @@ struct dynamic_bitset {
 		if (minWord > maxWord) return;
 		minWord = min(minWord, wordCount - 1);
         maxWord = min(maxWord, wordCount - 1);
-        idx_t newMin = wordCount;
+        idx_t newMin = wordCount - 1;
         idx_t newMax = 0;
         bool first = true;
         for (idx_t word_id = minWord; word_id <= maxWord; word_id++) {
@@ -158,7 +158,7 @@ struct dynamic_bitset {
         if (minWord > maxWord) return;
         minWord = min(minWord, wordCount - 1);
         maxWord = min(maxWord, wordCount - 1);
-        idx_t newMin = wordCount;
+        idx_t newMin = wordCount - 1;
         idx_t newMax = 0;
         bool first = true;
         for (idx_t word_id = maxWord; word_id >= minWord && word_id != IDX_MAX; word_id--) {
