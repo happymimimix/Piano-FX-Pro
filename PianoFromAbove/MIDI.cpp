@@ -26,10 +26,21 @@ MIDIPos::MIDIPos(MIDI& midi) : m_MIDI(midi)
     m_iCurrTick = m_iCurrMicroSec = 0;
 
     // Init track positions
-    idx_t iTracks = m_MIDI.m_vTracks.size();
-    m_pTrackTime = new mtk_t[iTracks];
-    for (idx_t i = 0; i < iTracks; i++)
+    m_iTrackCount = static_cast<track_t>(m_MIDI.m_vTracks.size());
+    m_pTrackTime = new mtk_t[m_iTrackCount];
+    for (track_t i = 0; i < m_iTrackCount; ++i) {
+        m_pTrackTime[i] = INT64_MAX;
         m_vTrackPos.push_back(0);
+    }
+
+    // Calculate the tournament tree size (must round up to a power of 2)
+    idx_t size = 1;
+    while (size < static_cast<idx_t>(m_iTrackCount)) size <<= 1;
+    m_iTreeSize = static_cast<track_t>(size); // 65536 -> 0 by uint16 wrap
+
+    // Allocate the tree
+    m_pLoserTree = new track_t[TreeSize()];
+    m_bTreeBuilt = false;
 
     // Init SMPTE tempo
     if (m_MIDI.m_Info.iDivision & 0x8000)
@@ -57,10 +68,67 @@ MIDIPos::MIDIPos(MIDI& midi) : m_MIDI(midi)
 
 MIDIPos::~MIDIPos() {
     delete[] m_pTrackTime;
+    delete[] m_pLoserTree;
 }
 
-idx_t GetMinItem(mtk_t* array, idx_t size) {
-    return min_element(array, array + size) - array;
+void MIDIPos::BuildTree()
+{
+    const idx_t size = TreeSize();
+
+    memset(m_pLoserTree, 0xFF, static_cast<size_t>(size) * sizeof(track_t));
+
+    for (idx_t t = 0; t < size; ++t) {
+        track_t contender = static_cast<track_t>(t);
+        idx_t node = (size + t) >> 1; // first internal-node
+
+        while (node >= 1) {
+            track_t seated = m_pLoserTree[node];
+
+            if (seated == TRACK_INVALID) {
+                // Empty slot
+                m_pLoserTree[node] = contender;
+                contender = TRACK_INVALID;
+                break;
+            }
+
+            // Match: winner climbs, loser stays seated at this node.
+            track_t loser;
+            track_t winner = PlayMatch(contender, seated, &loser);
+            m_pLoserTree[node] = loser;
+            contender = winner;
+            // We've just played the root match.
+            if (node == 1) break;
+            node >>= 1;
+        }
+
+        // If the contender survived all the way through the root, it must be compared against the current champion.
+        if (contender != TRACK_INVALID) {
+            if (m_pLoserTree[0] == TRACK_INVALID || TrackBeats(contender, m_pLoserTree[0])) {
+                m_pLoserTree[0] = contender;
+            }
+        }
+    }
+
+    m_bTreeBuilt = true;
+}
+
+void MIDIPos::RestoreTree(track_t leafId)
+{
+    const idx_t size = TreeSize();
+    track_t contender = leafId;
+    idx_t node = (size + leafId) >> 1;
+
+    while (node >= 1) {
+        track_t loser;
+        track_t winner = PlayMatch(contender, m_pLoserTree[node], &loser);
+        m_pLoserTree[node] = loser;
+        contender = winner;
+
+        if (node == 1) break;
+        node >>= 1;
+    }
+
+    m_pLoserTree[0] = contender;
 }
 
 // Gets the next closest event as long as it occurs before iMicroSecs elapse
@@ -70,10 +138,16 @@ idx_t MIDIPos::GetNextEvent(mms_t iMicroSecs, MIDIEvent** pOutEvent)
     if (!pOutEvent) return 0;
     *pOutEvent = NULL;
 
-    // Get the next closest event
-    idx_t iMinPos = GetMinItem(reinterpret_cast<mtk_t*>(m_pTrackTime), static_cast<idx_t>(m_vTrackPos.size()));
+    if (!m_bTreeBuilt) BuildTree();
 
-    if (m_pTrackTime[iMinPos] == INT64_MAX) return 0;
+    if (m_iTrackCount == 0) return 0;
+
+    const track_t champion = m_pLoserTree[0];
+
+    // No events left? champion is sentinel, out of range, or has INT64_MAX key.
+    if (champion == TRACK_INVALID || champion >= m_iTrackCount || m_pTrackTime[champion] == INT64_MAX) return 0;
+
+    const idx_t iMinPos = static_cast<idx_t>(champion);
 
     MIDIEvent* pMinEvent = m_MIDI.m_vTracks[iMinPos]->m_vEvents[m_vTrackPos[iMinPos]];
 
@@ -97,8 +171,11 @@ idx_t MIDIPos::GetNextEvent(mms_t iMicroSecs, MIDIEvent** pOutEvent)
             iSpan = (1000000LL * iSpan) / m_iTicksPerSecond - m_iCurrMicroSec;
         m_iCurrTick = pMinEvent->GetAbsT();
         m_iCurrMicroSec = 0;
+
+        // Advance this track's head pointer + key, then re-balance the tree.
         m_vTrackPos[iMinPos]++;
         m_pTrackTime[iMinPos] = m_vTrackPos[iMinPos] == m_MIDI.m_vTracks[iMinPos]->m_vEvents.size() ? INT64_MAX : m_MIDI.m_vTracks[iMinPos]->m_vEvents[m_vTrackPos[iMinPos]]->GetAbsT();
+        RestoreTree(champion);
 
         // Change the tempo going forward if we're at a SetTempo event
         if (pMinEvent->GetEventType() == MIDIEvent::MetaEvent)
@@ -372,7 +449,7 @@ key_t MIDI::aWhiteCount[MIDI::KEYS + 1];
 
 void MIDI::InitArrays()
 {
-    wchar_t buf[1<<3];
+    wchar_t buf[1 << 3];
     wchar_t cNote = L'C';
     int16_t iOctave = -1;
     bool bIsSharp = false;
@@ -572,7 +649,7 @@ bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
             pChannelEvent->SetSimultaneous(iSimultaneous);
             if (pChannelEvent->HasSister())
             {
-                if (IsOn(pChannelEvent->GetChannelEventType(),pChannelEvent->GetParam2()))
+                if (IsOn(pChannelEvent->GetChannelEventType(), pChannelEvent->GetParam2()))
                 {
                     if (llFirstNote < 0) llFirstNote = llTime;
                     iSimultaneous++;
@@ -644,7 +721,7 @@ bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
 
 void MIDI::ConnectNotes()
 {
-    vector<array<stack<idx_t>,128>> vStacks;
+    vector<array<stack<idx_t>, 128>> vStacks;
     vStacks.resize(m_vTracks.size() * 16);
 
     g_LoadingProgress.stage = MIDILoadingProgress::Stage::ConnectNotes;

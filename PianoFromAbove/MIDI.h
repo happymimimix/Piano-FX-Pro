@@ -48,7 +48,36 @@ public:
     mtk_t* m_pTrackTime;
 
 private:
-    // Where are we in the file?
+    // Tournament tree
+    track_t* m_pLoserTree;
+    track_t m_iTreeSize;
+    track_t m_iTrackCount;
+    bool m_bTreeBuilt;
+
+    __forceinline idx_t TreeSize() const {
+        // Size 0 is impossible, so whenever we see 0 we know the actual size is 65536.
+        // It overflowed to 0 because the size field is an unsigned 16 bit.
+        return m_iTreeSize == 0 ? static_cast<idx_t>(UINT16_MAX) + static_cast<idx_t>(1) : static_cast<idx_t>(m_iTreeSize);
+    }
+
+    __forceinline mtk_t TreeKey(track_t trackId) const {
+        return (trackId < m_iTrackCount) ? m_pTrackTime[trackId] : INT64_MAX;
+    }
+
+    __forceinline bool TrackBeats(track_t a, track_t b) const {
+        const mtk_t ka = TreeKey(a), kb = TreeKey(b);
+        if (ka != kb) return ka < kb;
+        return a < b;
+    }
+
+    __forceinline track_t PlayMatch(track_t a, track_t b, track_t* loserOut) const {
+        if (TrackBeats(a, b)) { *loserOut = b; return a; }
+        else { *loserOut = a; return b; }
+    }
+
+    void BuildTree();
+    void RestoreTree(track_t leafId);
+
     MIDI& m_MIDI;
     vector<idx_t> m_vTrackPos;
 
@@ -69,7 +98,7 @@ class MIDI
 public:
     enum Note { A, AS, B, C, CS, D, DS, E, F, FS, G, GS };
 
-    static const key_t KEYS = 1<<7;
+    static const key_t KEYS = 1 << 7;
     static const wstring Instruments[(1 << 7) + 1];
 
     __forceinline static const wstring& NoteName(key_t iNote)
@@ -83,7 +112,7 @@ public:
         if (iNote & 0x80) return C;
         return aNoteVal[iNote];
     }
-    
+
     __forceinline static bool IsSharp(key_t iNote)
     {
         if (iNote < 192) {
@@ -94,13 +123,13 @@ public:
             return (1 << (siNote % 12)) & 0b010101001010;
         }
     }
-    
+
     __forceinline static key_t WhiteCount(key_t iMinNote, key_t iMaxNote)
     {
         if (iMinNote >= MIDI::KEYS || iMaxNote > MIDI::KEYS) return false;
         return aWhiteCount[iMaxNote] - aWhiteCount[iMinNote];
     }
-    
+
     //Generally usefull static parsing functions
     static uint32_t ParseVarNum(const unsigned char* pcData, msgln_t iMaxSize, uint32_t* piOut);
     static uint32_t Parse32Bit(const unsigned char* pcData, msgln_t iMaxSize, uint32_t* piOut);
@@ -230,7 +259,7 @@ public:
     static EventType DecodeEventType(msg_t iEventCode);
 
     //Parsing functions that load data into the instance
-    static uint32_t MakeNextEvent(MIDI& midi, const unsigned char* pcData, msgln_t iMaxSize, track_t iTrack, MIDIEvent** pOutEvent);
+    static uint32_t MakeNextEvent(MIDI & midi, const unsigned char* pcData, msgln_t iMaxSize, track_t iTrack, MIDIEvent * *pOutEvent);
 
     //Accessors
     __forceinline EventType GetEventType() const { return (EventType)m_eEventType; }
@@ -263,10 +292,10 @@ public:
     __forceinline chan_t GetChannel() const { return m_cChannel & 0x0F; }
     __forceinline key_t GetParam1() const { return m_cParam1 & 0x7F; }
     __forceinline key_t GetParam2() const { return m_cParam2 & 0x7F; }
-    __forceinline MIDIChannelEvent* GetSister(const vector<MIDIChannelEvent*>& events) const {
+    __forceinline MIDIChannelEvent* GetSister(const vector<MIDIChannelEvent*>&events) const {
         return m_iSisterIdx == IDX_MAX ? nullptr : events[m_iSisterIdx];
     }
-    __forceinline MIDIChannelEvent* GetSister(const vector<MIDIEvent*>& events) const {
+    __forceinline MIDIChannelEvent* GetSister(const vector<MIDIEvent*>&events) const {
         return m_iSisterIdx == IDX_MAX ? nullptr : (MIDIChannelEvent*)events[m_iSisterIdx];
     }
     __forceinline idx_t GetSisterIdx() const { return m_iSisterIdx; }
