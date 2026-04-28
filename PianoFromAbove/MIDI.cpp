@@ -34,13 +34,10 @@ MIDIPos::MIDIPos(MIDI& midi) : m_MIDI(midi)
     // Init SMPTE tempo
     if (m_MIDI.m_Info.iDivision & 0x8000)
     {
-        unsigned short iFramesPerSec = static_cast<unsigned short>(-static_cast<signed char>(m_MIDI.m_Info.iDivision >> 8)) * static_cast<unsigned short>(100);
-        if (iFramesPerSec == 2900) iFramesPerSec = 2997;
-        if (iFramesPerSec == 5900) iFramesPerSec = 5994;
-        if (iFramesPerSec == 11900) iFramesPerSec = 11988;
+        unsigned char iFramesPerSec = static_cast<unsigned char>(-static_cast<signed char>(m_MIDI.m_Info.iDivision >> 8));
         unsigned char iTicksPerFrame = m_MIDI.m_Info.iDivision & 0xFF;
-        iFramesPerSec |= !iFramesPerSec;// Clamp to > 0
-        iTicksPerFrame |= !iTicksPerFrame;// Clamp to > 0
+        iFramesPerSec |= !iFramesPerSec; // Clamp to > 0
+        iTicksPerFrame |= !iTicksPerFrame; // Clamp to > 0
 
         m_bIsStandard = false;
         m_iTicksPerBeat = m_iMicroSecsPerBeat = 0;

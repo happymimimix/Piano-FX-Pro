@@ -116,17 +116,6 @@ GameState::GameError IntroScreen::Render() {
 // SplashScreen GameState object
 //-----------------------------------------------------------------------------
 
-void InsertSorted(vector<idx_t>& vec, idx_t value) {
-    auto it = lower_bound(vec.begin(), vec.end(), value);
-    vec.insert(it, value);
-}
-
-idx_t LocateElement(const vector<idx_t>& vec, idx_t value) {
-    auto it = lower_bound(vec.begin(), vec.end(), value);
-    if (it != vec.end() && *it == value) return it - vec.begin();
-    return IDX_MAX;
-}
-
 SplashScreen::SplashScreen(HWND hWnd, Renderer11* pRenderer, bool enableSplash) : GameState(hWnd, pRenderer) {
     if (enableSplash) {
         HRSRC hResInfo = FindResource(NULL, MAKEINTRESOURCE(IDR_SPLASHMIDI), TEXT("MIDI"));
@@ -217,20 +206,17 @@ SplashScreen::SplashScreen(HWND hWnd, Renderer11* pRenderer, bool enableSplash) 
             m_MIDI.ParseMIDI(pData, iSize);
             delete[] pData;
         }
-        vector<MIDIEvent*> vEvents;
-        vEvents.reserve(m_MIDI.GetInfo().iEventCount);
         m_MIDI.ConnectNotes(); // Order's important here
+        m_vEvents.reserve(m_MIDI.GetInfo().iEventCount);
         bool IsPostProcessOK = m_MIDI.PostProcess(m_vEvents);
         if (!IsPostProcessOK) {
             MessageBoxW(hWnd, Errors[GameError::OutOfMemory].c_str(), L"Error", MB_OK);
             return;
         }
-
         // Allocate
         m_vTrackSettings.clear();
         m_vTrackSettings.resize(min(m_MIDI.GetInfo().iNumTracks, MaxTrackColors));
-        m_vState.clear();
-        m_vState.reserve(1 << 10);
+        m_pState = new dynamic_bitset(m_vEvents.size());
     }
     InitState();
     UpdateNotePos = true;
@@ -412,18 +398,12 @@ GameState::GameError SplashScreen::Logic() {
 
 void SplashScreen::UpdateState(idx_t idx, idx_t sister_idx) {
     if (sister_idx == IDX_MAX) {
-        // Note-on
-        m_vState.push_back(idx);
+        if (m_pState->IsActive(idx)) MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
+        m_pState->Activate(idx);
     }
     else {
-        // Note-off
-        idx_t pos = LocateElement(m_vState, sister_idx);
-        if (pos != IDX_MAX) {
-            m_vState.erase(m_vState.begin() + pos);
-        }
-        else {
-            MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
-        }
+        if (!m_pState->IsActive(sister_idx)) MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
+        m_pState->Deactivate(sister_idx);
     }
 }
 
@@ -481,11 +461,11 @@ void SplashScreen::RenderNotes() {
         return;
 
     // White held notes
-    for (idx_t idx : m_vState) {
+    m_pState->ForEach([&](idx_t idx) {
         if (!MIDI::IsSharp(m_vEvents[idx]->GetParam1())) {
             RenderNote(m_vEvents[idx]);
         }
-    }
+        });
     // White falling notes
     for (sidx_t i = m_iStartPos; i <= m_iEndPos; i++) {
         MIDIChannelEvent* pEvent = m_vEvents[i];
@@ -496,11 +476,11 @@ void SplashScreen::RenderNotes() {
         }
     }
     // Sharp held notes
-    for (idx_t idx : m_vState) {
+    m_pState->ForEach([&](idx_t idx) {
         if (MIDI::IsSharp(m_vEvents[idx]->GetParam1())) {
             RenderNote(m_vEvents[idx]);
         }
-    }
+        });
     // Sharp falling notes
     for (sidx_t i = m_iStartPos; i <= m_iEndPos; i++) {
         MIDIChannelEvent* pEvent = m_vEvents[i];
@@ -593,18 +573,15 @@ MainScreen::MainScreen(wstring sMIDIFile, HWND hWnd, Renderer11* pRenderer) : Ga
     if (!m_MIDI.IsValid()) return;
     m_MIDI.ConnectNotes(); // Order's important here
     m_vEvents.reserve(m_MIDI.GetInfo().iEventCount);
-
-    // Allocate
-    m_vTrackSettings.clear();
-    m_vTrackSettings.resize(min(m_MIDI.GetInfo().iNumTracks, MaxTrackColors));
-    m_vState.clear();
-    m_vState.reserve(1 << 10);
-
     bool IsPostProcessOK = m_MIDI.PostProcess(m_vEvents, &m_vMetaEvents, &m_vTempo, &m_vSignature, &m_vMarkers, &m_vColors);
     if (!IsPostProcessOK) {
         MessageBoxW(hWnd, Errors[GameError::OutOfMemory].c_str(), L"Error", MB_OK);
         return;
     }
+    // Allocate
+    m_vTrackSettings.clear();
+    m_vTrackSettings.resize(min(m_MIDI.GetInfo().iNumTracks, MaxTrackColors));
+    m_pState = new dynamic_bitset(m_vEvents.size());
 
     g_LoadingProgress.stage = MIDILoadingProgress::Stage::NCTable;
     g_LoadingProgress.progress = 0;
@@ -854,10 +831,10 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
         winword_t iId = LOWORD(wParam);
         switch (iId)
         {
-		case ID_CHANGESTATE:
+        case ID_CHANGESTATE:
             m_pNextState = reinterpret_cast<GameState*>(lParam);
             return Success;
-		case ID_PLAY_STOP:
+        case ID_PLAY_STOP:
         {
             bool StartTimer = (JumpTarget == ~0);
             JumpTarget = GetMinTime();
@@ -873,7 +850,7 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
             if (StartTimer) SetTimer(g_hWnd, IDC_POSNDELAY, nxtdelay, NULL); //Async JumpTo process
             return Success;
         }
-		case ID_PLAY_SKIPBACK:
+        case ID_PLAY_SKIPBACK:
         {
             bool StartTimer = (JumpTarget == ~0);
             JumpTarget = static_cast<mms_t>(m_llStartTime - cControls.dFwdBackSecs * S);
@@ -1216,12 +1193,7 @@ GameState::GameError MainScreen::Logic() {
             if (IsNote(pEvent->GetChannelEventType()) && pEvent->HasSister()) {
                 idx_t idx = Reverse ? ogsistidx : static_cast<idx_t>(m_iStartPos);
                 idx_t sister = IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()) ? IDX_MAX : (Reverse ? static_cast<idx_t>(m_iStartPos) : ogsistidx);
-                if (Reverse) {
-                    UpdateStateBackwards(idx, sister);
-                }
-                else {
-                    UpdateState(idx, sister);
-                }
+                UpdateState(idx, sister);
             }
 
             // Advance loop counter and start the next itteration. 
@@ -1306,36 +1278,17 @@ GameState::GameError MainScreen::Logic() {
 
 void MainScreen::UpdateState(idx_t idx, idx_t sister_idx) {
     if (sister_idx == IDX_MAX) {
-        // Note-on: push_back preserves sorted order in forward playback
-        m_vState.push_back(idx);
+        if (m_pState->IsActive(idx) && JumpTarget == ~0) MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
+        m_pState->Activate(idx);
     }
     else {
-        // Note-off: binary search + erase
-        idx_t pos = LocateElement(m_vState, sister_idx);
-        if (pos != IDX_MAX) {
-            m_vState.erase(m_vState.begin() + pos);
-        }
-        else if (JumpTarget == ~0) {
-            MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
-        }
+        if (!m_pState->IsActive(sister_idx) && JumpTarget == ~0) MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
+        m_pState->Deactivate(sister_idx);
     }
 }
 
-void MainScreen::UpdateStateBackwards(idx_t idx, idx_t sister_idx) {
-    if (sister_idx == IDX_MAX) {
-        // Note-on in reverse: indices arrive out of order, need sorted insert
-        InsertSorted(m_vState, idx);
-    }
-    else {
-        // Note-off in reverse: binary search + erase
-        idx_t pos = LocateElement(m_vState, sister_idx);
-        if (pos != IDX_MAX) {
-            m_vState.erase(m_vState.begin() + pos);
-        }
-        else if (JumpTarget == ~0) {
-            MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
-        }
-    }
+void MainScreen::UpdateStateBackwards(idx_t start, idx_t end) {
+    // To do
 }
 
 void MainScreen::JumpTo(mms_t llStartTime, boolean loadingMode) {
@@ -1379,7 +1332,7 @@ void MainScreen::JumpTo(mms_t llStartTime, boolean loadingMode) {
     m_iStartPos = itMiddle - m_vEvents.begin();
 
     // Find the notes that occur simultaneously with the previous note on...
-    m_vState.clear();
+    m_pState->Clear();
     if (itMiddle != itEnd && itMiddle != itBegin)
     {
         // Find the previous note on...
@@ -1397,8 +1350,7 @@ void MainScreen::JumpTo(mms_t llStartTime, boolean loadingMode) {
         // Found it!
         auto TargetNote = itMiddle;
         if ((*TargetNote)->GetSister(m_vEvents)->GetAbsMicroSec() > m_llStartTime) {
-            // Push it into m_vState if it's held at this moment
-            m_vState.push_back(TargetNote - m_vEvents.begin());
+            m_pState->Activate(TargetNote - m_vEvents.begin());
         }
         // Search for more held notes...
         idx_t iFound = 0;
@@ -1412,7 +1364,7 @@ void MainScreen::JumpTo(mms_t llStartTime, boolean loadingMode) {
                         iFound++;
                     }
                     if ((*itMiddle)->GetSister(m_vEvents)->GetAbsMicroSec() > m_llStartTime) {
-                        m_vState.push_back(itMiddle - m_vEvents.begin());
+                        m_pState->Activate(itMiddle - m_vEvents.begin());
                     }
                 }
                 if (itMiddle == itBegin || iFound >= iSimultaneous) {
@@ -1424,9 +1376,6 @@ void MainScreen::JumpTo(mms_t llStartTime, boolean loadingMode) {
             if (iFound != iSimultaneous) {
                 MessageBoxW(g_hWnd, Errors[GameError::JumpToFailure].c_str(), L"Error", MB_OK);
             }
-            // If there's only one note, there's no need to reverse.
-            // So let's put this statement inside the if check.
-            reverse(m_vState.begin(), m_vState.end());
         }
     }
 SkipSearch:
@@ -1710,7 +1659,14 @@ mtk_t MainScreen::GetCurrentTick(mms_t llStartTime, mtk_t iLastTempoTick, mms_t 
         else
             return iLastTempoTick - static_cast<mtk_t>((iDivision * (llLastTempoTime - llStartTime) + 1) / iMicroSecsPerBeat) - 1;
     }
-    return -1;
+    else {
+        unsigned char iFramesPerSec = static_cast<unsigned char>(-static_cast<signed char>(m_MIDI.GetInfo().iDivision >> 8));
+        unsigned char iTicksPerFrame = m_MIDI.GetInfo().iDivision & 0xFF;
+        iFramesPerSec |= !iFramesPerSec; // Clamp to > 0
+        iTicksPerFrame |= !iTicksPerFrame; // Clamp to > 0
+        double dTicksPerMicrosecond = static_cast<double>(iTicksPerFrame * iFramesPerSec) / static_cast<double>(S);
+        return static_cast<mtk_t>(static_cast<double>(llStartTime) * dTicksPerMicrosecond);
+    }
 }
 
 // Gets the time corresponding to the tick
@@ -1996,22 +1952,28 @@ void MainScreen::RenderNotes() {
                 }
             }
         }
-        for (vector<idx_t>::reverse_iterator it = m_vState.rbegin(); it != m_vState.rend(); it++) {
-            MIDIChannelEvent* pEvent = m_vEvents[*it];
+        polyphony = 0;
+        m_pState->ForEachReversed([&](idx_t idx) {
+            MIDIChannelEvent* pEvent = m_vEvents[idx];
             if (m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
                 RenderNote(pEvent);
                 if (!IsPressed(pEvent->GetParam1())) {
                     PressAndBlend(pEvent);
                 }
             }
-        }
+            polyphony++;
+            });
     }
     else {
-        for (vector<idx_t>::iterator it = m_vState.begin(); it != m_vState.end(); it++) {
-            MIDIChannelEvent* pEvent = m_vEvents[*it];
-            RenderNote(pEvent);
-            PressAndBlend(pEvent);
-        }
+        polyphony = 0;
+        m_pState->ForEach([&](idx_t idx) {
+            MIDIChannelEvent* pEvent = m_vEvents[idx];
+            if (m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
+                RenderNote(pEvent);
+                PressAndBlend(pEvent);
+            }
+            polyphony++;
+            });
         if (m_dNSpeed < 0) {
             for (sidx_t i = iEndPos; i >= iStartPos; i--) {
                 MIDIChannelEvent* pEvent = m_vEvents[i];
@@ -2288,7 +2250,6 @@ void MainScreen::RenderText() {
     static const ControlsSettings& cControls = config.GetControlsSettings();
 
     unsigned char Lines = 10; //Basic info
-    if (m_MIDI.GetInfo().iDivision & 0x8000) Lines -= 1; // SMPTE
     if (cVideo.bDebug) {
         Lines += 10; //Debug info
     }
@@ -2392,7 +2353,6 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
     if (m_llStartTime < 0)
         llStartTimeFormatted.insert(0, "-");
 
-    polyphony = m_vState.size();
     polyFormatted = to_wstring(polyphony);
     for (signed short i = polyFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
         polyFormatted.insert(i, L",");
@@ -2414,7 +2374,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         m_llStartTime >= 0 ? L"" : L"-",
         min, sec, cs,
         tmin, tsec, tcs);
-    if (!(m_MIDI.GetInfo().iDivision & 0x8000)) RenderStatusLine(cur_line++, StatisticsText4, L"%d/%d", m_iStartTick, resolution);
+    RenderStatusLine(cur_line++, StatisticsText4, L"%d/%d", m_iStartTick, resolution);
     if (cVideo.bDebug) {
         RenderStatusLine(cur_line++, StatisticsText5, L"%d", m_llStartTime);
     }
@@ -2422,14 +2382,11 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         RenderStatusLine(cur_line++, StatisticsText6, L"%.2lf", m_dFPS);
     }
     if (m_MIDI.GetInfo().iDivision & 0x8000) {
-        unsigned short iFramesPerSec = static_cast<unsigned short>(-static_cast<signed char>(m_MIDI.GetInfo().iDivision >> 8)) * static_cast<unsigned short>(100);
-        if (iFramesPerSec == 2900) iFramesPerSec = 2997;
-        if (iFramesPerSec == 5900) iFramesPerSec = 5994;
-        if (iFramesPerSec == 11900) iFramesPerSec = 11988;
+        unsigned char iFramesPerSec = static_cast<unsigned char>(-static_cast<signed char>(m_MIDI.GetInfo().iDivision >> 8));
         unsigned char iTicksPerFrame = m_MIDI.GetInfo().iDivision & 0xFF;
-        iFramesPerSec |= !iFramesPerSec;// Clamp to > 0
-        iTicksPerFrame |= !iTicksPerFrame;// Clamp to > 0
-        RenderStatusLine(cur_line++, StatisticsText7, L"%d TPF @%.2f FPS", iTicksPerFrame, static_cast<float>(iFramesPerSec) / 100.0f);
+        iFramesPerSec |= !iFramesPerSec; // Clamp to > 0
+        iTicksPerFrame |= !iTicksPerFrame; // Clamp to > 0
+        RenderStatusLine(cur_line++, StatisticsText7, L"%d TPF @%d FPS", iTicksPerFrame, iFramesPerSec);
     }
     else {
         RenderStatusLine(cur_line++, StatisticsText7, L"%.3lf BPM", tempo);

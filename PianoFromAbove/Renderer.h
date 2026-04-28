@@ -85,14 +85,11 @@ constexpr unsigned long MaxChannelColors = 1<<4; //Theoretic maximum number of c
 class Renderer11 {
 public:
     Renderer11() {
-        if (RendererActive) {
-            MessageBoxW(g_hWnd, L"Multiple renderer instance is active at once! Unexpected behaviors may occur.", L"D3D11 Error", MB_OK);
-        }
-        RendererActive = true;
+        PtrToIsWrapRenderer = &m_bSoftware;
     }
     ~Renderer11() {
         imguiClearFontCache();
-        RendererActive = false;
+        PtrToIsWrapRenderer = nullptr;
     }
 
     tuple<HRESULT, const char*> Init(HWND hWnd, bool bLimitFPS);
@@ -145,6 +142,7 @@ private:
     win32_t m_iBufferWidth = 0;
     win32_t m_iBufferHeight = 0;
     bool m_bLimitFPS = false;
+    bool m_bSoftware = false;
 
     HWND m_hWnd = NULL;
     ComPtr<IDXGIFactory1> m_pFactory;

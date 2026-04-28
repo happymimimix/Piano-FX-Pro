@@ -24,8 +24,7 @@ extern TSQueue< MSG > g_MsgQueue; // Producer/consumer to hold events for our ga
 #define NOMINMAX
 #define LONG_MAX_PATH 0x0FFF
 
-inline bool IsWrapRenderer = false;
-inline bool RendererActive = false;
+inline bool* PtrToIsWrapRenderer = nullptr;
 #define TitleGapLine wstring(L" | ")
 #define TitleGapEmpty wstring(L"  ")
 #define EmptyWstr wstring(L"")
@@ -33,7 +32,7 @@ inline bool RendererActive = false;
 #ifdef SOFTWARE_RENDER_ONLY
 #define PF_SWR TitleGapEmpty+MainWindowTitle8
 #else
-#define PF_SWR wstring(IsWrapRenderer ? wstring(TitleGapEmpty+MainWindowTitle7) : EmptyWstr)
+#define PF_SWR wstring(PtrToIsWrapRenderer != nullptr && (*PtrToIsWrapRenderer) ? wstring(TitleGapEmpty+MainWindowTitle7) : EmptyWstr)
 #endif
 #ifdef LIMIT_COLORS
 #define PF_COL TitleGapEmpty+MainWindowTitle9

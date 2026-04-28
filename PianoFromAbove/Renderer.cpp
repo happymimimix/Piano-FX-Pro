@@ -34,7 +34,7 @@ tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
     // TODO: Allow device selection for people with multiple GPUs
     m_hWnd = hWnd;
     m_bLimitFPS = bLimitFPS;
-    IsWrapRenderer = true;
+    m_bSoftware = true;
 #ifndef SOFTWARE_RENDER_ONLY
     for (UINT i = 0;; i++) {
         ComPtr<IDXGIAdapter1> adapter;
@@ -52,10 +52,10 @@ tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
             D3D11_CREATE_DEVICE_BGRA_SUPPORT, wanted, _countof(wanted),
             D3D11_SDK_VERSION, &m_pDevice, &featureLevel, &m_pContext);
         if (FAILED(res)) continue;
-        IsWrapRenderer = false;
+        m_bSoftware = false;
         break;
     }
-    if (IsWrapRenderer) //Oh we love software rendering!
+    if (m_bSoftware) //Oh we love software rendering!
 #endif
     {
         D3D_FEATURE_LEVEL featureLevel;
@@ -63,7 +63,7 @@ tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
         res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_WARP, NULL,
             D3D11_CREATE_DEVICE_BGRA_SUPPORT, wanted, _countof(wanted),
             D3D11_SDK_VERSION, &m_pDevice, &featureLevel, &m_pContext);
-        if (FAILED(res)) return make_tuple(res, "D3D11CreateDevice (WARP)");
+        if (FAILED(res)) return make_tuple(res, "D3D11CreateDevice");
     }
 
     // Create shaders

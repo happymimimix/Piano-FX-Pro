@@ -89,6 +89,7 @@ int main() {
                 PatBlt(cmdDC, 0, H - cmdTM.tmHeight, W, cmdTM.tmHeight, BLACKNESS);
                 TextOutW(cmdDC, 0, H - cmdTM.tmHeight, DefString.c_str(), DefString.length());
                 PatBlt(cmdDC, TextSize.cx, H - cmdTM.tmHeight, 1, cmdTM.tmHeight, PATCOPY);
+                GdiFlush();
             }
         }
     }

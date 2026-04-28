@@ -69,6 +69,8 @@ inline HRESULT GetGDI(HWND hGDI, win32_t W, win32_t H, char* Output) {
     return S_OK;
 }
 
+// This is a large dynamic array of 1 and 0. 
+// It's purpose is to track what keys are pressed. 
 struct dynamic_bitset {
     static constexpr unsigned char WORD_SIZE = sizeof(size_t) * CHAR_BIT;
     static constexpr unsigned char WORD_DIV_SHR = __builtin_ctz(WORD_SIZE);
@@ -83,8 +85,7 @@ struct dynamic_bitset {
         // This is the ONLY place where we need to modify wordCount. It should never be changed elsewhere.
         wordCount = (size + WORD_MASK) >> WORD_DIV_SHR;
         bits = new size_t[wordCount]();
-        minWord = wordCount;
-        maxWord = 0;
+        this->Clear();
     }
     ~dynamic_bitset() { delete[] bits; }
 
@@ -100,11 +101,11 @@ struct dynamic_bitset {
         maxWord = 0;
     }
 
-    __forceinline void Activate(idx_t idx, bool future) {
+    __forceinline void Activate(idx_t idx) {
         idx_t word = idx >> WORD_DIV_SHR;
         bits[word] |= (size_t(1) << (idx & WORD_MASK));
-        minWord = future ? minWord : min(minWord, word);
-        maxWord = future ? max(maxWord,word) : maxWord;
+        minWord = min(minWord, word);
+        maxWord = max(maxWord, word);
     }
 
     __forceinline void Deactivate(idx_t idx) {
@@ -132,10 +133,14 @@ struct dynamic_bitset {
         maxWord = min(maxWord, wordCount - 1);
         idx_t newMin = wordCount;
         idx_t newMax = 0;
+        bool first = true;
         for (idx_t word_id = minWord; word_id <= maxWord; word_id++) {
             size_t word = bits[word_id];
             if (word) {
-                if(newMin == wordCount) newMin = word_id;
+                if (first) {
+                    newMin = word_id;
+                    first = false;
+                }
                 newMax = word_id;
             }
             while (word) {
@@ -155,11 +160,15 @@ struct dynamic_bitset {
         maxWord = min(maxWord, wordCount - 1);
         idx_t newMin = wordCount;
         idx_t newMax = 0;
+        bool first = true;
         for (idx_t word_id = maxWord; word_id >= minWord && word_id != IDX_MAX; word_id--) {
             size_t word = bits[word_id];
             if (word) {
                 newMin = word_id;
-                if (newMax == 0) newMax = word_id;
+                if (first) {
+                    newMax = word_id;
+                    first = false;
+                }
             }
             while (word) {
                 idx_t bit = WORD_MASK - CLZ(word);
@@ -173,6 +182,31 @@ struct dynamic_bitset {
 private:
     size_t* bits = nullptr;
     idx_t wordCount = 0;
+};
+
+struct ChannelSettings
+{
+    ChannelSettings() { bHidden = bMuted = false; SetColor(0x00000000); }
+    void SetColor();
+    void SetColor(color_t iColor, double dDark = 0.5, double dVeryDark = 0.2);
+
+    bool bHidden, bMuted;
+    color_t iPrimaryRGB, iDarkRGB, iVeryDarkRGB, iOrigBGR;
+};
+struct TrackSettings { ChannelSettings aChannels[16]; };
+
+class CustomHashFunc {
+public:
+    unsigned operator() (MIDIChannelEvent* key) const {
+        return (uint64_t)key & 0xFFFFFFFF;
+    }
+};
+
+class CustomKeyEqualFunc {
+public:
+    bool operator() (MIDIChannelEvent* a, MIDIChannelEvent* b) const {
+        return a == b;
+    }
 };
 
 //Abstract base class
@@ -218,21 +252,22 @@ protected:
     GameState* m_pNextState;
 };
 
-struct ChannelSettings
+class IntroScreen : public GameState
 {
-    ChannelSettings() { bHidden = bMuted = false; SetColor(0x00000000); }
-    void SetColor();
-    void SetColor(color_t iColor, double dDark = 0.5, double dVeryDark = 0.2);
+public:
+    IntroScreen(HWND hWnd, Renderer11* pRenderer) : GameState(hWnd, pRenderer) {}
 
-    bool bHidden, bMuted;
-    color_t iPrimaryRGB, iDarkRGB, iVeryDarkRGB, iOrigBGR;
+    GameError MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+    GameError Init();
+    GameError Logic();
+    GameError Render();
 };
-struct TrackSettings { ChannelSettings aChannels[16]; };
 
 class SplashScreen : public GameState
 {
 public:
     SplashScreen(HWND hWnd, Renderer11* pRenderer, bool enableSplash = true);
+    ~SplashScreen() { delete m_pState; }
 
     GameError MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     GameError Init();
@@ -257,7 +292,7 @@ private:
     MIDI m_MIDI; // The song to display
     vector<MIDIChannelEvent*> m_vEvents; // The channel events of the song
     sidx_t m_iStartPos, m_iEndPos;
-    vector<idx_t> m_vState;  // The notes that are on at time m_llStartTime.
+    dynamic_bitset* m_pState = nullptr;
     Timer m_Timer; // Frame timers
     double m_dVolume;
     bool m_bMute;
@@ -277,37 +312,13 @@ private:
     float notex_table[128];
 };
 
-class IntroScreen : public GameState
-{
-public:
-    IntroScreen(HWND hWnd, Renderer11* pRenderer) : GameState(hWnd, pRenderer) {}
-
-    GameError MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-    GameError Init();
-    GameError Logic();
-    GameError Render();
-};
-
-class CustomHashFunc {
-public:
-    unsigned operator() (MIDIChannelEvent* key) const {
-        return (uint64_t)key & 0xFFFFFFFF;
-    }
-};
-
-class CustomKeyEqualFunc {
-public:
-    bool operator() (MIDIChannelEvent* a, MIDIChannelEvent* b) const {
-        return a == b;
-    }
-};
-
 class MainScreen : public GameState
 {
 public:
     static const float KBPercent;
 
     MainScreen(wstring sMIDIFile, HWND hWnd, Renderer11* pRenderer);
+    ~MainScreen() { delete m_pState; }
 
     // GameState functions
     GameError MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -332,7 +343,7 @@ private:
 
     // Logic
     void UpdateState(idx_t idx, idx_t sister_idx);
-    void UpdateStateBackwards(idx_t idx, idx_t sister_idx);
+    void UpdateStateBackwards(idx_t start, idx_t end);
     void JumpTo(mms_t llStartTime, boolean loadingMode = false);
     void ApplyMarker(unsigned char* data, msgln_t size);
     void ApplyColor(MIDIMetaEvent* event);
@@ -393,7 +404,7 @@ private:
     sidx_t m_iStartPos, m_iEndPos, m_iPrevStartPos; // Postions of the start and end events that occur in the current window
     mms_t m_llTimeSpan;  // Times of the start and end events of the current window
     mms_t m_llPrevTime;
-    vector<idx_t> m_vState;  // The notes that are on at time m_llStartTime.
+    dynamic_bitset* m_pState = nullptr;
     NoteColor m_pKeyColors[128]; // Per-key blended color for keyboard rendering.
     __uint128_t m_bKeyPressed; // Is key pressed?
     __forceinline bool IsPressed(key_t Key) { return m_bKeyPressed & (static_cast<__uint128_t>(1) << Key); }
