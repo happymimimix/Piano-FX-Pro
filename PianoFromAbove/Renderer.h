@@ -121,7 +121,7 @@ public:
     TrackColor* GetTrackColors() { return m_TrackColors; };
 
     inline void PushNoteData(NoteData data) { m_vNotesIntermediate.push_back(data); };
-    idx_t GetRenderedNotesCount() { return static_cast<idx_t>(m_vNotesIntermediate.size()+ m_vRectsIntermediate.size()); };
+    idx_t GetRenderedNotesCount() { return static_cast<idx_t>(m_vNotesIntermediate.size()); };
     void SplitRect() { m_iRectSplit = static_cast<sidx_t>(m_vRectsIntermediate.size()); }
 
     HRESULT Screenshot(char* Output);

@@ -348,6 +348,7 @@ private:
     void ApplyMarker(unsigned char* data, msgln_t size);
     void ApplyColor(MIDIMetaEvent* event);
     void AdvanceIterators(mms_t llTime, bool bIsJump);
+    void SendSysEx(MIDISysExEvent* pSysEx);
     MIDIMetaEvent* GetPrevious(eventvec_t::const_iterator& itCurrent, const eventvec_t& vEventMap, msgln_t iDataLen);
 
     // MIDI helpers
@@ -378,6 +379,7 @@ private:
     MIDI m_MIDI; // The song to display
     vector<MIDIChannelEvent*> m_vEvents; // The channel events of the song
     vector<MIDIMetaEvent*> m_vMetaEvents; // The meta events of the song
+    vector<MIDISysExEvent*> m_vSysExEvents; // The SysEx events of the song
     eventvec_t m_vTempo; // Tracked for drawing measure lines
     eventvec_t m_vSignature; // Measure lines again
     eventvec_t m_vMarkers; // Tracked for section names in some longer MIDIs
@@ -386,6 +388,7 @@ private:
     eventvec_t::const_iterator m_itNextSignature;
     eventvec_t::const_iterator m_itNextMarker;
     eventvec_t::const_iterator m_itNextColor;
+    vector<MIDISysExEvent*>::const_iterator m_itNextSysEx;
     bpm_t m_iMicroSecsPerBeat; // Tempo
     mtk_t m_iLastTempoTick; // Tempo
     mms_t m_llLastTempoTime; // Tempo

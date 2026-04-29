@@ -150,7 +150,7 @@ public:
     idx_t ParseEvents(const unsigned char* pcData, idx_t iMaxSize);
     bool IsValid() const { return (m_vTracks.size() > 0 && m_Info.iNoteCount > 0 && m_Info.iDivision > 0); }
 
-    bool PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMetaEvent*>* vMetaEvents = nullptr, eventvec_t* vTempo = nullptr, eventvec_t* vSignature = nullptr, eventvec_t* vMarkers = nullptr, eventvec_t* vColors = nullptr);
+    bool PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMetaEvent*>* vMetaEvents = nullptr, eventvec_t* vTempo = nullptr, eventvec_t* vSignature = nullptr, eventvec_t* vMarkers = nullptr, eventvec_t* vColors = nullptr, vector<MIDISysExEvent*>* vSysExEvents = nullptr);
     void ConnectNotes();
     void clear(void);
 
@@ -345,7 +345,7 @@ private:
     unsigned char* m_pcData;
 };
 
-//SysEx Event: probably to be ignored
+//SysEx Event: forwarded to MIDI output device
 class __attribute__((packed)) MIDISysExEvent : public MIDIEvent
 {
 public:
@@ -353,11 +353,19 @@ public:
     ~MIDISysExEvent() { if (m_pcData) delete[] m_pcData; }
 
     __forceinline uint32_t ParseEvent(const unsigned char* pcData, msgln_t iMaxSize);
+    __forceinline uint32_t GetDataLen() const { return m_iDataLen; }
+    __forceinline unsigned char* GetData() const { return m_pcData; }
+    __forceinline bool HasMoreData() const { return m_iEventCode == 0xF0 && m_iDataLen > 0 && m_pcData[m_iDataLen - 1] != 0xF7; }
+    __forceinline bool IsNew() const { return m_iEventCode != 0xF7; }
+    __forceinline void TakeData(unsigned char* pcData, uint32_t iLen) {
+        if (m_pcData) delete[] m_pcData;
+        m_pcData = pcData;
+        m_iDataLen = iLen;
+    }
 
 private:
     uint32_t m_iDataLen;
     unsigned char* m_pcData;
-    bool m_bHasMoreData;
 };
 
 //
@@ -387,13 +395,17 @@ public:
     bool PlayEventAcrossChannels(msg_t cStatus, msg_t cParam1, msg_t cParam2);
     bool PlayEventAcrossChannels(msg_t cStatus, msg_t cParam1, msg_t cParam2, const vector<chan_t>& vChannels);
     bool PlayEvent(msg_t bStatus, msg_t bParam1, msg_t bParam2 = 0);
+    bool PlaySysEx(unsigned char* pcData, msg_t iLen);
 
 private:
     static FARPROC GetOmniMIDIProc(const char* func);
 
     bool m_bIsOpen;
     bool m_bIsKDMAPI;
-    void(WINAPI* SendDirectData)(DWORD);
+    void (WINAPI *SendDirectData)(DWORD);
+    MMRESULT (WINAPI *PrepareLongData)(MIDIHDR*, UINT);
+    MMRESULT (WINAPI *UnprepareLongData)(MIDIHDR*, UINT);
+    MMRESULT (WINAPI *SendDirectLongData)(MIDIHDR*, UINT);
     wstring m_sDevice;
     HMIDIOUT m_hMIDIOut;
 };

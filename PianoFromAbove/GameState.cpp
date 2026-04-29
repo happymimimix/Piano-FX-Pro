@@ -573,7 +573,7 @@ MainScreen::MainScreen(wstring sMIDIFile, HWND hWnd, Renderer11* pRenderer) : Ga
     if (!m_MIDI.IsValid()) return;
     m_MIDI.ConnectNotes(); // Order's important here
     m_vEvents.reserve(m_MIDI.GetInfo().iEventCount);
-    bool IsPostProcessOK = m_MIDI.PostProcess(m_vEvents, &m_vMetaEvents, &m_vTempo, &m_vSignature, &m_vMarkers, &m_vColors);
+    bool IsPostProcessOK = m_MIDI.PostProcess(m_vEvents, &m_vMetaEvents, &m_vTempo, &m_vSignature, &m_vMarkers, &m_vColors, &m_vSysExEvents);
     if (!IsPostProcessOK) {
         MessageBoxW(hWnd, Errors[GameError::OutOfMemory].c_str(), L"Error", MB_OK);
         return;
@@ -1479,6 +1479,22 @@ void MainScreen::ApplyMarker(unsigned char* data, msgln_t size) {
 }
 
 // Advance program change, tempo, and signature
+void MainScreen::SendSysEx(MIDISysExEvent* pSysEx) {
+    if (!pSysEx  || pSysEx->GetDataLen() == 0) return;
+    if (pSysEx->GetEventCode() == 0xF0) {
+        // Standard SysEx: prepend F0 status byte (parser strips it).
+        unsigned char* pcMsg = new unsigned char[pSysEx->GetDataLen() + 1];
+        pcMsg[0] = 0xF0;
+        memcpy(pcMsg + 1, pSysEx->GetData(), pSysEx->GetDataLen());
+        m_OutDevice.PlaySysEx(pcMsg, pSysEx->GetDataLen() + 1);
+        delete[] pcMsg;
+    }
+    else {
+        // F7 escape: raw byte sequence, send as-is.
+        m_OutDevice.PlaySysEx(pSysEx->GetData(), pSysEx->GetDataLen());
+    }
+}
+
 void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
     if (bIsJump)
     {
@@ -1524,12 +1540,8 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
                 ApplyMarker(nullptr, 0);
             }
         }
-        if (m_dSpeed < 0) {
-            m_itNextColor = lower_bound(m_vColors.begin(), m_vColors.end(), pair<mms_t, idx_t>(llTime, m_vMetaEvents.size()));
-        }
-        else {
-            m_itNextColor = upper_bound(m_vColors.begin(), m_vColors.end(), pair<mms_t, idx_t>(llTime, m_vMetaEvents.size()));
-        }
+        m_itNextColor = lower_bound(m_vColors.begin(), m_vColors.end(), pair<mms_t, idx_t>(llTime, m_vMetaEvents.size()));
+        m_itNextSysEx = lower_bound(m_vSysExEvents.begin(), m_vSysExEvents.end(), llTime, [](const MIDISysExEvent* message, mms_t target) {return message->GetAbsMicroSec() < target;});
     }
     else
     {
@@ -1581,6 +1593,10 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
                 MIDIMetaEvent* pEvent = m_vMetaEvents[(m_itNextColor - 1)->second];
                 ApplyColor(pEvent);
             }
+            for (; m_itNextSysEx != m_vSysExEvents.begin() && (*(m_itNextSysEx - 1))->GetAbsMicroSec() >= llTime; --m_itNextSysEx)
+            {
+                SendSysEx(*(m_itNextSysEx - 1));
+            }
         }
         else {
             for (; m_itNextTempo != m_vTempo.end() && m_itNextTempo->first <= llTime; ++m_itNextTempo)
@@ -1620,6 +1636,10 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
             {
                 MIDIMetaEvent* pEvent = m_vMetaEvents[m_itNextColor->second];
                 ApplyColor(pEvent);
+            }
+            for (; m_itNextSysEx != m_vSysExEvents.end() && (*m_itNextSysEx)->GetAbsMicroSec() <= llTime; ++m_itNextSysEx)
+            {
+                SendSysEx(*m_itNextSysEx);
             }
         }
     }

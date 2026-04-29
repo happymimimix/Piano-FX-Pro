@@ -609,7 +609,7 @@ void MIDI::MIDIInfo::AddTrackInfo(const MIDITrack& mTrack)
 
 // Sets absolute time variables. A lot of code for not much happening...
 // Has to be EXACT. Even a little drift and things start messing up a few minutes in (metronome, etc)
-bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMetaEvent*>* vMetaEvents, eventvec_t* vTempo, eventvec_t* vSignature, eventvec_t* vMarkers, eventvec_t* vColors)
+bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMetaEvent*>* vMetaEvents, eventvec_t* vTempo, eventvec_t* vSignature, eventvec_t* vMarkers, eventvec_t* vColors, vector<MIDISysExEvent*>* vSysExEvents)
 {
     // Iterator like class
     MIDIPos midiPos(*this);
@@ -704,6 +704,27 @@ bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
                     break;
                 default:
                     break;
+                }
+            }
+        }
+        else if (pEvent->GetEventType() == MIDIEvent::SysExEvent)
+        {
+            MIDISysExEvent* pSysExEvent = reinterpret_cast<MIDISysExEvent*>(pEvent);
+            if (vSysExEvents) {
+                // Reassemble partial SysEx
+                if (!vSysExEvents->empty() && vSysExEvents->back()->HasMoreData() && !pSysExEvent->IsNew())
+                {
+                    MIDISysExEvent* pPrev = vSysExEvents->back();
+                    uint32_t iOldLen = pPrev->GetDataLen();
+                    uint32_t iAddLen = pSysExEvent->GetDataLen();
+                    uint32_t iNewLen = iOldLen + iAddLen;
+                    unsigned char* pNewData = new unsigned char[iNewLen];
+                    memcpy(pNewData, pPrev->GetData(), iOldLen);
+                    memcpy(pNewData + iOldLen, pSysExEvent->GetData(), iAddLen);
+                    pPrev->TakeData(pNewData, iNewLen);
+                }
+                else {
+                    vSysExEvents->push_back(pSysExEvent);
                 }
             }
         }
@@ -1043,8 +1064,6 @@ uint32_t MIDISysExEvent::ParseEvent(const unsigned char* pcData, msgln_t iMaxSiz
     {
         m_pcData = new unsigned char[m_iDataLen];
         memcpy(m_pcData, pcData + iCount, m_iDataLen);
-        if (m_iEventCode == 0xF0 && m_pcData[m_iDataLen - 1] != 0xF7)
-            m_bHasMoreData = true;
     }
 
     return iCount + m_iDataLen;
@@ -1161,7 +1180,10 @@ bool MIDIOutDevice::OpenKDMAPI() {
 
     auto InitializeKDMAPIStream = (win32_t(WINAPI*)())GetOmniMIDIProc("InitializeKDMAPIStream");
     *(FARPROC*)&SendDirectData = GetOmniMIDIProc("SendDirectData");
-    return m_bIsOpen = (SendDirectData && InitializeKDMAPIStream && InitializeKDMAPIStream());
+    *(FARPROC*)&PrepareLongData = GetOmniMIDIProc("PrepareLongData");
+    *(FARPROC*)&UnprepareLongData = GetOmniMIDIProc("UnprepareLongData");
+    *(FARPROC*)&SendDirectLongData = GetOmniMIDIProc("SendDirectLongData");
+    return m_bIsOpen = (SendDirectData && PrepareLongData && UnprepareLongData && SendDirectLongData && InitializeKDMAPIStream && InitializeKDMAPIStream());
 }
 
 void MIDIOutDevice::Close()
@@ -1250,6 +1272,50 @@ bool MIDIOutDevice::PlayEvent(msg_t cStatus, msg_t cParam1, msg_t cParam2)
     }
     else {
         return midiOutShortMsg(m_hMIDIOut, (cParam2 << 16) + (cParam1 << 8) + cStatus) == MMSYSERR_NOERROR;
+    }
+}
+
+bool MIDIOutDevice::PlaySysEx(unsigned char* pcData, msg_t iLen)
+{
+    if (!m_bIsOpen || !pcData || iLen == 0) return false;
+    MIDIHDR hdr = {};
+    hdr.lpData = reinterpret_cast<LPSTR>(pcData);
+    hdr.dwBufferLength = iLen;
+    hdr.dwBytesRecorded = iLen;
+    hdr.dwFlags = NULL;
+
+    if (m_bIsKDMAPI) {
+        if (PrepareLongData(&hdr, sizeof(MIDIHDR)) != MMSYSERR_NOERROR) {
+            return false;
+        }
+        if (SendDirectLongData(&hdr, sizeof(MIDIHDR)) != MMSYSERR_NOERROR) {
+            UnprepareLongData(&hdr, sizeof(MIDIHDR));
+            return false;
+        }
+        while (!(hdr.dwFlags & MHDR_DONE)) {
+            _mm_pause();
+        }
+        if (UnprepareLongData(&hdr, sizeof(MIDIHDR)) != MMSYSERR_NOERROR) {
+            return false;
+        }
+        return true;
+    }
+    else {
+        if (midiOutPrepareHeader(m_hMIDIOut, &hdr, sizeof(MIDIHDR)) != MMSYSERR_NOERROR) {
+            return false;
+        }
+
+        if (midiOutLongMsg(m_hMIDIOut, &hdr, sizeof(MIDIHDR)) != MMSYSERR_NOERROR) {
+            midiOutUnprepareHeader(m_hMIDIOut, &hdr, sizeof(MIDIHDR));
+            return false;
+        }
+        while (!(hdr.dwFlags & MHDR_DONE)) {
+            _mm_pause();
+        }
+        if (midiOutUnprepareHeader(m_hMIDIOut, &hdr, sizeof(MIDIHDR)) != MMSYSERR_NOERROR) {
+            return false;
+        }
+        return true;
     }
 }
 
