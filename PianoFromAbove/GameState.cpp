@@ -1093,7 +1093,7 @@ GameState::GameError MainScreen::Logic() {
         }
     }
 
-    if (abs(llOldStartTime - m_llPrevTime) > llElapsed && JumpTarget == ~0) { // Handle time jump from cheat engine
+    if (abs(llOldStartTime - m_llPrevTime) && JumpTarget == ~0) { // Handle time jump from cheat engine
         JumpTarget = m_llStartTime;
         JumpTo(m_llStartTime, true);
         JumpTarget = ~0;
