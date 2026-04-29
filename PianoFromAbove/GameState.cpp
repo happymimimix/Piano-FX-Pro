@@ -686,6 +686,9 @@ void MainScreen::InitState() {
     else if (TotalNC < 400000000) { strcpy(Difficulty, "AT Lv.18"); }
     else { strcpy(Difficulty, "SP Lv.?"); }
 
+    // m_Timer will be initialized *later*
+    m_RealTimer.Init(false);
+
     m_bDumpFrames = cControls.bDumpFrames;
     if (m_bDumpFrames) {
         RECT rect = {};
@@ -836,11 +839,10 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
             return Success;
         case ID_PLAY_STOP:
         {
-            bool StartTimer = (JumpTarget == ~0);
             JumpTarget = GetMinTime();
-            if (StartTimer) SetTimer(g_hWnd, IDC_POSNDELAY, nxtdelay, NULL); //Async JumpTo process
             JumpTo(GetMinTime());
             cPlayback.SetStopped(true);
+            JumpTarget = ~0;
             return Success;
         }
         case ID_PLAY_SKIPFWD:
@@ -1052,10 +1054,12 @@ GameState::GameError MainScreen::Logic() {
     mms_t llMaxTime = GetMaxTime();
     mms_t llMinTime = GetMinTime();
     mms_t llElapsed = m_Timer.GetMicroSecs();
+    mms_t llRealElapsed = m_RealTimer.GetMicroSecs();
     m_Timer.Start();
+    m_RealTimer.Start();
 
     // Compute FPS
-    m_llFPSTime += llElapsed;
+    m_llFPSTime += llRealElapsed;
     m_iFPSCount++;
     if (m_llFPSTime >= 100000)
     {
@@ -1089,8 +1093,10 @@ GameState::GameError MainScreen::Logic() {
         }
     }
 
-    if (abs(llOldStartTime - m_llPrevTime) > 1e+6 / (m_dFPS / 4)) { // Handle time jump from cheat engine
+    if (abs(llOldStartTime - m_llPrevTime) > llElapsed && JumpTarget == ~0) { // Handle time jump from cheat engine
+        JumpTarget = m_llStartTime;
         JumpTo(m_llStartTime, true);
+        JumpTarget = ~0;
     }
     else {
         m_llPrevTime = m_llStartTime;
@@ -1266,7 +1272,7 @@ GameState::GameError MainScreen::Logic() {
     for (track_t i = 0; i < min(m_vTrackSettings.size(), MaxTrackColors); i++) {
         for (chan_t j = 0; j < MaxChannelColors; j++) {
             auto& src = m_vTrackSettings[i].aChannels[j];
-            auto& dst = track_colors[i * 16 + j];
+            auto& dst = track_colors[TnC_t(i) * TnC_t(16) + TnC_t(j)];
             dst.primary = src.iPrimaryRGB;
             dst.dark = src.iDarkRGB;
             dst.darker = src.bHidden ? 0xFFFFFFFF : src.iVeryDarkRGB; // Hack to signal hidden track without checking on CPU
@@ -1479,20 +1485,13 @@ void MainScreen::ApplyMarker(unsigned char* data, msgln_t size) {
 }
 
 // Advance program change, tempo, and signature
-void MainScreen::SendSysEx(MIDISysExEvent* pSysEx) {
-    if (!pSysEx  || pSysEx->GetDataLen() == 0) return;
-    if (pSysEx->GetEventCode() == 0xF0) {
-        // Standard SysEx: prepend F0 status byte (parser strips it).
-        unsigned char* pcMsg = new unsigned char[pSysEx->GetDataLen() + 1];
-        pcMsg[0] = 0xF0;
-        memcpy(pcMsg + 1, pSysEx->GetData(), pSysEx->GetDataLen());
-        m_OutDevice.PlaySysEx(pcMsg, pSysEx->GetDataLen() + 1);
-        delete[] pcMsg;
-    }
-    else {
-        // F7 escape: raw byte sequence, send as-is.
-        m_OutDevice.PlaySysEx(pSysEx->GetData(), pSysEx->GetDataLen());
-    }
+void MainScreen::SendSysEx(MIDISysExEvent * pSysEx) {
+    if (!pSysEx || pSysEx->GetDataLen() == 0) return;
+    unsigned char* pcMsg = new unsigned char[pSysEx->GetDataLen() + 1];
+    pcMsg[0] = pSysEx->GetEventCode();
+    memcpy(pcMsg + 1, pSysEx->GetData(), pSysEx->GetDataLen());
+    m_OutDevice.PlaySysEx(pcMsg, pSysEx->GetDataLen() + 1);
+    delete[] pcMsg;
 }
 
 void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
@@ -1541,7 +1540,7 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
             }
         }
         m_itNextColor = lower_bound(m_vColors.begin(), m_vColors.end(), pair<mms_t, idx_t>(llTime, m_vMetaEvents.size()));
-        m_itNextSysEx = lower_bound(m_vSysExEvents.begin(), m_vSysExEvents.end(), llTime, [](const MIDISysExEvent* message, mms_t target) {return message->GetAbsMicroSec() < target;});
+        m_itNextSysEx = lower_bound(m_vSysExEvents.begin(), m_vSysExEvents.end(), llTime, [](const MIDISysExEvent* message, mms_t target) {return message->GetAbsMicroSec() < target; });
     }
     else
     {

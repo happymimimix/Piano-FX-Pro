@@ -429,6 +429,7 @@ private:
     double m_dNSpeed; // Note Speed multiplier
     bool m_bPaused; // Paused state
     Timer m_Timer; // Frame timers
+    Timer m_RealTimer;
     bool m_bMute;
     double m_dVolume;
     bool m_bTickMode = false;

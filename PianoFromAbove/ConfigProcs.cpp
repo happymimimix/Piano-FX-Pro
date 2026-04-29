@@ -594,7 +594,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         vMuted.resize(mInfo.iNumChannels);
         vHidden.resize(mInfo.iNumChannels);
         vColors.resize(mInfo.iNumChannels);
-        for (chan_t i = 0; i < mInfo.iNumChannels; i++)
+        for (TnC_t i = 0; i < mInfo.iNumChannels; i++)
         {
             vMuted[i] = vHidden[i] = false;
             if (cVisual.bRandomizeColor) {

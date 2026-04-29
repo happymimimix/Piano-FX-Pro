@@ -131,11 +131,15 @@ public:
     }
 
     //Generally usefull static parsing functions
-    static uint32_t ParseVarNum(const unsigned char* pcData, msgln_t iMaxSize, uint32_t* piOut);
-    static uint32_t Parse32Bit(const unsigned char* pcData, msgln_t iMaxSize, uint32_t* piOut);
-    static uint32_t Parse24Bit(const unsigned char* pcData, msgln_t iMaxSize, uint32_t* piOut);
-    static uint16_t Parse16Bit(const unsigned char* pcData, msgln_t iMaxSize, uint16_t* piOut);
-    static uint32_t ParseNChars(const unsigned char* pcData, msgln_t iNChars, msgln_t iMaxSize, char* pcOut);
+    static idx_t ParseVarNum(const unsigned char* pcData, msgln_t iMaxSize, uint32_t* piOut);
+    static idx_t Parse32Bit(const unsigned char* pcData, msgln_t iMaxSize, uint32_t* piOut);
+    static idx_t Parse24Bit(const unsigned char* pcData, msgln_t iMaxSize, uint32_t* piOut);
+    static idx_t Parse16Bit(const unsigned char* pcData, msgln_t iMaxSize, uint16_t* piOut);
+    static idx_t Parse8Bit(const unsigned char* pcData, msgln_t iMaxSize, uint8_t* piOut);
+    static idx_t Parse64BitLE(const unsigned char* pcData, msgln_t iMaxSize, uint64_t* piOut);
+    static idx_t Parse32BitLE(const unsigned char* pcData, msgln_t iMaxSize, uint32_t* piOut);
+    static idx_t Parse16BitLE(const unsigned char* pcData, msgln_t iMaxSize, uint16_t* piOut);
+    static idx_t ParseNChars(const unsigned char* pcData, msgln_t iNChars, msgln_t iMaxSize, char* pcOut);
 
     MIDI(void) {};
     MIDI(const wstring& sFilename);
@@ -162,8 +166,7 @@ public:
     {
         MIDIInfo() { clear(); }
         void clear() {
-            llTotalMicroSecs = llFirstNote = iFormatType = iNumTracks = iNumChannels = iDivision = iMinNote =
-                iMaxNote = iNoteCount = iEventCount = iTotalTicks = iTotalBeats = 0;
+            llTotalMicroSecs = llFirstNote = iFormatType = iNumTracks = iNumChannels = iDivision = iMinNote = iMaxNote = iNoteCount = iEventCount = iTotalTicks = iTotalBeats = 0;
             sFilename.clear();
         }
         void AddTrackInfo(const MIDITrack& mTrack);
@@ -171,7 +174,7 @@ public:
         wstring sFilename;
         uint16_t iFormatType;
         track_t iNumTracks;
-        chan_t iNumChannels;
+        TnC_t iNumChannels;
         uint16_t iDivision;
         key_t iMinNote, iMaxNote;
         idx_t iNoteCount, iEventCount;
@@ -221,11 +224,8 @@ public:
     {
         MIDITrackInfo() { clear(); }
         void clear() {
-            llTotalMicroSecs = iSequenceNumber = iMinNote = iMaxNote = iNoteCount =
-                iEventCount = iTotalTicks = iNumChannels = 0;
-            memset(aNoteCount, 0, sizeof(aNoteCount)),
-                memset(aProgram, 0, sizeof(aProgram)),
-                sSequenceName.clear();
+            llTotalMicroSecs = iSequenceNumber = iMinNote = iMaxNote = iNoteCount = iEventCount = iTotalTicks = iNumChannels = 0;
+            memset(aNoteCount, 0, sizeof(aNoteCount)), memset(aProgram, 0, sizeof(aProgram)), sSequenceName.clear();
         }
         void AddEventInfo(const MIDIEvent& mTrack);
 
