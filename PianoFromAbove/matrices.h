@@ -1,5 +1,5 @@
 //Matix definitions
-#include <Widths.h>
+#include <WidthsWrapper.h>
 #include <Fonts.h>
 #define PropertyWindowW 300
 #define PropertyWindowH 150

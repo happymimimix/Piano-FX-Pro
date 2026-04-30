@@ -679,7 +679,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                     SendMessage(hWndTracks, LVM_SETITEM, 0, (LPARAM)&lvi);
 
                     lvi.iSubItem++;
-                    _stprintf_s(buf, TEXT("%s"), j == 9 ? TEXT("Drums") : MIDI::Instruments[mTrackInfo.aProgram[j]].c_str());
+                    _stprintf_s(buf, TEXT("%s"), j == 9 ? TEXT("Percussion") : MIDI::Instruments[mTrackInfo.aProgram[j]].c_str());
                     SendMessage(hWndTracks, LVM_SETITEM, 0, (LPARAM)&lvi);
 
                     lvi.iSubItem++;

@@ -85,6 +85,9 @@
     <Filter Include="Resource Files\Embedded ffmpeg.exe">
       <UniqueIdentifier>{bfb735c4-31ac-4c24-b72e-f60975558e20}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\LanguagePacks">
+      <UniqueIdentifier>{59c079ee-d026-4177-a960-984f15feddf8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Config.h">
@@ -279,16 +282,7 @@
     <ClInclude Include="ConsoleNumberSpinner.h">
       <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="matrices.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LanguagePacks.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DebugLanguageOverride.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
     <ClInclude Include="ModdingAPI.h">
@@ -298,9 +292,6 @@
       <Filter>Resource Files</Filter>
     </ClInclude>
     <ClInclude Include="Fonts.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PackWrapper.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
     <ClInclude Include="LanguagePacks.hpp">
@@ -347,6 +338,27 @@
     </ClInclude>
     <ClInclude Include="Tab1Btn5.h">
       <Filter>Source Files\Piano-FX Studio\TouchEventListeners\Tab1\SubViews</Filter>
+    </ClInclude>
+    <ClInclude Include="LanguagePacks.h">
+      <Filter>Resource Files\LanguagePacks</Filter>
+    </ClInclude>
+    <ClInclude Include="matrices.h">
+      <Filter>Resource Files\LanguagePacks</Filter>
+    </ClInclude>
+    <ClInclude Include="WidthsWrapper.h">
+      <Filter>Resource Files\LanguagePacks</Filter>
+    </ClInclude>
+    <ClInclude Include="FallbackStrings.h">
+      <Filter>Resource Files\LanguagePacks</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugLanguageOverride.h">
+      <Filter>Resource Files\LanguagePacks</Filter>
+    </ClInclude>
+    <ClInclude Include="PackWrapper.h">
+      <Filter>Resource Files\LanguagePacks</Filter>
+    </ClInclude>
+    <ClInclude Include="FallbackStrings.hpp">
+      <Filter>Generated Files %28DO NOT EDIT!%29</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -411,7 +423,7 @@
       <Filter>Source Files\Piano-FX Studio\Tutorials</Filter>
     </ClCompile>
     <ClCompile Include="TextWidthCalculator.cpp">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\LanguagePacks</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

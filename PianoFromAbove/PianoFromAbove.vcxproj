@@ -387,12 +387,17 @@ msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platfo
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
 xxd -i Colorizer.exe &gt; Colorizer.exe.h
 xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content LanguagePacks.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 LanguagePacks.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content FallbackStrings.h -Encoding Unicode; (@(''), $lines) | Set-Content -Encoding UTF8 FallbackStrings.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.h ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.hpp ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\FallbackStrings.hpp ^|.\tmp.exe ^&gt;^&gt;.\Widths.h
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
-Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encoding Unicode | Set-Content -Encoding UTF8 LanguagePacks.hpp"
-Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"</Command>
+Powershell -ExecutionPolicy Bypass -Command "Get-Content Widths.h -Encoding UTF8 | Select-Object -skip 1 | Set-Content -Encoding Unicode Widths.hh"
+del .\Widths.h /f /q
+rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -475,12 +480,17 @@ msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platfo
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
 xxd -i Colorizer.exe &gt; Colorizer.exe.h
 xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content LanguagePacks.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 LanguagePacks.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content FallbackStrings.h -Encoding Unicode; (@(''), $lines) | Set-Content -Encoding UTF8 FallbackStrings.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.h ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.hpp ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\FallbackStrings.hpp ^|.\tmp.exe ^&gt;^&gt;.\Widths.h
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
-Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encoding Unicode | Set-Content -Encoding UTF8 LanguagePacks.hpp"
-Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"</Command>
+Powershell -ExecutionPolicy Bypass -Command "Get-Content Widths.h -Encoding UTF8 | Select-Object -skip 1 | Set-Content -Encoding Unicode Widths.hh"
+del .\Widths.h /f /q
+rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -563,12 +573,17 @@ msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platfo
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
 xxd -i Colorizer.exe &gt; Colorizer.exe.h
 xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content LanguagePacks.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 LanguagePacks.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content FallbackStrings.h -Encoding Unicode; (@(''), $lines) | Set-Content -Encoding UTF8 FallbackStrings.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.h ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.hpp ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\FallbackStrings.hpp ^|.\tmp.exe ^&gt;^&gt;.\Widths.h
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
-Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encoding Unicode | Set-Content -Encoding UTF8 LanguagePacks.hpp"
-Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"</Command>
+Powershell -ExecutionPolicy Bypass -Command "Get-Content Widths.h -Encoding UTF8 | Select-Object -skip 1 | Set-Content -Encoding Unicode Widths.hh"
+del .\Widths.h /f /q
+rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -651,12 +666,17 @@ msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platfo
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
 xxd -i Colorizer.exe &gt; Colorizer.exe.h
 xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content LanguagePacks.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 LanguagePacks.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content FallbackStrings.h -Encoding Unicode; (@(''), $lines) | Set-Content -Encoding UTF8 FallbackStrings.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.h ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.hpp ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\FallbackStrings.hpp ^|.\tmp.exe ^&gt;^&gt;.\Widths.h
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
-Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encoding Unicode | Set-Content -Encoding UTF8 LanguagePacks.hpp"
-Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"</Command>
+Powershell -ExecutionPolicy Bypass -Command "Get-Content Widths.h -Encoding UTF8 | Select-Object -skip 1 | Set-Content -Encoding Unicode Widths.hh"
+del .\Widths.h /f /q
+rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -739,12 +759,17 @@ msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platfo
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
 xxd -i Colorizer.exe &gt; Colorizer.exe.h
 xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content LanguagePacks.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 LanguagePacks.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content FallbackStrings.h -Encoding Unicode; (@(''), $lines) | Set-Content -Encoding UTF8 FallbackStrings.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.h ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.hpp ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\FallbackStrings.hpp ^|.\tmp.exe ^&gt;^&gt;.\Widths.h
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
-Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encoding Unicode | Set-Content -Encoding UTF8 LanguagePacks.hpp"
-Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"</Command>
+Powershell -ExecutionPolicy Bypass -Command "Get-Content Widths.h -Encoding UTF8 | Select-Object -skip 1 | Set-Content -Encoding Unicode Widths.hh"
+del .\Widths.h /f /q
+rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -827,12 +852,17 @@ msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platfo
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
 xxd -i Colorizer.exe &gt; Colorizer.exe.h
 xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content LanguagePacks.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 LanguagePacks.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content FallbackStrings.h -Encoding Unicode; (@(''), $lines) | Set-Content -Encoding UTF8 FallbackStrings.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.h ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.hpp ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\FallbackStrings.hpp ^|.\tmp.exe ^&gt;^&gt;.\Widths.h
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
-Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encoding Unicode | Set-Content -Encoding UTF8 LanguagePacks.hpp"
-Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"</Command>
+Powershell -ExecutionPolicy Bypass -Command "Get-Content Widths.h -Encoding UTF8 | Select-Object -skip 1 | Set-Content -Encoding Unicode Widths.hh"
+del .\Widths.h /f /q
+rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -915,12 +945,17 @@ msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platfo
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
 xxd -i Colorizer.exe &gt; Colorizer.exe.h
 xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content LanguagePacks.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 LanguagePacks.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content FallbackStrings.h -Encoding Unicode; (@(''), $lines) | Set-Content -Encoding UTF8 FallbackStrings.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.h ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.hpp ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\FallbackStrings.hpp ^|.\tmp.exe ^&gt;^&gt;.\Widths.h
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
-Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encoding Unicode | Set-Content -Encoding UTF8 LanguagePacks.hpp"
-Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"</Command>
+Powershell -ExecutionPolicy Bypass -Command "Get-Content Widths.h -Encoding UTF8 | Select-Object -skip 1 | Set-Content -Encoding Unicode Widths.hh"
+del .\Widths.h /f /q
+rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1003,12 +1038,17 @@ msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platfo
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
 xxd -i Colorizer.exe &gt; Colorizer.exe.h
 xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content LanguagePacks.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 LanguagePacks.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content FallbackStrings.h -Encoding Unicode; (@(''), $lines) | Set-Content -Encoding UTF8 FallbackStrings.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.h ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.hpp ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\FallbackStrings.hpp ^|.\tmp.exe ^&gt;^&gt;.\Widths.h
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
-Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encoding Unicode | Set-Content -Encoding UTF8 LanguagePacks.hpp"
-Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"</Command>
+Powershell -ExecutionPolicy Bypass -Command "Get-Content Widths.h -Encoding UTF8 | Select-Object -skip 1 | Set-Content -Encoding Unicode Widths.hh"
+del .\Widths.h /f /q
+rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1091,12 +1131,17 @@ msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platfo
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
 xxd -i Colorizer.exe &gt; Colorizer.exe.h
 xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content LanguagePacks.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 LanguagePacks.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content FallbackStrings.h -Encoding Unicode; (@(''), $lines) | Set-Content -Encoding UTF8 FallbackStrings.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.h ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.hpp ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\FallbackStrings.hpp ^|.\tmp.exe ^&gt;^&gt;.\Widths.h
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
-Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encoding Unicode | Set-Content -Encoding UTF8 LanguagePacks.hpp"
-Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"</Command>
+Powershell -ExecutionPolicy Bypass -Command "Get-Content Widths.h -Encoding UTF8 | Select-Object -skip 1 | Set-Content -Encoding Unicode Widths.hh"
+del .\Widths.h /f /q
+rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1177,12 +1222,17 @@ msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platfo
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
 xxd -i Colorizer.exe &gt; Colorizer.exe.h
 xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content LanguagePacks.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 LanguagePacks.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content FallbackStrings.h -Encoding Unicode; (@(''), $lines) | Set-Content -Encoding UTF8 FallbackStrings.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.h ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.hpp ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\FallbackStrings.hpp ^|.\tmp.exe ^&gt;^&gt;.\Widths.h
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
-Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encoding Unicode | Set-Content -Encoding UTF8 LanguagePacks.hpp"
-Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"</Command>
+Powershell -ExecutionPolicy Bypass -Command "Get-Content Widths.h -Encoding UTF8 | Select-Object -skip 1 | Set-Content -Encoding Unicode Widths.hh"
+del .\Widths.h /f /q
+rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1265,12 +1315,17 @@ msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platfo
 msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
 xxd -i Colorizer.exe &gt; Colorizer.exe.h
 xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content LanguagePacks.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 LanguagePacks.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content FallbackStrings.h -Encoding Unicode; (@(''), $lines) | Set-Content -Encoding UTF8 FallbackStrings.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.h ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.hpp ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\FallbackStrings.hpp ^|.\tmp.exe ^&gt;^&gt;.\Widths.h
 del .\tmp.exe /f /q
 del .\tmp.obj /f /q
-Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encoding Unicode | Set-Content -Encoding UTF8 LanguagePacks.hpp"
-Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"</Command>
+Powershell -ExecutionPolicy Bypass -Command "Get-Content Widths.h -Encoding UTF8 | Select-Object -skip 1 | Set-Content -Encoding Unicode Widths.hh"
+del .\Widths.h /f /q
+rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1335,10 +1390,15 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content LanguagePacks.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 LanguagePacks.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content FallbackStrings.h -Encoding Unicode; (@(''), $lines) | Set-Content -Encoding UTF8 FallbackStrings.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.h ^|.\tmp.exe ^&gt;.\Widths.h
-Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encoding Unicode | Set-Content -Encoding UTF8 LanguagePacks.hpp"
-Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"</Command>
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.hpp ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\FallbackStrings.hpp ^|.\tmp.exe ^&gt;^&gt;.\Widths.h
+Powershell -ExecutionPolicy Bypass -Command "Get-Content Widths.h -Encoding UTF8 | Select-Object -skip 1 | Set-Content -Encoding Unicode Widths.hh"
+del .\Widths.h /f /q
+rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -1393,10 +1453,15 @@ Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h 
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content LanguagePacks.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 LanguagePacks.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content FallbackStrings.h -Encoding Unicode; (@(''), $lines) | Set-Content -Encoding UTF8 FallbackStrings.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"
 clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
-start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.h ^|.\tmp.exe ^&gt;.\Widths.h
-Powershell -ExecutionPolicy Bypass -Command "Get-Content LanguagePacks.h -Encoding Unicode | Set-Content -Encoding UTF8 LanguagePacks.hpp"
-Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"</Command>
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.hpp ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\FallbackStrings.hpp ^|.\tmp.exe ^&gt;^&gt;.\Widths.h
+Powershell -ExecutionPolicy Bypass -Command "Get-Content Widths.h -Encoding UTF8 | Select-Object -skip 1 | Set-Content -Encoding Unicode Widths.hh"
+del .\Widths.h /f /q
+rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -1455,6 +1520,8 @@ Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h 
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="EmbededFilesExtractor.h" />
+    <ClInclude Include="FallbackStrings.h" />
+    <ClInclude Include="FallbackStrings.hpp" />
     <ClInclude Include="ffmpeg1.h" />
     <ClInclude Include="ffmpeg2.h" />
     <ClInclude Include="ffmpeg3.h" />
@@ -1557,6 +1624,7 @@ Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h 
     <ClInclude Include="Tutorials.h" />
     <ClInclude Include="VisualizePitchBendTutorial.h" />
     <ClInclude Include="Widths.h" />
+    <ClInclude Include="WidthsWrapper.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PianoFromAbove.rc">

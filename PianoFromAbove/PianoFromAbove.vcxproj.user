@@ -7,13 +7,11 @@
     <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
     <DeploymentDirectory>$(SystemDrive)\$(TargetName)_Debug</DeploymentDirectory>
     <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
-    <RemoteDebuggerAmpDefaultAccelerator>
-    </RemoteDebuggerAmpDefaultAccelerator>
+    <RemoteDebuggerAmpDefaultAccelerator> </RemoteDebuggerAmpDefaultAccelerator>
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\$(TargetName)_Debug</RemoteDebuggerWorkingDirectory>
     <LocalDebuggerWorkingDirectory>$(OutputPath)</LocalDebuggerWorkingDirectory>
-    <LocalDebuggerAmpDefaultAccelerator>
-    </LocalDebuggerAmpDefaultAccelerator>
+    <LocalDebuggerAmpDefaultAccelerator> </LocalDebuggerAmpDefaultAccelerator>
     <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
     <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
   </PropertyGroup>
@@ -24,13 +22,11 @@
     <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
     <DeploymentDirectory>$(SystemDrive)\$(TargetName)_Debug</DeploymentDirectory>
     <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
-    <RemoteDebuggerAmpDefaultAccelerator>
-    </RemoteDebuggerAmpDefaultAccelerator>
+    <RemoteDebuggerAmpDefaultAccelerator> </RemoteDebuggerAmpDefaultAccelerator>
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\$(TargetName)_Debug</RemoteDebuggerWorkingDirectory>
     <LocalDebuggerWorkingDirectory>$(OutputPath)</LocalDebuggerWorkingDirectory>
-    <LocalDebuggerAmpDefaultAccelerator>
-    </LocalDebuggerAmpDefaultAccelerator>
+    <LocalDebuggerAmpDefaultAccelerator> </LocalDebuggerAmpDefaultAccelerator>
     <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
     <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
   </PropertyGroup>
@@ -41,16 +37,13 @@
     <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
     <DeploymentDirectory>$(SystemDrive)\$(TargetName)_Debug</DeploymentDirectory>
     <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
-    <RemoteDebuggerAmpDefaultAccelerator>
-    </RemoteDebuggerAmpDefaultAccelerator>
+    <RemoteDebuggerAmpDefaultAccelerator> </RemoteDebuggerAmpDefaultAccelerator>
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\$(TargetName)_Debug</RemoteDebuggerWorkingDirectory>
     <LocalDebuggerWorkingDirectory>$(OutputPath)</LocalDebuggerWorkingDirectory>
-    <LocalDebuggerAmpDefaultAccelerator>
-    </LocalDebuggerAmpDefaultAccelerator>
+    <LocalDebuggerAmpDefaultAccelerator> </LocalDebuggerAmpDefaultAccelerator>
     <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
     <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
-    <RemoteDebuggerCommandArguments>OPEN PFXSTUDIO</RemoteDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">
     <RemoteDebuggerDeployDebugCppRuntime>true</RemoteDebuggerDeployDebugCppRuntime>
@@ -59,13 +52,11 @@
     <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
     <DeploymentDirectory>$(SystemDrive)\$(TargetName)_Debug</DeploymentDirectory>
     <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
-    <RemoteDebuggerAmpDefaultAccelerator>
-    </RemoteDebuggerAmpDefaultAccelerator>
+    <RemoteDebuggerAmpDefaultAccelerator> </RemoteDebuggerAmpDefaultAccelerator>
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\$(TargetName)_Debug</RemoteDebuggerWorkingDirectory>
     <LocalDebuggerWorkingDirectory>$(OutputPath)</LocalDebuggerWorkingDirectory>
-    <LocalDebuggerAmpDefaultAccelerator>
-    </LocalDebuggerAmpDefaultAccelerator>
+    <LocalDebuggerAmpDefaultAccelerator> </LocalDebuggerAmpDefaultAccelerator>
     <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
     <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
   </PropertyGroup>
@@ -76,13 +67,11 @@
     <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
     <DeploymentDirectory>$(SystemDrive)\$(TargetName)_Debug</DeploymentDirectory>
     <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
-    <RemoteDebuggerAmpDefaultAccelerator>
-    </RemoteDebuggerAmpDefaultAccelerator>
+    <RemoteDebuggerAmpDefaultAccelerator> </RemoteDebuggerAmpDefaultAccelerator>
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\$(TargetName)_Debug</RemoteDebuggerWorkingDirectory>
     <LocalDebuggerWorkingDirectory>$(OutputPath)</LocalDebuggerWorkingDirectory>
-    <LocalDebuggerAmpDefaultAccelerator>
-    </LocalDebuggerAmpDefaultAccelerator>
+    <LocalDebuggerAmpDefaultAccelerator> </LocalDebuggerAmpDefaultAccelerator>
     <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
     <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
   </PropertyGroup>
@@ -93,13 +82,11 @@
     <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
     <DeploymentDirectory>$(SystemDrive)\$(TargetName)_Debug</DeploymentDirectory>
     <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
-    <RemoteDebuggerAmpDefaultAccelerator>
-    </RemoteDebuggerAmpDefaultAccelerator>
+    <RemoteDebuggerAmpDefaultAccelerator> </RemoteDebuggerAmpDefaultAccelerator>
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\$(TargetName)_Debug</RemoteDebuggerWorkingDirectory>
     <LocalDebuggerWorkingDirectory>$(OutputPath)</LocalDebuggerWorkingDirectory>
-    <LocalDebuggerAmpDefaultAccelerator>
-    </LocalDebuggerAmpDefaultAccelerator>
+    <LocalDebuggerAmpDefaultAccelerator> </LocalDebuggerAmpDefaultAccelerator>
     <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
     <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
   </PropertyGroup>
@@ -110,13 +97,11 @@
     <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
     <DeploymentDirectory>$(SystemDrive)\$(TargetName)_Debug</DeploymentDirectory>
     <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
-    <RemoteDebuggerAmpDefaultAccelerator>
-    </RemoteDebuggerAmpDefaultAccelerator>
+    <RemoteDebuggerAmpDefaultAccelerator> </RemoteDebuggerAmpDefaultAccelerator>
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\$(TargetName)_Debug</RemoteDebuggerWorkingDirectory>
     <LocalDebuggerWorkingDirectory>$(OutputPath)</LocalDebuggerWorkingDirectory>
-    <LocalDebuggerAmpDefaultAccelerator>
-    </LocalDebuggerAmpDefaultAccelerator>
+    <LocalDebuggerAmpDefaultAccelerator> </LocalDebuggerAmpDefaultAccelerator>
     <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
     <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
   </PropertyGroup>
@@ -127,13 +112,11 @@
     <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
     <DeploymentDirectory>$(SystemDrive)\$(TargetName)_Debug</DeploymentDirectory>
     <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
-    <RemoteDebuggerAmpDefaultAccelerator>
-    </RemoteDebuggerAmpDefaultAccelerator>
+    <RemoteDebuggerAmpDefaultAccelerator> </RemoteDebuggerAmpDefaultAccelerator>
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\$(TargetName)_Debug</RemoteDebuggerWorkingDirectory>
     <LocalDebuggerWorkingDirectory>$(OutputPath)</LocalDebuggerWorkingDirectory>
-    <LocalDebuggerAmpDefaultAccelerator>
-    </LocalDebuggerAmpDefaultAccelerator>
+    <LocalDebuggerAmpDefaultAccelerator> </LocalDebuggerAmpDefaultAccelerator>
     <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
     <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
   </PropertyGroup>
@@ -144,13 +127,11 @@
     <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
     <DeploymentDirectory>$(SystemDrive)\$(TargetName)_Debug</DeploymentDirectory>
     <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
-    <RemoteDebuggerAmpDefaultAccelerator>
-    </RemoteDebuggerAmpDefaultAccelerator>
+    <RemoteDebuggerAmpDefaultAccelerator> </RemoteDebuggerAmpDefaultAccelerator>
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\$(TargetName)_Debug</RemoteDebuggerWorkingDirectory>
     <LocalDebuggerWorkingDirectory>$(OutputPath)</LocalDebuggerWorkingDirectory>
-    <LocalDebuggerAmpDefaultAccelerator>
-    </LocalDebuggerAmpDefaultAccelerator>
+    <LocalDebuggerAmpDefaultAccelerator> </LocalDebuggerAmpDefaultAccelerator>
     <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
     <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
   </PropertyGroup>
@@ -161,13 +142,11 @@
     <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
     <DeploymentDirectory>$(SystemDrive)\$(TargetName)_Debug</DeploymentDirectory>
     <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
-    <RemoteDebuggerAmpDefaultAccelerator>
-    </RemoteDebuggerAmpDefaultAccelerator>
+    <RemoteDebuggerAmpDefaultAccelerator> </RemoteDebuggerAmpDefaultAccelerator>
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\$(TargetName)_Debug</RemoteDebuggerWorkingDirectory>
     <LocalDebuggerWorkingDirectory>$(OutputPath)</LocalDebuggerWorkingDirectory>
-    <LocalDebuggerAmpDefaultAccelerator>
-    </LocalDebuggerAmpDefaultAccelerator>
+    <LocalDebuggerAmpDefaultAccelerator> </LocalDebuggerAmpDefaultAccelerator>
     <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
     <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
   </PropertyGroup>
@@ -178,13 +157,11 @@
     <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
     <DeploymentDirectory>$(SystemDrive)\$(TargetName)_Debug</DeploymentDirectory>
     <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
-    <RemoteDebuggerAmpDefaultAccelerator>
-    </RemoteDebuggerAmpDefaultAccelerator>
+    <RemoteDebuggerAmpDefaultAccelerator> </RemoteDebuggerAmpDefaultAccelerator>
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\$(TargetName)_Debug</RemoteDebuggerWorkingDirectory>
     <LocalDebuggerWorkingDirectory>$(OutputPath)</LocalDebuggerWorkingDirectory>
-    <LocalDebuggerAmpDefaultAccelerator>
-    </LocalDebuggerAmpDefaultAccelerator>
+    <LocalDebuggerAmpDefaultAccelerator> </LocalDebuggerAmpDefaultAccelerator>
     <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
     <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
   </PropertyGroup>
@@ -195,13 +172,11 @@
     <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
     <DeploymentDirectory>$(SystemDrive)\$(TargetName)_Debug</DeploymentDirectory>
     <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
-    <RemoteDebuggerAmpDefaultAccelerator>
-    </RemoteDebuggerAmpDefaultAccelerator>
+    <RemoteDebuggerAmpDefaultAccelerator> </RemoteDebuggerAmpDefaultAccelerator>
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\$(TargetName)_Debug</RemoteDebuggerWorkingDirectory>
     <LocalDebuggerWorkingDirectory>$(OutputPath)</LocalDebuggerWorkingDirectory>
-    <LocalDebuggerAmpDefaultAccelerator>
-    </LocalDebuggerAmpDefaultAccelerator>
+    <LocalDebuggerAmpDefaultAccelerator> </LocalDebuggerAmpDefaultAccelerator>
     <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
     <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
   </PropertyGroup>
@@ -212,13 +187,11 @@
     <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
     <DeploymentDirectory>$(SystemDrive)\$(TargetName)_Debug</DeploymentDirectory>
     <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
-    <RemoteDebuggerAmpDefaultAccelerator>
-    </RemoteDebuggerAmpDefaultAccelerator>
+    <RemoteDebuggerAmpDefaultAccelerator> </RemoteDebuggerAmpDefaultAccelerator>
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\$(TargetName)_Debug</RemoteDebuggerWorkingDirectory>
     <LocalDebuggerWorkingDirectory>$(OutputPath)</LocalDebuggerWorkingDirectory>
-    <LocalDebuggerAmpDefaultAccelerator>
-    </LocalDebuggerAmpDefaultAccelerator>
+    <LocalDebuggerAmpDefaultAccelerator> </LocalDebuggerAmpDefaultAccelerator>
     <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
     <RemoteDebuggerConnection>RemoteWithoutAuthentication</RemoteDebuggerConnection>
   </PropertyGroup>

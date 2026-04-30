@@ -579,10 +579,6 @@ MainScreen::MainScreen(wstring sMIDIFile, HWND hWnd, Renderer11* pRenderer) : Ga
     g_LoadingProgress.stage = MIDILoadingProgress::Stage::NCTable;
     g_LoadingProgress.progress = 0;
     g_LoadingProgress.max = m_vEvents.size();
-    if (m_vNCTable) {
-        delete[] m_vNCTable;
-        m_vNCTable = nullptr;
-    }
     mms_t iMaxMS = m_MIDI.GetInfo().llTotalMicroSecs / MS;
     m_vNCTable = new idx_t[iMaxMS + static_cast<idx_t>(1LL)]();
     idx_t iNC = 0;

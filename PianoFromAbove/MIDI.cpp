@@ -378,6 +378,10 @@ MIDI::MIDI(const wstring& sFilename)
 
 MIDI::~MIDI(void)
 {
+    if (__SMF3_SWAP_SPACE != nullptr) {
+        delete __SMF3_SWAP_SPACE;
+        __SMF3_SWAP_SPACE = nullptr;
+    }
     clear();
 }
 
@@ -388,7 +392,7 @@ MIDIChannelEvent* MIDI::AllocChannelEvent() {
         // This is conveniently exactly half the size of an x86 cache line.
         // Making sure the pool allocation is aligned to at least 32 bytes should ensure that all member accesses are in cache.
         event_pools.emplace_back();
-        event_pools.back().events = (MIDIChannelEvent*)_aligned_malloc(EVENT_POOL_MAX * sizeof(MIDIChannelEvent), sizeof(MIDIChannelEvent));
+        event_pools.back().events = (MIDIChannelEvent*)_aligned_malloc(EVENT_POOL_MAX * sizeof(MIDIChannelEvent), 32u);
         event_pools.back().count = 0;
     }
     auto& pool = event_pools.back();
@@ -487,10 +491,10 @@ void MIDI::clear(void)
 
 fileln_t MIDI::ParseMIDI(const unsigned char* pcData, fileln_t iMaxSize)
 {
-    char pcBuf[4];
     // Reset first. This is the only parsing function that resets/clears first.
     clear();
     // Read header info
+    char pcBuf[4];
     if (ParseNChars(pcData, 4, iMaxSize, pcBuf) != 4) return 0;
     // Check signature
     if (strncmp(pcBuf, "MThd", 4) != 0) return 0;
@@ -507,8 +511,43 @@ fileln_t MIDI::ParseMIDI(const unsigned char* pcData, fileln_t iMaxSize)
         if (iTotal != 18 || m_Info.iDivision == 0) return 0;
         // Parse the rest of the file
         iTotal += iHdrSize - 10;
-        // To do
-        return iTotal + ParseTracksF3(pcData + iTotal, iMaxSize - iTotal);
+        // We need to use a swap space to transfer the parsed events to GameState in PostProcess().
+        this->__SMF3_SWAP_SPACE = new SWAP();
+        uint8_t FirstPass = 0x1E; // Safe guard for potential duplicated chunks
+        for (uint8_t chunk = 0; chunk < 4; chunk++) {
+            // SMF3's chunk signatures are always 13 bytes long. (God knows how long it took me to align this shit!)
+            // The chunks are named as follows:
+            // "F3TrackLayout"
+            // "F3EventStream"
+            // "F3MetaContext"
+            // "F3SysExPacket"
+            // And what is the visually most satisfying way to represent 13? Say hello to the carriage return character!
+            char F3pcBuf['\r'];
+            if (ParseNChars(pcData + iTotal, '\r', iMaxSize - iTotal, F3pcBuf) != '\r') return 0;
+            else if (strncmp(F3pcBuf, "F3TrackLayout", '\r') == 0 && FirstPass & 0x10) {
+                iTotal += '\r';
+                iTotal += ParseTracksF3(pcData + iTotal, iMaxSize - iTotal);
+                FirstPass &= 0xEF;
+            }
+            else if (strncmp(F3pcBuf, "F3EventStream", '\r') == 0 && FirstPass & 0x08) {
+                iTotal += '\r';
+                iTotal += ParseEventsF3(pcData + iTotal, iMaxSize - iTotal, MIDIEvent::EventType::ChannelEvent);
+                FirstPass &= 0xF7;
+            }
+            else if (strncmp(F3pcBuf, "F3MetaContext", '\r') == 0 && FirstPass & 0x04) {
+                iTotal += '\r';
+                iTotal += ParseEventsF3(pcData + iTotal, iMaxSize - iTotal, MIDIEvent::EventType::MetaEvent);
+                FirstPass &= 0xFB;
+            }
+            else if (strncmp(F3pcBuf, "F3SysExPacket", '\r') == 0 && FirstPass & 0x02) {
+                iTotal += '\r';
+                iTotal += ParseEventsF3(pcData + iTotal, iMaxSize - iTotal, MIDIEvent::EventType::SysExEvent);
+                FirstPass &= 0xFD;
+            }
+            else return 0;
+        }
+        // Pasing finished.
+        return iTotal;
     }
     else if (m_Info.iFormatType == 1 || m_Info.iFormatType == 0) {
         // SMF 1 and SMF 0
@@ -529,7 +568,7 @@ fileln_t MIDI::ParseTracks(const unsigned char* pcData, fileln_t iMaxSize)
     fileln_t iTotal = 0, iCount = 0;
     track_t iTrack = m_vTracks.size();
     g_LoadingProgress.stage = MIDILoadingProgress::Stage::ParseTracks;
-    g_LoadingProgress.progress = 0;
+    g_LoadingProgress.progress = iTrack;
     g_LoadingProgress.max = m_Info.iNumTracks; // not actually guaranteed to hit this
     do
     {
@@ -561,22 +600,18 @@ fileln_t MIDI::ParseTracksF3(const unsigned char* pcData, fileln_t iMaxSize)
 {
     track_t iTrack = m_vTracks.size();
     g_LoadingProgress.stage = MIDILoadingProgress::Stage::ParseTracks;
-    g_LoadingProgress.progress = 0;
+    g_LoadingProgress.progress = iTrack;
     g_LoadingProgress.max = m_Info.iNumTracks; // not actually guaranteed to hit this
-    char pcBuf[4];
-    // Read header
-    if (MIDI::ParseNChars(pcData, 9, iMaxSize, pcBuf) != 9) return 0;
-    // Check signature
-    if (strncmp(pcBuf, "F3TrkInfo", 9) != 0) return 0;
     fileln_t iSize = 0;
-    if (Parse64BitLE(pcData + 9, iMaxSize - 9, reinterpret_cast<uint64_t*>(&iSize)) != 4) return 0;
+    if (Parse32BitLE(pcData, iMaxSize, reinterpret_cast<uint32_t*>(&iSize)) != 4) return 0;
     //Read track info
-    fileln_t iTotal = 13, iCount = 0;
+    fileln_t iTotal = 4, iCount = 0;
     do
     {
         // Create and parse the track
         MIDITrack* track = new MIDITrack(*this);
-        iCount = track->ParseTrackF3(pcData + iTotal, iSize - (iTotal - 13));
+        iCount = track->ParseTrackF3(pcData + iTotal, iSize - (iTotal - 4));
+        iTrack++;
 
         // If Success, add it to the list
         if (iCount > 0)
@@ -588,14 +623,176 @@ fileln_t MIDI::ParseTracksF3(const unsigned char* pcData, fileln_t iMaxSize)
             delete track;
         }
 
-        iTrack++;
         iTotal += iCount;
-    } while (iSize - (iTotal - 13) > 0 && iCount > 0 && iTrack < 0xFFFFu);
+    } while (iSize - (iTotal - 4) > 0 && iCount > 0 && iTrack < 0xFFFFu);
 
     // Some MIDIs lie about the amount of tracks
     m_Info.iNumTracks = min(m_vTracks.size(), 0xFFFFu);
 
     return iTotal;
+}
+
+fileln_t MIDI::ParseEventsF3(const unsigned char* pcData, fileln_t iMaxSize, msg_t eChunkFormat)
+{
+    /*
+    fileln_t iSize = 0;
+    if (Parse32BitLE(pcData, iMaxSize, reinterpret_cast<uint32_t*>(&iSize)) != 4 || iSize == 0) return 0;
+    g_LoadingProgress.stage = MIDILoadingProgress::Stage::SortEvents;
+    g_LoadingProgress.progress = 0;
+    g_LoadingProgress.max = iSize;
+    fileln_t iTotal = 4;
+    switch (eChunkFormat) {
+    case MIDIEvent::EventType::ChannelEvent: {
+        idx_t iSimultaneous = 0;
+        for (idx_t i = 0; i < static_cast<idx_t>(iSize); i++) {
+            MIDIChannelEvent* pEvent = AllocChannelEvent();
+            pEvent->m_eEventType = MIDIEvent::ChannelEvent;
+            iTotal += MIDI::Parse8Bit(pcData + iTotal, iMaxSize - iTotal, &pEvent->m_iEventCode);
+            iTotal += MIDI::Parse16BitLE(pcData + iTotal, iMaxSize - iTotal, &pEvent->m_iTrack);
+            iTotal += MIDI::Parse64BitLE(pcData + iTotal, iMaxSize - iTotal, reinterpret_cast<uint64_t*>(&pEvent->m_llAbsMicroSec));
+            iTotal += MIDI::Parse64BitLE(pcData + iTotal, iMaxSize - iTotal, reinterpret_cast<uint64_t*>(&pEvent->m_iAbsTick));
+            iTotal += MIDI::Parse8Bit(pcData + iTotal, iMaxSize - iTotal, &pEvent->m_cParam1);
+            iTotal += MIDI::Parse8Bit(pcData + iTotal, iMaxSize - iTotal, &pEvent->m_cParam2);
+            iTotal += MIDI::Parse32BitLE(pcData + iTotal, iMaxSize - iTotal, &pEvent->m_iSisterIdx);
+            pEvent->SetSimultaneous(iSimultaneous);
+            if (pEvent->HasSister())
+            {
+                if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()))
+                {
+                    iSimultaneous++;
+                }
+                else {
+                    iSimultaneous--;
+                }
+            }
+            __SMF3_SWAP_SPACE->m_vEvents.push_back(pEvent);
+        }
+        break;
+    }
+    case MIDIEvent::EventType::MetaEvent: {
+        break; 
+    }
+    case MIDIEvent::EventType::SysExEvent: {
+        break;
+    }
+    }
+
+    MIDIEvent* pEvent = NULL;
+    mms_t llFirstNote = -1;
+    mms_t llTime = 0;
+    for (midiPos.GetNextEvent(-1, &pEvent); pEvent; midiPos.GetNextEvent(-1, &pEvent))
+    {
+        // Compute the exact time (off by at most a micro second... I don't feel like rounding)
+        mtk_t iTick = pEvent->GetAbsTick();
+        if (bIsStandard)
+            llTime = llLastTempoTime + (static_cast<mms_t>(iMicroSecsPerBeat) * (iTick - iLastTempoTick)) / iTicksPerBeat;
+        else
+            llTime = llLastTempoTime + (1000000LL * (iTick - iLastTempoTick)) / iTicksPerSecond;
+        pEvent->SetAbsMicroSec(llTime);
+
+        if (pEvent->GetEventType() == MIDIEvent::ChannelEvent)
+        {
+            MIDIChannelEvent* pChannelEvent = reinterpret_cast<MIDIChannelEvent*>(pEvent);
+            pChannelEvent->SetSimultaneous(iSimultaneous);
+            if (pChannelEvent->HasSister())
+            {
+                if (IsOn(pChannelEvent->GetChannelEventType(), pChannelEvent->GetParam2()))
+                {
+                    if (llFirstNote < 0) llFirstNote = llTime;
+                    iSimultaneous++;
+                }
+                else {
+                    iSimultaneous--;
+                }
+                auto sister = pChannelEvent->GetPassDone() ? pChannelEvent->GetSister(vChannelEvents) : pChannelEvent->GetSister(m_vTracks[pEvent->GetTrack()]->m_vEvents);
+                if (vChannelEvents.size() >= IDX_MAX) {
+                    return false;
+                }
+                else {
+                    sister->SetSisterIdx(vChannelEvents.size());
+                    sister->SetPassDone(true);
+                }
+            }
+            vChannelEvents.push_back(pChannelEvent);
+        }
+        else if (pEvent->GetEventType() == MIDIEvent::MetaEvent)
+        {
+            MIDIMetaEvent* pMetaEvent = reinterpret_cast<MIDIMetaEvent*>(pEvent);
+            if (pMetaEvent->GetMetaEventType() == MIDIMetaEvent::SetTempo)
+            {
+                iTicksPerBeat = midiPos.GetTicksPerBeat();
+                iTicksPerSecond = midiPos.GetTicksPerSecond();
+                iMicroSecsPerBeat = midiPos.GetMicroSecsPerBeat();
+                iLastTempoTick = iTick;
+                llLastTempoTime = llTime;
+            }
+
+            if (vMetaEvents) {
+                MIDIMetaEvent::MetaEventType eEventType = pMetaEvent->GetMetaEventType();
+                vMetaEvents->push_back(pMetaEvent);
+                switch (eEventType) {
+                case MIDIMetaEvent::SetTempo:
+                    if (vTempo)
+                        vTempo->push_back(pair<mms_t, idx_t>(pEvent->GetAbsMicroSec(), vMetaEvents->size() - 1));
+                    break;
+                case MIDIMetaEvent::TimeSignature:
+                    if (vSignature)
+                        vSignature->push_back(pair<mms_t, idx_t>(pEvent->GetAbsMicroSec(), vMetaEvents->size() - 1));
+                    break;
+                case MIDIMetaEvent::Marker:
+                    if (vMarkers)
+                        vMarkers->push_back(pair<mms_t, idx_t>(pEvent->GetAbsMicroSec(), vMetaEvents->size() - 1));
+                    break;
+                case MIDIMetaEvent::GenericTextA:
+                    if (vColors)
+                        vColors->push_back(pair<mms_t, idx_t>(pEvent->GetAbsMicroSec(), vMetaEvents->size() - 1));
+                    break;
+                default:
+                    break;
+                }
+            }
+            else {
+                delete pMetaEvent; // caller doesn't want meta events, free it
+            }
+        }
+        else if (pEvent->GetEventType() == MIDIEvent::SysExEvent)
+        {
+            MIDISysExEvent* pSysExEvent = reinterpret_cast<MIDISysExEvent*>(pEvent);
+            if (vSysExEvents) {
+                // Reassemble partial SysEx
+                if (!vSysExEvents->empty() && vSysExEvents->back()->HasMoreData() && !pSysExEvent->IsNew())
+                {
+                    MIDISysExEvent* pPrev = vSysExEvents->back();
+                    uint32_t iOldLen = pPrev->GetDataLen();
+                    uint32_t iAddLen = pSysExEvent->GetDataLen();
+                    uint32_t iNewLen = iOldLen + iAddLen;
+                    unsigned char* pNewData = new unsigned char[iNewLen];
+                    memcpy(pNewData, pPrev->GetData(), iOldLen);
+                    memcpy(pNewData + iOldLen, pSysExEvent->GetData(), iAddLen);
+                    pPrev->TakeData(pNewData, iNewLen);
+                    delete pSysExEvent; // ownership not transferred to vector, free here
+                }
+                else {
+                    vSysExEvents->push_back(pSysExEvent);
+                }
+            }
+            else {
+                delete pSysExEvent; // caller doesn't want sysex events, free it
+            }
+        }
+
+        g_LoadingProgress.progress++;
+    }
+
+    // We don't need the track vectors anymore (saves 8 bytes per event!)
+    for (auto track : m_vTracks)
+        track->ClearEvents();
+
+    m_Info.llTotalMicroSecs = llTime;
+    m_Info.llFirstNote = max(0LL, llFirstNote);
+
+    return true;
+    */
 }
 
 // Computes some of the MIDIInfo info
@@ -826,10 +1023,10 @@ void MIDITrack::clear(void)
 
 fileln_t MIDITrack::ParseTrack(const unsigned char* pcData, fileln_t iMaxSize, track_t iTrack)
 {
-    char pcBuf[4];
     // Reset first
     clear();
     // Read header
+    char pcBuf[4];
     if (MIDI::ParseNChars(pcData, 4, iMaxSize, pcBuf) != 4) return 0;
     // Check signature
     if (strncmp(pcBuf, "MTrk", 4) != 0) return 0;
@@ -1021,7 +1218,7 @@ fileln_t MIDIChannelEvent::ParseEvent(const unsigned char* pcData, fileln_t iMax
     if (static_cast<ChannelEventType>(m_iEventCode >> 4) == ProgramChange || static_cast<ChannelEventType>(m_iEventCode >> 4) == ChannelAftertouch)
     {
         if (iMaxSize < 1) return 0;
-        m_cParam1 = pcData[0] & 0x7F;
+        m_cParam1 = pcData[0];
         m_cParam2 = 0x00;
         return 1;
     }
@@ -1029,8 +1226,8 @@ fileln_t MIDIChannelEvent::ParseEvent(const unsigned char* pcData, fileln_t iMax
     else
     {
         if (iMaxSize < 2) return 0;
-        m_cParam1 = pcData[0] & 0x7F;
-        m_cParam2 = pcData[1] & 0x7F;
+        m_cParam1 = pcData[0];
+        m_cParam2 = pcData[1];
         return 2;
     }
 }
@@ -1040,7 +1237,7 @@ fileln_t MIDIMetaEvent::ParseEvent(const unsigned char* pcData, fileln_t iMaxSiz
     if (iMaxSize < 1) return 0;
 
     // Parse the code and the length
-    m_eMetaEventType = static_cast<MetaEventType>(pcData[0]);
+    m_iEventCode = static_cast<MetaEventType>(pcData[0]);
     fileln_t iCount = MIDI::ParseVarNum(pcData + 1, iMaxSize - 1, &m_iDataLen);
     if (iCount == 0 || iMaxSize < 1 + iCount + m_iDataLen) return 0;
     // Get the data

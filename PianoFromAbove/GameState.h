@@ -21,7 +21,6 @@
 inline mms_t m_llStartTime;
 inline mms_t m_llRndStartTime;
 inline mtk_t m_iStartTick;
-inline idx_t* m_vNCTable = nullptr;
 inline idx_t polyphony;
 inline wstring polyFormatted;
 inline idx_t nps;
@@ -319,6 +318,7 @@ public:
 
     MainScreen(wstring sMIDIFile, HWND hWnd, Renderer11* pRenderer);
     ~MainScreen() {
+        delete[] m_vNCTable;
         delete m_pState;
         for (auto* p : m_vMetaEvents) delete p;
         for (auto* p : m_vSysExEvents) delete p;
@@ -393,6 +393,7 @@ private:
     eventvec_t::const_iterator m_itNextMarker;
     eventvec_t::const_iterator m_itNextColor;
     vector<MIDISysExEvent*>::const_iterator m_itNextSysEx;
+    idx_t* m_vNCTable = nullptr;
     bpm_t m_iMicroSecsPerBeat; // Tempo
     mtk_t m_iLastTempoTick; // Tempo
     mms_t m_llLastTempoTime; // Tempo

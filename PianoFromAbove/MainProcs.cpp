@@ -1062,7 +1062,7 @@ INT_PTR CALLBACK LoadingProc(HWND hwnd, UINT msg, WPARAM, LPARAM) {
     switch (msg) {
     case WM_INITDIALOG: {
         SetWindowTextW(hwnd, (LoadingText L" " + g_LoadingProgress.name).c_str());
-        SetTimer(hwnd, 420691337, 1, NULL);
+        SetTimer(hwnd, NULL, 1, NULL);
         EnableMenuItem(GetSystemMenu(hwnd, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
         return true;
     }
@@ -1132,7 +1132,7 @@ BOOL PlayFile(const wstring& sFile)
     MainScreen* pGameState = NULL;
     g_LoadingProgress.stage = MIDILoadingProgress::Stage::CopyToMem;
     g_LoadingProgress.name = sFile;
-    g_LoadingProgress.progress = 0;
+    g_LoadingProgress.progress = 1;
     g_LoadingProgress.max = 1;
     auto gamethread = thread([&]() {
         pGameState = new MainScreen(sFile, NULL, NULL);

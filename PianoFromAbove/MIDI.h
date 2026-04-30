@@ -90,6 +90,7 @@ private:
 };
 
 typedef vector<pair<mms_t, idx_t>> eventvec_t;
+typedef vector<idx_t> notevec_t;
 
 //Holds MIDI data
 class MIDI
@@ -151,7 +152,7 @@ public:
     fileln_t ParseMIDI(const unsigned char* pcData, fileln_t iMaxSize);
     fileln_t ParseTracks(const unsigned char* pcData, fileln_t iMaxSize);
     fileln_t ParseTracksF3(const unsigned char* pcData, fileln_t iMaxSize);
-    fileln_t ParseEventsF3(const unsigned char* pcData, fileln_t iMaxSize);
+    fileln_t ParseEventsF3(const unsigned char* pcData, fileln_t iMaxSize, msg_t eChunkFormat);
     bool IsValid() const { return (m_vTracks.size() > 0 && m_Info.iNoteCount > 0 && m_Info.iDivision > 0 && (m_Info.iFormatType == 0 || m_Info.iFormatType == 1 || m_Info.iFormatType == 3)); }
 
     bool PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMetaEvent*>* vMetaEvents = nullptr, eventvec_t* vTempo = nullptr, eventvec_t* vSignature = nullptr, eventvec_t* vMarkers = nullptr, eventvec_t* vColors = nullptr, vector<MIDISysExEvent*>* vSysExEvents = nullptr);
@@ -195,9 +196,25 @@ private:
         idx_t count;
     };
 
+    struct SWAP {
+        vector<MIDIChannelEvent*> m_vEvents; // The channel events of the song
+        vector<MIDIMetaEvent*> m_vMetaEvents; // The meta events of the song
+        vector<MIDISysExEvent*> m_vSysExEvents; // The SysEx events of the song
+        eventvec_t m_vTempo; // Tracked for drawing measure lines
+        eventvec_t m_vSignature; // Measure lines again
+        eventvec_t m_vMarkers; // Tracked for section names in some longer MIDIs
+        eventvec_t m_vColors; // Tracked for section names in some longer MIDIs
+        notevec_t m_vNoteOns; // Tracked for note on events in some large MIDIs
+        ~SWAP() {
+            for (auto* p : m_vMetaEvents) delete p;
+            for (auto* p : m_vSysExEvents) delete p;
+        }
+    };
+
     MIDIInfo m_Info;
     vector<MIDITrack*> m_vTracks;
     vector<EventPool> event_pools;
+    SWAP* __SMF3_SWAP_SPACE = nullptr;
 
     static wstring aNoteNames[KEYS + 1];
     static Note aNoteVal[KEYS];
@@ -269,19 +286,24 @@ public:
     __forceinline mms_t GetAbsMicroSec() const { return m_llAbsMicroSec; }
     __forceinline void SetAbsMicroSec(mms_t llAbsMicroSec) { m_llAbsMicroSec = llAbsMicroSec; };
 
+private:
+    mms_t m_llAbsMicroSec;
+    mtk_t m_iAbsTick;
     msg_t m_eEventType;
     msg_t m_iEventCode;
     track_t m_iTrack;
-    mms_t m_llAbsMicroSec;
-    mtk_t m_iAbsTick;
-    unsigned char ALIGNMENT = 0xFF;
+
+    friend class MIDIChannelEvent;
+    friend class MIDIMetaEvent;
+    friend class MIDISysExEvent;
+    friend fileln_t MIDI::ParseEventsF3(const unsigned char* pcData, fileln_t iMaxSize, msg_t eChunkFormat);
 };
 
 //Channel Event: notes and whatnot
 class __attribute__((packed)) MIDIChannelEvent : public MIDIEvent
 {
 public:
-    MIDIChannelEvent() : m_iSisterIdx(IDX_MAX), m_iSimultaneous(0) { }
+    MIDIChannelEvent() : Completed(false), m_iSisterIdx(IDX_MAX), m_iSimultaneous(0) { }
 
     enum ChannelEventType : msg_t { NoteOff = 8, NoteOn, NoteAftertouch, Controller, ProgramChange, ChannelAftertouch, PitchBend };
     enum RPN : msg_t { RPNType = 100, PBSRPNID = 0, RPNData = 6 };
@@ -301,21 +323,25 @@ public:
     }
     __forceinline idx_t GetSisterIdx() const { return m_iSisterIdx; }
     __forceinline idx_t GetSimultaneous() const { return m_iSimultaneous; }
-    __forceinline bool GetPassDone() const { return m_cParam2 & 0x80; }
+    __forceinline bool GetPassDone() const { return Completed; }
 
     __forceinline void SetSisterIdx(idx_t iSisterIdx) { m_iSisterIdx = iSisterIdx; }
     __forceinline void SetSimultaneous(idx_t iSimultaneous) { m_iSimultaneous = iSimultaneous; }
-    __forceinline void SetPassDone(bool done) { m_cParam2 = done ? m_cParam2 | 0x80 : m_cParam2 & 0x7F; }
+    __forceinline void SetPassDone(bool done) { Completed = done; }
 
     __forceinline bool HasSister() const { return m_iSisterIdx != IDX_MAX; }
 
 private:
-    unsigned char ALIGNMENT = 0xFF;
     key_t m_cParam1;
     key_t m_cParam2;
+    bool Completed;
+    unsigned char ALIGNMENT = ~0;
     idx_t m_iSisterIdx;
     idx_t m_iSimultaneous;
+
+    friend fileln_t MIDI::ParseEventsF3(const unsigned char* pcData, fileln_t iMaxSize, msg_t eChunkFormat);
 };
+static_assert(sizeof(MIDIChannelEvent) == 32);
 
 //Meta Event: info about the notes and whatnot
 class __attribute__((packed)) MIDIMetaEvent : public MIDIEvent
@@ -332,15 +358,18 @@ public:
     fileln_t ParseEvent(const unsigned char* pcData, fileln_t iMaxSize);
 
     //Accessors
-    __forceinline MetaEventType GetMetaEventType() const { return static_cast<MetaEventType>(m_eMetaEventType); }
+    __forceinline MetaEventType GetMetaEventType() const { return static_cast<MetaEventType>(m_iEventCode); }
     __forceinline msgln_t GetDataLen() const { return m_iDataLen; }
     __forceinline unsigned char* GetData() const { return m_pcData; }
 
 private:
-    msg_t m_eMetaEventType;
     msgln_t m_iDataLen;
     unsigned char* m_pcData;
+
+    msg_t GetEventCode() const {} // PLEASE DO NOT USE THIS!
+    friend fileln_t MIDI::ParseEventsF3(const unsigned char* pcData, fileln_t iMaxSize, msg_t eChunkFormat);
 };
+static_assert(sizeof(MIDIMetaEvent) == 32);
 
 //SysEx Event: forwarded to MIDI output device
 class __attribute__((packed)) MIDISysExEvent : public MIDIEvent
@@ -361,10 +390,12 @@ public:
     }
 
 private:
-    unsigned char ALIGNMENT = 0xFF;
     msgln_t m_iDataLen;
     unsigned char* m_pcData;
+
+    friend fileln_t MIDI::ParseEventsF3(const unsigned char* pcData, fileln_t iMaxSize, msg_t eChunkFormat);
 };
+static_assert(sizeof(MIDISysExEvent) == 32);
 
 //
 // MIDI Device Classes
