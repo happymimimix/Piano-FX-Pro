@@ -1,12 +1,4 @@
-﻿/*
-⚠️ Disguised header file notice:
-
-This file will be treated as a .cpp source code file when compiling.
-Please do not be deceived by the .h file extension!
-See file properties for more details.
-*/
-
-#include <Tab3.h>
+﻿#include <Tab3.h>
 
 TouchEventListener* Tab3::Btn1 = nullptr;
 

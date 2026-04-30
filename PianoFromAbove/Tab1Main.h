@@ -1,12 +1,4 @@
-﻿/*
-⚠️ Disguised header file notice:
-
-This file will be treated as a .cpp source code file when compiling.
-Please do not be deceived by the .h file extension!
-See file properties for more details.
-*/
-
-#include <Tab1.h>
+﻿#include <Tab1.h>
 #include <Tab1Btn2.h>
 #include <Tab1Btn4.h>
 #include <Tab1Btn5.h>
