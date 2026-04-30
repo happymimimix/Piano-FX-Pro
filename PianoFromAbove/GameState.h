@@ -318,7 +318,11 @@ public:
     static const float KBPercent;
 
     MainScreen(wstring sMIDIFile, HWND hWnd, Renderer11* pRenderer);
-    ~MainScreen() { delete m_pState; }
+    ~MainScreen() {
+        delete m_pState;
+        for (auto* p : m_vMetaEvents) delete p;
+        for (auto* p : m_vSysExEvents) delete p;
+    }
 
     // GameState functions
     GameError MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

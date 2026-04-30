@@ -37,13 +37,12 @@ public:
     MIDIPos(MIDI& midi);
     ~MIDIPos();
 
-    idx_t GetNextEvent(mms_t iMicroSecs, MIDIEvent** pEvent);
-    idx_t GetNextEvents(mms_t iMicroSecs, vector<MIDIEvent*>& vEvents);
-
     bool IsStandard() const { return m_bIsStandard; }
     bpm_t GetTicksPerBeat() const { return m_iTicksPerBeat; }
     bpm_t GetTicksPerSecond() const { return m_iTicksPerSecond; }
     bpm_t GetMicroSecsPerBeat() const { return m_iMicroSecsPerBeat; }
+
+    idx_t GetNextEvent(mms_t iMicroSecs, MIDIEvent** pEvent);
 
     mtk_t* m_pTrackTime;
 
@@ -151,8 +150,8 @@ public:
     //Parsing functions that load data into the instance
     fileln_t ParseMIDI(const unsigned char* pcData, fileln_t iMaxSize);
     fileln_t ParseTracks(const unsigned char* pcData, fileln_t iMaxSize);
-    fileln_t ParseEvents(const unsigned char* pcData, fileln_t iMaxSize);
-    bool IsValid() const { return (m_vTracks.size() > 0 && m_Info.iNoteCount > 0 && m_Info.iDivision > 0); }
+    fileln_t ParseTracksF3(const unsigned char* pcData, fileln_t iMaxSize);
+    bool IsValid() const { return (m_vTracks.size() > 0 && m_Info.iNoteCount > 0 && m_Info.iDivision > 0 && (m_Info.iFormatType == 0 || m_Info.iFormatType == 1 || m_Info.iFormatType == 3)); }
 
     bool PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMetaEvent*>* vMetaEvents = nullptr, eventvec_t* vTempo = nullptr, eventvec_t* vSignature = nullptr, eventvec_t* vMarkers = nullptr, eventvec_t* vColors = nullptr, vector<MIDISysExEvent*>* vSysExEvents = nullptr);
     void ConnectNotes();
@@ -214,6 +213,7 @@ public:
 
     //Parsing functions that load data into the instance
     fileln_t ParseTrack(const unsigned char* pcData, fileln_t iMaxSize, track_t iTrack);
+    fileln_t ParseTrackF3(const unsigned char* pcData, fileln_t iMaxSize);
     fileln_t ParseEvents(const unsigned char* pcData, fileln_t iMaxSize, track_t iTrack);
     void clear(void);
 
