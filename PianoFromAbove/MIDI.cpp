@@ -569,7 +569,7 @@ fileln_t MIDI::ParseTracksF3(const unsigned char* pcData, fileln_t iMaxSize)
     // Check signature
     if (strncmp(pcBuf, "F3TrkInfo", 9) != 0) return 0;
     fileln_t iSize = 0;
-    if (Parse32BitLE(pcData + 9, iMaxSize - 9, reinterpret_cast<uint32_t*>(&iSize)) != 4) return 0;
+    if (Parse64BitLE(pcData + 9, iMaxSize - 9, reinterpret_cast<uint64_t*>(&iSize)) != 4) return 0;
     //Read track info
     fileln_t iTotal = 13, iCount = 0;
     do

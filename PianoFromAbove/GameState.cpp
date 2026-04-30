@@ -1771,6 +1771,7 @@ GameState::GameError MainScreen::Render()
                 delete[] Frame;
             }
             else {
+                delete[] Frame;
                 return DirectXError;
             }
         }
@@ -1786,6 +1787,7 @@ GameState::GameError MainScreen::Render()
                 delete[] Frame;
             }
             else {
+                delete[] Frame;
                 return DirectXError;
             }
         }
