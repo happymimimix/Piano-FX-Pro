@@ -654,7 +654,28 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                     lvi.iItem = (win32_t)SendMessage(hWndTracks, LVM_INSERTITEM, 0, (LPARAM)&lvi);
 
                     lvi.iSubItem++;
-                    _stprintf_s(buf, TEXT("%hs"), mTrackInfo.sSequenceName.c_str());
+                    string NarrowTitle = mTrackInfo.sSequenceName;
+                    static Config& config = Config::GetConfig();
+                    static const VideoSettings& cVideo = config.GetVideoSettings();
+                    constexpr uint16_t codepages[] = { 1252, 437, 82, 886, 932, 936, CP_UTF8 };
+                    size_t size_needed = MultiByteToWideChar(
+                        codepages[cVideo.eMarkerEncoding],
+                        0,
+                        NarrowTitle.data(),
+                        (win32_t)NarrowTitle.size(),
+                        nullptr,
+                        0
+                    );
+                    wstring WideTitle(size_needed, 0);
+                    MultiByteToWideChar(
+                        codepages[cVideo.eMarkerEncoding],
+                        0,
+                        NarrowTitle.data(),
+                        (win32_t)NarrowTitle.size(),
+                        &WideTitle[0],
+                        size_needed
+                    );
+                    _stprintf_s(buf, TEXT("%s"), WideTitle.c_str());
                     SendMessage(hWndTracks, LVM_SETITEM, 0, (LPARAM)&lvi);
 
                     lvi.iSubItem++;

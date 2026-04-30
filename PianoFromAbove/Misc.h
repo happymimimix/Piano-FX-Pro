@@ -24,6 +24,7 @@ typedef uint8_t chan_t; // Midi channel id type
 typedef uint32_t TnC_t; // Any code that does `track * 16 + channel` must use this type
 typedef uint8_t msg_t; // Midi message type
 typedef uint32_t msgln_t; // Midi message length type (always 32bit unsigned)
+typedef int64_t fileln_t; // File length type (always 64bit signed)
 typedef uint32_t idx_t; // Array indexing type
 typedef int64_t sidx_t; // Array indexing type (signed)
 constexpr idx_t IDX_MAX = static_cast<idx_t>(-1); // Maximum array size

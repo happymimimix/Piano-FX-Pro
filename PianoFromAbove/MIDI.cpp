@@ -234,7 +234,7 @@ MIDI::MIDI(const wstring& sFilename)
     {
         // Go to the end of the file to get the max size
         _fseeki64(stream, 0, SEEK_END);
-        idx_t iSize = static_cast<idx_t>(_ftelli64(stream));
+        fileln_t iSize = _ftelli64(stream);
         unsigned char* pcMemBlock = new unsigned char[iSize];
 
         // Go to the beginning of the file to prepare for parsing
@@ -403,6 +403,7 @@ MIDIChannelEvent* MIDI::AllocChannelEvent() {
         // Currently, MIDIChannelEvent is 32 bytes large.
         // This is conveniently exactly half the size of an x86 cache line.
         // Making sure the pool allocation is aligned to at least 32 bytes should ensure that all member accesses are in cache.
+        static_assert(sizeof(MIDIChannelEvent) == 32);
         event_pools.emplace_back();
         event_pools.back().events = (MIDIChannelEvent*)_aligned_malloc(EVENT_POOL_MAX * sizeof(MIDIChannelEvent), sizeof(MIDIChannelEvent));
         event_pools.back().count = 0;
@@ -501,49 +502,47 @@ void MIDI::clear(void)
     event_pools.clear();
 }
 
-idx_t MIDI::ParseMIDI(const unsigned char* pcData, idx_t iMaxSize)
+fileln_t MIDI::ParseMIDI(const unsigned char* pcData, fileln_t iMaxSize)
 {
     char pcBuf[4];
-    idx_t iTotal;
-    uint32_t iHdrSize;
-
     // Reset first. This is the only parsing function that resets/clears first.
     clear();
-
     // Read header info
     if (ParseNChars(pcData, 4, iMaxSize, pcBuf) != 4) return 0;
-    if (Parse32Bit(pcData + 4, iMaxSize - 4, &iHdrSize) != 4) return 0;
-    iTotal = 8;
-
-    // Check header info
+    // Check signature
     if (strncmp(pcBuf, "MThd", 4) != 0) return 0;
-
+    fileln_t iHdrSize = 0;
+    if (Parse32Bit(pcData + 4, iMaxSize - 4, reinterpret_cast<uint32_t*>(&iHdrSize)) != 4) return 0;
     //Read header
+    idx_t iTotal = 8;
     iTotal += Parse16Bit(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iFormatType);
-    iTotal += Parse16Bit(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iNumTracks);
-    iTotal += Parse16Bit(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iDivision);
-
-    // Check header
-    if (iTotal != 14 || (m_Info.iFormatType != 0 && m_Info.iFormatType != 1 && m_Info.iFormatType != 3) || m_Info.iDivision == 0) return 0;
-
-    // Parse the rest of the file
     if (m_Info.iFormatType == 3) {
         // SMF 3
-        iTotal += Parse64BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), reinterpret_cast<uint64_t*>(&m_Info.llTotalMicroSecs));
-        iTotal += Parse64BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), reinterpret_cast<uint64_t*>(&m_Info.iTotalTicks));
-        iTotal += Parse8Bit(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iMinNote);
-        iTotal += Parse8Bit(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iMaxNote);
+        iTotal += Parse16BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iNumTracks);
+        iTotal += Parse16BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iDivision);
+        iTotal += Parse32BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iNumChannels);
+        if (iTotal != 18 || m_Info.iDivision == 0) return 0;
+        // Parse the rest of the file
+        iTotal += iHdrSize - 6;
+        // To do
     }
-    else {
+    else if (m_Info.iFormatType == 1 || m_Info.iFormatType == 0) {
         // SMF 1 and SMF 0
+        iTotal += Parse16Bit(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iNumTracks);
+        iTotal += Parse16Bit(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iDivision);
+        if (iTotal != 14 || m_Info.iDivision == 0) return 0;
+        // Parse the rest of the file
         iTotal += iHdrSize - 6;
         return iTotal + ParseTracks(pcData + iTotal, iMaxSize - iTotal);
     }
+    else {
+        return 0;
+    }
 }
 
-idx_t MIDI::ParseTracks(const unsigned char* pcData, idx_t iMaxSize)
+fileln_t MIDI::ParseTracks(const unsigned char* pcData, fileln_t iMaxSize)
 {
-    idx_t iTotal = 0, iCount = 0;
+    fileln_t iTotal = 0, iCount = 0;
     track_t iTrack = m_vTracks.size();
     g_LoadingProgress.stage = MIDILoadingProgress::Stage::ParseTracks;
     g_LoadingProgress.progress = 0;
@@ -573,11 +572,11 @@ idx_t MIDI::ParseTracks(const unsigned char* pcData, idx_t iMaxSize)
     return iTotal;
 }
 
-idx_t MIDI::ParseEvents(const unsigned char* pcData, idx_t iMaxSize)
+fileln_t MIDI::ParseEvents(const unsigned char* pcData, fileln_t iMaxSize)
 {
     // Create and parse the track
     MIDITrack* track = new MIDITrack(*this);
-    idx_t iCount = track->ParseEvents(pcData, iMaxSize, m_vTracks.size());
+    fileln_t iCount = track->ParseEvents(pcData, iMaxSize, m_vTracks.size());
 
     // If Success, add it to the list
     if (iCount > 0) {
@@ -809,35 +808,27 @@ void MIDITrack::clear(void)
     m_TrackInfo.clear();
 }
 
-idx_t MIDITrack::ParseTrack(const unsigned char* pcData, idx_t iMaxSize, track_t iTrack)
+fileln_t MIDITrack::ParseTrack(const unsigned char* pcData, fileln_t iMaxSize, track_t iTrack)
 {
     char pcBuf[4];
-    idx_t iTotal;
-    idx_t iTrkSize;
-
     // Reset first
     clear();
-
     // Read header
-    if (MIDI::ParseNChars(pcData, 4, iMaxSize, pcBuf) != 4)
-        return 0;
-    if (MIDI::Parse32Bit(pcData + 4, iMaxSize - 4, &iTrkSize) != 4)
-        return 0;
-    iTotal = 8;
-
-    // Check header
-    if (strncmp(pcBuf, "MTrk", 4) != 0)
-        return 0;
-
+    if (MIDI::ParseNChars(pcData, 4, iMaxSize, pcBuf) != 4) return 0;
+    // Check signature
+    if (strncmp(pcBuf, "MTrk", 4) != 0) return 0;
+    fileln_t iTrkSize = 0;
+    if (MIDI::Parse32Bit(pcData + 4, iMaxSize - 4, reinterpret_cast<uint32_t*>(&iTrkSize)) != 4) return 0;
+    fileln_t iTotal = 8;
     //return iTotal + ParseEvents( pcData + iTotal, iMaxSize - iTotal, iTrack );
     ParseEvents(pcData + iTotal, iMaxSize - iTotal, iTrack);
     return iTotal + iTrkSize;
 }
 
-idx_t MIDITrack::ParseEvents(const unsigned char* pcData, idx_t iMaxSize, track_t iTrack)
+fileln_t MIDITrack::ParseEvents(const unsigned char* pcData, fileln_t iMaxSize, track_t iTrack)
 {
-    uint32_t iDTCode = 0;
-    idx_t iTotal = 0, iCount = 0;
+    msgln_t iDTCode = 0;
+    fileln_t iTotal = 0, iCount = 0;
     MIDIEvent* pEvent = NULL;
 
     do {
@@ -859,8 +850,9 @@ idx_t MIDITrack::ParseEvents(const unsigned char* pcData, idx_t iMaxSize, track_
                 m_vEvents.push_back(pEvent);
                 m_TrackInfo.AddEventInfo(*pEvent);
             }
-            else
+            else {
                 delete pEvent;
+            }
         }
     }
     // Until we've parsed all the data, the last parse failed, or the event signals the end of track
@@ -953,20 +945,17 @@ MIDIEvent::EventType MIDIEvent::DecodeEventType(msg_t iEventCode)
     return MetaEvent;
 }
 
-uint32_t MIDIEvent::MakeNextEvent(MIDI& midi, const unsigned char* pcData, msgln_t iMaxSize, track_t iTrack, MIDIEvent** pOutEvent)
+fileln_t MIDIEvent::MakeNextEvent(MIDI& midi, const unsigned char* pcData, fileln_t iMaxSize, track_t iTrack, MIDIEvent** pOutEvent)
 {
     MIDIEvent* pPrevEvent = *pOutEvent;
-
     // Parse and check DT
-    msgln_t iDT;
-    msgln_t iTotal = MIDI::ParseVarNum(pcData, iMaxSize, &iDT);
+    mtk_t iDT = 0;
+    fileln_t iTotal = MIDI::ParseVarNum(pcData, iMaxSize, reinterpret_cast<uint32_t*>(&iDT));
     if (iTotal == 0 || iMaxSize - iTotal < 1) return 0;
-
     // Parse and decode event code
     msg_t iEventCode = pcData[iTotal];
     EventType eEventType = DecodeEventType(iEventCode);
     iTotal++;
-
     // Use previous event code for running status
     if (eEventType == RunningStatus && pPrevEvent)
     {
@@ -974,7 +963,6 @@ uint32_t MIDIEvent::MakeNextEvent(MIDI& midi, const unsigned char* pcData, msgln
         eEventType = DecodeEventType(iEventCode);
         iTotal--;
     }
-
     // Make the object
     switch (eEventType)
     {
@@ -983,7 +971,6 @@ uint32_t MIDIEvent::MakeNextEvent(MIDI& midi, const unsigned char* pcData, msgln
     case SysExEvent: *pOutEvent = new MIDISysExEvent(); break;
     default: break;
     }
-
     (*pOutEvent)->m_eEventType = eEventType;
     (*pOutEvent)->m_iEventCode = iEventCode;
     (*pOutEvent)->m_iTrack = iTrack;
@@ -993,7 +980,7 @@ uint32_t MIDIEvent::MakeNextEvent(MIDI& midi, const unsigned char* pcData, msgln
     return iTotal;
 }
 
-uint32_t MIDIChannelEvent::ParseEvent(const unsigned char* pcData, msgln_t iMaxSize)
+fileln_t MIDIChannelEvent::ParseEvent(const unsigned char* pcData, fileln_t iMaxSize)
 {
     // Parse one parameter
     if (static_cast<ChannelEventType>(m_iEventCode >> 4) == ProgramChange || static_cast<ChannelEventType>(m_iEventCode >> 4) == ChannelAftertouch)
@@ -1013,42 +1000,37 @@ uint32_t MIDIChannelEvent::ParseEvent(const unsigned char* pcData, msgln_t iMaxS
     }
 }
 
-uint32_t MIDIMetaEvent::ParseEvent(const unsigned char* pcData, msgln_t iMaxSize)
+fileln_t MIDIMetaEvent::ParseEvent(const unsigned char* pcData, fileln_t iMaxSize)
 {
     if (iMaxSize < 1) return 0;
 
     // Parse the code and the length
     m_eMetaEventType = static_cast<MetaEventType>(pcData[0]);
-    msgln_t iCount = MIDI::ParseVarNum(pcData + 1, iMaxSize - 1, &m_iDataLen);
+    fileln_t iCount = MIDI::ParseVarNum(pcData + 1, iMaxSize - 1, &m_iDataLen);
     if (iCount == 0 || iMaxSize < 1 + iCount + m_iDataLen) return 0;
-
     // Get the data
     if (m_iDataLen > 0)
     {
         m_pcData = new unsigned char[m_iDataLen];
         memcpy(m_pcData, pcData + 1 + iCount, m_iDataLen);
     }
-
     return 1 + iCount + m_iDataLen;
 }
 
 // NOTE: this is INCOMPLETE. Data is parsed but not fully interpreted:
 // divided messages don't know about each other
-uint32_t MIDISysExEvent::ParseEvent(const unsigned char* pcData, msgln_t iMaxSize)
+fileln_t MIDISysExEvent::ParseEvent(const unsigned char* pcData, fileln_t iMaxSize)
 {
     if (iMaxSize < 1) return 0;
-
     // Parse the code and the length
-    msgln_t iCount = MIDI::ParseVarNum(pcData, iMaxSize, &m_iDataLen);
+    fileln_t iCount = MIDI::ParseVarNum(pcData, iMaxSize, &m_iDataLen);
     if (iCount == 0 || iMaxSize < iCount + m_iDataLen) return 0;
-
     // Get the data
     if (m_iDataLen > 0)
     {
         m_pcData = new unsigned char[m_iDataLen];
         memcpy(m_pcData, pcData + iCount, m_iDataLen);
     }
-
     return iCount + m_iDataLen;
 }
 
@@ -1058,20 +1040,21 @@ uint32_t MIDISysExEvent::ParseEvent(const unsigned char* pcData, msgln_t iMaxSiz
 //-----------------------------------------------------------------------------
 
 //Parse a variable length number from MIDI data
-idx_t MIDI::ParseVarNum(const unsigned char* pcData, msgln_t iMaxSize, uint32_t* piOut)
+fileln_t MIDI::ParseVarNum(const unsigned char* pcData, fileln_t iMaxSize, uint32_t* piOut)
 {
     if (!pcData || !piOut || iMaxSize <= 0) return 0;
+    uint8_t TargetLength = static_cast<uint8_t>(min(iMaxSize, sizeof(msgln_t)));
     *piOut = 0;
-    msgln_t i = 0;
-    do {
-        *piOut = (*piOut << 7) | (pcData[i] & 0x7F);
-        i++;
-    } while (i < 4 && i < iMaxSize && (pcData[i - 1] & 0x80));
-    return i;
+    uint8_t Byte = 0;
+    while (Byte < TargetLength) {
+        *piOut = (*piOut << 7) | (pcData[Byte] & 0x7F);
+        if (!(pcData[Byte] & 0x80)) return ++Byte; else ++Byte;
+    }
+    return Byte;
 }
 
 //Parse 32 bits of data. Big Endian.
-idx_t MIDI::Parse32Bit(const unsigned char* pcData, msgln_t iMaxSize, uint32_t* piOut)
+fileln_t MIDI::Parse32Bit(const unsigned char* pcData, fileln_t iMaxSize, uint32_t* piOut)
 {
     if (!pcData || !piOut || iMaxSize < 4) return 0;
     *piOut = (pcData[0] << 24) | (pcData[1] << 16) | (pcData[2] << 8) | (pcData[3] << 0);
@@ -1079,7 +1062,7 @@ idx_t MIDI::Parse32Bit(const unsigned char* pcData, msgln_t iMaxSize, uint32_t* 
 }
 
 //Parse 24 bits of data. Big Endian.
-idx_t MIDI::Parse24Bit(const unsigned char* pcData, msgln_t iMaxSize, uint32_t* piOut)
+fileln_t MIDI::Parse24Bit(const unsigned char* pcData, fileln_t iMaxSize, uint32_t* piOut)
 {
     if (!pcData || !piOut || iMaxSize < 3) return 0;
     *piOut = (pcData[0] << 16) | (pcData[1] << 8) | (pcData[2] << 0);
@@ -1087,7 +1070,7 @@ idx_t MIDI::Parse24Bit(const unsigned char* pcData, msgln_t iMaxSize, uint32_t* 
 }
 
 //Parse 16 bits of data. Big Endian.
-idx_t MIDI::Parse16Bit(const unsigned char* pcData, msgln_t iMaxSize, uint16_t* piOut)
+fileln_t MIDI::Parse16Bit(const unsigned char* pcData, fileln_t iMaxSize, uint16_t* piOut)
 {
     if (!pcData || !piOut || iMaxSize < 2) return 0;
     *piOut = (pcData[0] << 8) | (pcData[1] << 0);
@@ -1095,7 +1078,7 @@ idx_t MIDI::Parse16Bit(const unsigned char* pcData, msgln_t iMaxSize, uint16_t* 
 }
 
 //Parse 8 bits of data.
-idx_t MIDI::Parse8Bit(const unsigned char* pcData, msgln_t iMaxSize, uint8_t* piOut)
+fileln_t MIDI::Parse8Bit(const unsigned char* pcData, fileln_t iMaxSize, uint8_t* piOut)
 {
     if (!pcData || !piOut || iMaxSize < 1) return 0;
     *piOut = pcData[0];
@@ -1103,7 +1086,7 @@ idx_t MIDI::Parse8Bit(const unsigned char* pcData, msgln_t iMaxSize, uint8_t* pi
 }
 
 //Parse 64 bits of data. Little Endian.
-idx_t MIDI::Parse64BitLE(const unsigned char* pcData, msgln_t iMaxSize, uint64_t* piOut)
+fileln_t MIDI::Parse64BitLE(const unsigned char* pcData, fileln_t iMaxSize, uint64_t* piOut)
 {
     if (!pcData || !piOut || iMaxSize < 8) return 0;
     // No need to shift digits around here, we're already on little endian.
@@ -1112,7 +1095,7 @@ idx_t MIDI::Parse64BitLE(const unsigned char* pcData, msgln_t iMaxSize, uint64_t
 }
 
 //Parse 32 bits of data. Little Endian.
-idx_t MIDI::Parse32BitLE(const unsigned char* pcData, msgln_t iMaxSize, uint32_t* piOut)
+fileln_t MIDI::Parse32BitLE(const unsigned char* pcData, fileln_t iMaxSize, uint32_t* piOut)
 {
     if (!pcData || !piOut || iMaxSize < 4) return 0;
     // No need to shift digits around here, we're already on little endian.
@@ -1121,7 +1104,7 @@ idx_t MIDI::Parse32BitLE(const unsigned char* pcData, msgln_t iMaxSize, uint32_t
 }
 
 //Parse 16 bits of data. Little Endian.
-idx_t MIDI::Parse16BitLE(const unsigned char* pcData, msgln_t iMaxSize, uint16_t* piOut)
+fileln_t MIDI::Parse16BitLE(const unsigned char* pcData, fileln_t iMaxSize, uint16_t* piOut)
 {
     if (!pcData || !piOut || iMaxSize < 2) return 0;
     // No need to shift digits around here, we're already on little endian.
@@ -1130,10 +1113,10 @@ idx_t MIDI::Parse16BitLE(const unsigned char* pcData, msgln_t iMaxSize, uint16_t
 }
 
 //Parse a bunch of characters
-idx_t MIDI::ParseNChars(const unsigned char* pcData, msgln_t iNChars, msgln_t iMaxSize, char* pcOut)
+fileln_t MIDI::ParseNChars(const unsigned char* pcData, fileln_t iNChars, fileln_t iMaxSize, char* pcOut)
 {
     if (!pcData || !pcOut || iMaxSize <= 0) return 0;
-    msgln_t iSize = min(iNChars, iMaxSize);
+    fileln_t iSize = min(iNChars, iMaxSize);
     memcpy(pcOut, pcData, iSize);
     return iSize;
 }
@@ -1271,7 +1254,7 @@ bool MIDIOutDevice::PlayEvent(msg_t cStatus, msg_t cParam1, msg_t cParam2)
     }
 }
 
-bool MIDIOutDevice::PlaySysEx(unsigned char* pcData, msg_t iLen)
+bool MIDIOutDevice::PlaySysEx(unsigned char* pcData, msgln_t iLen)
 {
     if (!m_bIsOpen || !pcData || iLen == 0) return false;
     MIDIHDR hdr = {};

@@ -131,15 +131,15 @@ public:
     }
 
     //Generally usefull static parsing functions
-    static idx_t ParseVarNum(const unsigned char* pcData, msgln_t iMaxSize, uint32_t* piOut);
-    static idx_t Parse32Bit(const unsigned char* pcData, msgln_t iMaxSize, uint32_t* piOut);
-    static idx_t Parse24Bit(const unsigned char* pcData, msgln_t iMaxSize, uint32_t* piOut);
-    static idx_t Parse16Bit(const unsigned char* pcData, msgln_t iMaxSize, uint16_t* piOut);
-    static idx_t Parse8Bit(const unsigned char* pcData, msgln_t iMaxSize, uint8_t* piOut);
-    static idx_t Parse64BitLE(const unsigned char* pcData, msgln_t iMaxSize, uint64_t* piOut);
-    static idx_t Parse32BitLE(const unsigned char* pcData, msgln_t iMaxSize, uint32_t* piOut);
-    static idx_t Parse16BitLE(const unsigned char* pcData, msgln_t iMaxSize, uint16_t* piOut);
-    static idx_t ParseNChars(const unsigned char* pcData, msgln_t iNChars, msgln_t iMaxSize, char* pcOut);
+    static fileln_t ParseVarNum(const unsigned char* pcData, fileln_t iMaxSize, uint32_t* piOut);
+    static fileln_t Parse32Bit(const unsigned char* pcData, fileln_t iMaxSize, uint32_t* piOut);
+    static fileln_t Parse24Bit(const unsigned char* pcData, fileln_t iMaxSize, uint32_t* piOut);
+    static fileln_t Parse16Bit(const unsigned char* pcData, fileln_t iMaxSize, uint16_t* piOut);
+    static fileln_t Parse8Bit(const unsigned char* pcData, fileln_t iMaxSize, uint8_t* piOut);
+    static fileln_t Parse64BitLE(const unsigned char* pcData, fileln_t iMaxSize, uint64_t* piOut);
+    static fileln_t Parse32BitLE(const unsigned char* pcData, fileln_t iMaxSize, uint32_t* piOut);
+    static fileln_t Parse16BitLE(const unsigned char* pcData, fileln_t iMaxSize, uint16_t* piOut);
+    static fileln_t ParseNChars(const unsigned char* pcData, fileln_t iNChars, fileln_t iMaxSize, char* pcOut);
 
     MIDI(void) {};
     MIDI(const wstring& sFilename);
@@ -149,9 +149,9 @@ public:
     MIDIChannelEvent* AllocChannelEvent();
 
     //Parsing functions that load data into the instance
-    idx_t ParseMIDI(const unsigned char* pcData, idx_t iMaxSize);
-    idx_t ParseTracks(const unsigned char* pcData, idx_t iMaxSize);
-    idx_t ParseEvents(const unsigned char* pcData, idx_t iMaxSize);
+    fileln_t ParseMIDI(const unsigned char* pcData, fileln_t iMaxSize);
+    fileln_t ParseTracks(const unsigned char* pcData, fileln_t iMaxSize);
+    fileln_t ParseEvents(const unsigned char* pcData, fileln_t iMaxSize);
     bool IsValid() const { return (m_vTracks.size() > 0 && m_Info.iNoteCount > 0 && m_Info.iDivision > 0); }
 
     bool PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMetaEvent*>* vMetaEvents = nullptr, eventvec_t* vTempo = nullptr, eventvec_t* vSignature = nullptr, eventvec_t* vMarkers = nullptr, eventvec_t* vColors = nullptr, vector<MIDISysExEvent*>* vSysExEvents = nullptr);
@@ -166,7 +166,7 @@ public:
     {
         MIDIInfo() { clear(); }
         void clear() {
-            llTotalMicroSecs = llFirstNote = iFormatType = iNumTracks = iNumChannels = iDivision = iMinNote = iMaxNote = iNoteCount = iEventCount = iTotalTicks = iTotalBeats = 0;
+            iFormatType = iNumTracks = iNumChannels = iDivision = iMinNote = iMaxNote = iNoteCount = iEventCount = llTotalMicroSecs = iTotalTicks = llFirstNote = iTotalBeats = 0;
             sFilename.clear();
         }
         void AddTrackInfo(const MIDITrack& mTrack);
@@ -178,9 +178,10 @@ public:
         uint16_t iDivision;
         key_t iMinNote, iMaxNote;
         idx_t iNoteCount, iEventCount;
+        mms_t llTotalMicroSecs;
         mtk_t iTotalTicks;
+        mms_t llFirstNote;
         bpm_t iTotalBeats;
-        mms_t llTotalMicroSecs, llFirstNote;
     };
 
     const MIDIInfo& GetInfo() const { return m_Info; }
@@ -212,8 +213,8 @@ public:
     ~MIDITrack(void);
 
     //Parsing functions that load data into the instance
-    idx_t ParseTrack(const unsigned char* pcData, idx_t iMaxSize, track_t iTrack);
-    idx_t ParseEvents(const unsigned char* pcData, idx_t iMaxSize, track_t iTrack);
+    fileln_t ParseTrack(const unsigned char* pcData, fileln_t iMaxSize, track_t iTrack);
+    fileln_t ParseEvents(const unsigned char* pcData, fileln_t iMaxSize, track_t iTrack);
     void clear(void);
 
     friend class MIDIPos;
@@ -257,7 +258,7 @@ public:
     static EventType DecodeEventType(msg_t iEventCode);
 
     //Parsing functions that load data into the instance
-    static uint32_t MakeNextEvent(MIDI & midi, const unsigned char* pcData, msgln_t iMaxSize, track_t iTrack, MIDIEvent** pOutEvent);
+    static fileln_t MakeNextEvent(MIDI & midi, const unsigned char* pcData, fileln_t iMaxSize, track_t iTrack, MIDIEvent** pOutEvent);
 
     //Accessors
     __forceinline EventType GetEventType() const { return static_cast<EventType>(m_eEventType); }
@@ -283,7 +284,7 @@ public:
 
     enum ChannelEventType : msg_t { NoteOff = 8, NoteOn, NoteAftertouch, Controller, ProgramChange, ChannelAftertouch, PitchBend };
     enum RPN : msg_t { RPNType = 100, PBSRPNID = 0, RPNData = 6 };
-    uint32_t ParseEvent(const unsigned char* pcData, msgln_t iMaxSize);
+    fileln_t ParseEvent(const unsigned char* pcData, fileln_t iMaxSize);
 
     //Accessors
     __forceinline ChannelEventType GetChannelEventType() const { return static_cast<ChannelEventType>(m_iEventCode >> 4); }
@@ -327,7 +328,7 @@ public:
         GenericTextA = 0x0a, ChannelPrefix = 0x20, PortPrefix, EndOfTrack = 0x2F,
         SetTempo = 0x51, SMPTEOffset = 0x54, TimeSignature = 0x58, KeySignature, Proprietary = 0x7F
     };
-    uint32_t ParseEvent(const unsigned char* pcData, msgln_t iMaxSize);
+    fileln_t ParseEvent(const unsigned char* pcData, fileln_t iMaxSize);
 
     //Accessors
     __forceinline MetaEventType GetMetaEventType() const { return static_cast<MetaEventType>(m_eMetaEventType); }
@@ -347,12 +348,12 @@ public:
     MIDISysExEvent() : m_pcData(0) { }
     ~MIDISysExEvent() { if (m_pcData) delete[] m_pcData; }
 
-    __forceinline uint32_t ParseEvent(const unsigned char* pcData, msgln_t iMaxSize);
-    __forceinline uint32_t GetDataLen() const { return m_iDataLen; }
+    __forceinline fileln_t ParseEvent(const unsigned char* pcData, fileln_t iMaxSize);
+    __forceinline msgln_t GetDataLen() const { return m_iDataLen; }
     __forceinline unsigned char* GetData() const { return m_pcData; }
     __forceinline bool HasMoreData() const { return m_iEventCode == 0xF0 && m_iDataLen > 0 && m_pcData[m_iDataLen - 1] != 0xF7; }
     __forceinline bool IsNew() const { return m_iEventCode != 0xF7; }
-    __forceinline void TakeData(unsigned char* pcData, uint32_t iLen) {
+    __forceinline void TakeData(unsigned char* pcData, msgln_t iLen) {
         if (m_pcData) delete[] m_pcData;
         m_pcData = pcData;
         m_iDataLen = iLen;
@@ -360,7 +361,7 @@ public:
 
 private:
     unsigned char ALIGNMENT = 0xFF;
-    uint32_t m_iDataLen;
+    msgln_t m_iDataLen;
     unsigned char* m_pcData;
 };
 
