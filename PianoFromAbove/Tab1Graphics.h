@@ -9,19 +9,19 @@ struct Tab1Graphics {
         y++;
         switch (state) {
         case Normal:
-            cout << "[" << (short)y << ';' << (short)x << "H[107m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀"; y++;
-            cout << "[" << (short)y << ';' << (short)x << "H[107m[30m Download English translated Domino [90m█"; y++;
-            cout << "[" << (short)y << ';' << (short)x << "H[107m[30m▄[90m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
+            cout << "[" << (short)y << ';' << (short)x << "H[107m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[107m[30m Install Cheat Engine 7.5.1 [90m█"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[107m[30m▄[90m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
             break;
         case Hovered:
-            cout << "[" << (short)y << ';' << (short)x << "H[103m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀"; y++;
-            cout << "[" << (short)y << ';' << (short)x << "H[103m[30m Download English translated Domino [90m█"; y++;
-            cout << "[" << (short)y << ';' << (short)x << "H[103m[30m▄[90m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
+            cout << "[" << (short)y << ';' << (short)x << "H[103m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[103m[30m Install Cheat Engine 7.5.1 [90m█"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[103m[30m▄[90m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
             break;
         case Touched:
-            cout << "[" << (short)y << ';' << (short)x << "H[44m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀"; y++;
-            cout << "[" << (short)y << ';' << (short)x << "H[44m[97m Download English translated Domino [30m█"; y++;
-            cout << "[" << (short)y << ';' << (short)x << "H[44m[30m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
+            cout << "[" << (short)y << ';' << (short)x << "H[44m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[44m[97m Install Cheat Engine 7.5.1 [30m█"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[44m[30m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
             break;
         default:
             cout << "[1;1H[40m[91mERROR: Unknown button state ";
@@ -36,38 +36,6 @@ struct Tab1Graphics {
         }
     }
     static void Btn2(uint8_t x, uint8_t y, BtnState state) {
-        // 0-based -> 1-based
-        x++;
-        y++;
-        switch (state) {
-        case Normal:
-            cout << "[" << (short)y << ';' << (short)x << "H[107m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀"; y++;
-            cout << "[" << (short)y << ';' << (short)x << "H[107m[30m Download Fl Studio v12.3 archive [90m█"; y++;
-            cout << "[" << (short)y << ';' << (short)x << "H[107m[30m▄[90m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
-            break;
-        case Hovered:
-            cout << "[" << (short)y << ';' << (short)x << "H[103m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀"; y++;
-            cout << "[" << (short)y << ';' << (short)x << "H[103m[30m Download Fl Studio v12.3 archive [90m█"; y++;
-            cout << "[" << (short)y << ';' << (short)x << "H[103m[30m▄[90m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
-            break;
-        case Touched:
-            cout << "[" << (short)y << ';' << (short)x << "H[44m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀"; y++;
-            cout << "[" << (short)y << ';' << (short)x << "H[44m[97m Download Fl Studio v12.3 archive [30m█"; y++;
-            cout << "[" << (short)y << ';' << (short)x << "H[44m[30m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
-            break;
-        default:
-            cout << "[1;1H[40m[91mERROR: Unknown button state ";
-            cout << (int)state;
-            cout << ", should only be 1(normal), 2(hovered), or 3(touched). \n";
-            cout << "\nThe program will now stop. \n";
-            while (true) {
-                // Make the program hang instead of closing! 
-                // This way the user can clearly see the error message. 
-            }
-            break;
-        }
-    }
-    static void Btn3(uint8_t x, uint8_t y, BtnState state) {
         // 0-based -> 1-based
         x++;
         y++;
@@ -99,25 +67,57 @@ struct Tab1Graphics {
             break;
         }
     }
+    static void Btn3(uint8_t x, uint8_t y, BtnState state) {
+        // 0-based -> 1-based
+        x++;
+        y++;
+        switch (state) {
+        case Normal:
+            cout << "[" << (short)y << ';' << (short)x << "H[107m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[107m[30m Standard MIDI Format Type 3 introduction [90m█"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[107m[30m▄[90m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
+            break;
+        case Hovered:
+            cout << "[" << (short)y << ';' << (short)x << "H[103m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[103m[30m Standard MIDI Format Type 3 introduction [90m█"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[103m[30m▄[90m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
+            break;
+        case Touched:
+            cout << "[" << (short)y << ';' << (short)x << "H[44m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[44m[97m Standard MIDI Format Type 3 introduction [30m█"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[44m[30m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
+            break;
+        default:
+            cout << "[1;1H[40m[91mERROR: Unknown button state ";
+            cout << (int)state;
+            cout << ", should only be 1(normal), 2(hovered), or 3(touched). \n";
+            cout << "\nThe program will now stop. \n";
+            while (true) {
+                // Make the program hang instead of closing! 
+                // This way the user can clearly see the error message. 
+            }
+            break;
+        }
+    }
     static void Btn4(uint8_t x, uint8_t y, BtnState state) {
         // 0-based -> 1-based
         x++;
         y++;
         switch (state) {
         case Normal:
-            cout << "[" << (short)y << ';' << (short)x << "H[107m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀"; y++;
-            cout << "[" << (short)y << ';' << (short)x << "H[107m[30m Download Cheat Engine from official website [90m█"; y++;
-            cout << "[" << (short)y << ';' << (short)x << "H[107m[30m▄[90m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
+            cout << "[" << (short)y << ';' << (short)x << "H[107m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[107m[30m Convert SMF 1 to SMF 3 for faster loading [90m█"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[107m[30m▄[90m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
             break;
         case Hovered:
-            cout << "[" << (short)y << ';' << (short)x << "H[103m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀"; y++;
-            cout << "[" << (short)y << ';' << (short)x << "H[103m[30m Download Cheat Engine from official website [90m█"; y++;
-            cout << "[" << (short)y << ';' << (short)x << "H[103m[30m▄[90m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
+            cout << "[" << (short)y << ';' << (short)x << "H[103m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[103m[30m Convert SMF 1 to SMF 3 for faster loading [90m█"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[103m[30m▄[90m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
             break;
         case Touched:
-            cout << "[" << (short)y << ';' << (short)x << "H[44m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀"; y++;
-            cout << "[" << (short)y << ';' << (short)x << "H[44m[97m Download Cheat Engine from official website [30m█"; y++;
-            cout << "[" << (short)y << ';' << (short)x << "H[44m[30m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
+            cout << "[" << (short)y << ';' << (short)x << "H[44m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[44m[97m Convert SMF 1 to SMF 3 for faster loading [30m█"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[44m[30m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
             break;
         default:
             cout << "[1;1H[40m[91mERROR: Unknown button state ";
@@ -137,19 +137,19 @@ struct Tab1Graphics {
         y++;
         switch (state) {
         case Normal:
-            cout << "[" << (short)y << ';' << (short)x << "H[107m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀"; y++;
-            cout << "[" << (short)y << ';' << (short)x << "H[107m[30m Improve audio quality with OmniMIDI [90m█"; y++;
-            cout << "[" << (short)y << ';' << (short)x << "H[107m[30m▄[90m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
+            cout << "[" << (short)y << ';' << (short)x << "H[107m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[107m[30m Convert SMF 3 to SMF 1 for better compatibility [90m█"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[107m[30m▄[90m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
             break;
         case Hovered:
-            cout << "[" << (short)y << ';' << (short)x << "H[103m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀"; y++;
-            cout << "[" << (short)y << ';' << (short)x << "H[103m[30m Improve audio quality with OmniMIDI [90m█"; y++;
-            cout << "[" << (short)y << ';' << (short)x << "H[103m[30m▄[90m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
+            cout << "[" << (short)y << ';' << (short)x << "H[103m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[103m[30m Convert SMF 3 to SMF 1 for better compatibility [90m█"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[103m[30m▄[90m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
             break;
         case Touched:
-            cout << "[" << (short)y << ';' << (short)x << "H[44m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀"; y++;
-            cout << "[" << (short)y << ';' << (short)x << "H[44m[97m Improve audio quality with OmniMIDI [30m█"; y++;
-            cout << "[" << (short)y << ';' << (short)x << "H[44m[30m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
+            cout << "[" << (short)y << ';' << (short)x << "H[44m[30m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[44m[97m Convert SMF 3 to SMF 1 for better compatibility [30m█"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[44m[30m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█";
             break;
         default:
             cout << "[1;1H[40m[91mERROR: Unknown button state ";
@@ -163,7 +163,7 @@ struct Tab1Graphics {
             break;
         }
     }
-    struct Btn3Graphics {
+    struct Btn2Graphics {
         static void Main(uint8_t x, uint8_t y) {
             // 0-based -> 1-based
             x++;
@@ -217,6 +217,74 @@ struct Tab1Graphics {
                 break;
             case Touched:
                 cout << "[" << (short)y << ';' << (short)x << "H[44m[32mInstall";
+                break;
+            default:
+                cout << "[1;1H[40m[91mERROR: Unknown button state ";
+                cout << (int)state;
+                cout << ", should only be 1(normal), 2(hovered), or 3(touched). \n";
+                cout << "\nThe program will now stop. \n";
+                while (true) {
+                    // Make the program hang instead of closing! 
+                    // This way the user can clearly see the error message. 
+                }
+                break;
+            }
+        }
+    };
+    struct Btn4Graphics {
+        static void Main(uint8_t x, uint8_t y) {
+            // 0-based -> 1-based
+            x++;
+            y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[44m[36m┌────────────────────────────────────────────────────────────[[91mx[36m]┐"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[44m[36m│[95m Path to MIDI file:                                            [36m│"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[44m[36m│[95m ┌──────────────────────────────────────────────────┬────────┐ [36m│"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[44m[36m│[95m │                                                  │ [91mBrowse[95m │ [36m│"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[44m[36m│[95m └──────────────────────────────────────────────────┴────────┘ [36m│"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[44m[36m│[95m                                                   [91m┌─────────┐ [36m│"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[44m[36m│[95m                                                   [91m│ [92mConvert[91m │ [36m│"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[44m[36m│[95m                                                   [91m└─────────┘ [36m│"; y++;
+            cout << "[" << (short)y << ';' << (short)x << "H[44m[36m└───────────────────────────────────────────────────────────────┘";
+        }
+        static void Browse(uint8_t x, uint8_t y, BtnState state) {
+            // 0-based -> 1-based
+            x++;
+            y++;
+            switch (state) {
+            case Normal:
+                cout << "[" << (short)y << ';' << (short)x << "H[44m[91mBrowse";
+                break;
+            case Hovered:
+                cout << "[" << (short)y << ';' << (short)x << "H[44m[93mBrowse";
+                break;
+            case Touched:
+                cout << "[" << (short)y << ';' << (short)x << "H[44m[31mBrowse";
+                break;
+            default:
+                cout << "[1;1H[40m[91mERROR: Unknown button state ";
+                cout << (int)state;
+                cout << ", should only be 1(normal), 2(hovered), or 3(touched). \n";
+                cout << "\nThe program will now stop. \n";
+                while (true) {
+                    // Make the program hang instead of closing! 
+                    // This way the user can clearly see the error message. 
+                }
+                break;
+            }
+        }
+        static void Convert(uint8_t x, uint8_t y, BtnState state) {
+            // 0-based -> 1-based
+            x++;
+            y++;
+            switch (state) {
+            case Normal:
+                cout << "[" << (short)y << ';' << (short)x << "H[44m[92mConvert";
+                break;
+            case Hovered:
+                cout << "[" << (short)y << ';' << (short)x << "H[44m[93mConvert";
+                break;
+            case Touched:
+                cout << "[" << (short)y << ';' << (short)x << "H[44m[32mConvert";
                 break;
             default:
                 cout << "[1;1H[40m[91mERROR: Unknown button state ";

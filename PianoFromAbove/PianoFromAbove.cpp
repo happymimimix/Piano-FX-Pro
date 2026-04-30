@@ -51,13 +51,6 @@ wstring GetProcessName() {
     return (pos != string::npos) ? fullPath.substr(pos + 1) : fullPath;
 }
 
-wstring ProgramPath() {
-    wchar_t szFilePath[LONG_MAX_PATH] = {};
-    GetModuleFileNameW(NULL, szFilePath, LONG_MAX_PATH);
-    (wcsrchr(szFilePath, L'\\'))[0] = 0;
-    return szFilePath;
-}
-
 string MultiInstanceGuardInit() {
     string Code = "";
     Code += "if _G.Working then\n";
@@ -1682,6 +1675,10 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
             }
             if (ARG2 == "GDITutorial") {
                 DisplayTutorial(GDITutorial);
+                return 0;
+            }
+            if (ARG2 == "SMF3Intro") {
+                DisplayTutorial(SMF3Intro);
                 return 0;
             }
         }

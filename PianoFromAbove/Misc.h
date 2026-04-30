@@ -32,6 +32,7 @@ typedef uint32_t color_t; // Color type
 typedef signed long bpm_t; // Anything that has something to do with tempo, beat, and measure
 typedef signed int win32_t; // Classic signed 32bit integer, aka dword, used for interfacing with Win32 API (should not appear in any game logic)
 typedef signed short winword_t; // Classic signed 16bit integer, aka word, used for interfacing with Win32 API (should not appear in any game logic)
+#define LONG_MAX_PATH 0x0FFF
 
 #define NoteVelFormula(velvar) (static_cast<unsigned char>(m_dVolume > 1.0 ? static_cast<double>(INT8_MAX) - (static_cast<double>(INT8_MAX) - static_cast<double>(velvar)) * (2.0 - m_dVolume) : static_cast<double>(velvar) * m_dVolume))
 #define IsNote(type) (type == MIDIChannelEvent::NoteOn || type == MIDIChannelEvent::NoteOff)
@@ -74,6 +75,13 @@ __forceinline string FloatSizeToCE(uint8_t Size) {
         return "Double";
     }
     return "Bytes";
+}
+
+inline wstring GetExePath(void) {
+    wchar_t szFilePath[LONG_MAX_PATH] = {};
+    GetModuleFileNameW(NULL, szFilePath, LONG_MAX_PATH);
+    *wcsrchr(szFilePath, '\\') = 0;
+    return szFilePath;
 }
 
 //The timer

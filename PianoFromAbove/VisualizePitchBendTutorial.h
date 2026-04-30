@@ -1,6 +1,6 @@
 #include <TutorialFramework.h>
 
-TutorialDocument LoadVisualizePitchBenddTutorial() {
+TutorialDocument LoadVisualizePitchBendTutorial() {
 	TutorialDocument Document;
 	Document.TextContent = R"MultilineText(
 

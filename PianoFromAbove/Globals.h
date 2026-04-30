@@ -18,11 +18,7 @@ extern HWND g_hWnd;
 extern HWND g_hWndBar;
 extern HWND g_hWndGfx;
 extern bool g_bGfxDestroyed;
-extern TSQueue< MSG > g_MsgQueue; // Producer/consumer to hold events for our game thread
-
-#define ERRORANDRETURN(hwnd, msg, retval) {MessageBox((hwnd), (msg), TEXT("Error"), MB_OK | MB_ICONERROR); return (retval);}
-#define NOMINMAX
-#define LONG_MAX_PATH 0x0FFF
+extern TSQueue<MSG> g_MsgQueue;
 
 inline bool* PtrToIsWrapRenderer = nullptr;
 #define TitleGapLine wstring(L" | ")

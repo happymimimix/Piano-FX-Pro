@@ -8,7 +8,7 @@
 wstring ProgramDIR() {
     wchar_t szFilePath[LONG_MAX_PATH] = {};
     GetModuleFileNameW(NULL, szFilePath, LONG_MAX_PATH);
-    (wcsrchr(szFilePath, '\\'))[0] = 0;
+    *wcsrchr(szFilePath, '\\') = 0;
     return szFilePath;
 }
 

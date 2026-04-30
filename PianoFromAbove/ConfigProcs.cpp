@@ -608,9 +608,9 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         // Set up the columns of the list view
         RECT rcTracks;
         GetClientRect(hWndTracks, &rcTracks);
-        win32_t aFmt[6] = { LVCFMT_LEFT, LVCFMT_LEFT, LVCFMT_RIGHT, LVCFMT_CENTER, LVCFMT_CENTER, LVCFMT_CENTER };
-        win32_t aCx[6] = { 40, rcTracks.right - 50 * 5, 60, 50, 50, 50 };
-        CONST TCHAR* aText[6] = { TEXT("Track"), TEXT("Instrument"), TEXT("Notes"), TEXT("Muted"), TEXT("Hidden"), TEXT("Color") };
+        win32_t aFmt[7] = { LVCFMT_RIGHT, LVCFMT_LEFT, LVCFMT_LEFT, LVCFMT_RIGHT, LVCFMT_CENTER, LVCFMT_CENTER, LVCFMT_CENTER };
+        win32_t aCx[7] = { 40, (rcTracks.right - 50 * 5) / 2, (rcTracks.right - 50 * 5) / 2, 60, 50, 50, 50 };
+        CONST TCHAR* aText[7] = { TEXT("Track"), TEXT("Title"), TEXT("Instrument"), TEXT("Notes"), TEXT("Muted"), TEXT("Hidden"), TEXT("Color") };
 
         LVCOLUMN lvc = {};
         lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT;
@@ -652,6 +652,10 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                     lvi.iSubItem = 0;
                     _stprintf_s(buf, TEXT("%d"), iPos + 1);
                     lvi.iItem = (win32_t)SendMessage(hWndTracks, LVM_INSERTITEM, 0, (LPARAM)&lvi);
+
+                    lvi.iSubItem++;
+                    _stprintf_s(buf, TEXT("%hs"), mTrackInfo.sSequenceName.c_str());
+                    SendMessage(hWndTracks, LVM_SETITEM, 0, (LPARAM)&lvi);
 
                     lvi.iSubItem++;
                     _stprintf_s(buf, TEXT("%s"), j == 9 ? TEXT("Drums") : MIDI::Instruments[mTrackInfo.aProgram[j]].c_str());
@@ -712,17 +716,17 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 bool bAllChecked = true;
                 switch (lpnmlv->iSubItem)
                 {
-                case 3:
+                case 4:
                     for (idx_t i = 0; i < vMuted.size(); i++) bAllChecked &= vMuted[i];
                     for (idx_t i = 0; i < vMuted.size(); i++) vMuted[i] = !bAllChecked;
                     InvalidateRect(lpnmlv->hdr.hwndFrom, NULL, FALSE);
                     return TRUE;
-                case 4:
+                case 5:
                     for (idx_t i = 0; i < vHidden.size(); i++) bAllChecked &= vHidden[i];
                     for (idx_t i = 0; i < vHidden.size(); i++) vHidden[i] = !bAllChecked;
                     InvalidateRect(lpnmlv->hdr.hwndFrom, NULL, FALSE);
                     return TRUE;
-                case 5:
+                case 6:
                     for (idx_t i = 0; i < vColors.size(); i++)
                         if (cVisual.bRandomizeColor) {
                             vColors[i] = Util::RandColor() & 0x00FFFFFF | (cVisual.colors[i % 16] & 0xFF000000);
@@ -749,15 +753,15 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 SendMessage(lpnmia->hdr.hwndFrom, LVM_GETITEMRECT, lvhti.iItem, (LPARAM)&rcItem);
                 switch (lvhti.iSubItem)
                 {
-                case 3:
+                case 4:
                     vMuted[lvhti.iItem] = !vMuted[lvhti.iItem];
                     InvalidateRect(lpnmia->hdr.hwndFrom, &rcItem, FALSE);
                     return TRUE;
-                case 4:
+                case 5:
                     vHidden[lvhti.iItem] = !vHidden[lvhti.iItem];
                     InvalidateRect(lpnmia->hdr.hwndFrom, &rcItem, FALSE);
                     return TRUE;
-                case 5:
+                case 6:
                 {
                     static COLORREF acrCustClr[16] = { 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF,
                                                        0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF };
@@ -783,7 +787,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 HWND hWndTracks = GetDlgItem(hWnd, IDC_TRACKS);
                 RECT rcTracks;
                 GetClientRect(hWndTracks, &rcTracks);
-                win32_t aCx[6] = { 40, rcTracks.right - 50 * 5, 60, 50, 50, 50 };
+                win32_t aCx[7] = { 40, (rcTracks.right - 50 * 5) / 2, (rcTracks.right - 50 * 5) / 2, 60, 50, 50, 50 };
                 for (win32_t i = 0; i < static_cast<win32_t>(sizeof(aCx) / sizeof(win32_t)); i++) {
                     SendMessage(hWndTracks, LVM_SETCOLUMNWIDTH, i, aCx[i]); //Please don't resize this, it makes the interface look very ridiculous! 
                 }
@@ -793,7 +797,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                     SetWindowLongPtr(hWnd, DWLP_MSGRESULT, CDRF_NOTIFYITEMDRAW);
                     return TRUE;
                 case CDDS_SUBITEM | CDDS_ITEMPREPAINT:
-                    if (lpnmlvcd->iSubItem >= 3 && lpnmlvcd->iSubItem <= 5)
+                    if (lpnmlvcd->iSubItem >= 4 && lpnmlvcd->iSubItem <= 6)
                     {
                         // Figure out size. Too big a rect is fine: will be clipped
                         RECT rcOut;
@@ -804,20 +808,22 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                         rcOut.bottom = rcOut.top + iBmpSize;
 
                         // Drawing. Checkbox, checkbox, color
-                        if (lpnmlvcd->iSubItem == 3)
-                            DrawFrameControl(lpnmcd->hdc, &rcOut, DFC_BUTTON,
-                                DFCS_BUTTONCHECK | (vMuted[lpnmcd->dwItemSpec] ? DFCS_CHECKED : 0));
-                        else if (lpnmlvcd->iSubItem == 4)
-                            DrawFrameControl(lpnmcd->hdc, &rcOut, DFC_BUTTON,
-                                DFCS_BUTTONCHECK | (vHidden[lpnmcd->dwItemSpec] ? DFCS_CHECKED : 0));
-                        else
+                        switch (lpnmlvcd->iSubItem)
                         {
+                        case 4:
+                            DrawFrameControl(lpnmcd->hdc, &rcOut, DFC_BUTTON, DFCS_BUTTONCHECK | (vMuted[lpnmcd->dwItemSpec] ? DFCS_CHECKED : 0));
+                            break;
+                        case 5:
+                            DrawFrameControl(lpnmcd->hdc, &rcOut, DFC_BUTTON, DFCS_BUTTONCHECK | (vHidden[lpnmcd->dwItemSpec] ? DFCS_CHECKED : 0));
+                            break;
+                        case 6:
                             SetDCBrushColor(lpnmcd->hdc, lpnmlvcd->clrFace);
                             FillRect(lpnmcd->hdc, &lpnmcd->rc, (HBRUSH)GetStockObject(DC_BRUSH));
                             InflateRect(&lpnmcd->rc, -1, -1);
                             SetDCBrushColor(lpnmcd->hdc, vColors[lpnmcd->dwItemSpec] & 0x00FFFFFF);
                             FillRect(lpnmcd->hdc, &lpnmcd->rc, (HBRUSH)GetStockObject(DC_BRUSH));
                             DrawEdge(lpnmcd->hdc, &lpnmcd->rc, BDR_SUNKENINNER, BF_RECT);
+                            break;
                         }
                         SetWindowLongPtr(hWnd, DWLP_MSGRESULT, CDRF_SKIPDEFAULT);
                     }

@@ -2,6 +2,7 @@
 #include <CheatEngineTutorial.h>
 #include <VisualizePitchBendTutorial.h>
 #include <GDITutorial.h>
+#include <SMF3Intro.h>
 #include <TutorialFramework.h>
 
 void DisplayTutorial(Tutorials DocumentName) {
@@ -10,10 +11,13 @@ void DisplayTutorial(Tutorials DocumentName) {
 		OpenTutorialDocument(LoadCheatEngineTutorial());
 		break;
 	case VisualizePitchBendTutorial:
-
+		OpenTutorialDocument(LoadVisualizePitchBendTutorial());
 		break;
 	case GDITutorial:
-
+		OpenTutorialDocument(LoadGDITutorial());
+		break;
+	case SMF3Intro:
+		OpenTutorialDocument(LoadSMF3Intro());
 		break;
 	default:
 		cout << "[1;1H[40m[91mERROR: Unknown tutorial document: ";

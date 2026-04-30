@@ -246,7 +246,7 @@
     <ClInclude Include="GDITutorial.h">
       <Filter>Source Files\Piano-FX Studio\Tutorials</Filter>
     </ClInclude>
-    <ClInclude Include="Tab1Btn3.h">
+    <ClInclude Include="Tab1Btn2.h">
       <Filter>Source Files\Piano-FX Studio\TouchEventListeners\Tab1\SubViews</Filter>
     </ClInclude>
     <ClInclude Include="Tab2Btn4.h">
@@ -338,6 +338,15 @@
     </ClInclude>
     <ClInclude Include="BackgroundVertexShader.h">
       <Filter>Generated Files %28DO NOT EDIT!%29</Filter>
+    </ClInclude>
+    <ClInclude Include="Tab1Btn4.h">
+      <Filter>Source Files\Piano-FX Studio\TouchEventListeners\Tab1\SubViews</Filter>
+    </ClInclude>
+    <ClInclude Include="SMF3Intro.h">
+      <Filter>Source Files\Piano-FX Studio\Tutorials</Filter>
+    </ClInclude>
+    <ClInclude Include="Tab1Btn5.h">
+      <Filter>Source Files\Piano-FX Studio\TouchEventListeners\Tab1\SubViews</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

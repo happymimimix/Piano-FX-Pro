@@ -3,8 +3,8 @@
 #include <Fonts.h>
 #define PropertyWindowW 300
 #define PropertyWindowH 150
-#define TrackWindowW 300
-#define TrackWindowH 200
+#define TrackWindowW 400
+#define TrackWindowH 250
 #define AboutWindowW 250
 #define AboutWindowH 100
 #define hLoadingWindowW 125

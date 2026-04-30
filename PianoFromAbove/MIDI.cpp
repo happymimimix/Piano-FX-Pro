@@ -162,21 +162,21 @@ idx_t MIDIPos::GetNextEvent(mms_t iMicroSecs, MIDIEvent** pOutEvent)
         iMaxTickAllowed += (static_cast<mms_t>(m_iTicksPerSecond) * (m_iCurrMicroSec + iMicroSecs)) / 1000000;
     }
 
-    if (iMicroSecs < 0 || pMinEvent->GetAbsT() <= iMaxTickAllowed)
+    if (iMicroSecs < 0 || pMinEvent->GetAbsTick() <= iMaxTickAllowed)
     {
         // How many micro seconds did we just process?
         *pOutEvent = pMinEvent;
-        mtk_t iSpan = pMinEvent->GetAbsT() - m_iCurrTick;
+        mtk_t iSpan = pMinEvent->GetAbsTick() - m_iCurrTick;
         if (m_bIsStandard)
             iSpan = (static_cast<mms_t>(m_iMicroSecsPerBeat) * iSpan) / m_iTicksPerBeat - m_iCurrMicroSec;
         else
             iSpan = (1000000LL * iSpan) / m_iTicksPerSecond - m_iCurrMicroSec;
-        m_iCurrTick = pMinEvent->GetAbsT();
+        m_iCurrTick = pMinEvent->GetAbsTick();
         m_iCurrMicroSec = 0;
 
         // Advance this track's head pointer + key, then re-balance the tree.
         m_pTrackPos[iMinPos]++;
-        m_pTrackTime[iMinPos] = m_pTrackPos[iMinPos] == m_MIDI.m_vTracks[iMinPos]->m_vEvents.size() ? INT64_MAX : m_MIDI.m_vTracks[iMinPos]->m_vEvents[m_pTrackPos[iMinPos]]->GetAbsT();
+        m_pTrackTime[iMinPos] = m_pTrackPos[iMinPos] == m_MIDI.m_vTracks[iMinPos]->m_vEvents.size() ? INT64_MAX : m_MIDI.m_vTracks[iMinPos]->m_vEvents[m_pTrackPos[iMinPos]]->GetAbsTick();
         RestoreTree(champion);
 
         // Change the tempo going forward if we're at a SetTempo event
@@ -403,9 +403,8 @@ MIDIChannelEvent* MIDI::AllocChannelEvent() {
         // Currently, MIDIChannelEvent is 32 bytes large.
         // This is conveniently exactly half the size of an x86 cache line.
         // Making sure the pool allocation is aligned to at least 32 bytes should ensure that all member accesses are in cache.
-        static_assert(sizeof(MIDIChannelEvent) == 32);
         event_pools.emplace_back();
-        event_pools.back().events = (MIDIChannelEvent*)_aligned_malloc(EVENT_POOL_MAX * sizeof(MIDIChannelEvent), 32);
+        event_pools.back().events = (MIDIChannelEvent*)_aligned_malloc(EVENT_POOL_MAX * sizeof(MIDIChannelEvent), sizeof(MIDIChannelEvent));
         event_pools.back().count = 0;
     }
     auto& pool = event_pools.back();
@@ -520,9 +519,9 @@ idx_t MIDI::ParseMIDI(const unsigned char* pcData, idx_t iMaxSize)
     if (strncmp(pcBuf, "MThd", 4) != 0) return 0;
 
     //Read header
-    iTotal += Parse16Bit(pcData + iTotal, iHdrSize - iTotal, &m_Info.iFormatType);
-    iTotal += Parse16Bit(pcData + iTotal, iHdrSize - iTotal, &m_Info.iNumTracks);
-    iTotal += Parse16Bit(pcData + iTotal, iHdrSize - iTotal, &m_Info.iDivision);
+    iTotal += Parse16Bit(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iFormatType);
+    iTotal += Parse16Bit(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iNumTracks);
+    iTotal += Parse16Bit(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iDivision);
 
     // Check header
     if (iTotal != 14 || (m_Info.iFormatType != 0 && m_Info.iFormatType != 1 && m_Info.iFormatType != 3) || m_Info.iDivision == 0) return 0;
@@ -530,10 +529,10 @@ idx_t MIDI::ParseMIDI(const unsigned char* pcData, idx_t iMaxSize)
     // Parse the rest of the file
     if (m_Info.iFormatType == 3) {
         // SMF 3
-        iTotal += Parse64BitLE(pcData + iTotal, iHdrSize - iTotal, reinterpret_cast<uint64_t*>(&m_Info.llTotalMicroSecs));
-        iTotal += Parse64BitLE(pcData + iTotal, iHdrSize - iTotal, reinterpret_cast<uint64_t*>(&m_Info.iTotalTicks));
-        iTotal += Parse8Bit(pcData + iTotal, iHdrSize - iTotal, &m_Info.iMinNote);
-        iTotal += Parse8Bit(pcData + iTotal, iHdrSize - iTotal, &m_Info.iMaxNote);
+        iTotal += Parse64BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), reinterpret_cast<uint64_t*>(&m_Info.llTotalMicroSecs));
+        iTotal += Parse64BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), reinterpret_cast<uint64_t*>(&m_Info.iTotalTicks));
+        iTotal += Parse8Bit(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iMinNote);
+        iTotal += Parse8Bit(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iMaxNote);
     }
     else {
         // SMF 1 and SMF 0
@@ -634,7 +633,7 @@ bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
     for (track_t i = 0; i < m_vTracks.size(); i++) {
         event_count += m_vTracks[i]->m_vEvents.size();
         if (!m_vTracks[i]->m_vEvents.empty())
-            midiPos.m_pTrackTime[i] = m_vTracks[i]->m_vEvents[0]->GetAbsT();
+            midiPos.m_pTrackTime[i] = m_vTracks[i]->m_vEvents[0]->GetAbsTick();
     }
 
     g_LoadingProgress.stage = MIDILoadingProgress::Stage::SortEvents;
@@ -647,7 +646,7 @@ bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
     for (midiPos.GetNextEvent(-1, &pEvent); pEvent; midiPos.GetNextEvent(-1, &pEvent))
     {
         // Compute the exact time (off by at most a micro second... I don't feel like rounding)
-        mtk_t iTick = pEvent->GetAbsT();
+        mtk_t iTick = pEvent->GetAbsTick();
         if (bIsStandard)
             llTime = llLastTempoTime + (static_cast<mms_t>(iMicroSecsPerBeat) * (iTick - iLastTempoTick)) / iTicksPerBeat;
         else
@@ -840,7 +839,6 @@ idx_t MIDITrack::ParseEvents(const unsigned char* pcData, idx_t iMaxSize, track_
     uint32_t iDTCode = 0;
     idx_t iTotal = 0, iCount = 0;
     MIDIEvent* pEvent = NULL;
-    m_TrackInfo.iSequenceNumber = iTrack;
 
     do {
         // Create and parse the event
@@ -877,7 +875,7 @@ void MIDITrack::MIDITrackInfo::AddEventInfo(const MIDIEvent& mEvent)
 {
     //EventCount and TotalTicks
     this->iEventCount++;
-    this->iTotalTicks = max(this->iTotalTicks, mEvent.GetAbsT());
+    this->iTotalTicks = max(this->iTotalTicks, mEvent.GetAbsTick());
 
     switch (mEvent.GetEventType())
     {
@@ -885,19 +883,9 @@ void MIDITrack::MIDITrackInfo::AddEventInfo(const MIDIEvent& mEvent)
     {
         const MIDIMetaEvent& mMetaEvent = reinterpret_cast<const MIDIMetaEvent&>(mEvent);
         MIDIMetaEvent::MetaEventType eMetaEventType = mMetaEvent.GetMetaEventType();
-        switch (eMetaEventType)
+        if (eMetaEventType == MIDIMetaEvent::SequenceName)
         {
-            //SequenceName
-        case MIDIMetaEvent::SequenceName:
             this->sSequenceName.assign(reinterpret_cast<char*>(mMetaEvent.GetData()), mMetaEvent.GetDataLen());
-            break;
-            //SequenceNumber
-        case MIDIMetaEvent::SequenceNumber:
-            if (mMetaEvent.GetDataLen() == 2)
-                MIDI::Parse16Bit(mMetaEvent.GetData(), 2, &this->iSequenceNumber);
-            break;
-        default:
-            break;
         }
         break;
     }
@@ -999,31 +987,28 @@ uint32_t MIDIEvent::MakeNextEvent(MIDI& midi, const unsigned char* pcData, msgln
     (*pOutEvent)->m_eEventType = eEventType;
     (*pOutEvent)->m_iEventCode = iEventCode;
     (*pOutEvent)->m_iTrack = iTrack;
-    (*pOutEvent)->m_iAbsT = iDT;
-    if (pPrevEvent) (*pOutEvent)->m_iAbsT += pPrevEvent->m_iAbsT;
+    (*pOutEvent)->m_iAbsTick = iDT;
+    if (pPrevEvent) (*pOutEvent)->m_iAbsTick += pPrevEvent->m_iAbsTick;
 
     return iTotal;
 }
 
 uint32_t MIDIChannelEvent::ParseEvent(const unsigned char* pcData, msgln_t iMaxSize)
 {
-    // Split up the event code
-    m_cChannel = m_iEventCode & 0xF;
-
     // Parse one parameter
     if (static_cast<ChannelEventType>(m_iEventCode >> 4) == ProgramChange || static_cast<ChannelEventType>(m_iEventCode >> 4) == ChannelAftertouch)
     {
         if (iMaxSize < 1) return 0;
-        m_cParam1 = pcData[0];
-        m_cParam2 = 0;
+        m_cParam1 = pcData[0] & 0x7F;
+        m_cParam2 = 0x00;
         return 1;
     }
     // Parse two parameters
     else
     {
         if (iMaxSize < 2) return 0;
-        m_cParam1 = pcData[0];
-        m_cParam2 = pcData[1];
+        m_cParam1 = pcData[0] & 0x7F;
+        m_cParam2 = pcData[1] & 0x7F;
         return 2;
     }
 }

@@ -561,13 +561,6 @@ float SplashScreen::GetNoteX(key_t iNote) {
 // MainScreen GameState object
 //-----------------------------------------------------------------------------
 
-wstring GetExePath(void) {
-    wchar_t szFilePath[LONG_MAX_PATH] = {};
-    GetModuleFileNameW(NULL, szFilePath, LONG_MAX_PATH);
-    (wcsrchr(szFilePath, '\\'))[0] = 0;
-    return szFilePath;
-}
-
 MainScreen::MainScreen(wstring sMIDIFile, HWND hWnd, Renderer11* pRenderer) : GameState(hWnd, pRenderer), m_MIDI(sMIDIFile) {
     // Finish off midi processing
     if (!m_MIDI.IsValid()) return;
@@ -1110,10 +1103,10 @@ GameState::GameError MainScreen::Logic() {
     if (dNSpeed >= 0) {
     AdvanceEnd:
         if (m_bTickMode) {
-            while (m_iEndPos > 0 && (m_iEndPos + 1 >= iEventCount || m_vEvents[m_iEndPos + 1]->GetAbsT() > llEndTime)) {
+            while (m_iEndPos > 0 && (m_iEndPos + 1 >= iEventCount || m_vEvents[m_iEndPos + 1]->GetAbsTick() > llEndTime)) {
                 m_iEndPos--; //Make sure we're 10000% not drawing any unnecessary notes! 
             }
-            while (m_iEndPos + 1 < iEventCount && m_vEvents[m_iEndPos + 1]->GetAbsT() < llEndTime) {
+            while (m_iEndPos + 1 < iEventCount && m_vEvents[m_iEndPos + 1]->GetAbsTick() < llEndTime) {
                 m_iEndPos++;
             }
         }
@@ -1393,7 +1386,7 @@ SkipSearch:
         if (m_bTickMode) {
             m_iEndPos = m_iStartPos + 1;
             idx_t iEventCount = static_cast<idx_t>(m_vEvents.size());
-            while (m_iEndPos > 0 && (m_iEndPos + 1 >= iEventCount || m_vEvents[m_iEndPos + 1]->GetAbsT() > llEndTime))
+            while (m_iEndPos > 0 && (m_iEndPos + 1 >= iEventCount || m_vEvents[m_iEndPos + 1]->GetAbsTick() > llEndTime))
                 m_iEndPos--;
             m_iEndPos += (m_iStartPos - m_iEndPos) * 2;
         }
@@ -1409,7 +1402,7 @@ SkipSearch:
         if (m_bTickMode) {
             m_iEndPos = m_iStartPos - 1;
             idx_t iEventCount = static_cast<idx_t>(m_vEvents.size());
-            while (m_iEndPos + 1 < iEventCount && m_vEvents[m_iEndPos + 1]->GetAbsT() < llEndTime)
+            while (m_iEndPos + 1 < iEventCount && m_vEvents[m_iEndPos + 1]->GetAbsTick() < llEndTime)
                 m_iEndPos++;
         }
         else {
@@ -1503,7 +1496,7 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
         {
             MIDI::Parse24Bit(pPrevious->GetData(), 3, (uint32_t*)&m_iMicroSecsPerBeat);
             m_iMicroSecsPerBeat |= !m_iMicroSecsPerBeat;// Clamp to > 0
-            m_iLastTempoTick = pPrevious->GetAbsT();
+            m_iLastTempoTick = pPrevious->GetAbsTick();
             m_llLastTempoTime = pPrevious->GetAbsMicroSec();
         }
         else
@@ -1518,7 +1511,7 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
             m_iBeatsPerMeasure = pPrevious->GetData()[0];
             m_iBeatType = 1 << pPrevious->GetData()[1];
             m_iClocksPerMet = pPrevious->GetData()[2];
-            m_iLastSignatureTick = pPrevious->GetAbsT();
+            m_iLastSignatureTick = pPrevious->GetAbsTick();
         }
         else
         {
@@ -1551,7 +1544,7 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
             {
                 MIDI::Parse24Bit(pPrevious->GetData(), 3, (uint32_t*)&m_iMicroSecsPerBeat);
                 m_iMicroSecsPerBeat |= !m_iMicroSecsPerBeat;// Clamp to > 0
-                m_iLastTempoTick = pPrevious->GetAbsT();
+                m_iLastTempoTick = pPrevious->GetAbsTick();
                 m_llLastTempoTime = pPrevious->GetAbsMicroSec();
             }
             else
@@ -1566,7 +1559,7 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
                 m_iBeatsPerMeasure = pPrevious->GetData()[0];
                 m_iBeatType = 1 << pPrevious->GetData()[1];
                 m_iClocksPerMet = pPrevious->GetData()[2];
-                m_iLastSignatureTick = pPrevious->GetAbsT();
+                m_iLastSignatureTick = pPrevious->GetAbsTick();
             }
             else
             {
@@ -1605,7 +1598,7 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
                 {
                     MIDI::Parse24Bit(pEvent->GetData(), 3, (uint32_t*)&m_iMicroSecsPerBeat);
                     m_iMicroSecsPerBeat |= !m_iMicroSecsPerBeat;// Clamp to > 0
-                    m_iLastTempoTick = pEvent->GetAbsT();
+                    m_iLastTempoTick = pEvent->GetAbsTick();
                     m_llLastTempoTime = pEvent->GetAbsMicroSec();
                 }
             }
@@ -1617,7 +1610,7 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
                     m_iBeatsPerMeasure = pEvent->GetData()[0];
                     m_iBeatType = 1 << pEvent->GetData()[1];
                     m_iClocksPerMet = pEvent->GetData()[2];
-                    m_iLastSignatureTick = pEvent->GetAbsT();
+                    m_iLastSignatureTick = pEvent->GetAbsTick();
                 }
             }
             auto itCurMarker = m_itNextMarker;
@@ -1892,22 +1885,22 @@ void MainScreen::RenderLines() {
 
             // Next beat crosses the next tempo event. handle the event and recalculate next beat time
             while (itNextTempo != m_vTempo.end() && m_vMetaEvents[itNextTempo->second]->GetDataLen() == 3 &&
-                iNextBeatTick > m_vMetaEvents[itNextTempo->second]->GetAbsT())
+                iNextBeatTick > m_vMetaEvents[itNextTempo->second]->GetAbsTick())
             {
                 MIDIMetaEvent* pEvent = m_vMetaEvents[itNextTempo->second];
                 MIDI::Parse24Bit(pEvent->GetData(), 3, (uint32_t*)&iMicroSecsPerBeat);
                 iMicroSecsPerBeat |= !iMicroSecsPerBeat;// Clamp to > 0
-                iLastTempoTick = pEvent->GetAbsT();
+                iLastTempoTick = pEvent->GetAbsTick();
                 llLastTempoTime = pEvent->GetAbsMicroSec();
                 ++itNextTempo;
             }
             while (itNextSignature != m_vSignature.end() && m_vMetaEvents[itNextSignature->second]->GetDataLen() == 4 &&
-                iNextBeatTick > m_vMetaEvents[itNextSignature->second]->GetAbsT())
+                iNextBeatTick > m_vMetaEvents[itNextSignature->second]->GetAbsTick())
             {
                 MIDIMetaEvent* pEvent = m_vMetaEvents[itNextSignature->second];
                 iBeatsPerMeasure = pEvent->GetData()[0];
                 iBeatType = 1 << pEvent->GetData()[1];
-                iLastSignatureTick = pEvent->GetAbsT();
+                iLastSignatureTick = pEvent->GetAbsTick();
                 iNextBeatTick = GetBeatTick(iLastSignatureTick + 1, iBeatType, iLastSignatureTick);
                 ++itNextSignature;
             }
@@ -2022,8 +2015,8 @@ void MainScreen::RenderNote(const MIDIChannelEvent * pNote) {
     mms_t llNoteEnd = pNote->GetSister(m_vEvents)->GetAbsMicroSec();
     key_t iVel = m_bMapVel ? pNote->GetParam2() ^ 0x7F : 0x7F;
     if (m_bTickMode) {
-        llNoteStart = pNote->GetAbsT();
-        llNoteEnd = pNote->GetSister(m_vEvents)->GetAbsT();
+        llNoteStart = pNote->GetAbsTick();
+        llNoteEnd = pNote->GetSister(m_vEvents)->GetAbsTick();
     }
     float fPos = static_cast<float>(
         (m_dNSpeed < 0) != (m_fZoomX * m_fTempZoomX < 0)

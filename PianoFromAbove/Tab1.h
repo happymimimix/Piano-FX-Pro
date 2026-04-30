@@ -20,11 +20,29 @@ struct Tab1 {
     static void DisableAll();
     static void Draw();
 
-    struct SubViewBtn3 {
+    struct SubViewBtn2 {
         static TouchEventListener* Close;
         static ConsoleTextbox Path;
         static TouchEventListener* Browse;
         static TouchEventListener* Install;
+
+        static void Open();
+    };
+
+    struct SubViewBtn4 {
+        static TouchEventListener* Close;
+        static ConsoleTextbox Path;
+        static TouchEventListener* Browse;
+        static TouchEventListener* Convert;
+
+        static void Open();
+    };
+
+    struct SubViewBtn5 {
+        static TouchEventListener* Close;
+        static ConsoleTextbox Path;
+        static TouchEventListener* Browse;
+        static TouchEventListener* Convert;
 
         static void Open();
     };
