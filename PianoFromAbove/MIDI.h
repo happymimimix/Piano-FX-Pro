@@ -254,7 +254,7 @@ class __attribute__((packed)) MIDIEvent
 {
 public:
     //Event types
-    enum EventType : msg_t { ChannelEvent = 1, MetaEvent, SysExEvent, RunningStatus };
+    enum EventType : msg_t { ChannelEvent = 192, MetaEvent, SysExEvent, RunningStatus };
     static EventType DecodeEventType(msg_t iEventCode);
 
     //Parsing functions that load data into the instance
@@ -392,7 +392,7 @@ public:
     bool PlayEventAcrossChannels(msg_t cStatus, msg_t cParam1, msg_t cParam2);
     bool PlayEventAcrossChannels(msg_t cStatus, msg_t cParam1, msg_t cParam2, const vector<chan_t>& vChannels);
     bool PlayEvent(msg_t bStatus, msg_t bParam1, msg_t bParam2 = 0);
-    bool PlaySysEx(unsigned char* pcData, msg_t iLen);
+    bool PlaySysEx(unsigned char* pcData, msgln_t iLen);
 
 private:
     static FARPROC GetOmniMIDIProc(const char* func);

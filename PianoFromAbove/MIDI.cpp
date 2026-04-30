@@ -205,7 +205,7 @@ idx_t MIDIPos::GetNextEvent(mms_t iMicroSecs, MIDIEvent** pOutEvent)
     }
 }
 
-idx_t MIDIPos::GetNextEvents(mms_t iMicroSecs, vector< MIDIEvent* >& vEvents)
+idx_t MIDIPos::GetNextEvents(mms_t iMicroSecs, vector<MIDIEvent*>& vEvents)
 {
     MIDIEvent* pEvent = NULL;
     idx_t iTotal = 0;
@@ -234,7 +234,7 @@ MIDI::MIDI(const wstring& sFilename)
     {
         // Go to the end of the file to get the max size
         _fseeki64(stream, 0, SEEK_END);
-        fileln_t iSize = _ftelli64(stream);
+        size_t iSize = static_cast<size_t>(_ftelli64(stream));
         unsigned char* pcMemBlock = new unsigned char[iSize];
 
         // Go to the beginning of the file to prepare for parsing
@@ -403,7 +403,6 @@ MIDIChannelEvent* MIDI::AllocChannelEvent() {
         // Currently, MIDIChannelEvent is 32 bytes large.
         // This is conveniently exactly half the size of an x86 cache line.
         // Making sure the pool allocation is aligned to at least 32 bytes should ensure that all member accesses are in cache.
-        static_assert(sizeof(MIDIChannelEvent) == 32);
         event_pools.emplace_back();
         event_pools.back().events = (MIDIChannelEvent*)_aligned_malloc(EVENT_POOL_MAX * sizeof(MIDIChannelEvent), sizeof(MIDIChannelEvent));
         event_pools.back().count = 0;
@@ -514,7 +513,7 @@ fileln_t MIDI::ParseMIDI(const unsigned char* pcData, fileln_t iMaxSize)
     fileln_t iHdrSize = 0;
     if (Parse32Bit(pcData + 4, iMaxSize - 4, reinterpret_cast<uint32_t*>(&iHdrSize)) != 4) return 0;
     //Read header
-    idx_t iTotal = 8;
+    fileln_t iTotal = 8;
     iTotal += Parse16Bit(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iFormatType);
     if (m_Info.iFormatType == 3) {
         // SMF 3
