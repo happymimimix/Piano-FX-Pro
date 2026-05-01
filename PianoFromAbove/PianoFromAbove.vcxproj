@@ -227,7 +227,7 @@
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -235,7 +235,7 @@
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro-ARN</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -243,7 +243,7 @@
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro-DRN</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -251,7 +251,7 @@
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro-KOR</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -259,7 +259,7 @@
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro-KOP</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -267,7 +267,7 @@
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro-RUS</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -275,7 +275,7 @@
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro-CHN</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -283,7 +283,7 @@
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro-JPN</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -291,7 +291,7 @@
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro-HRG</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -299,7 +299,7 @@
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro-EnforcedSoftwareRendering</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -307,7 +307,7 @@
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro-LimitedTrackColoring</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -315,7 +315,7 @@
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -323,7 +323,7 @@
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnabled>false</VcpkgEnabled>
@@ -1473,6 +1473,7 @@ rename .\Widths.hh Widths.h</Command>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="monocypher\monocypher.c" />
     <ClCompile Include="TextWidthCalculator.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">true</ExcludedFromBuild>
@@ -1571,6 +1572,7 @@ rename .\Widths.hh Widths.h</Command>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="monocypher\monocypher.h" />
     <ClInclude Include="NotePixelShader.h" />
     <ClInclude Include="NoteVertexShader.h" />
     <ClInclude Include="NoteVertexShaderSameWidth.h" />

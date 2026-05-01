@@ -88,6 +88,9 @@
     <Filter Include="Resource Files\LanguagePacks">
       <UniqueIdentifier>{59c079ee-d026-4177-a960-984f15feddf8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\monocypher">
+      <UniqueIdentifier>{7ff0a4ed-b47e-4662-9711-d5faeae04094}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Config.h">
@@ -360,6 +363,9 @@
     <ClInclude Include="FallbackStrings.hpp">
       <Filter>Generated Files %28DO NOT EDIT!%29</Filter>
     </ClInclude>
+    <ClInclude Include="monocypher\monocypher.h">
+      <Filter>Header Files\monocypher</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tinyxml\tinystr.cpp">
@@ -424,6 +430,9 @@
     </ClCompile>
     <ClCompile Include="TextWidthCalculator.cpp">
       <Filter>Resource Files\LanguagePacks</Filter>
+    </ClCompile>
+    <ClCompile Include="monocypher\monocypher.c">
+      <Filter>Header Files\monocypher</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
