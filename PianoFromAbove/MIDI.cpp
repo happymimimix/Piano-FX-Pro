@@ -508,6 +508,8 @@ fileln_t MIDI::ParseMIDI(const unsigned char* pcData, fileln_t iMaxSize)
         iTotal += Parse16BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iNumTracks);
         iTotal += Parse16BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iDivision);
         iTotal += Parse32BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iNumChannels);
+
+        iTotal += Parse16BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iNumTracks);
         if (iTotal != 18 || m_Info.iDivision == 0) return 0;
         // Parse the rest of the file
         iTotal += iHdrSize - 10;
