@@ -508,15 +508,23 @@ fileln_t MIDI::ParseMIDI(const unsigned char* pcData, fileln_t iMaxSize)
         iTotal += Parse16BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iNumTracks);
         iTotal += Parse16BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iDivision);
         iTotal += Parse32BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iNumChannels);
-
-        iTotal += Parse16BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iNumTracks);
-        if (iTotal != 18 || m_Info.iDivision == 0) return 0;
+        uint32_t FeatureFlags = 0;
+        iTotal += Parse32BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &FeatureFlags);
+        if (iTotal != 22 || m_Info.iDivision == 0) return 0;
         // Parse the rest of the file
-        iTotal += iHdrSize - 10;
+        iTotal += iHdrSize - 14;
         // We need to use a swap space to transfer the parsed events to GameState in PostProcess().
         this->__SMF3_SWAP_SPACE = new SWAP();
+        // SMF3 32 bit feature flags: 
+        // Bit 32 - Includes digital signature
+        // Bit 31 - Provides pre-computed microseconds
+        // Bit 30 - 64 bit event indexing
+        // Bit 29 - Has system exclusive events
+        // Bit 28 - Provides note on/off linking
+        // Bit 27 - Provides packed note structure grouped by keys
+        // Bit 26 - Provides polyphony count label
         uint8_t FirstPass = 0x1E; // Safe guard for potential duplicated chunks
-        for (uint8_t chunk = 0; chunk < 4; chunk++) {
+        while (iMaxSize - iTotal > 0) {
             // SMF3's chunk signatures are always 13 bytes long. (God knows how long it took me to align this shit!)
             // The chunks are named as follows:
             // "F3TrackLayout"
@@ -526,6 +534,11 @@ fileln_t MIDI::ParseMIDI(const unsigned char* pcData, fileln_t iMaxSize)
             // And what is the visually most satisfying way to represent 13? Say hello to the carriage return character!
             char F3pcBuf['\r'];
             if (ParseNChars(pcData + iTotal, '\r', iMaxSize - iTotal, F3pcBuf) != '\r') return 0;
+            else if (strncmp(F3pcBuf, "F3Certificate", '\r') == 0 && FirstPass & 0x10) {
+                iTotal += '\r';
+                iTotal += ParseTracksF3(pcData + iTotal, iMaxSize - iTotal);
+                FirstPass &= 0xEF;
+            }
             else if (strncmp(F3pcBuf, "F3TrackLayout", '\r') == 0 && FirstPass & 0x10) {
                 iTotal += '\r';
                 iTotal += ParseTracksF3(pcData + iTotal, iMaxSize - iTotal);

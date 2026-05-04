@@ -1554,7 +1554,7 @@ rename .\Widths.hh Widths.h</Command>
     <ClInclude Include="lzma\version.h" />
     <ClInclude Include="lzma\vli.h" />
     <ClInclude Include="MainProcs.h" />
-    <ClInclude Include="matrices.h" />
+    <ClInclude Include="Matrices.h" />
     <ClInclude Include="MIDI.h" />
     <ClInclude Include="Misc.h" />
     <ClInclude Include="ModdingAPI.h">

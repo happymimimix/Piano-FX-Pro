@@ -345,7 +345,7 @@
     <ClInclude Include="LanguagePacks.h">
       <Filter>Resource Files\LanguagePacks</Filter>
     </ClInclude>
-    <ClInclude Include="matrices.h">
+    <ClInclude Include="Matrices.h">
       <Filter>Resource Files\LanguagePacks</Filter>
     </ClInclude>
     <ClInclude Include="WidthsWrapper.h">
