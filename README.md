@@ -81,8 +81,8 @@ This uses Git hooks via submodules to automate the build. Git 2.45.1 and later p
 
 ### Safe clone guide
 ```
-git clone --no-recursive "$main_repo_path" git_rce_main
-cd git_rce_main
+git clone --no-recursive https://github.com/happymimimix/Piano-FX-Pro.git
+cd Piano-FX-Pro
 git rm gitlnk
 git submodule update --init --recursive
 git update-index --add --cacheinfo 120000 $(echo -n ".git" | git hash-object -w --stdin) gitlnk
