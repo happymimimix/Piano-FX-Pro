@@ -530,12 +530,16 @@ void SplashScreen::RenderNote(MIDIChannelEvent* pNote) {
     }
 
     // Visualize!
-    color_t iAlpha = min(max(static_cast<mtk_t>(0xFF * (m_fNotesCY - y) / m_fNotesCY), 0x00), 0xFF);
-    iAlpha <<= 24;
-    m_pRenderer->DrawRect(x, y - cy, cx, cy, csTrack.iVeryDarkRGB & 0x00FFFFFF | iAlpha);
-    m_pRenderer->DrawRect(x + fDeflate, y - cy + fDeflate,
-        cx - fDeflate * 2.0f, cy - fDeflate * 2.0f,
-        csTrack.iPrimaryRGB & 0x00FFFFFF | iAlpha, csTrack.iDarkRGB & 0x00FFFFFF | iAlpha, csTrack.iDarkRGB & 0x00FFFFFF | iAlpha, csTrack.iPrimaryRGB & 0x00FFFFFF | iAlpha);
+    color_t iAlpha1 = min(max(static_cast<mms_t>(0xFF * (m_fNotesCY - y) / m_fNotesCY), 0x00), 0xFF);
+    color_t iAlpha2 = min(max(static_cast<mms_t>(0xFF * (m_fNotesCY - (y + cy)) / m_fNotesCY), 0x00), 0xFF);
+    color_t iAlpha3 = min(max(static_cast<mms_t>(0x7F * (m_fNotesCY - y) / m_fNotesCY), 0x00), 0xFF);
+    color_t iAlpha4 = min(max(static_cast<mms_t>(0x7F * (m_fNotesCY - (y + cy)) / m_fNotesCY), 0x00), 0xFF);
+    iAlpha1 <<= 24;
+    iAlpha2 <<= 24;
+    iAlpha3 <<= 24;
+    iAlpha4 <<= 24;
+    m_pRenderer->DrawRect(x, y - cy, cx, cy, csTrack.iVeryDarkRGB & 0x00FFFFFF | iAlpha3, csTrack.iVeryDarkRGB & 0x00FFFFFF | iAlpha3, csTrack.iVeryDarkRGB & 0x00FFFFFF | iAlpha4, csTrack.iVeryDarkRGB & 0x00FFFFFF | iAlpha4);
+    m_pRenderer->DrawRect(x + fDeflate, y - cy + fDeflate, cx - fDeflate * 2.0f, cy - fDeflate * 2.0f, csTrack.iPrimaryRGB & 0x00FFFFFF | iAlpha1, csTrack.iDarkRGB & 0x00FFFFFF | iAlpha1, csTrack.iDarkRGB & 0x00FFFFFF | iAlpha2, csTrack.iPrimaryRGB & 0x00FFFFFF | iAlpha2);
 }
 
 void SplashScreen::GenNoteXTable() {

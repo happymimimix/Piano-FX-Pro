@@ -516,13 +516,14 @@ fileln_t MIDI::ParseMIDI(const unsigned char* pcData, fileln_t iMaxSize)
         // We need to use a swap space to transfer the parsed events to GameState in PostProcess().
         this->__SMF3_SWAP_SPACE = new SWAP();
         // SMF3 32 bit feature flags: 
-        // Bit 32 - Includes digital signature
-        // Bit 31 - Provides pre-computed microseconds
-        // Bit 30 - 64 bit event indexing
-        // Bit 29 - Has system exclusive events
-        // Bit 28 - Provides note on/off linking
-        // Bit 27 - Provides packed note structure grouped by keys
+        // Bit 31 - Includes digital signature
+        // Bit 30 - Provides pre-computed microseconds
+        // Bit 29 - Uses 64 bit event indexing
+        // Bit 28 - Provides note pair linking
+        // Bit 27 - Provides packed note structure grouped by note pitch
         // Bit 26 - Provides polyphony count label
+        // Bit 25 - Provides track layout summary
+        // Bit 24~0 - Reserved for future
         uint8_t FirstPass = 0x1E; // Safe guard for potential duplicated chunks
         while (iMaxSize - iTotal > 0) {
             // SMF3's chunk signatures are always 13 bytes long. (God knows how long it took me to align this shit!)
