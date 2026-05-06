@@ -127,9 +127,7 @@ void Tab2::SubViewBtn4::Open() {
     UseThreads->OnTouch = []() {
         Thread = !Thread;
         UseThreads->OnLeave();
-        while (GetAsyncKeyState(VK_LBUTTON) & 0x8000) {
-            
-        }
+        while (GetAsyncKeyState(VK_LBUTTON) & 0x8000) {}
     };
     UseThreads->OnHover = []() {
         Tab2Graphics::Btn4Graphics::UseThreads(49, 27, Hovered);
