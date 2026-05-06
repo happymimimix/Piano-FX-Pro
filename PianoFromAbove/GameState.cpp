@@ -500,44 +500,17 @@ void SplashScreen::RenderNote(MIDIChannelEvent* pNote) {
     mms_t llNoteEnd = pNote->GetSister(m_vEvents)->GetAbsMicroSec();
 
     ChannelSettings& csTrack = m_vTrackSettings[iTrack].aChannels[iChannel];
-    if (m_vTrackSettings[iTrack].aChannels[iChannel].bHidden) return;
-
     // Compute true positions
     float x = GetNoteX(iNote);
-    float y = m_fNotesY + m_fNotesCY * (1.0f - static_cast<float>(llNoteStart - m_llRndStartTime) / TimeSpan);
+    float y = round(m_fNotesY + m_fNotesCY * (1.0f - static_cast<float>(llNoteStart - m_llRndStartTime) / TimeSpan));
     float cx = MIDI::IsSharp(iNote) ? m_fWhiteCX * SharpRatio : m_fWhiteCX;
-    float cy = m_fNotesCY * (static_cast<float>(llNoteEnd - llNoteStart) / TimeSpan);
-    float fDeflate = m_fWhiteCX * 0.15f / 2.0f;
-
-    // Rounding to make everything consistent
-    cy = floor(cy + 0.5f); // constant cy across rendering
-    y = floor(y + 0.5f);
-    fDeflate = floor(fDeflate + 0.5f);
-    fDeflate = max(min(fDeflate, 3.0f), 1.0f);
-
-    // Clipping :/
-    float fMinY = m_fNotesY - 5.0f;
-    float fMaxY = m_fNotesY + m_fNotesCY + 5.0f;
-    if (y > fMaxY)
-    {
-        cy -= (y - fMaxY);
-        y = fMaxY;
-    }
-    if (y - cy < fMinY)
-    {
-        cy -= (fMinY - (y - cy));
-        y = fMinY + cy;
-    }
-
+    float cy = max(round(m_fNotesCY * static_cast<float>(llNoteEnd - llNoteStart) / TimeSpan), 0.0f) + 1.0f;
+    float fDeflate = clamp(round(m_fWhiteCX * 0.15f / 2.0f), 1.0f, 3.0f);
     // Visualize!
-    color_t iAlpha1 = min(max(static_cast<mms_t>(0xFF * (m_fNotesCY - y) / m_fNotesCY), 0x00), 0xFF);
-    color_t iAlpha2 = min(max(static_cast<mms_t>(0xFF * (m_fNotesCY - (y + cy)) / m_fNotesCY), 0x00), 0xFF);
-    color_t iAlpha3 = min(max(static_cast<mms_t>(0x7F * (m_fNotesCY - y) / m_fNotesCY), 0x00), 0xFF);
-    color_t iAlpha4 = min(max(static_cast<mms_t>(0x7F * (m_fNotesCY - (y + cy)) / m_fNotesCY), 0x00), 0xFF);
-    iAlpha1 <<= 24;
-    iAlpha2 <<= 24;
-    iAlpha3 <<= 24;
-    iAlpha4 <<= 24;
+    color_t iAlpha1 = min(max(static_cast<mms_t>(0xFF * (m_fNotesCY - y) / m_fNotesCY), 0x00), 0xFF) << 24;
+    color_t iAlpha2 = min(max(static_cast<mms_t>(0xFF * (m_fNotesCY - (y + cy)) / m_fNotesCY), 0x00), 0xFF) << 24;
+    color_t iAlpha3 = min(max(static_cast<mms_t>(0x7F * (m_fNotesCY - y) / m_fNotesCY), 0x00), 0xFF) << 24;
+    color_t iAlpha4 = min(max(static_cast<mms_t>(0x7F * (m_fNotesCY - (y + cy)) / m_fNotesCY), 0x00), 0xFF) << 24;
     m_pRenderer->DrawRect(x, y - cy, cx, cy, csTrack.iVeryDarkRGB & 0x00FFFFFF | iAlpha3, csTrack.iVeryDarkRGB & 0x00FFFFFF | iAlpha3, csTrack.iVeryDarkRGB & 0x00FFFFFF | iAlpha4, csTrack.iVeryDarkRGB & 0x00FFFFFF | iAlpha4);
     m_pRenderer->DrawRect(x + fDeflate, y - cy + fDeflate, cx - fDeflate * 2.0f, cy - fDeflate * 2.0f, csTrack.iPrimaryRGB & 0x00FFFFFF | iAlpha1, csTrack.iDarkRGB & 0x00FFFFFF | iAlpha1, csTrack.iDarkRGB & 0x00FFFFFF | iAlpha2, csTrack.iPrimaryRGB & 0x00FFFFFF | iAlpha2);
 }
@@ -1348,7 +1321,7 @@ void MainScreen::JumpTo(mms_t llStartTime, boolean loadingMode) {
     NoteOnFound:
         // Found it!
         auto TargetNote = itMiddle;
-        if ((*TargetNote)->GetSister(m_vEvents)->GetAbsMicroSec() > m_llStartTime) {
+        if ((*TargetNote)->GetSisterIdx() >= m_iStartPos) {
             m_pState->Activate(TargetNote - m_vEvents.begin());
         }
         // Search for more held notes...
@@ -1359,10 +1332,10 @@ void MainScreen::JumpTo(mms_t llStartTime, boolean loadingMode) {
             {
                 itMiddle--;
                 if (IsOn((*itMiddle)->GetChannelEventType(), (*itMiddle)->GetParam2())) {
-                    if ((*itMiddle)->GetSisterIdx() > TargetNote - m_vEvents.begin()) {
+                    if ((*itMiddle)->GetSisterIdx() >= TargetNote - m_vEvents.begin()) {
                         iFound++;
                     }
-                    if ((*itMiddle)->GetSister(m_vEvents)->GetAbsMicroSec() > m_llStartTime) {
+                    if ((*itMiddle)->GetSisterIdx() >= m_iStartPos) {
                         m_pState->Activate(itMiddle - m_vEvents.begin());
                     }
                 }
