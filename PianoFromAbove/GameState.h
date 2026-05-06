@@ -73,7 +73,7 @@ inline HRESULT GetGDI(HWND hGDI, win32_t W, win32_t H, char* Output) {
 struct dynamic_bitset {
     static constexpr unsigned char WORD_SIZE = sizeof(size_t) * CHAR_BIT;
     static constexpr unsigned char WORD_DIV_SHR = __builtin_ctz(WORD_SIZE);
-    static constexpr size_t WORD_MASK = WORD_SIZE - 1;
+    static constexpr size_t WORD_MASK = WORD_SIZE - 1u;
     idx_t minWord = 0;
     idx_t maxWord = 0;
     // Disable copying
