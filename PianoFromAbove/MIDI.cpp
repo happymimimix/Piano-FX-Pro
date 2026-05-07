@@ -993,7 +993,7 @@ void MIDI::ConnectNotes()
             if (vEvents[i]->GetEventType() == MIDIEvent::ChannelEvent)
             {
                 MIDIChannelEvent* pEvent = reinterpret_cast<MIDIChannelEvent*>(vEvents[i]);
-                auto& sStack = vStacks[TnC_t(track) * TnC_t(16) + TnC_t(pEvent->GetChannel())][pEvent->GetParam1()];
+                auto& sStack = vStacks[TnC_t(track) * TnC_t(16u) + TnC_t(pEvent->GetChannel())][pEvent->GetParam1()];
 
                 if (IsNote(pEvent->GetChannelEventType())) {
                     if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2())) {

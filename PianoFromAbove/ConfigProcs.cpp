@@ -230,7 +230,7 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             // Save settings
             config.SaveConfigValues();
 
-            UpdateNotePos = true; //Update Note Pos! 
+            if (PointersInitialized) *Ptr_to_m_bUpdateNotePos = true; //Update Note Pos! 
             return TRUE;
         }
         }
@@ -306,7 +306,7 @@ INT_PTR WINAPI AudioProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             // Save settings
             config.SaveConfigValues();
 
-            UpdateNotePos = true; //Update Note Pos! 
+            if (PointersInitialized) *Ptr_to_m_bUpdateNotePos = true; //Update Note Pos! 
             return TRUE;
         }
         }
@@ -373,7 +373,7 @@ INT_PTR WINAPI VideoProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             // Save settings
             config.SaveConfigValues();
 
-            UpdateNotePos = true; //Update Note Pos! 
+            if (PointersInitialized) *Ptr_to_m_bUpdateNotePos = true; //Update Note Pos! 
             return TRUE;
         }
         }
@@ -543,7 +543,7 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             // Save settings
             config.SaveConfigValues();
 
-            UpdateNotePos = true; //Update Note Pos! 
+            if (PointersInitialized) *Ptr_to_m_bUpdateNotePos = true; //Update Note Pos! 
             return TRUE;
         }
         }

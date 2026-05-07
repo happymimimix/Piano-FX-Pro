@@ -18,31 +18,27 @@
 #include <MIDI.h>
 #include <Misc.h>
 
-inline mms_t m_llStartTime;
-inline mms_t m_llRndStartTime;
-inline mtk_t m_iStartTick;
-inline idx_t polyphony;
-inline wstring polyFormatted;
-inline idx_t nps;
-inline wstring npsFormatted;
-inline idx_t passed;
-inline wstring passedFormatted;
-inline idx_t TotalNC;
-inline win32_t width = -1;
-inline win32_t height = -1;
-inline uint16_t resolution = -1;
-inline char CheatEngineCaption[1 << 19] = { 'C' };
-inline char* CaptionContent = CheatEngineCaption + 1;
-inline mms_t TotalTime;
-inline string TotalTimeFormatted;
-inline string llStartTimeFormatted;
-inline char Difficulty[1 << 10] = {};
-inline bool UpdateNotePos = true;
-inline static const mms_t MS = 1e+3;
-inline static const mms_t S = 1e+6;
-inline bool CE_Connected = false;
-inline bool CE_DoNextTick = false;
-inline bool CE_Responded = false;
+inline bool PointersInitialized = false;
+inline mms_t* Ptr_to_m_llStartTime = nullptr;
+inline mtk_t* Ptr_to_m_iStartTick = nullptr;
+inline mms_t* Ptr_to_m_llMinTime = nullptr;
+inline mms_t* Ptr_to_m_llMaxTime = nullptr;
+inline idx_t* Ptr_to_m_iPolyphony = nullptr;
+inline idx_t* Ptr_to_m_iNPS = nullptr;
+inline idx_t* Ptr_to_m_iPassed = nullptr;
+inline const idx_t* Ptr_to_m_MIDI_iTotalNC = nullptr;
+inline win32_t* Ptr_to_m_iWidth = nullptr;
+inline win32_t* Ptr_to_m_iHeight = nullptr;
+inline const uint16_t* Ptr_to_m_MIDI_iResolution = nullptr;
+inline bool* Ptr_to_m_bUpdateNotePos = nullptr;
+inline bool* Ptr_to_m_bUpdateTrackColor = nullptr;
+inline bool* Ptr_to_CE_VideoOutput = nullptr;
+inline bool* Ptr_to_CE_Connected = nullptr;
+inline bool* Ptr_to_CE_DoNextTick = nullptr;
+inline bool* Ptr_to_CE_Responded = nullptr;
+inline char* Ptr_to_CheatEngineCaption = nullptr;
+inline char* Ptr_to_CaptionContent = nullptr;
+inline char* Ptr_to_Difficulty = nullptr;
 
 inline HRESULT GetGDI(HWND hGDI, win32_t W, win32_t H, char* Output) {
     if (!hGDI) return E_FAIL;
@@ -221,7 +217,7 @@ public:
 
     //Constructors
     GameState(HWND hWnd, Renderer11* pRenderer) : m_hWnd(hWnd), m_pRenderer(pRenderer), m_pNextState(NULL) {};
-    virtual ~GameState() {};
+    virtual ~GameState(void) {};
 
     // Initialize after all other game states have been deleted
     virtual GameError Init() = 0;
@@ -265,7 +261,7 @@ public:
 class SplashScreen : public GameState
 {
 public:
-    SplashScreen(HWND hWnd, Renderer11* pRenderer, bool enableSplash = true);
+    SplashScreen(HWND hWnd, Renderer11* pRenderer);
     ~SplashScreen() { delete m_pState; }
 
     GameError MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -291,13 +287,16 @@ private:
     MIDI m_MIDI; // The song to display
     vector<MIDIChannelEvent*> m_vEvents; // The channel events of the song
     sidx_t m_iStartPos, m_iEndPos;
+    mms_t m_llStartTime;
     dynamic_bitset* m_pState = nullptr;
     Timer m_Timer; // Frame timers
     double m_dVolume;
     bool m_bMute;
 
+    // Devices
     MIDIOutDevice m_OutDevice;
 
+    // Visual
     static const float SharpRatio;
     static const mms_t TimeSpan = 500000;
     vector<TrackSettings> m_vTrackSettings;
@@ -307,8 +306,10 @@ private:
     float m_fNotesX, m_fNotesY, m_fNotesCX, m_fNotesCY; // Notes position
     key_t m_iAllWhiteKeys; // Number of white keys are on the screen
     float m_fWhiteCX; // Width of the white keys
+    mms_t m_llRndStartTime; // Rounded start time to make stuff drop at the same time
 
     float notex_table[128];
+    bool UpdateNotePos = true;
 };
 
 class MainScreen : public GameState
@@ -318,6 +319,7 @@ public:
 
     MainScreen(wstring sMIDIFile, HWND hWnd, Renderer11* pRenderer);
     ~MainScreen() {
+        PointersInitialized = false;
         delete[] m_vNCTable;
         delete m_pState;
         for (auto* p : m_vMetaEvents) delete p;
@@ -339,6 +341,9 @@ public:
     void HideChannel(track_t iTrack, chan_t iChannel, bool bHidden) { m_vTrackSettings[iTrack].aChannels[iChannel].bHidden = bHidden; }
     void ColorChannel(track_t iTrack, chan_t iChannel, color_t iColor, bool bRandom = false);
     void SetChannelSettings(const vector<bool>& vMuted, const vector<bool>& vHidden, const vector<color_t>& vColor);
+
+    static size_t CE_Caption_Size() { return sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]) - 1; }
+    static size_t Difficulty_Size() { return sizeof(Difficulty) / sizeof(Difficulty[0]); }
 
 private:
     // Initialization
@@ -362,8 +367,6 @@ private:
     mms_t GetTickTime(mtk_t iTick, mtk_t iLastTempoTick, mms_t llLastTempoTime, bpm_t iMicroSecsPerBeat);
     bpm_t GetBeat(mtk_t iTick, bpm_t iBeatType, mtk_t iLastTempoTick);
     mtk_t GetBeatTick(mtk_t iTick, bpm_t iBeatType, mtk_t iLastTempoTick);
-    mms_t GetMinTime() const { return m_MIDI.GetInfo().llFirstNote - 3000000; }
-    mms_t GetMaxTime() const { return m_MIDI.GetInfo().llTotalMicroSecs + 500000; }
 
     // Rendering
     void RenderGlobals();
@@ -393,15 +396,15 @@ private:
     eventvec_t::const_iterator m_itNextMarker;
     eventvec_t::const_iterator m_itNextColor;
     vector<MIDISysExEvent*>::const_iterator m_itNextSysEx;
-    idx_t* m_vNCTable = nullptr;
+    idx_t* m_vNCTable;
     bpm_t m_iMicroSecsPerBeat; // Tempo
     mtk_t m_iLastTempoTick; // Tempo
     mms_t m_llLastTempoTime; // Tempo
     bpm_t m_CurBeat, m_iBeatsPerMeasure, m_iBeatType, m_iClocksPerMet; // Time signature
     mtk_t m_iLastSignatureTick;
     wstring m_sMarker; // Current marker to display on the screen
-    unsigned char* m_pMarkerData = nullptr; // Used for refreshing marker data when changing encoding on the fly
-    msgln_t m_iMarkerSize = 0;
+    unsigned char* m_pMarkerData; // Used for refreshing marker data when changing encoding on the fly
+    msgln_t m_iMarkerSize;
     uint8_t m_iCurEncoding;
 
     // color events and bend range and such
@@ -410,9 +413,9 @@ private:
 
     // Playback
     sidx_t m_iStartPos, m_iEndPos, m_iPrevStartPos; // Postions of the start and end events that occur in the current window
-    mms_t m_llTimeSpan;  // Times of the start and end events of the current window
-    mms_t m_llPrevTime;
-    dynamic_bitset* m_pState = nullptr;
+    mms_t m_llStartTime, m_llPrevTime, m_llTimeSpan, m_llMinTime, m_llMaxTime;  // Times of the start and end events of the current window
+    mtk_t m_iStartTick, m_iPrevTick; // Tick that corresponds with m_llStartTime, used to help with beat and metronome detection
+    dynamic_bitset* m_pState;
     NoteColor m_pKeyColors[128]; // Per-key blended color for keyboard rendering.
     __uint128_t m_bKeyPressed; // Is key pressed?
     __forceinline bool IsPressed(key_t Key) { return m_bKeyPressed & (static_cast<__uint128_t>(1) << Key); }
@@ -429,18 +432,23 @@ private:
         memcpy(m_pKeyColors + 96, m_pKeyColors, 32 * sizeof(NoteColor));
     }
     double m_dSpeed; // Speed multiplier
-    bool IsLastFrameReversed = false;
-    bool IsReversedStateInitialized = false;
+    bool IsLastFrameReversed;
+    bool IsReversedStateInitialized;
     double m_dNSpeed; // Note Speed multiplier
     bool m_bPaused; // Paused state
     Timer m_Timer; // Frame timers
     Timer m_RealTimer;
     bool m_bMute;
     double m_dVolume;
-    bool m_bTickMode = false;
+    bool m_bTickMode;
     UINT nxtdelay = 1 << 6;
     mms_t JumpTarget = ~0;
-
+    idx_t m_iPolyphony;
+    idx_t m_iNPS;
+    idx_t m_iPassed;
+    win32_t m_iScreenWidth;
+    win32_t m_iScreenHeight;
+    
     // FPS variables
     short m_iFPSCount;
     mms_t m_llFPSTime;
@@ -454,10 +462,10 @@ private:
     static const float SharpRatio;
     static const float KeyRatio;
     bool m_bShowKB;
-    uint8_t m_eKeysShown;
     ChannelSettings m_csBackground;
     ChannelSettings m_csKBRed, m_csKBWhite, m_csKBSharp, m_csKBBackground;
     vector<TrackSettings> m_vTrackSettings;
+    bool m_bUpdateTrackColor;
     float m_pBends[16] = {};
     float m_pBendsValue[16] = {};
     wstring m_sCurBackground;
@@ -470,6 +478,7 @@ private:
     POINT m_ptStartZoom, m_ptLastPos;
 
     float notex_table[128];
+    bool m_bUpdateNotePos;
 
     // Computed in RenderGlobal
     key_t m_iStartNote, m_iEndNote; // Start and end notes of the songs
@@ -477,14 +486,20 @@ private:
     bool m_bFlipKeyboard;
     float m_fNotesX, m_fNotesY, m_fNotesCX, m_fNotesCY; // Notes position
     float m_fWhiteCX; // Width of the white keys
+    mms_t m_llRndStartTime; // Rounded start time to make stuff drop at the same time
     bool m_bSameWidth;
     bool m_bMapVel;
 
     // Frame dumping stuff
-    bool m_bDumpFrames = false;
+    bool m_bDumpFrames;
     vector<unsigned char> m_vImageData;
     HANDLE m_hVideoPipe;
 
-    // Debug assertion fail workaround
-    bool m_bNextMarkerInited = false;
+    // Cheat Engine integration
+    bool CE_Connected = false;
+    bool CE_DoNextTick = false;
+    bool CE_Responded = false;
+
+    char CheatEngineCaption[1 << 19] = { 'C' };
+    char Difficulty[1 << 10] = {};
 };

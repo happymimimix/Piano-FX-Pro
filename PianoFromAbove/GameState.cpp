@@ -30,6 +30,29 @@ const wstring GameState::Errors[] =
     L"Error calling DirectX. It would be nice if you could submit feedback with a description of how this happened."
 };
 
+// Sets to a random color
+void ChannelSettings::SetColor() {
+    SetColor(Util::RandColor(), 0.6, 0.2);
+}
+
+// Flips around windows format (ABGR) -> direct x format (ARGB)
+void ChannelSettings::SetColor(color_t iColor, double dDark, double dVeryDark) {
+    color_t R = (iColor >> 0) & 0xFF, dR, vdR;
+    color_t G = (iColor >> 8) & 0xFF, dG, vdG;
+    color_t B = (iColor >> 16) & 0xFF, dB, vdB;
+    color_t A = (iColor >> 24) & 0xFF;
+
+    color_t H, S, V;
+    Util::RGBtoHSV(R, G, B, H, S, V);
+    Util::HSVtoRGB(H, S, min(100, static_cast<color_t>(V * dDark)), dR, dG, dB);
+    Util::HSVtoRGB(H, S, min(100, static_cast<color_t>(V * dVeryDark)), vdR, vdG, vdB);
+
+    this->iOrigBGR = iColor;
+    this->iPrimaryRGB = (A << 24) | (R << 16) | (G << 8) | (B << 0);
+    this->iDarkRGB = (A << 24) | (dR << 16) | (dG << 8) | (dB << 0);
+    this->iVeryDarkRGB = (A << 24) | (vdR << 16) | (vdG << 8) | (vdB << 0);
+}
+
 GameState::GameError GameState::ChangeState(GameState* pNextState, GameState** pDestObj) {
     // Null NextState is valid. Signifies no change in state.
     if (!pNextState)
@@ -74,7 +97,6 @@ GameState::GameError IntroScreen::MsgProc(HWND, UINT msg, WPARAM wParam, LPARAM 
             m_pNextState = reinterpret_cast<GameState*>(lParam);
             return Success;
         case ID_VIEW_RESETDEVICE:
-            UpdateNotePos = true;
             if (FAILED(m_pRenderer->ResetDevice())) return DirectXError;
             return Success;
         }
@@ -116,110 +138,107 @@ GameState::GameError IntroScreen::Render() {
 // SplashScreen GameState object
 //-----------------------------------------------------------------------------
 
-SplashScreen::SplashScreen(HWND hWnd, Renderer11* pRenderer, bool enableSplash) : GameState(hWnd, pRenderer) {
-    if (enableSplash) {
-        HRSRC hResInfo = FindResource(NULL, MAKEINTRESOURCE(IDR_SPLASHMIDI), TEXT("MIDI"));
-        HGLOBAL hRes = LoadResource(NULL, hResInfo);
-        win32_t iSize = SizeofResource(NULL, hResInfo);
-        unsigned char* pData = (unsigned char*)LockResource(hRes);
+SplashScreen::SplashScreen(HWND hWnd, Renderer11* pRenderer) : GameState(hWnd, pRenderer) {
+    HRSRC hResInfo = FindResource(NULL, MAKEINTRESOURCE(IDR_SPLASHMIDI), TEXT("MIDI"));
+    HGLOBAL hRes = LoadResource(NULL, hResInfo);
+    win32_t iSize = SizeofResource(NULL, hResInfo);
+    unsigned char* pData = (unsigned char*)LockResource(hRes);
 
-        Config& config = Config::GetConfig();
-        const ControlsSettings& cControls = config.GetControlsSettings();
+    Config& config = Config::GetConfig();
+    const ControlsSettings& cControls = config.GetControlsSettings();
 
-        // Parse MIDI
-        if (!cControls.sSplashMIDI.empty()) {
-            // this is REALLY BAD, but i can't figure out how to make it move ownership of the memory pool vector instead of copying
-            m_MIDI.~MIDI();
-            new (&m_MIDI) MIDI(cControls.sSplashMIDI);
-            if (!m_MIDI.IsValid()) {
-                MessageBox(hWnd, L"The custom splash MIDI failed to load. Please choose a different MIDI.", L"", MB_ICONWARNING);
-                m_MIDI = MIDI();
-                goto SplashFailed;
-            }
+    // Parse MIDI
+    if (!cControls.sSplashMIDI.empty()) {
+        // this is REALLY BAD, but i can't figure out how to make it move ownership of the memory pool vector instead of copying
+        m_MIDI.~MIDI();
+        new (&m_MIDI) MIDI(cControls.sSplashMIDI);
+        if (!m_MIDI.IsValid()) {
+            MessageBox(hWnd, L"The custom splash MIDI failed to load. Please choose a different MIDI.", L"", MB_ICONWARNING);
+            m_MIDI = MIDI();
+            goto SplashFailed;
         }
-        else {
-        SplashFailed:
-            constexpr uint8_t lzma_magic[] = { 0xFD, 0x37, 0x7A, 0x58, 0x5A, 0x00 };
-            while (iSize >= LZMA_STREAM_HEADER_SIZE * 2 && !memcmp(pData, lzma_magic, sizeof(lzma_magic))) {
-                unsigned char* compressed = pData;
-                uint64_t decompressed_size = 0;
-                lzma_stream strm = LZMA_STREAM_INIT;
-                lzma_stream_flags stream_flags;
-                lzma_index* index = nullptr;
-                auto pos = (int64_t)iSize;
-                lzma_ret ret;
-                do {
-                    pos -= LZMA_STREAM_HEADER_SIZE;
-                    uint64_t footer_pos;
-                    while (true) {
-                        footer_pos = pos;
-
-                        int i = 2;
-                        if (*(uint32_t*)&compressed[footer_pos + 8] != 0)
-                            break;
-
-                        do {
-                            pos -= 4;
-                            --i;
-                        } while (i >= 0 && *(uint32_t*)&compressed[footer_pos + i * 4] == 0);
-                    }
-                    ret = lzma_stream_footer_decode(&stream_flags, &compressed[footer_pos]);
-                    pos -= stream_flags.backward_size;
-                    lzma_index_decoder(&strm, &index, UINT64_MAX);
-                    strm.avail_in = stream_flags.backward_size;
-                    strm.next_in = &compressed[pos];
-                    pos += stream_flags.backward_size;
-                    ret = lzma_code(&strm, LZMA_RUN);
-                    pos -= stream_flags.backward_size + LZMA_STREAM_HEADER_SIZE;
-                    pos -= lzma_index_total_size(index);
-                    decompressed_size += lzma_index_uncompressed_size(index);
-                } while (pos > 0);
-                pData = new unsigned char[decompressed_size];
-                uint8_t* write_ptr = pData;
-                lzma_end(&strm);
-                strm = LZMA_STREAM_INIT;
-                lzma_stream_decoder(&strm, UINT64_MAX, LZMA_CONCATENATED);
-                strm.next_in = compressed;
-                strm.avail_in = iSize;
-                bool done = false;
-                lzma_action action = LZMA_RUN;
-                while (!done) {
-                    if (strm.avail_in == 0)
-                        action = LZMA_FINISH;
-                    lzma_ret ret = lzma_code(&strm, action);
-                    if (strm.avail_out == 0) {
-                        auto remaining = min(decompressed_size - (write_ptr - pData), 1 << 20);
-                        strm.next_out = write_ptr;
-                        strm.avail_out = remaining;
-                        write_ptr += remaining;
-                    }
-                    switch (ret) {
-                    case LZMA_STREAM_END:
-                        done = true;
-                        break;
-                    case LZMA_OK:
-                        break;
-                    }
-                }
-                iSize = decompressed_size;
-            }
-            m_MIDI.ParseMIDI(pData, iSize);
-            delete[] pData;
-        }
-        m_MIDI.ConnectNotes(); // Order's important here
-        m_vEvents.reserve(m_MIDI.GetInfo().iEventCount);
-        bool IsPostProcessOK = m_MIDI.PostProcess(m_vEvents);
-        if (!IsPostProcessOK) {
-            MessageBoxW(hWnd, Errors[GameError::OutOfMemory].c_str(), L"Error", MB_OK);
-            return;
-        }
-        // Allocate
-        m_vTrackSettings.clear();
-        m_vTrackSettings.resize(min(m_MIDI.GetInfo().iNumTracks, MaxTrackColors));
-        m_pState = new dynamic_bitset(m_vEvents.size());
     }
+    else {
+    SplashFailed:
+        constexpr uint8_t lzma_magic[] = { 0xFD, 0x37, 0x7A, 0x58, 0x5A, 0x00 };
+        while (iSize >= LZMA_STREAM_HEADER_SIZE * 2 && !memcmp(pData, lzma_magic, sizeof(lzma_magic))) {
+            unsigned char* compressed = pData;
+            uint64_t decompressed_size = 0;
+            lzma_stream strm = LZMA_STREAM_INIT;
+            lzma_stream_flags stream_flags;
+            lzma_index* index = nullptr;
+            auto pos = (int64_t)iSize;
+            lzma_ret ret;
+            do {
+                pos -= LZMA_STREAM_HEADER_SIZE;
+                uint64_t footer_pos;
+                while (true) {
+                    footer_pos = pos;
+
+                    int i = 2;
+                    if (*(uint32_t*)&compressed[footer_pos + 8] != 0)
+                        break;
+
+                    do {
+                        pos -= 4;
+                        --i;
+                    } while (i >= 0 && *(uint32_t*)&compressed[footer_pos + i * 4] == 0);
+                }
+                ret = lzma_stream_footer_decode(&stream_flags, &compressed[footer_pos]);
+                pos -= stream_flags.backward_size;
+                lzma_index_decoder(&strm, &index, UINT64_MAX);
+                strm.avail_in = stream_flags.backward_size;
+                strm.next_in = &compressed[pos];
+                pos += stream_flags.backward_size;
+                ret = lzma_code(&strm, LZMA_RUN);
+                pos -= stream_flags.backward_size + LZMA_STREAM_HEADER_SIZE;
+                pos -= lzma_index_total_size(index);
+                decompressed_size += lzma_index_uncompressed_size(index);
+            } while (pos > 0);
+            pData = new unsigned char[decompressed_size];
+            uint8_t* write_ptr = pData;
+            lzma_end(&strm);
+            strm = LZMA_STREAM_INIT;
+            lzma_stream_decoder(&strm, UINT64_MAX, LZMA_CONCATENATED);
+            strm.next_in = compressed;
+            strm.avail_in = iSize;
+            bool done = false;
+            lzma_action action = LZMA_RUN;
+            while (!done) {
+                if (strm.avail_in == 0)
+                    action = LZMA_FINISH;
+                lzma_ret ret = lzma_code(&strm, action);
+                if (strm.avail_out == 0) {
+                    auto remaining = min(decompressed_size - (write_ptr - pData), 1 << 20);
+                    strm.next_out = write_ptr;
+                    strm.avail_out = remaining;
+                    write_ptr += remaining;
+                }
+                switch (ret) {
+                case LZMA_STREAM_END:
+                    done = true;
+                    break;
+                case LZMA_OK:
+                    break;
+                }
+            }
+            iSize = decompressed_size;
+        }
+        m_MIDI.ParseMIDI(pData, iSize);
+        delete[] pData;
+    }
+    m_MIDI.ConnectNotes(); // Order's important here
+    m_vEvents.reserve(m_MIDI.GetInfo().iEventCount);
+    bool IsPostProcessOK = m_MIDI.PostProcess(m_vEvents);
+    if (!IsPostProcessOK) {
+        MessageBoxW(hWnd, Errors[GameError::OutOfMemory].c_str(), L"Error", MB_OK);
+        return;
+    }
+    // Allocate
+    m_vTrackSettings.clear();
+    m_vTrackSettings.resize(min(m_MIDI.GetInfo().iNumTracks, MaxTrackColors));
+    m_pState = new dynamic_bitset(m_vEvents.size());
     InitState();
-    UpdateNotePos = true;
 }
 
 void SplashScreen::InitNotes(const vector<MIDIEvent*>& vEvents) {
@@ -253,6 +272,8 @@ void SplashScreen::InitState() {
     m_OutDevice.SetVolume(1.0);
 
     m_Timer.Init(false);
+
+    UpdateNotePos = true;
 }
 
 GameState::GameError SplashScreen::Init() {
@@ -357,12 +378,12 @@ GameState::GameError SplashScreen::Logic() {
     m_Timer.Start();
 
     // Figure out start and end times for display
-    m_llStartTime = m_llStartTime + llElapsed;
-    if (m_llStartTime > m_MIDI.GetInfo().llTotalMicroSecs + 500000) {
+    if (m_llStartTime > m_MIDI.GetInfo().llTotalMicroSecs + 300000) {
         m_llStartTime = m_MIDI.GetInfo().llFirstNote - 1000000;
         m_iStartPos = 0;
         m_iEndPos = -1;
     }
+    m_llStartTime = m_llStartTime + llElapsed;
     mms_t llEndTime = m_llStartTime + TimeSpan;
 
     // Needs start time to be set. For creating textparticles.
@@ -579,7 +600,7 @@ MainScreen::MainScreen(wstring sMIDIFile, HWND hWnd, Renderer11* pRenderer) : Ga
     // Initialize
     InitColors();
     InitState();
-    UpdateNotePos = true;
+    m_bUpdateNotePos = true;
 
     g_LoadingProgress.stage = MIDILoadingProgress::Stage::Done;
 }
@@ -606,7 +627,10 @@ void MainScreen::InitState() {
     m_iStartPos = 0;
     m_iPrevStartPos = 0;
     m_iEndPos = -1;
-    m_llStartTime = GetMinTime();
+    m_llMinTime = m_MIDI.GetInfo().llFirstNote - 3000000;
+    m_llMaxTime = m_MIDI.GetInfo().llTotalMicroSecs + 500000;
+    m_llStartTime = m_llMinTime;
+    m_iStartTick = GetCurrentTick(m_llStartTime);
     m_bTrackPos = m_bTrackZoom = false;
     m_fTempZoomX = 1.0f;
     m_fTempOffsetX = m_fTempOffsetY = 0.0f;
@@ -614,6 +638,7 @@ void MainScreen::InitState() {
     m_iFPSCount = 0;
     m_llFPSTime = 0;
     m_llPrevTime = m_llStartTime;
+    m_iPrevTick = m_iStartTick;
 
     m_fZoomX = cView.GetZoomX();
     m_fOffsetX = cView.GetOffsetX();
@@ -625,57 +650,76 @@ void MainScreen::InitState() {
     m_llTimeSpan = static_cast<mms_t>(3.0 * abs(m_dNSpeed) * 1000000);
     IsLastFrameReversed = m_dSpeed < 0;
     IsReversedStateInitialized = false;
-    CE_Connected = false;
-    CE_DoNextTick = false;
-    CE_Responded = false;
+    RECT rect = {};
+    GetWindowRect(g_hWndGfx, &rect);
+    m_iScreenWidth = rect.right - rect.left;
+    m_iScreenHeight = rect.bottom - rect.top;
 
-    resolution = m_MIDI.GetInfo().iDivision;
-    TotalTime = m_MIDI.GetInfo().llTotalMicroSecs + 250000;
-    TotalNC = m_MIDI.GetInfo().iNoteCount;
-    if (TotalNC < 100000) { strcpy(Difficulty, "EZ Lv.1"); }
-    else if (TotalNC < 200000) { strcpy(Difficulty, "EZ Lv.2"); }
-    else if (TotalNC < 400000) { strcpy(Difficulty, "EZ Lv.3"); }
-    else if (TotalNC < 600000) { strcpy(Difficulty, "EZ Lv.4"); }
-    else if (TotalNC < 800000) { strcpy(Difficulty, "EZ Lv.5"); }
-    else if (TotalNC < 1000000) { strcpy(Difficulty, "HD Lv.6"); }
-    else if (TotalNC < 2000000) { strcpy(Difficulty, "HD Lv.7"); }
-    else if (TotalNC < 4000000) { strcpy(Difficulty, "HD Lv.8"); }
-    else if (TotalNC < 6000000) { strcpy(Difficulty, "HD Lv.9"); }
-    else if (TotalNC < 8000000) { strcpy(Difficulty, "HD Lv.10"); }
-    else if (TotalNC < 10000000) { strcpy(Difficulty, "IN Lv.11"); }
-    else if (TotalNC < 20000000) { strcpy(Difficulty, "IN Lv.12"); }
-    else if (TotalNC < 40000000) { strcpy(Difficulty, "IN Lv.13"); }
-    else if (TotalNC < 60000000) { strcpy(Difficulty, "IN Lv.14"); }
-    else if (TotalNC < 80000000) { strcpy(Difficulty, "IN Lv.15"); }
-    else if (TotalNC < 100000000) { strcpy(Difficulty, "AT Lv.16"); }
-    else if (TotalNC < 200000000) { strcpy(Difficulty, "AT Lv.17"); }
-    else if (TotalNC < 400000000) { strcpy(Difficulty, "AT Lv.18"); }
+    if (m_MIDI.GetInfo().iNoteCount < 100000) { strcpy(Difficulty, "EZ Lv.1"); }
+    else if (m_MIDI.GetInfo().iNoteCount < 200000) { strcpy(Difficulty, "EZ Lv.2"); }
+    else if (m_MIDI.GetInfo().iNoteCount < 400000) { strcpy(Difficulty, "EZ Lv.3"); }
+    else if (m_MIDI.GetInfo().iNoteCount < 600000) { strcpy(Difficulty, "EZ Lv.4"); }
+    else if (m_MIDI.GetInfo().iNoteCount < 800000) { strcpy(Difficulty, "EZ Lv.5"); }
+    else if (m_MIDI.GetInfo().iNoteCount < 1000000) { strcpy(Difficulty, "HD Lv.6"); }
+    else if (m_MIDI.GetInfo().iNoteCount < 2000000) { strcpy(Difficulty, "HD Lv.7"); }
+    else if (m_MIDI.GetInfo().iNoteCount < 4000000) { strcpy(Difficulty, "HD Lv.8"); }
+    else if (m_MIDI.GetInfo().iNoteCount < 6000000) { strcpy(Difficulty, "HD Lv.9"); }
+    else if (m_MIDI.GetInfo().iNoteCount < 8000000) { strcpy(Difficulty, "HD Lv.10"); }
+    else if (m_MIDI.GetInfo().iNoteCount < 10000000) { strcpy(Difficulty, "IN Lv.11"); }
+    else if (m_MIDI.GetInfo().iNoteCount < 20000000) { strcpy(Difficulty, "IN Lv.12"); }
+    else if (m_MIDI.GetInfo().iNoteCount < 40000000) { strcpy(Difficulty, "IN Lv.13"); }
+    else if (m_MIDI.GetInfo().iNoteCount < 60000000) { strcpy(Difficulty, "IN Lv.14"); }
+    else if (m_MIDI.GetInfo().iNoteCount < 80000000) { strcpy(Difficulty, "IN Lv.15"); }
+    else if (m_MIDI.GetInfo().iNoteCount < 100000000) { strcpy(Difficulty, "AT Lv.16"); }
+    else if (m_MIDI.GetInfo().iNoteCount < 200000000) { strcpy(Difficulty, "AT Lv.17"); }
+    else if (m_MIDI.GetInfo().iNoteCount < 400000000) { strcpy(Difficulty, "AT Lv.18"); }
     else { strcpy(Difficulty, "SP Lv.?"); }
 
     // m_Timer will be initialized *later*
     m_RealTimer.Init(false);
 
+    m_bUpdateTrackColor = true;
+    m_bUpdateNotePos = true;
+
     m_bDumpFrames = cControls.bDumpFrames;
     if (m_bDumpFrames) {
-        RECT rect = {};
-        GetWindowRect(g_hWndGfx, &rect);
-        win32_t width = rect.right - rect.left;
-        win32_t height = rect.bottom - rect.top;
-
         //Running ffmpeg
         wchar_t buf[LONG_MAX_PATH] = {};
-        swprintf(buf, sizeof(buf), L"cd /d \"%s\" && md \"%s\\PianoFX_Framedump\" & start cmd /k ffmpeg -r 60 -f rawvideo -s %dx%d -pix_fmt bgra -i async:\\\\.\\pipe\\PFXdump -c:v h264 -qp 19 -pix_fmt yuv420p \"%s\\PianoFX_Framedump\\Output.mp4\"", GetExePath().c_str(), GetExePath().c_str(), width, height, GetExePath().c_str());
-        m_hVideoPipe = CreateNamedPipe(TEXT("\\\\.\\pipe\\PFXdump"), PIPE_ACCESS_OUTBOUND, PIPE_TYPE_BYTE | PIPE_WAIT, PIPE_UNLIMITED_INSTANCES, static_cast<DWORD>(width * height * 4 * 120), 0, 0, nullptr);
+        swprintf(buf, sizeof(buf), L"cd /d \"%s\" && md \"%s\\PianoFX_Framedump\" & start cmd /k ffmpeg -r 60 -f rawvideo -s %dx%d -pix_fmt bgra -i async:\\\\.\\pipe\\PFXdump -c:v h264 -qp 19 -pix_fmt yuv420p \"%s\\PianoFX_Framedump\\Output.mp4\"", GetExePath().c_str(), GetExePath().c_str(), m_iScreenWidth, m_iScreenHeight, GetExePath().c_str());
+        m_hVideoPipe = CreateNamedPipe(TEXT("\\\\.\\pipe\\PFXdump"), PIPE_ACCESS_OUTBOUND, PIPE_TYPE_BYTE | PIPE_WAIT, PIPE_UNLIMITED_INSTANCES, static_cast<DWORD>(m_iScreenWidth * m_iScreenHeight * 4 * 120), 0, 0, nullptr);
         _wsystem(buf);
         ConnectNamedPipe(m_hVideoPipe, NULL);
     }
+
     InitKeyColor();
     AdvanceIterators(m_llStartTime, true);
+
+    // Setup pointers
+    Ptr_to_m_llStartTime = &m_llStartTime;
+    Ptr_to_m_iStartTick = &m_iStartTick;
+    Ptr_to_m_llMinTime = &m_llMinTime;
+    Ptr_to_m_llMaxTime = &m_llMaxTime;
+    Ptr_to_m_iPolyphony = &m_iPolyphony;
+    Ptr_to_m_iNPS = &m_iNPS;
+    Ptr_to_m_iPassed = &m_iPassed;
+    Ptr_to_m_MIDI_iTotalNC = &m_MIDI.GetInfo().iNoteCount;
+    Ptr_to_m_iWidth = &m_iScreenWidth;
+    Ptr_to_m_iHeight = &m_iScreenHeight;
+    Ptr_to_m_MIDI_iResolution = &m_MIDI.GetInfo().iDivision;
+    Ptr_to_m_bUpdateNotePos = &m_bUpdateNotePos;
+    Ptr_to_m_bUpdateTrackColor = &m_bUpdateTrackColor;
+    Ptr_to_CE_VideoOutput = &m_Timer.m_bManualTimer;
+    Ptr_to_CE_Connected = &CE_Connected;
+    Ptr_to_CE_DoNextTick = &CE_DoNextTick;
+    Ptr_to_CE_Responded = &CE_Responded;
+    Ptr_to_CheatEngineCaption = &CheatEngineCaption[0];
+    Ptr_to_CaptionContent = &CheatEngineCaption[1];
+    Ptr_to_Difficulty = &Difficulty[0];
+    PointersInitialized = true;
 }
 
 // Called immediately before changing to this state
 GameState::GameError MainScreen::Init() {
-    UpdateNotePos = true;
     static Config& config = Config::GetConfig();
     static const AudioSettings& cAudio = config.GetAudioSettings();
     if (cAudio.bKDMAPI) {
@@ -715,29 +759,6 @@ void MainScreen::ColorChannel(track_t iTrack, chan_t iChannel, color_t iColor, b
         m_vTrackSettings[iTrack].aChannels[iChannel].SetColor();
     else
         m_vTrackSettings[iTrack].aChannels[iChannel].SetColor(iColor);
-}
-
-// Sets to a random color
-void ChannelSettings::SetColor() {
-    SetColor(Util::RandColor(), 0.6, 0.2);
-}
-
-// Flips around windows format (ABGR) -> direct x format (ARGB)
-void ChannelSettings::SetColor(color_t iColor, double dDark, double dVeryDark) {
-    color_t R = (iColor >> 0) & 0xFF, dR, vdR;
-    color_t G = (iColor >> 8) & 0xFF, dG, vdG;
-    color_t B = (iColor >> 16) & 0xFF, dB, vdB;
-    color_t A = (iColor >> 24) & 0xFF;
-
-    color_t H, S, V;
-    Util::RGBtoHSV(R, G, B, H, S, V);
-    Util::HSVtoRGB(H, S, min(100, static_cast<color_t>(V * dDark)), dR, dG, dB);
-    Util::HSVtoRGB(H, S, min(100, static_cast<color_t>(V * dVeryDark)), vdR, vdG, vdB);
-
-    this->iOrigBGR = iColor;
-    this->iPrimaryRGB = (A << 24) | (R << 16) | (G << 8) | (B << 0);
-    this->iDarkRGB = (A << 24) | (dR << 16) | (dG << 8) | (dB << 0);
-    this->iVeryDarkRGB = (A << 24) | (vdR << 16) | (vdG << 8) | (vdB << 0);
 }
 
 void MainScreen::SetChannelSettings(const vector<bool>& vMuted, const vector<bool>& vHidden, const vector<color_t>& vColor) {
@@ -805,8 +826,8 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
             return Success;
         case ID_PLAY_STOP:
         {
-            JumpTarget = GetMinTime();
-            JumpTo(GetMinTime());
+            JumpTarget = m_llMinTime;
+            JumpTo(m_llMinTime);
             cPlayback.SetStopped(true);
             JumpTarget = ~0;
             return Success;
@@ -826,7 +847,7 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
             return Success;
         }
         case ID_VIEW_RESETDEVICE:
-            UpdateNotePos = true;
+            m_bUpdateNotePos = true;
             if (FAILED(m_pRenderer->ResetDevice())) return DirectXError;
             return Success;
         case ID_VIEW_MOVEANDZOOM:
@@ -855,7 +876,7 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
             m_fTempOffsetX = 0.0f;
             m_fTempOffsetY = 0.0f;
             m_fTempZoomX = 1.0f;
-            UpdateNotePos = true;
+            m_bUpdateNotePos = true;
             return Success;
         }
         break;
@@ -871,10 +892,8 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
         break;
     case TBM_SETPOS:
     {
-        mms_t llFirstTime = GetMinTime();
-        mms_t llLastTime = GetMaxTime();
         bool StartTimer = (JumpTarget == ~0);
-        JumpTarget = llFirstTime + ((llLastTime - llFirstTime) * lParam) / 1000;
+        JumpTarget = m_llMinTime + ((m_llMaxTime - m_llMinTime) * lParam) / INT16_MAX;
         if (StartTimer) SetTimer(g_hWnd, IDC_POSNDELAY, nxtdelay, NULL); //Async JumpTo process
         break;
     }
@@ -919,7 +938,7 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
         {
             m_fTempOffsetX += dx;
             m_fTempOffsetY += dy;
-            UpdateNotePos = true; //Update Note Pos! 
+            m_bUpdateNotePos = true; //Update Note Pos! 
         }
         if (m_bTrackZoom)
         {
@@ -927,7 +946,7 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
             m_fTempZoomX *= pow(2.0f, dx / 200.0f);
             float fNewX = m_fOffsetX + m_fTempOffsetX + m_ptStartZoom.x * m_fZoomX * m_fTempZoomX;
             m_fTempOffsetX = m_fTempOffsetX - (fNewX - fOldX);
-            UpdateNotePos = true; //Update Note Pos! 
+            m_bUpdateNotePos = true; //Update Note Pos! 
         }
 
         m_ptLastPos.x = x;
@@ -988,13 +1007,12 @@ GameState::GameError MainScreen::Logic() {
     m_fOffsetY = cView.GetOffsetY();
     m_fZoomX = cView.GetZoomX();
     if (!m_bZoomMove) m_bTrackPos = m_bTrackZoom = false;
-    m_eKeysShown = cVisual.eKeysShown;
-    if (m_eKeysShown == VisualSettings::All)
+    if (cVisual.eKeysShown == VisualSettings::All)
     {
         m_iStartNote = 0;
         m_iEndNote = 127;
     }
-    else if (m_eKeysShown == VisualSettings::Song)
+    else if (cVisual.eKeysShown == VisualSettings::Song)
     {
         const MIDI::MIDIInfo& mInfo = m_MIDI.GetInfo();
         m_iStartNote = mInfo.iMinNote;
@@ -1017,8 +1035,6 @@ GameState::GameError MainScreen::Logic() {
     }
 
     // Time stuff
-    mms_t llMaxTime = GetMaxTime();
-    mms_t llMinTime = GetMinTime();
     mms_t llElapsed = m_Timer.GetMicroSecs();
     mms_t llRealElapsed = m_RealTimer.GetMicroSecs();
     m_Timer.Start();
@@ -1035,13 +1051,31 @@ GameState::GameError MainScreen::Logic() {
 
     if ((bPausedChanged || bMuteChanged) && (m_bPaused || m_bMute)) m_OutDevice.AllNotesOff();
 
-    // Figure out start and end times for display
-    mms_t llOldStartTime = m_llStartTime;
+    // Figure out start time for display
+    if (abs(m_llStartTime - m_llPrevTime) && JumpTarget == ~0) { // Handle time jump from cheat engine
+        JumpTarget = m_llStartTime;
+        JumpTo(m_llStartTime, true);
+        JumpTarget = ~0;
+    }
+    else {
+        m_llPrevTime = m_llStartTime;
+    }
     mms_t llNextStartTime = m_llStartTime + static_cast<mms_t>(llElapsed * m_dSpeed + 0.5);
-
     if (!m_bPaused) m_llStartTime = llNextStartTime;
+
+    // Figure out start tick
+    if (abs(m_iStartTick - m_iPrevTick) && JumpTarget == ~0) { // Handle time jump from cheat engine
+        JumpTarget = m_llStartTime;
+        JumpTo(m_iStartTick, true);
+        JumpTarget = ~0;
+    }
+    else {
+        m_iPrevTick = m_iStartTick;
+    }
     m_iStartTick = GetCurrentTick(m_llStartTime);
-    mms_t llEndTime = 0;
+
+    // Now the end time
+    mms_t llEndTime;
     if (m_bTickMode) {
         if (dNSpeed < 0) {
             llEndTime = m_iStartTick - m_llTimeSpan;
@@ -1059,14 +1093,6 @@ GameState::GameError MainScreen::Logic() {
         }
     }
 
-    if (abs(llOldStartTime - m_llPrevTime) && JumpTarget == ~0) { // Handle time jump from cheat engine
-        JumpTarget = m_llStartTime;
-        JumpTo(m_llStartTime, true);
-        JumpTarget = ~0;
-    }
-    else {
-        m_llPrevTime = m_llStartTime;
-    }
 
     idx_t iEventCount = static_cast<idx_t>(m_vEvents.size());
     RenderGlobals();
@@ -1195,14 +1221,11 @@ GameState::GameError MainScreen::Logic() {
     AdvanceIterators(m_llStartTime, false);
 
     // Update the position slider
-    mms_t llFirstTime = GetMinTime();
-    mms_t llLastTime = GetMaxTime();
-    mms_t llOldPos = ((llOldStartTime - llFirstTime) * 1000) / (llLastTime - llFirstTime);
-    mms_t llNewPos = ((m_llStartTime - llFirstTime) * 1000) / (llLastTime - llFirstTime);
-    if (llOldPos != llNewPos) cPlayback.SetPosition(static_cast<win32_t>(llNewPos));
+    mms_t llNewPos = ((m_llStartTime - m_llMinTime) * INT16_MAX) / (m_llMaxTime - m_llMinTime);
+    cPlayback.SetPosition(static_cast<win32_t>(llNewPos));
 
     // Song's over
-    if (!m_bPaused && ((m_dSpeed < 0) ? (m_llStartTime < llMinTime) : (m_llStartTime > llMaxTime))) {
+    if (!m_bPaused && ((m_dSpeed < 0) ? (m_llStartTime < m_llMinTime) : (m_llStartTime > m_llMaxTime))) {
         if (m_bDumpFrames) {
             wchar_t buf[LONG_MAX_PATH] = {};
             swprintf(buf, LONG_MAX_PATH, L"start \"Result\" \"C:\\Windows\\Explorer.exe\" \"%s\\PianoFX_Framedump\\\"", GetExePath().c_str());
@@ -1233,12 +1256,11 @@ GameState::GameError MainScreen::Logic() {
         memset(&fixed_consts.bends, 0, sizeof(float) * 16);
 
     // Update track colors
-    // TODO: Only update track colors lazily
     auto* track_colors = m_pRenderer->GetTrackColors();
     for (track_t i = 0; i < min(m_vTrackSettings.size(), MaxTrackColors); i++) {
         for (chan_t j = 0; j < MaxChannelColors; j++) {
             auto& src = m_vTrackSettings[i].aChannels[j];
-            auto& dst = track_colors[TnC_t(i) * TnC_t(16) + TnC_t(j)];
+            auto& dst = track_colors[TnC_t(i) * TnC_t(16u) + TnC_t(j)];
             dst.primary = src.iPrimaryRGB;
             dst.dark = src.iDarkRGB;
             dst.darker = src.bHidden ? 0xFFFFFFFF : src.iVeryDarkRGB; // Hack to signal hidden track without checking on CPU
@@ -1268,13 +1290,9 @@ void MainScreen::JumpTo(mms_t llStartTime, boolean loadingMode) {
     if (!loadingMode) m_OutDevice.AllNotesOff();
 
     // Start time. Piece of cake!
-    mms_t llFirstTime;
-    mms_t llLastTime;
     mms_t llEndTime;
     if (!loadingMode) {
-        llFirstTime = GetMinTime();
-        llLastTime = GetMaxTime();
-        m_llStartTime = min(max(llStartTime, llFirstTime), llLastTime);
+        m_llStartTime = min(max(llStartTime, m_llMinTime), m_llMaxTime);
     }
 
     if (m_dNSpeed < 0) {
@@ -1389,12 +1407,13 @@ SkipSearch:
     if (!loadingMode)
     {
         static PlaybackSettings& cPlayback = Config::GetConfig().GetPlaybackSettings();
-        win32_t llNewPos = static_cast<win32_t>(((m_llStartTime - llFirstTime) * 1000) / (llLastTime - llFirstTime));
+        win32_t llNewPos = static_cast<win32_t>(((m_llStartTime - m_llMinTime) * INT16_MAX) / (m_llMaxTime - m_llMinTime));
         cPlayback.SetPosition(llNewPos);
     }
 
     IsLastFrameReversed = false;
     m_llPrevTime = m_llStartTime;
+    m_iPrevTick = m_iStartTick;
     m_iPrevStartPos = m_iStartPos;
 }
 
@@ -1495,8 +1514,7 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
         }
         auto itCurMarker = m_itNextMarker;
         m_itNextMarker = upper_bound(m_vMarkers.begin(), m_vMarkers.end(), pair<mms_t, idx_t>(llTime, m_vMetaEvents.size()));
-        if (!m_bNextMarkerInited || itCurMarker != m_itNextMarker) {
-            m_bNextMarkerInited = true;
+        if (itCurMarker != m_itNextMarker) {
             if (m_itNextMarker != m_vMarkers.begin() && (m_itNextMarker - 1)->second != -1) {
                 const auto eEvent = m_vMetaEvents[(m_itNextMarker - 1)->second];
                 ApplyMarker(eEvent->GetData(), eEvent->GetDataLen());
@@ -1543,8 +1561,7 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
             }
             auto itCurMarker = m_itNextMarker;
             m_itNextMarker = upper_bound(m_vMarkers.begin(), m_vMarkers.end(), pair<mms_t, idx_t>(llTime, m_vMetaEvents.size()));
-            if (!m_bNextMarkerInited || itCurMarker != m_itNextMarker) {
-                m_bNextMarkerInited = true;
+            if (itCurMarker != m_itNextMarker) {
                 if (m_itNextMarker != m_vMarkers.begin() && (m_itNextMarker - 1)->second != -1) {
                     const auto eEvent = m_vMetaEvents[(m_itNextMarker - 1)->second];
                     ApplyMarker(eEvent->GetData(), eEvent->GetDataLen());
@@ -1773,6 +1790,9 @@ GameState::GameError MainScreen::Render()
 // These used to be created as local variables inside each Render* function, but too much copying of code :/
 // Depends on m_llStartTime, m_llTimeSpan, m_eKeysShown, m_iStartNote, m_iEndNote
 void MainScreen::RenderGlobals() {
+    m_iScreenWidth = m_pRenderer->GetBufferWidth();
+    m_iScreenHeight = m_pRenderer->GetBufferHeight();
+
     // Screen X info
     m_fNotesX = m_fOffsetX + m_fTempOffsetX;
     m_fNotesCX = m_pRenderer->GetBufferWidth() * abs(m_fZoomX) * abs(m_fTempZoomX);
@@ -1811,7 +1831,7 @@ void MainScreen::RenderGlobals() {
         }
     }
 
-    if (UpdateNotePos) GenNoteXTable();
+    if (m_bUpdateNotePos) GenNoteXTable();
 }
 
 void MainScreen::RenderLines() {
@@ -1939,7 +1959,7 @@ void MainScreen::RenderNotes() {
                 }
             }
         }
-        polyphony = 0;
+        m_iPolyphony = 0;
         m_pState->ForEachReversed([&](idx_t idx) {
             MIDIChannelEvent* pEvent = m_vEvents[idx];
             if (m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
@@ -1948,18 +1968,18 @@ void MainScreen::RenderNotes() {
                     PressAndBlend(pEvent);
                 }
             }
-            polyphony++;
+            m_iPolyphony++;
             });
     }
     else {
-        polyphony = 0;
+        m_iPolyphony = 0;
         m_pState->ForEach([&](idx_t idx) {
             MIDIChannelEvent* pEvent = m_vEvents[idx];
             if (m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
                 RenderNote(pEvent);
                 PressAndBlend(pEvent);
             }
-            polyphony++;
+            m_iPolyphony++;
             });
         if (m_dNSpeed < 0) {
             for (sidx_t i = iEndPos; i >= iStartPos; i--) {
@@ -2019,7 +2039,7 @@ void MainScreen::RenderNote(const MIDIChannelEvent * pNote) {
 }
 
 void MainScreen::GenNoteXTable() {
-    UpdateNotePos = false; //We don't need to do this on every single frame! 
+    m_bUpdateNotePos = false; //We don't need to do this on every single frame! 
     float NoteWidth = (m_pRenderer->GetBufferWidth() * abs(m_fZoomX) * abs(m_fTempZoomX)) / (m_iEndNote - m_iStartNote);
     for (chan_t ch = 0; ch < MaxChannelColors; ch++) {
         float ShiftAmount = m_pBendsRange[ch] == 0 ? 0 : m_pBendsValue[ch] / ((1 << 13) / m_pBendsRange[ch]);
@@ -2278,7 +2298,7 @@ void MainScreen::RenderText() {
     }
     if (strnlen(CheatEngineCaption, sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0])) > 1) {
         if (strnlen(CheatEngineCaption, sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0])) < sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0])) {
-            RenderMessage(&rcMsg, &rcScr, Utf8ToWString(CaptionContent), CheatEngineCaption[0]);
+            RenderMessage(&rcMsg, &rcScr, Utf8ToWString(Ptr_to_CaptionContent), CheatEngineCaption[0]);
         }
         else {
             RenderMessage(&rcMsg, &rcScr, Utf8ToWString("The caption has exceeded the maximum acceptable length of " + to_string(sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]) - 2) + " characters. \nAs a result, this caption has been blocked from showing in order to prevent crashing. \nPlease consider writing something slightly shorter. "), 'L');
@@ -2312,14 +2332,12 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
     const ControlsSettings& cControls = config.GetControlsSettings();
     const PlaybackSettings& cPlayback = config.GetPlaybackSettings();
 
-    width = m_pRenderer->GetBufferWidth();
-    height = m_pRenderer->GetBufferHeight();
     mms_t min = abs(m_llStartTime) / 60000000;
     mms_t sec = (abs(m_llStartTime) % 60000000) / 1000000;
     mms_t cs = (abs(m_llStartTime) % 1000000) / 100000;
-    mms_t tmin = TotalTime / 60000000;
-    mms_t tsec = (TotalTime % 60000000) / 1000000;
-    mms_t tcs = (TotalTime % 1000000) / 100000;
+    mms_t tmin = abs(m_llMaxTime) / 60000000;
+    mms_t tsec = (abs(m_llMaxTime) % 60000000) / 1000000;
+    mms_t tcs = (abs(m_llMaxTime) % 1000000) / 100000;
     double tempo = 60000000.0 / m_iMicroSecsPerBeat;
     mms_t iMaxMS = m_MIDI.GetInfo().llTotalMicroSecs / MS;
     uint8_t cur_line = 0;
@@ -2328,40 +2346,50 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         m_pRenderer->AddGDIRect(prcStatus->left, prcStatus->top, prcStatus->right - prcStatus->left, prcStatus->bottom - prcStatus->top, 0x80000000);
     }
 
-    TotalTimeFormatted = to_string(TotalTime);
+    string TotalTimeFormatted = to_string(m_llMaxTime);
     uint8_t Splits = 0;
     for (signed short i = TotalTimeFormatted.length() - 3; Splits < 2 && i > 0; i -= 3, Splits++)
         TotalTimeFormatted.insert(i, " ");
+    if (m_llMaxTime < 0)
+        TotalTimeFormatted.insert(0, "-");
+    
+    string BeginTimeFormatted = to_string(m_llMinTime);
+    Splits = 0;
+    for (signed short i = BeginTimeFormatted.length() - 3; Splits < 2 && i > 0; i -= 3, Splits++)
+        BeginTimeFormatted.insert(i, " ");
+    if (m_llMinTime < 0)
+        BeginTimeFormatted.insert(0, "-");
 
-    llStartTimeFormatted = to_string(abs(m_llStartTime));
+    string llStartTimeFormatted = to_string(abs(m_llStartTime));
     Splits = 0;
     for (signed short i = llStartTimeFormatted.length() - 3; Splits < 2 && i > 0; i -= 3, Splits++)
         llStartTimeFormatted.insert(i, " ");
     if (m_llStartTime < 0)
         llStartTimeFormatted.insert(0, "-");
 
-    polyFormatted = to_wstring(polyphony);
+    wstring polyFormatted = to_wstring(m_iPolyphony);
     for (signed short i = polyFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
         polyFormatted.insert(i, L",");
 
-    nps = m_vNCTable[min(max(m_llStartTime / MS, 0LL), iMaxMS)] - m_vNCTable[min(max((m_llStartTime - S) / MS, 0LL), iMaxMS)];
-    npsFormatted = to_wstring(nps);
+    m_iNPS = m_vNCTable[min(max(m_llStartTime / MS, 0LL), iMaxMS)] - m_vNCTable[min(max((m_llStartTime - S) / MS, 0LL), iMaxMS)];
+    wstring npsFormatted = to_wstring(m_iNPS);
     for (signed short i = npsFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
         npsFormatted.insert(i, L",");
 
-    passed = m_vNCTable[min(max(m_llStartTime / MS, 0LL), iMaxMS)];
-    passedFormatted = to_wstring(passed);
+    m_iPassed = m_vNCTable[min(max(m_llStartTime / MS, 0LL), iMaxMS)];
+    wstring passedFormatted = to_wstring(m_iPassed);
     for (signed short i = passedFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
         passedFormatted.insert(i, L",");
 
     RenderStatusLine(cur_line++, StatisticsText1, L"%s", L"v" VersionString);
     RenderStatusLine(cur_line++, StatisticsText2, L"");
     RenderStatusLine(cur_line++, L"", L"");
-    RenderStatusLine(cur_line++, StatisticsText3, L"%s%lld:%02d.%d / %lld:%02d.%d",
-        m_llStartTime >= 0 ? L"" : L"-",
+    RenderStatusLine(cur_line++, StatisticsText3, L"%s%lld:%02d.%d / %s%lld:%02d.%d",
+        m_llStartTime < 0 ? L"-" : L"",
         min, sec, cs,
+        m_llMaxTime < 0 ? L"-" : L"",
         tmin, tsec, tcs);
-    RenderStatusLine(cur_line++, StatisticsText4, L"%d/%d", m_iStartTick, resolution);
+    RenderStatusLine(cur_line++, StatisticsText4, L"%d/%d", m_iStartTick, m_MIDI.GetInfo().iDivision);
     if (cVideo.bDebug) {
         RenderStatusLine(cur_line++, StatisticsText5, L"%d", m_llStartTime);
     }
@@ -2422,18 +2450,18 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         RenderStatusLine(cur_line++, StatisticsText19, L"%f", cView.GetOffsetX() + m_fTempOffsetX);
         RenderStatusLine(cur_line++, StatisticsText20, L"%f", cView.GetOffsetY() + m_fTempOffsetY);
         RenderStatusLine(cur_line++, StatisticsText21, L"%f", cView.GetZoomX() * m_fTempZoomX);
-        RenderStatusLine(cur_line++, StatisticsText22, L"%d*%d", width, height);
+        RenderStatusLine(cur_line++, StatisticsText22, L"%d*%d", m_iScreenWidth, m_iScreenHeight);
         RenderStatusLine(cur_line++, StatisticsText23, L"%d~%d", m_bFlipKeyboard ? m_iEndNote : m_iStartNote, m_bFlipKeyboard ? m_iStartNote : m_iEndNote);
         RenderStatusLine(cur_line++, StatisticsText24, L"%d", cControls.iVelocityThreshold);
     }
     if (cControls.bPhigros) {
-        RenderStatusLine(cur_line++, StatisticsText25, L"%07.0f", (passed == TotalNC ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(TotalNC) * 1000000)));
+        RenderStatusLine(cur_line++, StatisticsText25, L"%07.0f", (m_iPassed == m_MIDI.GetInfo().iNoteCount ? 1000000 : floor(static_cast<float>(m_iPassed) / static_cast<float>(m_MIDI.GetInfo().iNoteCount) * 1000000)));
         RenderStatusLine(cur_line++, StatisticsText26, L"%s", Utf8ToWString(Difficulty).c_str());
         RenderStatusLine(cur_line++, StatisticsText27, L"%s", StatisticsText28 L" ");
-        if (static_cast<float>(passed == TotalNC ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(TotalNC) * 1000000)) == static_cast<float>(1000000)) {
+        if (m_iPassed == m_MIDI.GetInfo().iNoteCount) {
             RenderStatusLine(cur_line++, StatisticsText29, L"");
         }
-        else if (static_cast<float>(passed == TotalNC ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(TotalNC) * 1000000)) < static_cast<float>(1000000)) {
+        else if (m_iPassed < m_MIDI.GetInfo().iNoteCount) {
             if (!cPlayback.GetPaused()) {
                 RenderStatusLine(cur_line++, StatisticsText30, L"");
             }
@@ -2441,7 +2469,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
                 RenderStatusLine(cur_line++, StatisticsText31, L"");
             }
         }
-        else if (static_cast<float>(passed == TotalNC ? 1000000 : floor(static_cast<float>(passed) / static_cast<float>(TotalNC) * 1000000)) > static_cast<float>(1000000)) {
+        else {
             RenderStatusLine(cur_line++, StatisticsText32, L"");
         }
     }
@@ -2468,49 +2496,55 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X - 1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    SongLength: " + TotalTimeFormatted + " (" + IntSizeToCE(sizeof(TotalTime)) + " +" + GetAddress(TotalTime) + ")[Read Only]";
+        cout << "    SongLength: " + TotalTimeFormatted + " (" + IntSizeToCE(sizeof(m_llMaxTime)) + CEPtr() + " +" + GetAddress(Ptr_to_m_llMaxTime) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X - 1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Microseconds: " + llStartTimeFormatted + " (" + IntSizeToCE(sizeof(m_llStartTime)) + " +" + GetAddress(m_llStartTime) + ") [Read / Write]";
+        cout << "    InitialSilence: " + BeginTimeFormatted + " (" + IntSizeToCE(sizeof(m_llMinTime)) + CEPtr() + " +" + GetAddress(Ptr_to_m_llMinTime) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X - 1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Ticks: " + to_string(m_iStartTick) + " (" + IntSizeToCE(sizeof(m_iStartTick)) + " +" + GetAddress(m_iStartTick) + ")[Read Only]";
+        cout << "    Microseconds: " + llStartTimeFormatted + " (" + IntSizeToCE(sizeof(m_llStartTime)) + CEPtr() + " +" + GetAddress(Ptr_to_m_llStartTime) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X - 1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Resolution: " + to_string(resolution) + " (" + IntSizeToCE(sizeof(resolution)) + " +" + GetAddress(resolution) + ") [Read Only]";
+        cout << "    Ticks: " + to_string(m_iStartTick) + " (" + IntSizeToCE(sizeof(m_iStartTick)) + CEPtr() + " +" + GetAddress(Ptr_to_m_iStartTick) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X - 1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    NoteCount: " + to_string(TotalNC) + " (" + IntSizeToCE(sizeof(TotalNC)) + " +" + GetAddress(TotalNC) + ") [Read Only]";
+        cout << "    Resolution: " + to_string(m_MIDI.GetInfo().iDivision) + " (" + IntSizeToCE(sizeof(m_MIDI.GetInfo().iDivision)) + CEPtr() + " +" + GetAddress(Ptr_to_m_MIDI_iResolution) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X - 1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    NotesPerSecond: " + to_string(nps) + " (" + IntSizeToCE(sizeof(nps)) + " +" + GetAddress(nps) + ") [Read Only]";
+        cout << "    NoteCount: " + to_string(m_MIDI.GetInfo().iNoteCount) + " (" + IntSizeToCE(sizeof(m_MIDI.GetInfo().iNoteCount)) + CEPtr() + " +" + GetAddress(Ptr_to_m_MIDI_iTotalNC) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X - 1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Polyphony: " + to_string(polyphony) + " (" + IntSizeToCE(sizeof(polyphony)) + " +" + GetAddress(polyphony) + ") [Read Only]";
+        cout << "    NotesPerSecond: " + to_string(m_iNPS) + " (" + IntSizeToCE(sizeof(m_iNPS)) + CEPtr() + " +" + GetAddress(m_iNPS) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X - 1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Passed: " + to_string(passed) + " (" + IntSizeToCE(sizeof(passed)) + " +" + GetAddress(passed) + ") [Read Only]";
+        cout << "    Polyphony: " + to_string(m_iPolyphony) + " (" + IntSizeToCE(sizeof(m_iPolyphony)) + CEPtr() + " +" + GetAddress(m_iPolyphony) + ") [Read Only]";
+        pos.X = 0;
+        pos.Y = line; line++;
+        SetConsoleCursorPosition(hConsole, pos);
+        cout << string(csbi.dwSize.X - 1, ' ') << "\n";
+        SetConsoleCursorPosition(hConsole, pos);
+        cout << "    Passed: " + to_string(m_iPassed) + " (" + IntSizeToCE(sizeof(m_iPassed)) + CEPtr() + " +" + GetAddress(m_iPassed) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
@@ -2582,7 +2616,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X - 1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    WindowSize: " + to_string(width) + "*" + to_string(height) + " (" + IntSizeToCE(sizeof(width)) + " +" + GetAddress(width) + " * " + IntSizeToCE(sizeof(height)) + " +" + GetAddress(height) + ") [Read Only]";
+        cout << "    WindowSize: " + to_string(m_iScreenWidth) + "*" + to_string(m_iScreenHeight) + " (" + IntSizeToCE(sizeof(m_iScreenWidth)) + CEPtr() + " +" + GetAddress(Ptr_to_m_iWidth) + " * " + IntSizeToCE(sizeof(m_iScreenHeight)) + CEPtr() + " +" + GetAddress(Ptr_to_m_iHeight) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
@@ -2648,7 +2682,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X - 1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Caption: \"" + string(strlen(CheatEngineCaption) < sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]) ? CaptionContent : "MAXIMUM LENGTH EXCEEDED! ") + "\" (String[" + to_string(sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]) - 1) + "] +" + GetAddress(CheatEngineCaption[1]) + ") [Read / Write]";
+        cout << "    Caption: \"" + string(strlen(CheatEngineCaption) < sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]) ? Ptr_to_CaptionContent : "MAXIMUM LENGTH EXCEEDED! ") + "\" (String[" + to_string(sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]) - 1) + "] +" + GetAddress(CheatEngineCaption[1]) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);

@@ -35,6 +35,9 @@ typedef signed int win32_t; // Classic signed 32bit integer, aka dword, used for
 typedef signed short winword_t; // Classic signed 16bit integer, aka word, used for interfacing with Win32 API (should not appear in any game logic)
 #define LONG_MAX_PATH 0x0FFF
 
+inline static constexpr mms_t MS = 1e+3;
+inline static constexpr mms_t S = 1e+6;
+
 #define NoteVelFormula(velvar) (static_cast<unsigned char>(m_dVolume > 1.0 ? static_cast<double>(INT8_MAX) - (static_cast<double>(INT8_MAX) - static_cast<double>(velvar)) * (2.0 - m_dVolume) : static_cast<double>(velvar) * m_dVolume))
 #define IsNote(type) (type == MIDIChannelEvent::NoteOn || type == MIDIChannelEvent::NoteOff)
 #define IsNotNote(type) (type != MIDIChannelEvent::NoteOn && type != MIDIChannelEvent::NoteOff)
@@ -78,6 +81,10 @@ __forceinline string FloatSizeToCE(uint8_t Size) {
     return "Bytes";
 }
 
+__forceinline string CEPtr() {
+    return "Pointer";
+}
+
 inline wstring GetExePath(void) {
     wchar_t szFilePath[LONG_MAX_PATH] = {};
     GetModuleFileNameW(NULL, szFilePath, LONG_MAX_PATH);
@@ -116,9 +123,6 @@ public:
     double m_dFramerate;
 
 private:
-    static const mms_t m_llPrecisionLimit = 1000000000ll;
-    static const mms_t m_llPrecisionThrottle = 1000ll;
-
     // Timer stuff
     mms_t GetRawTicks();
     mms_t m_llStartTicks;

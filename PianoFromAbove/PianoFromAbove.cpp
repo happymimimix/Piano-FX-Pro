@@ -186,9 +186,9 @@ string InitializeVariables() {
     return Code;
 }
 
-string DefineMemoryAddress(string VariableName, string Address) {
+string DefineMemoryAddress(string VariableName, string Address, bool Pointer) {
     string Code = "";
-    Code += VariableName + "=\"" + WStringToUtf8(GetProcessName()) + "+" + Address + "\"\n";
+    Code += VariableName + "=" + string(Pointer?"readPointer":"getAddress") + "(\"" + WStringToUtf8(GetProcessName()) + "+" + Address + "\")\n";
     return Code;
 }
 
@@ -467,7 +467,7 @@ string EasingFunctions() {
     Code += "end\n";
     Code += "end\n";
     Code += "function Incomplete()\n";
-    Code += "return GetMicroseconds()<GetSongLength()\n";
+    Code += "return GetMicroseconds()<GetSongLength() and readShortInteger(\"" + WStringToUtf8(GetProcessName()) + "+" + GetAddress(PointersInitialized) + "\")!=0\n";
     Code += "end\n";
     return Code;
 }
@@ -548,8 +548,6 @@ string ShaderEngine() {
     Code += "LastUpdate=os.time()*S+os.clock()*S\n";
     Code += "ShaderLookupTable={}\n";
     Code += "ShaderGlobalState={}\n";
-    Code += "ShaderPersistentDC={}\n";
-    Code += "ShaderPersistentBMP={}\n";
     Code += "ShaderLookupCounter=0\n";
     Code += "ShaderWorking=true\n";
     Code += "while Incomplete() and DebugShaderList.Items~=nil do\n";
@@ -564,21 +562,16 @@ string ShaderEngine() {
     Code += "while ShaderID<DebugShaderList.Items.Count do\n";
     Code += "local ShaderEntry=ShaderLookupTable[DebugShaderList.Items.getData(ShaderID)]\n";
     Code += "while ShaderEntry.Param.TimingMethod()>ShaderEntry.Param.EndTime do\n";
+    Code += "ShaderEntry.Func(MEMdc,true,1,ShaderEntry.Param.TimingMethod()-ShaderEntry.Param.StartTime,W,H,ShaderGlobalState[DebugShaderList.Items.getData(ShaderID)],table.unpack(ShaderEntry.Param.EffectParameters))\n";
     Code += "ShaderLookupTable[DebugShaderList.Items.getData(ShaderID)]=nil\n";
     Code += "ShaderGlobalState[DebugShaderList.Items.getData(ShaderID)]=nil\n";
-    Code += "EXE(\"DeleteDC\",ShaderPersistentDC[DebugShaderList.Items.getData(ShaderID)])\n";
-    Code += "EXE(\"DeleteObject\",ShaderPersistentBMP[DebugShaderList.Items.getData(ShaderID)])\n";
-    Code += "ShaderPersistentDC[DebugShaderList.Items.getData(ShaderID)]=nil\n";
-    Code += "ShaderPersistentBMP[DebugShaderList.Items.getData(ShaderID)]=nil\n";
     Code += "DebugShaderList.Items.delete(ShaderID)\n";
     Code += "if ShaderID>=DebugShaderList.Items.Count then goto Finish end\n";
     Code += "ShaderEntry=ShaderLookupTable[DebugShaderList.Items.getData(ShaderID)]\n";
     Code += "end\n";
     Code += "if ShaderEntry.Param.TimingMethod()<ShaderEntry.Param.StartTime then goto Skip end\n";
     Code += "if ShaderGlobalState[DebugShaderList.Items.getData(ShaderID)]==nil then ShaderGlobalState[DebugShaderList.Items.getData(ShaderID)]={} end\n";
-    Code += "if ShaderPersistentDC[DebugShaderList.Items.getData(ShaderID)]==nil then ShaderPersistentDC[DebugShaderList.Items.getData(ShaderID)]=EXE(\"CreateCompatibleDC\",GDIdc) end\n";
-    Code += "if ShaderPersistentBMP[DebugShaderList.Items.getData(ShaderID)]==nil then ShaderPersistentBMP[DebugShaderList.Items.getData(ShaderID)]=EXE(\"CreateCompatibleBitmap\",GDIdc,W,H) end\n";
-    Code += "ShaderEntry.Func(MEMdc,ShaderPersistentDC[DebugShaderList.Items.getData(ShaderID)],(ShaderEntry.Param.TimingMethod()-ShaderEntry.Param.StartTime)/(ShaderEntry.Param.EndTime-ShaderEntry.Param.StartTime),ShaderEntry.Param.TimingMethod()-ShaderEntry.Param.StartTime,W,H,ShaderGlobalState[DebugShaderList.Items.getData(ShaderID)],table.unpack(ShaderEntry.Param.EffectParameters))\n";
+    Code += "ShaderEntry.Func(MEMdc,false,(ShaderEntry.Param.TimingMethod()-ShaderEntry.Param.StartTime)/(ShaderEntry.Param.EndTime-ShaderEntry.Param.StartTime),ShaderEntry.Param.TimingMethod()-ShaderEntry.Param.StartTime,W,H,ShaderGlobalState[DebugShaderList.Items.getData(ShaderID)],table.unpack(ShaderEntry.Param.EffectParameters))\n";
     Code += "::Skip::\n";
     Code += "ShaderID=ShaderID+1\n";
     Code += "end\n";
@@ -654,15 +647,31 @@ string BlankShader(bool IsDark) {
 
 string WaveBitBlt(bool Vertical,string SRC,bool Persistent) {
     string ShiftCode = "math.random(-math.abs(ShiftingAmount),math.abs(ShiftingAmount))";
-    return "EXE(\"BitBlt\"," + string(Persistent ? "PersiDC" :"DC") + "," + string(Vertical ? "Line" : ShiftCode) + "," + string(Vertical ? ShiftCode: "Line") + "," + string(Vertical ? "MaxWaveWidth" : "W") + "," + string(Vertical ? "H" : "MaxWaveHeight") + ",DC," + string(Vertical ? "Line,0" : "0,Line") + ","+SRC+")\n";
+    return "EXE(\"BitBlt\"," + string(Persistent ? "GlobalState.PersiDC" :"DC") + "," + string(Vertical ? "Line" : ShiftCode) + "," + string(Vertical ? ShiftCode: "Line") + "," + string(Vertical ? "MaxWaveWidth" : "W") + "," + string(Vertical ? "H" : "MaxWaveHeight") + ",DC," + string(Vertical ? "Line,0" : "0,Line") + ","+SRC+")\n";
 }
 
 string WaveShader(string prefix, bool Vertical, bool Glitch) {
     string Code = "";
-    Code += "function " + prefix + "Shader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,MaxWave" + string(Vertical ? "Width" : "Height") + ",MinWave" + string(Vertical ? "Width" : "Height") + ",ShiftingAmount)\n";
+    Code += "function " + prefix + "Shader(DC,Final,Time,Elapsed,W,H,GlobalState,MaxWave" + string(Vertical ? "Width" : "Height") + ",MinWave" + string(Vertical ? "Width" : "Height") + ",ShiftingAmount)\n";
     Code += "if MaxWave" + string(Vertical ? "Width" : "Height") + "==nil then MaxWave" + string(Vertical ? "Width" : "Height") + "=" + string(Vertical ? "100" : "10") + " end\n";
     Code += "if MinWave" + string(Vertical ? "Width" : "Height") + "==nil then MinWave" + string(Vertical ? "Width" : "Height") + "=" + string(Vertical ? "20" : "5") + " end\n";
     Code += "if ShiftingAmount==nil then ShiftingAmount=10 end\n";
+    Code += Glitch ? "if GlobalState.PersiDC==nil then" : "";
+    Code += Glitch ? "GlobalState.PersiDC=EXE(\"CreateCompatibleDC\",DC)" : "";
+    Code += Glitch ? "GlobalState.PersiBMP=EXE(\"CreateCompatibleBitmap\",DC,W,H)" : "";
+    Code += Glitch ? "GlobalState.PersiW=W" : "";
+    Code += Glitch ? "GlobalState.PersiH=H" : "";
+    Code += Glitch ? "EXE(\"BitBlt\",GlobalState.PersiDC,0,0,W,H,DC,0,0,SRCCOPY)" : "";
+    Code += Glitch ? "end" : "";
+    Code += Glitch ? "if GlobalState.PersiW!=W or GlobalState.PersiH!=H then" : "";
+    Code += Glitch ? "EXE(\"DeleteDC\",GlobalState.PersiDC)\n" : "";
+    Code += Glitch ? "EXE(\"DeleteObject\",GlobalState.PersiBMP)\n" : "";
+    Code += Glitch ? "GlobalState.PersiDC=EXE(\"CreateCompatibleDC\",DC)" : "";
+    Code += Glitch ? "GlobalState.PersiBMP=EXE(\"CreateCompatibleBitmap\",DC,W,H)" : "";
+    Code += Glitch ? "GlobalState.PersiW=W" : "";
+    Code += Glitch ? "GlobalState.PersiH=H" : "";
+    Code += Glitch ? "EXE(\"BitBlt\",GlobalState.PersiDC,0,0,W,H,DC,0,0,SRCCOPY)" : "";
+    Code += Glitch ? "end" : "";
     Code += "local Line=0\n";
     Code += "while Line<" + string(Vertical ? "W" : "H") + " do\n";
     Code += Glitch ? "if math.random(0,1)==0 then\n" : "";
@@ -673,14 +682,18 @@ string WaveShader(string prefix, bool Vertical, bool Glitch) {
     Code += Glitch ? "end\n" : "";
     Code += "Line=Line+math.random(MinWave" + string(Vertical ? "Width" : "Height") + ",MaxWave" + string(Vertical ? "Width" : "Height") + ")\n";
     Code += "end\n";
-    Code += Glitch ? "EXE(\"BitBlt\",DC,0,0,W,H,PersiDC,0,0,SRCCOPY)\n" : "";
+    Code += Glitch ? "EXE(\"BitBlt\",DC,0,0,W,H,GlobalState.PersiDC,0,0,SRCCOPY)\n" : "";
+    Code += Glitch ? "if Final then" : "";
+    Code += Glitch ? "EXE(\"DeleteDC\",GlobalState.PersiDC)\n" : "";
+    Code += Glitch ? "EXE(\"DeleteObject\",GlobalState.PersiBMP)\n" : "";
+    Code += Glitch ? "end" : "";
     Code += "end\n";
     return Code;
 }
 
 string ColorBurnShader() {
     string Code = "";
-    Code += "function ColorBurnShader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,R,G,B)\n";
+    Code += "function ColorBurnShader(DC,Final,Time,Elapsed,W,H,GlobalState,R,G,B)\n";
     Code += "if R==nil then R=0 end\n";
     Code += "if G==nil then G=255 end\n";
     Code += "if B==nil then B=0 end\n";
@@ -698,7 +711,7 @@ string ColorBurnShader() {
 
 string RainbowBurnShader(bool Vertical,bool Animated,bool Reversed) {
     string Code = "";
-    Code += "function " + string(Reversed ? "Reversed" : "") + string(Animated ? "Animated" : "") + string(Vertical ? "Vertical" : "") + "RainbowBurnShader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,Initial_R,Initial_G,Initial_B,Final_R,Final_G,Final_B" + string(Animated ? ",Iteration" : "")+",Bar" + string(Vertical ? "Width" : "Height") + ")\n";
+    Code += "function " + string(Reversed ? "Reversed" : "") + string(Animated ? "Animated" : "") + string(Vertical ? "Vertical" : "") + "RainbowBurnShader(DC,Final,Time,Elapsed,W,H,GlobalState,Initial_R,Initial_G,Initial_B,Final_R,Final_G,Final_B" + string(Animated ? ",Iteration" : "")+",Bar" + string(Vertical ? "Width" : "Height") + ")\n";
     Code += "if Initial_R==nil then Initial_R=0 end\n";
     Code += "if Initial_G==nil then Initial_G=255 end\n";
     Code += "if Initial_B==nil then Initial_B=0 end\n";   
@@ -729,7 +742,7 @@ string RainbowBurnShader(bool Vertical,bool Animated,bool Reversed) {
 
 string ColorOffset(bool WithWave) {
     string Code = "";
-    Code += "function ColorOffset"+string(WithWave?"Wave":"") + "Shader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,OffsettingAmount" + string(WithWave ? ",MaxWaveHeight,MinWaveHeight,ShiftingAmount" : "") + ")\n";
+    Code += "function ColorOffset"+string(WithWave?"Wave":"") + "Shader(DC,Final,Time,Elapsed,W,H,GlobalState,OffsettingAmount" + string(WithWave ? ",MaxWaveHeight,MinWaveHeight,ShiftingAmount" : "") + ")\n";
     Code += "if OffsettingAmount==nil then OffsettingAmount=5 end\n";
     Code += WithWave?"if MaxWaveHeight==nil then MaxWaveHeight=40 end\n":"";
     Code += WithWave?"if MinWaveHeight==nil then MinWaveHeight=10 end\n" : "";
@@ -791,7 +804,7 @@ string ColorOffset(bool WithWave) {
 
 string FadeShader(bool IsDark, bool IsReversed) {
     string Code = "";
-    Code += "function " + string(IsReversed ? "Reversed" : "") + string(IsDark ? "Dark" : "Bright") + "FadeShader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,MaxAlpha,MinAlpha)\n";
+    Code += "function " + string(IsReversed ? "Reversed" : "") + string(IsDark ? "Dark" : "Bright") + "FadeShader(DC,Final,Time,Elapsed,W,H,GlobalState,MaxAlpha,MinAlpha)\n";
     Code += "if MaxAlpha==nil then MaxAlpha=255.0 end\n";
     Code += "if MinAlpha==nil then MinAlpha=0.0 end\n";
     Code += "local MEMdc=EXE(\"CreateCompatibleDC\",DC)\n";
@@ -810,7 +823,7 @@ string FadeShader(bool IsDark, bool IsReversed) {
 
 string HatchBrushShader() {
     string Code = "";
-    Code += "function HatchBrushShader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,R,G,B,BkR,BkG,BkB)\n";
+    Code += "function HatchBrushShader(DC,Final,Time,Elapsed,W,H,GlobalState,R,G,B,BkR,BkG,BkB)\n";
     Code += "if R==nil then R=0 end\n";
     Code += "if G==nil then G=255 end\n";
     Code += "if B==nil then B=0 end\n";
@@ -836,7 +849,7 @@ string HatchBrushShader() {
 
 string TextShader(bool Type, bool IsReversed) {
     string Code = "";
-    Code += "function " + string(Type ? (IsReversed ? "Delete" : "Type") : "") + "TextShader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,Text,FontHeight,FontWidth,FontWeight,FaceName,Alignment,Italic,Underline,StrikeOut,PosX,PosY,NoBackground,TextR,TextG,TextB,BkR,BkG,BkB)\n";
+    Code += "function " + string(Type ? (IsReversed ? "Delete" : "Type") : "") + "TextShader(DC,Final,Time,Elapsed,W,H,GlobalState,Text,FontHeight,FontWidth,FontWeight,FaceName,Alignment,Italic,Underline,StrikeOut,PosX,PosY,NoBackground,TextR,TextG,TextB,BkR,BkG,BkB)\n";
     Code += "if Text==nil then Text=\"Hello World\" end\n";
     Code += "if FontHeight==nil then FontHeight=50 end\n";
     Code += "if FontWidth==nil then FontWidth=30 end\n";
@@ -955,7 +968,7 @@ string RotatePointTool() {
 
 string RadialBlurShader(bool IsBlur, bool IsPaint) {
     string Code = "";
-    Code += "function Radial" + string(IsBlur ? "Blur" : (IsPaint ? "Paint" : "And")) + "Shader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,MaxRotation,Precision" + string(IsBlur ? ",BlendAlpha" : "") + ",Iteration)\n";
+    Code += "function Radial" + string(IsBlur ? "Blur" : (IsPaint ? "Paint" : "And")) + "Shader(DC,Final,Time,Elapsed,W,H,GlobalState,MaxRotation,Precision" + string(IsBlur ? ",BlendAlpha" : "") + ",Iteration)\n";
     Code += "if MaxRotation==nil then MaxRotation=0.05 end\n";
     Code += "if Precision==nil then Precision=4 end\n";
     Code += IsBlur ? "if BlendAlpha==nil then BlendAlpha=(1<<7)-1 end\n":"";
@@ -996,7 +1009,7 @@ string PolygonShader(bool IsColored, bool IsRandom) {
     EncodeColor::ColorR = "R";
     EncodeColor::ColorG = "G";
     EncodeColor::ColorB = "B";
-    Code += "function " + string(IsColored ? (IsRandom ? "RandomColor" : "Color") : "Invert") + "PolygonShader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,MaxSides,MinSides,MaxRadius,MinRadius,MaxCount,MinCount,RotationSpeed,LineThickness,Delay" + string(IsColored ? (IsRandom ? "" : ",R,G,B") : "") + ")\n";
+    Code += "function " + string(IsColored ? (IsRandom ? "RandomColor" : "Color") : "Invert") + "PolygonShader(DC,Final,Time,Elapsed,W,H,GlobalState,MaxSides,MinSides,MaxRadius,MinRadius,MaxCount,MinCount,RotationSpeed,LineThickness,Delay" + string(IsColored ? (IsRandom ? "" : ",R,G,B") : "") + ")\n";
     Code += "if MaxSides==nil then MaxSides=10 end\n";
     Code += "if MinSides==nil then MinSides=3 end\n";
     Code += "if MaxRadius==nil then MaxRadius=400 end\n";
@@ -1079,7 +1092,7 @@ string TriangleFrameShader(bool IsRandom) {
     EncodeColor::ColorG = "G";
     EncodeColor::ColorB = "B";
     EncodeColor::ColorA = "Transparency";
-    Code += "function " + string(IsRandom ? "RandomColor" : "") + "TriangleFrameShader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,Size,Speed,Transparency" + string(IsRandom ? "" : ",R,G,B") + ")\n";
+    Code += "function " + string(IsRandom ? "RandomColor" : "") + "TriangleFrameShader(DC,Final,Time,Elapsed,W,H,GlobalState,Size,Speed,Transparency" + string(IsRandom ? "" : ",R,G,B") + ")\n";
     Code += "if Size==nil then Size=200 end\n";
     Code += "if Speed==nil then Speed=5 end\n";
     Code += "if Transparency==nil then Transparency=(1<<7)+(1<<6)-1 end\n";
@@ -1168,7 +1181,7 @@ string TriangleFrameShader(bool IsRandom) {
 
 string CRTShader() {
     string Code = "";
-    Code += "function CRTShader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,ColorOffsetAmount,ColorOffsetTransparency,ScanLineTransparency,ScanLineHeight,ScanLineSpacing)\n";
+    Code += "function CRTShader(DC,Final,Time,Elapsed,W,H,GlobalState,ColorOffsetAmount,ColorOffsetTransparency,ScanLineTransparency,ScanLineHeight,ScanLineSpacing)\n";
     Code += "if ColorOffsetAmount==nil then ColorOffsetAmount=2 end\n";
     Code += "if ColorOffsetTransparency==nil then ColorOffsetTransparency=(1<<7)-1 end\n";
     Code += "if ScanLineTransparency==nil then ScanLineTransparency=(1<<6)-1 end\n";
@@ -1240,7 +1253,7 @@ string CRTShader() {
 
 string NoiseShader() {
     string Code = "";
-    Code += "function NoiseShader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,MaxNoiseSize,MinNoiseSize,MaxNoiseAmount,MinNoiseAmount)\n";
+    Code += "function NoiseShader(DC,Final,Time,Elapsed,W,H,GlobalState,MaxNoiseSize,MinNoiseSize,MaxNoiseAmount,MinNoiseAmount)\n";
     Code += "if MaxNoiseSize==nil then MaxNoiseSize=3 end\n";
     Code += "if MinNoiseSize==nil then MinNoiseSize=1 end\n";
     Code += "if MaxNoiseAmount==nil then MaxNoiseAmount=(1<<9)-1 end\n";
@@ -1256,7 +1269,7 @@ string NoiseShader() {
 
 string FrameShader(bool IsAnimated) {
     string Code = "";
-    Code += "function " + string(IsAnimated ? "Animated" : "") + "FrameShader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,FrameSize,Resolution" + string(IsAnimated ? ",Initial_R,Initial_G,Initial_B,Initial_A,Final_R,Final_G,Final_B,Final_A,Iteration" : ",R,G,B,A") + ")\n";
+    Code += "function " + string(IsAnimated ? "Animated" : "") + "FrameShader(DC,Final,Time,Elapsed,W,H,GlobalState,FrameSize,Resolution" + string(IsAnimated ? ",Initial_R,Initial_G,Initial_B,Initial_A,Final_R,Final_G,Final_B,Final_A,Iteration" : ",R,G,B,A") + ")\n";
     Code += "if FrameSize==nil then FrameSize=(1<<7)-1 end\n";
     Code += "if Resolution==nil then Resolution=2 end\n";
     Code += IsAnimated ? "if Initial_R==nil then Initial_R=255 end\n": "if R==nil then R=255 end\n";
@@ -1306,7 +1319,7 @@ string FrameShader(bool IsAnimated) {
 
 string GlassShader(bool Reversed) {
     string Code = "";
-    Code += "function " + string(Reversed ? "Reversed" : "") + "GlassFadeShader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,BlendAlpha,MaxBlur,MinBlur)\n";
+    Code += "function " + string(Reversed ? "Reversed" : "") + "GlassFadeShader(DC,Final,Time,Elapsed,W,H,GlobalState,BlendAlpha,MaxBlur,MinBlur)\n";
     Code += "if BlendAlpha==nil then BlendAlpha=(1<<6)-1 end\n";
     Code += "if MaxBlur==nil then MaxBlur=10 end\n";
     Code += "if MinBlur==nil then MinBlur=0 end\n";
@@ -1330,7 +1343,7 @@ string GlassShader(bool Reversed) {
 
 string PixelateShader(bool WithAlpha) {
     string Code = "";
-    Code += "function " + string(WithAlpha ? "Alpha" : "") + "PixelateShader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,Multiplier"+string(WithAlpha?",Alpha" :"") + ")\n";
+    Code += "function " + string(WithAlpha ? "Alpha" : "") + "PixelateShader(DC,Final,Time,Elapsed,W,H,GlobalState,Multiplier"+string(WithAlpha?",Alpha" :"") + ")\n";
     Code += "if Multiplier==nil then Multiplier=4 end\n";
     Code += WithAlpha?"if Alpha==nil then Alpha=(1<<7)+(1<<6)-1 end\n":"";
     Code += "local MEMdc=EXE(\"CreateCompatibleDC\",DC)\n";
@@ -1348,7 +1361,7 @@ string PixelateShader(bool WithAlpha) {
 
 string MatrixShader() {
     string Code = "";
-    Code += "function MatrixShader(DC,PersiDC,Time,Elapsed,W,H,GlobalState,Cols,CharHeight,FontWeight,MaxSpeed,MinSpeed,MaxTailLength,MinTailLength,FontName,R,G,B)\n";
+    Code += "function MatrixShader(DC,Final,Time,Elapsed,W,H,GlobalState,Cols,CharHeight,FontWeight,MaxSpeed,MinSpeed,MaxTailLength,MinTailLength,FontName,R,G,B)\n";
     Code += "if Cols==nil then Cols=50 end\n";
     Code += "if CharHeight==nil then CharHeight=20 end\n";
     Code += "if FontWeight==nil then FontWeight=400 end\n";
@@ -1502,48 +1515,53 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 string Code = "";
                 Code += MultiInstanceGuardInit();
                 Code += "collectgarbage(\"collect\")\n";// Clean up any leftovers from previous run
+                Code += "while readShortInteger(\"" + WStringToUtf8(GetProcessName()) + "+" + GetAddress(PointersInitialized) + "\")==0 do\n";
+                Code += "processMessages()\n";
+                Code += "end\n";
                 Code += "-- Variable Definitions: \n";
-                Code += DefineMemoryAddress("SongLength", GetAddress(TotalTime));
-                Code += DefineMemoryAddress("Microseconds", GetAddress(m_llStartTime));
-                Code += DefineMemoryAddress("Ticks", GetAddress(m_iStartTick));
-                Code += DefineMemoryAddress("Resolution", GetAddress(resolution));
-                Code += DefineMemoryAddress("NoteCount", GetAddress(TotalNC));
-                Code += DefineMemoryAddress("NotesPerSecond", GetAddress(nps));
-                Code += DefineMemoryAddress("Polyphony", GetAddress(polyphony));
-                Code += DefineMemoryAddress("Passed", GetAddress(passed));
-                Code += DefineMemoryAddress("Volume", cPlayback.GetVolumeAddress());
-                Code += DefineMemoryAddress("Mute", cPlayback.GetMuteAddress());
-                Code += DefineMemoryAddress("PlaybackSpeed", cPlayback.GetSpeedAddress());
-                Code += DefineMemoryAddress("NoteSpeed", cPlayback.GetNSpeedAddress());
-                Code += DefineMemoryAddress("OffsetX", cView.GetOffsetXAddress());
-                Code += DefineMemoryAddress("OffsetY", cView.GetOffsetYAddress());
-                Code += DefineMemoryAddress("Zoom", cView.GetZoomXAddress());
-                Code += DefineMemoryAddress("UpdateNotePos", GetAddress(UpdateNotePos));
-                Code += DefineMemoryAddress("SameWidth", GetAddress(cVideo.bSameWidth));
-                Code += DefineMemoryAddress("VelocityMapping", GetAddress(cVideo.bMapVel));
-                Code += DefineMemoryAddress("StartKey", GetAddress(cVisual.iFirstKey));
-                Code += DefineMemoryAddress("EndKey", GetAddress(cVisual.iLastKey));
-                Code += DefineMemoryAddress("KeyMode", GetAddress(cVisual.eKeysShown));
-                Code += DefineMemoryAddress("Width", GetAddress(width));
-                Code += DefineMemoryAddress("Height", GetAddress(height));
-                Code += DefineMemoryAddress("Paused", cPlayback.GetPausedAddress());
-                Code += DefineMemoryAddress("Keyboard", cView.GetKeyboardAddress());
-                Code += DefineMemoryAddress("VisualizePitchBends", GetAddress(cVideo.bVisualizePitchBends));
-                Code += DefineMemoryAddress("PhigrosMode", GetAddress(cControls.bPhigros));
-                Code += DefineMemoryAddress("ShowMarkers", GetAddress(cVideo.bShowMarkers));
-                Code += DefineMemoryAddress("TickBased", GetAddress(cVideo.bTickBased));
-                Code += DefineMemoryAddress("HideStatistics", GetAddress(cVideo.bDisableUI));
-                Code += DefineMemoryAddress("RemoveOverlaps", GetAddress(cVideo.bOR));
-                Code += DefineMemoryAddress("LimitFPS", GetAddress(cVideo.bLimitFPS));
-                Code += DefineMemoryAddress("VelocityThreshold", GetAddress(cControls.iVelocityThreshold));
-                Code += DefineMemoryAddress("Caption", GetAddress(CheatEngineCaption[1]));
-                Code += DefineMemoryAddress("CaptionAlignment", GetAddress(CheatEngineCaption));
-                Code += DefineMemoryAddress("DifficultyText", GetAddress(Difficulty));
+                Code += DefineMemoryAddress("SongLength", GetAddress(Ptr_to_m_llMaxTime), true);
+                Code += DefineMemoryAddress("InitialSilence", GetAddress(Ptr_to_m_llMinTime), true);
+                Code += DefineMemoryAddress("Microseconds", GetAddress(Ptr_to_m_llStartTime), true);
+                Code += DefineMemoryAddress("Ticks", GetAddress(Ptr_to_m_iStartTick), true);
+                Code += DefineMemoryAddress("Resolution", GetAddress(Ptr_to_m_MIDI_iResolution), true);
+                Code += DefineMemoryAddress("NoteCount", GetAddress(Ptr_to_m_MIDI_iTotalNC), true);
+                Code += DefineMemoryAddress("NotesPerSecond", GetAddress(Ptr_to_m_iNPS), true);
+                Code += DefineMemoryAddress("Polyphony", GetAddress(Ptr_to_m_iPolyphony), true);
+                Code += DefineMemoryAddress("Passed", GetAddress(Ptr_to_m_iPassed), true);
+                Code += DefineMemoryAddress("Volume", cPlayback.GetVolumeAddress(), false);
+                Code += DefineMemoryAddress("Mute", cPlayback.GetMuteAddress(), false);
+                Code += DefineMemoryAddress("PlaybackSpeed", cPlayback.GetSpeedAddress(), false);
+                Code += DefineMemoryAddress("NoteSpeed", cPlayback.GetNSpeedAddress(), false);
+                Code += DefineMemoryAddress("OffsetX", cView.GetOffsetXAddress(), false);
+                Code += DefineMemoryAddress("OffsetY", cView.GetOffsetYAddress(), false);
+                Code += DefineMemoryAddress("Zoom", cView.GetZoomXAddress(), false);
+                Code += DefineMemoryAddress("UpdateNotePos", GetAddress(Ptr_to_m_bUpdateNotePos), true);
+                Code += DefineMemoryAddress("UpdateTrackColor", GetAddress(Ptr_to_m_bUpdateTrackColor), true);
+                Code += DefineMemoryAddress("SameWidth", GetAddress(cVideo.bSameWidth), false);
+                Code += DefineMemoryAddress("VelocityMapping", GetAddress(cVideo.bMapVel), false);
+                Code += DefineMemoryAddress("StartKey", GetAddress(cVisual.iFirstKey), false);
+                Code += DefineMemoryAddress("EndKey", GetAddress(cVisual.iLastKey), false);
+                Code += DefineMemoryAddress("KeyMode", GetAddress(cVisual.eKeysShown), false);
+                Code += DefineMemoryAddress("Width", GetAddress(Ptr_to_m_iWidth), true);
+                Code += DefineMemoryAddress("Height", GetAddress(Ptr_to_m_iHeight), true);
+                Code += DefineMemoryAddress("Paused", cPlayback.GetPausedAddress(), false);
+                Code += DefineMemoryAddress("Keyboard", cView.GetKeyboardAddress(), false);
+                Code += DefineMemoryAddress("VisualizePitchBends", GetAddress(cVideo.bVisualizePitchBends), false);
+                Code += DefineMemoryAddress("PhigrosMode", GetAddress(cControls.bPhigros), false);
+                Code += DefineMemoryAddress("ShowMarkers", GetAddress(cVideo.bShowMarkers), false);
+                Code += DefineMemoryAddress("TickBased", GetAddress(cVideo.bTickBased), false);
+                Code += DefineMemoryAddress("HideStatistics", GetAddress(cVideo.bDisableUI), false);
+                Code += DefineMemoryAddress("RemoveOverlaps", GetAddress(cVideo.bOR), false);
+                Code += DefineMemoryAddress("LimitFPS", GetAddress(cVideo.bLimitFPS), false);
+                Code += DefineMemoryAddress("VelocityThreshold", GetAddress(cControls.iVelocityThreshold), false);
+                Code += DefineMemoryAddress("Caption", GetAddress(Ptr_to_CaptionContent), true);
+                Code += DefineMemoryAddress("CaptionAlignment", GetAddress(Ptr_to_CheatEngineCaption), true);
+                Code += DefineMemoryAddress("DifficultyText", GetAddress(Ptr_to_Difficulty), true);
                 Code += "-- FFMPEG Video Export\n";
-                Code += DefineMemoryAddress("CE_VideoOutput", GetAddress(cControls.bDumpFrames));
-                Code += DefineMemoryAddress("CE_Connected", GetAddress(CE_Connected));
-                Code += DefineMemoryAddress("CE_DoNextTick", GetAddress(CE_DoNextTick));
-                Code += DefineMemoryAddress("CE_Responded", GetAddress(CE_Responded));
+                Code += DefineMemoryAddress("CE_VideoOutput", GetAddress(Ptr_to_CE_VideoOutput), true);
+                Code += DefineMemoryAddress("CE_Connected", GetAddress(Ptr_to_CE_Connected), true);
+                Code += DefineMemoryAddress("CE_DoNextTick", GetAddress(Ptr_to_CE_DoNextTick), true);
+                Code += DefineMemoryAddress("CE_Responded", GetAddress(Ptr_to_CE_Responded), true);
                 Code += "-- Custom Variable Definitions: (Version: " + WStringToUtf8(VersionString) + ")\n";
                 Code += "\n";
                 Code += "-- Function Definitions: (DO NOT CHANGE!)\n";
@@ -1552,14 +1570,15 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += CreateDebugWindow("Pending", "0", "0", "400", "250");
                 Code += CreateDebugWindow("Active", "0", "280", "400", "220");
                 Code += CreateDebugWindow("History", "400", "0", "350", "500", false);
-                Code += GettersAndSetters("SongLength", IntSizeToCE(sizeof(TotalTime)), true, "History");
-                Code += GettersAndSetters("Microseconds", IntSizeToCE(sizeof(m_llStartTime)), false, "History");
-                Code += GettersAndSetters("Ticks", IntSizeToCE(sizeof(m_iStartTick)), true, "History", true);
-                Code += GettersAndSetters("Resolution", IntSizeToCE(sizeof(resolution)), true, "History");
-                Code += GettersAndSetters("NoteCount", IntSizeToCE(sizeof(TotalNC)), true, "History");
-                Code += GettersAndSetters("NotesPerSecond", IntSizeToCE(sizeof(nps)), true, "History");
-                Code += GettersAndSetters("Polyphony", IntSizeToCE(sizeof(polyphony)), true, "History");
-                Code += GettersAndSetters("Passed", IntSizeToCE(sizeof(passed)), true, "History");
+                Code += GettersAndSetters("SongLength", IntSizeToCE(sizeof(*Ptr_to_m_llMaxTime)), true, "History");
+                Code += GettersAndSetters("InitialSilence", IntSizeToCE(sizeof(*Ptr_to_m_llMinTime)), true, "History");
+                Code += GettersAndSetters("Microseconds", IntSizeToCE(sizeof(*Ptr_to_m_llStartTime)), false, "History");
+                Code += GettersAndSetters("Ticks", IntSizeToCE(sizeof(*Ptr_to_m_iStartTick)), true, "History", true);
+                Code += GettersAndSetters("Resolution", IntSizeToCE(sizeof(*Ptr_to_m_MIDI_iResolution)), true, "History");
+                Code += GettersAndSetters("NoteCount", IntSizeToCE(sizeof(*Ptr_to_m_MIDI_iTotalNC)), true, "History");
+                Code += GettersAndSetters("NotesPerSecond", IntSizeToCE(sizeof(*Ptr_to_m_iNPS)), true, "History");
+                Code += GettersAndSetters("Polyphony", IntSizeToCE(sizeof(*Ptr_to_m_iPolyphony)), true, "History");
+                Code += GettersAndSetters("Passed", IntSizeToCE(sizeof(*Ptr_to_m_iPassed)), true, "History");
                 Code += GettersAndSetters("Volume", FloatSizeToCE(cPlayback.GetVolumeSize()), false, "History");
                 Code += GettersAndSetters("Mute", IntSizeToCE(cPlayback.GetMuteSize()), false, "History");
                 Code += GettersAndSetters("PlaybackSpeed", FloatSizeToCE(cPlayback.GetSpeedSize()), false, "History");
@@ -1572,8 +1591,8 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += GettersAndSetters("StartKey", IntSizeToCE(sizeof(cVisual.iFirstKey)), false, "History", false, true);
                 Code += GettersAndSetters("EndKey", IntSizeToCE(sizeof(cVisual.iLastKey)), false, "History", false, true);
                 Code += GettersAndSetters("KeyMode", IntSizeToCE(sizeof(cVisual.eKeysShown)), false, "History", false, true);
-                Code += GettersAndSetters("Width", IntSizeToCE(sizeof(width)), true, "History", true, true);
-                Code += GettersAndSetters("Height", IntSizeToCE(sizeof(height)), true, "History", true, true);
+                Code += GettersAndSetters("Width", IntSizeToCE(sizeof(*Ptr_to_m_iWidth)), true, "History", true, true);
+                Code += GettersAndSetters("Height", IntSizeToCE(sizeof(*Ptr_to_m_iHeight)), true, "History", true, true);
                 Code += SetResolutionFunction();
                 Code += GettersAndSetters("Paused", IntSizeToCE(cPlayback.GetPausedSize()), false, "History");
                 Code += GettersAndSetters("Keyboard", IntSizeToCE(cView.GetKeyboardVarSize()), false, "History");
@@ -1585,8 +1604,8 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += GettersAndSetters("RemoveOverlaps", IntSizeToCE(sizeof(cVideo.bOR)), false, "History");
                 Code += GettersAndSetters("LimitFPS", IntSizeToCE(sizeof(cVideo.bLimitFPS)), false, "History");
                 Code += GettersAndSetters("VelocityThreshold", IntSizeToCE(sizeof(cControls.iVelocityThreshold)), false, "History");
-                Code += StringTypeGettersAndSetters("Caption", sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0])-1, false, "History", true);
-                Code += StringTypeGettersAndSetters("DifficultyText", sizeof(Difficulty) / sizeof(Difficulty[0]), false, "History");
+                Code += StringTypeGettersAndSetters("Caption", MainScreen::CE_Caption_Size(), false, "History", true);
+                Code += StringTypeGettersAndSetters("DifficultyText", MainScreen::Difficulty_Size(), false, "History");
                 Code += EasingFunctions();
                 Code += WaitUntil(false, "Pending");
                 Code += WaitUntil(true, "Pending");
@@ -1862,7 +1881,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
     MIDI::InitArrays();
     if (__argc == 2) {
         // Get the game going
-        hThread = CreateThread(NULL, 0, GameThread, new SplashScreen(NULL, NULL, false), 0, NULL);
+        hThread = CreateThread(NULL, 0, GameThread, new IntroScreen(NULL, NULL), 0, NULL);
         if (!hThread) return 1;
         // Set up GUI and show
         SetPlayMode(GameState::Intro);
@@ -1880,7 +1899,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
     else {
         cout << WStringToUtf8(StartupStage2Text) << "\n";
         // Get the game going
-        hThread = CreateThread(NULL, 0, GameThread, new SplashScreen(NULL, NULL, true), 0, NULL);
+        hThread = CreateThread(NULL, 0, GameThread, new SplashScreen(NULL, NULL), 0, NULL);
         if (!hThread) return 1;
         // Set up GUI and show
         SetPlayMode(GameState::Splash);
