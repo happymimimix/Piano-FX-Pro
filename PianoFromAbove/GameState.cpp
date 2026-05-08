@@ -637,7 +637,6 @@ void MainScreen::InitState() {
     m_iFPSCount = 0;
     m_llFPSTime = 0;
     m_llPrevTime = m_llStartTime;
-    m_iPrevTick = m_iStartTick;
 
     m_fZoomX = cView.GetZoomX();
     m_fOffsetX = cView.GetOffsetX();
@@ -1050,32 +1049,13 @@ GameState::GameError MainScreen::Logic() {
 
     if ((bPausedChanged || bMuteChanged) && (m_bPaused || m_bMute)) m_OutDevice.AllNotesOff();
 
-    // Figure out start time for display
-    if (abs(m_llStartTime - m_llPrevTime) && JumpTarget == ~0) { // Handle time jump from cheat engine
-        JumpTarget = m_llStartTime;
-        JumpTo(m_llStartTime, true);
-        JumpTarget = ~0;
-    }
-    else {
-        m_llPrevTime = m_llStartTime;
-    }
+    // Figure out start and end times for display
+    mms_t llOldStartTime = m_llStartTime;
     mms_t llNextStartTime = m_llStartTime + static_cast<mms_t>(llElapsed * m_dSpeed + 0.5);
+
     if (!m_bPaused) m_llStartTime = llNextStartTime;
-
-    // Figure out start tick
-    /*
-    if (abs(m_iStartTick - m_iPrevTick) && JumpTarget == ~0) { // Handle time jump from cheat engine
-        JumpTarget = m_llStartTime;
-        JumpTo(m_iStartTick, true);
-        JumpTarget = ~0;
-    }
-    else {
-        m_iPrevTick = m_iStartTick;
-    }
-    */
     m_iStartTick = GetCurrentTick(m_llStartTime);
-
-    // Now the end time
+    
     mms_t llEndTime;
     if (m_bTickMode) {
         if (dNSpeed < 0) {
@@ -1094,6 +1074,14 @@ GameState::GameError MainScreen::Logic() {
         }
     }
 
+    if (abs(llOldStartTime - m_llPrevTime) && JumpTarget == ~0) { // Handle time jump from cheat engine
+        JumpTarget = m_llStartTime;
+        JumpTo(m_llStartTime, true);
+        JumpTarget = ~0;
+    }
+    else {
+        m_llPrevTime = m_llStartTime;
+    }
 
     idx_t iEventCount = static_cast<idx_t>(m_vEvents.size());
     RenderGlobals();
@@ -1289,19 +1277,13 @@ void MainScreen::UpdateStateBackwards(idx_t start, idx_t end) {
     // To do
 }
 
-void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode, bool toTick) {
+void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
     // Kill the music!
     if (!loadingMode) m_OutDevice.AllNotesOff();
 
     // Start time. Piece of cake!
-    if (toTick) {
-        if (!loadingMode) {
-            m_llStartTime = min(max(llStartTime, m_llMinTime), m_llMaxTime);
-        }
-        m_iStartTick = GetCurrentTick(m_llStartTime);
-    }
-    else {
-        m_iStartTick = llStartTime;
+    if (!loadingMode) {
+        m_llStartTime = min(max(llStartTime, m_llMinTime), m_llMaxTime);
     }
 
     mms_t llEndTime;
@@ -1326,7 +1308,7 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode, bool toTick) {
     auto itBegin = m_vEvents.begin();
     auto itEnd = m_vEvents.end();
     auto itMiddle = lower_bound(itBegin, itEnd, llStartTime, [&](MIDIChannelEvent* lhs, const mms_t rhs) {
-        return (toTick ? lhs->GetAbsTick() : lhs->GetAbsMicroSec()) < rhs;
+        return lhs->GetAbsMicroSec() < rhs;
         });
     // We've found it! Set m_iStartPos to our latest findings now.
     m_iStartPos = itMiddle - m_vEvents.begin();
@@ -1380,6 +1362,7 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode, bool toTick) {
     }
 SkipSearch:
     AdvanceIterators(llStartTime, true);
+    m_iStartTick = GetCurrentTick(m_llStartTime);
 
     // End position: a little tricky. Same as logic code. Only needed for paused jumping.
     if (m_dNSpeed < 0) {
@@ -1422,7 +1405,6 @@ SkipSearch:
 
     IsLastFrameReversed = false;
     m_llPrevTime = m_llStartTime;
-    m_iPrevTick = m_iStartTick;
     m_iPrevStartPos = m_iStartPos;
 }
 
@@ -1450,7 +1432,6 @@ void MainScreen::ApplyColor(MIDIMetaEvent * event) {
         }
         m_bUpdateTrackColor = true;
     }
-
 }
 
 void MainScreen::ApplyMarker(unsigned char* data, msgln_t size) {

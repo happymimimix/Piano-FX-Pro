@@ -353,7 +353,7 @@ private:
     // Logic
     void UpdateState(idx_t idx, idx_t sister_idx);
     void UpdateStateBackwards(idx_t start, idx_t end);
-    void JumpTo(mms_t llStartTime, bool loadingMode = false, bool toTick = false);
+    void JumpTo(mms_t llStartTime, bool loadingMode = false);
     void ApplyMarker(unsigned char* data, msgln_t size);
     void ApplyColor(MIDIMetaEvent* event);
     void AdvanceIterators(mms_t llTime, bool bIsJump);
