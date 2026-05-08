@@ -637,6 +637,7 @@ void MainScreen::InitState() {
     m_iFPSCount = 0;
     m_llFPSTime = 0;
     m_llPrevTime = m_llStartTime;
+    m_iPrevTick = m_iStartTick;
 
     m_fZoomX = cView.GetZoomX();
     m_fOffsetX = cView.GetOffsetX();
@@ -1051,10 +1052,14 @@ GameState::GameError MainScreen::Logic() {
 
     // Figure out start and end times for display
     mms_t llOldStartTime = m_llStartTime;
+    mms_t iOldStartTick = m_iStartTick;
     mms_t llNextStartTime = m_llStartTime + static_cast<mms_t>(llElapsed * m_dSpeed + 0.5);
 
-    if (!m_bPaused) m_llStartTime = llNextStartTime;
-    m_iStartTick = GetCurrentTick(m_llStartTime);
+    if (!m_bPaused) {
+        m_llStartTime = llNextStartTime;
+        AdvanceIterators(m_llStartTime, false);
+        m_iStartTick = GetCurrentTick(m_llStartTime);
+    }
     
     mms_t llEndTime;
     if (m_bTickMode) {
@@ -1079,9 +1084,33 @@ GameState::GameError MainScreen::Logic() {
         JumpTo(m_llStartTime, true);
         JumpTarget = ~0;
     }
-    else {
-        m_llPrevTime = m_llStartTime;
+    m_llPrevTime = m_llStartTime;
+    
+    if (abs(iOldStartTick - m_iPrevTick) && JumpTarget == ~0) { // Handle tick jump from cheat engine
+        // We need to find the tempo region that this jump lands in first, here we use upper_bound.
+        m_itNextTempo = upper_bound(m_vTempo.begin(), m_vTempo.end(), iOldStartTick, [&](mtk_t target, const pair<mms_t, idx_t>& entry) {return target < m_vMetaEvents[entry.second]->GetAbsTick();});
+        MIDIMetaEvent* pPrevious = GetPrevious(m_itNextTempo, m_vTempo, 3);
+        if (pPrevious)
+        {
+            MIDI::Parse24Bit(pPrevious->GetData(), 3, (uint32_t*)&m_iMicroSecsPerBeat);
+            m_iMicroSecsPerBeat |= !m_iMicroSecsPerBeat;// Clamp to > 0
+            m_iLastTempoTick = pPrevious->GetAbsTick();
+            m_llLastTempoTime = pPrevious->GetAbsMicroSec();
+        }
+        else
+        {
+            m_iMicroSecsPerBeat = 500000;
+            m_llLastTempoTime = m_iLastTempoTick = 0;
+        }
+        // Now use GetTickTime to figure out the corrisponding microsecond. 
+        m_llStartTime = GetTickTime(iOldStartTick);
+        AdvanceIterators(m_llStartTime, false);
+        // We can finally make the jump now! 
+        JumpTarget = m_llStartTime;
+        JumpTo(m_llStartTime, true);
+        JumpTarget = ~0;
     }
+    m_iPrevTick = m_iStartTick;
 
     idx_t iEventCount = static_cast<idx_t>(m_vEvents.size());
     RenderGlobals();
@@ -1207,12 +1236,10 @@ GameState::GameError MainScreen::Logic() {
     }
     m_iPrevStartPos = m_iStartPos;
 
-    AdvanceIterators(m_llStartTime, false);
-
     // Update the position slider
-    mms_t llOldPos = ((llOldStartTime - m_llMinTime) * 1000) / (m_llMaxTime - m_llMinTime);
-    mms_t llNewPos = ((m_llStartTime - m_llMinTime) * 1000) / (m_llMaxTime - m_llMinTime);
-    if (llOldPos != llNewPos) cPlayback.SetPosition(static_cast<win32_t>(llNewPos));
+    mms_t llOldPos = ((llOldStartTime - m_llMinTime) * INT16_MAX) / (m_llMaxTime - m_llMinTime);
+    mms_t llNewPos = ((m_llStartTime - m_llMinTime) * INT16_MAX) / (m_llMaxTime - m_llMinTime);
+    if (llOldPos != llNewPos && JumpTarget == ~0) cPlayback.SetPosition(static_cast<win32_t>(llNewPos));
 
     // Song's over
     if (!m_bPaused && ((m_dSpeed < 0) ? (m_llStartTime < m_llMinTime) : (m_llStartTime > m_llMaxTime))) {
@@ -1406,6 +1433,7 @@ SkipSearch:
 
     IsLastFrameReversed = false;
     m_llPrevTime = m_llStartTime;
+    m_iPrevTick = m_iStartTick;
     m_iPrevStartPos = m_iStartPos;
 }
 
