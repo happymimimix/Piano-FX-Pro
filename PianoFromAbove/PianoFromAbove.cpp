@@ -1573,7 +1573,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 Code += GettersAndSetters("SongLength", IntSizeToCE(sizeof(*Ptr_to_m_llMaxTime)), true, "History");
                 Code += GettersAndSetters("InitialSilence", IntSizeToCE(sizeof(*Ptr_to_m_llMinTime)), true, "History");
                 Code += GettersAndSetters("Microseconds", IntSizeToCE(sizeof(*Ptr_to_m_llStartTime)), false, "History");
-                Code += GettersAndSetters("Ticks", IntSizeToCE(sizeof(*Ptr_to_m_iStartTick)), true, "History", true);
+                Code += GettersAndSetters("Ticks", IntSizeToCE(sizeof(*Ptr_to_m_iStartTick)), false, "History", true);
                 Code += GettersAndSetters("Resolution", IntSizeToCE(sizeof(*Ptr_to_m_MIDI_iResolution)), true, "History");
                 Code += GettersAndSetters("NoteCount", IntSizeToCE(sizeof(*Ptr_to_m_MIDI_iTotalNC)), true, "History");
                 Code += GettersAndSetters("NotesPerSecond", IntSizeToCE(sizeof(*Ptr_to_m_iNPS)), true, "History");
