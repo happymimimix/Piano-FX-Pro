@@ -82,7 +82,7 @@ __forceinline string FloatSizeToCE(uint8_t Size) {
 }
 
 __forceinline string CEPtr() {
-    return "Pointer";
+    return "Pointer->";
 }
 
 inline wstring GetExePath(void) {

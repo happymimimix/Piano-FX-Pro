@@ -273,11 +273,10 @@ void SplashScreen::InitState() {
 
     m_Timer.Init(false);
 
-    UpdateNotePos = true;
+    m_bUpdateNotePos = true;
 }
 
 GameState::GameError SplashScreen::Init() {
-    UpdateNotePos = true;
     return Success;
 }
 
@@ -346,7 +345,7 @@ GameState::GameError SplashScreen::MsgProc(HWND, UINT msg, WPARAM wParam, LPARAM
             m_pNextState = reinterpret_cast<GameState*>(lParam);
             return Success;
         case ID_VIEW_RESETDEVICE:
-            UpdateNotePos = true;
+            m_bUpdateNotePos = true;
             if (FAILED(m_pRenderer->ResetDevice())) return DirectXError;
             return Success;
         }
@@ -473,7 +472,7 @@ void SplashScreen::RenderGlobals() {
     m_llRndStartTime = m_llStartTime - (m_llStartTime < 0 ? llMicroSecsPP : 0);
     m_llRndStartTime = (m_llRndStartTime / llMicroSecsPP) * llMicroSecsPP;
 
-    if (UpdateNotePos) GenNoteXTable();
+    if (m_bUpdateNotePos) GenNoteXTable();
 }
 
 void SplashScreen::RenderNotes() {
@@ -537,7 +536,7 @@ void SplashScreen::RenderNote(MIDIChannelEvent* pNote) {
 }
 
 void SplashScreen::GenNoteXTable() {
-    UpdateNotePos = false;
+    m_bUpdateNotePos = false;
     for (key_t i = m_iStartNote; i <= m_iEndNote; i++) {
         key_t iWhiteKeys = MIDI::WhiteCount(m_iStartNote, i);
         float fStartX = (MIDI::IsSharp(m_iStartNote) - MIDI::IsSharp(i)) * SharpRatio / 2.0f;
@@ -1064,6 +1063,7 @@ GameState::GameError MainScreen::Logic() {
     if (!m_bPaused) m_llStartTime = llNextStartTime;
 
     // Figure out start tick
+    /*
     if (abs(m_iStartTick - m_iPrevTick) && JumpTarget == ~0) { // Handle time jump from cheat engine
         JumpTarget = m_llStartTime;
         JumpTo(m_iStartTick, true);
@@ -1072,6 +1072,7 @@ GameState::GameError MainScreen::Logic() {
     else {
         m_iPrevTick = m_iStartTick;
     }
+    */
     m_iStartTick = GetCurrentTick(m_llStartTime);
 
     // Now the end time
@@ -1256,14 +1257,17 @@ GameState::GameError MainScreen::Logic() {
         memset(&fixed_consts.bends, 0, sizeof(float) * 16);
 
     // Update track colors
-    auto* track_colors = m_pRenderer->GetTrackColors();
-    for (track_t i = 0; i < min(m_vTrackSettings.size(), MaxTrackColors); i++) {
-        for (chan_t j = 0; j < MaxChannelColors; j++) {
-            auto& src = m_vTrackSettings[i].aChannels[j];
-            auto& dst = track_colors[TnC_t(i) * TnC_t(16u) + TnC_t(j)];
-            dst.primary = src.iPrimaryRGB;
-            dst.dark = src.iDarkRGB;
-            dst.darker = src.bHidden ? 0xFFFFFFFF : src.iVeryDarkRGB; // Hack to signal hidden track without checking on CPU
+    if (m_bUpdateTrackColor) {
+        m_bUpdateTrackColor = false;
+        auto* track_colors = m_pRenderer->GetTrackColors();
+        for (track_t i = 0; i < min(m_vTrackSettings.size(), MaxTrackColors); i++) {
+            for (chan_t j = 0; j < MaxChannelColors; j++) {
+                auto& src = m_vTrackSettings[i].aChannels[j];
+                auto& dst = track_colors[TnC_t(i) * TnC_t(16u) + TnC_t(j)];
+                dst.primary = src.iPrimaryRGB;
+                dst.dark = src.iDarkRGB;
+                dst.darker = src.bHidden ? 0xFFFFFFFF : src.iVeryDarkRGB; // Hack to signal hidden track without checking on CPU
+            }
         }
     }
 
@@ -1285,16 +1289,22 @@ void MainScreen::UpdateStateBackwards(idx_t start, idx_t end) {
     // To do
 }
 
-void MainScreen::JumpTo(mms_t llStartTime, boolean loadingMode) {
+void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode, bool toTick) {
     // Kill the music!
     if (!loadingMode) m_OutDevice.AllNotesOff();
 
     // Start time. Piece of cake!
-    mms_t llEndTime;
-    if (!loadingMode) {
-        m_llStartTime = min(max(llStartTime, m_llMinTime), m_llMaxTime);
+    if (toTick) {
+        if (!loadingMode) {
+            m_llStartTime = min(max(llStartTime, m_llMinTime), m_llMaxTime);
+        }
+        m_iStartTick = GetCurrentTick(m_llStartTime);
+    }
+    else {
+        m_iStartTick = llStartTime;
     }
 
+    mms_t llEndTime;
     if (m_dNSpeed < 0) {
         if (m_bTickMode) {
             llEndTime = m_iStartTick - m_llTimeSpan;
@@ -1316,7 +1326,7 @@ void MainScreen::JumpTo(mms_t llStartTime, boolean loadingMode) {
     auto itBegin = m_vEvents.begin();
     auto itEnd = m_vEvents.end();
     auto itMiddle = lower_bound(itBegin, itEnd, llStartTime, [&](MIDIChannelEvent* lhs, const mms_t rhs) {
-        return lhs->GetAbsMicroSec() < rhs;
+        return (toTick ? lhs->GetAbsTick() : lhs->GetAbsMicroSec()) < rhs;
         });
     // We've found it! Set m_iStartPos to our latest findings now.
     m_iStartPos = itMiddle - m_vEvents.begin();
@@ -1370,7 +1380,6 @@ void MainScreen::JumpTo(mms_t llStartTime, boolean loadingMode) {
     }
 SkipSearch:
     AdvanceIterators(llStartTime, true);
-    m_iStartTick = GetCurrentTick(m_llStartTime);
 
     // End position: a little tricky. Same as logic code. Only needed for paused jumping.
     if (m_dNSpeed < 0) {
@@ -1439,7 +1448,9 @@ void MainScreen::ApplyColor(MIDIMetaEvent * event) {
             chan_settings.SetColor(color);
             chan_settings.bHidden = data[7] == 0;
         }
+        m_bUpdateTrackColor = true;
     }
+
 }
 
 void MainScreen::ApplyMarker(unsigned char* data, msgln_t size) {
@@ -2496,55 +2507,55 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X - 1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    SongLength: " + TotalTimeFormatted + " (" + IntSizeToCE(sizeof(m_llMaxTime)) + CEPtr() + " +" + GetAddress(Ptr_to_m_llMaxTime) + ") [Read Only]";
+        cout << "    SongLength: " + TotalTimeFormatted + " ("  + CEPtr()+ IntSizeToCE(sizeof(m_llMaxTime)) + " +" + GetAddress(Ptr_to_m_llMaxTime) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X - 1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    InitialSilence: " + BeginTimeFormatted + " (" + IntSizeToCE(sizeof(m_llMinTime)) + CEPtr() + " +" + GetAddress(Ptr_to_m_llMinTime) + ") [Read Only]";
+        cout << "    InitialSilence: " + BeginTimeFormatted + " ("+ CEPtr()  + IntSizeToCE(sizeof(m_llMinTime)) + " +" + GetAddress(Ptr_to_m_llMinTime) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X - 1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Microseconds: " + llStartTimeFormatted + " (" + IntSizeToCE(sizeof(m_llStartTime)) + CEPtr() + " +" + GetAddress(Ptr_to_m_llStartTime) + ") [Read / Write]";
+        cout << "    Microseconds: " + llStartTimeFormatted + " (" + CEPtr() + IntSizeToCE(sizeof(m_llStartTime)) + " +" + GetAddress(Ptr_to_m_llStartTime) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X - 1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Ticks: " + to_string(m_iStartTick) + " (" + IntSizeToCE(sizeof(m_iStartTick)) + CEPtr() + " +" + GetAddress(Ptr_to_m_iStartTick) + ") [Read / Write]";
+        cout << "    Ticks: " + to_string(m_iStartTick) + " ("  + CEPtr()+ IntSizeToCE(sizeof(m_iStartTick)) + " +" + GetAddress(Ptr_to_m_iStartTick) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X - 1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Resolution: " + to_string(m_MIDI.GetInfo().iDivision) + " (" + IntSizeToCE(sizeof(m_MIDI.GetInfo().iDivision)) + CEPtr() + " +" + GetAddress(Ptr_to_m_MIDI_iResolution) + ") [Read Only]";
+        cout << "    Resolution: " + to_string(m_MIDI.GetInfo().iDivision) + " ("+ CEPtr()  + IntSizeToCE(sizeof(m_MIDI.GetInfo().iDivision)) + " +" + GetAddress(Ptr_to_m_MIDI_iResolution) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X - 1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    NoteCount: " + to_string(m_MIDI.GetInfo().iNoteCount) + " (" + IntSizeToCE(sizeof(m_MIDI.GetInfo().iNoteCount)) + CEPtr() + " +" + GetAddress(Ptr_to_m_MIDI_iTotalNC) + ") [Read Only]";
+        cout << "    NoteCount: " + to_string(m_MIDI.GetInfo().iNoteCount) + " ("  + CEPtr() + IntSizeToCE(sizeof(m_MIDI.GetInfo().iNoteCount))+ " +" + GetAddress(Ptr_to_m_MIDI_iTotalNC) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X - 1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    NotesPerSecond: " + to_string(m_iNPS) + " (" + IntSizeToCE(sizeof(m_iNPS)) + CEPtr() + " +" + GetAddress(Ptr_to_m_iNPS) + ") [Read Only]";
+        cout << "    NotesPerSecond: " + to_string(m_iNPS) + " (" + CEPtr() + IntSizeToCE(sizeof(m_iNPS)) + " +" + GetAddress(Ptr_to_m_iNPS) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X - 1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Polyphony: " + to_string(m_iPolyphony) + " (" + IntSizeToCE(sizeof(m_iPolyphony)) + CEPtr() + " +" + GetAddress(Ptr_to_m_iPolyphony) + ") [Read Only]";
+        cout << "    Polyphony: " + to_string(m_iPolyphony) + " (" + CEPtr() + IntSizeToCE(sizeof(m_iPolyphony)) + " +" + GetAddress(Ptr_to_m_iPolyphony) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X - 1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Passed: " + to_string(m_iPassed) + " (" + IntSizeToCE(sizeof(m_iPassed)) + CEPtr() + " +" + GetAddress(Ptr_to_m_iPassed) + ") [Read Only]";
+        cout << "    Passed: " + to_string(m_iPassed) + " ("  + CEPtr()+ IntSizeToCE(sizeof(m_iPassed)) + " +" + GetAddress(Ptr_to_m_iPassed) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
@@ -2616,7 +2627,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X - 1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    WindowSize: " + to_string(m_iScreenWidth) + "*" + to_string(m_iScreenHeight) + " (" + IntSizeToCE(sizeof(m_iScreenWidth)) + CEPtr() + " +" + GetAddress(Ptr_to_m_iWidth) + " * " + IntSizeToCE(sizeof(m_iScreenHeight)) + CEPtr() + " +" + GetAddress(Ptr_to_m_iHeight) + ") [Read Only]";
+        cout << "    WindowSize: " + to_string(m_iScreenWidth) + "*" + to_string(m_iScreenHeight) + " (" + CEPtr() + IntSizeToCE(sizeof(m_iScreenWidth)) + " +" + GetAddress(Ptr_to_m_iWidth) + " * " + CEPtr() +IntSizeToCE(sizeof(m_iScreenHeight)) +  " +" + GetAddress(Ptr_to_m_iHeight) + ") [Read Only]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
@@ -2682,19 +2693,19 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X - 1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    Caption: \"" + string(strlen(CheatEngineCaption) < sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]) ? Ptr_to_CaptionContent : "MAXIMUM LENGTH EXCEEDED! ") + "\" (String" + CEPtr() + "[" + to_string(sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]) - 1) + "] +" + GetAddress(Ptr_to_CaptionContent) + ") [Read / Write]";
+        cout << "    Caption: \"" + string(strlen(CheatEngineCaption) < sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]) ? Ptr_to_CaptionContent : "MAXIMUM LENGTH EXCEEDED! ") + "\" (" + CEPtr() + "String[" + to_string(sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]) - 1) + "] +" + GetAddress(Ptr_to_CaptionContent) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X - 1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    CaptionAlignment: '" + string(1, CheatEngineCaption[0]) + "' (String"+CEPtr()+"[1] +" + GetAddress(Ptr_to_CheatEngineCaption) + ") [Read / Write]";
+        cout << "    CaptionAlignment: '" + string(1, CheatEngineCaption[0]) + "' ("+CEPtr()+"String[1] +" + GetAddress(Ptr_to_CheatEngineCaption) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
         cout << string(csbi.dwSize.X - 1, ' ') << "\n";
         SetConsoleCursorPosition(hConsole, pos);
-        cout << "    DifficultyText: \"" + string(strlen(Difficulty) < sizeof(Difficulty) / sizeof(Difficulty[0]) ? Difficulty : "MAXIMUM LENGTH EXCEEDED! ") + "\" (String" + CEPtr() + "[" + to_string(sizeof(Difficulty) / sizeof(Difficulty[0])) + "] +" + GetAddress(Ptr_to_Difficulty) + ") [Read / Write]";
+        cout << "    DifficultyText: \"" + string(strlen(Difficulty) < sizeof(Difficulty) / sizeof(Difficulty[0]) ? Difficulty : "MAXIMUM LENGTH EXCEEDED! ") + "\" (" + CEPtr() + "String[" + to_string(sizeof(Difficulty) / sizeof(Difficulty[0])) + "] +" + GetAddress(Ptr_to_Difficulty) + ") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
