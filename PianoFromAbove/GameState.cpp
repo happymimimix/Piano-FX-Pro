@@ -1210,8 +1210,9 @@ GameState::GameError MainScreen::Logic() {
     AdvanceIterators(m_llStartTime, false);
 
     // Update the position slider
-    mms_t llNewPos = ((m_llStartTime - m_llMinTime) * INT16_MAX) / (m_llMaxTime - m_llMinTime);
-    cPlayback.SetPosition(static_cast<win32_t>(llNewPos));
+    mms_t llOldPos = ((llOldStartTime - m_llMinTime) * 1000) / (m_llMaxTime - m_llMinTime);
+    mms_t llNewPos = ((m_llStartTime - m_llMinTime) * 1000) / (m_llMaxTime - m_llMinTime);
+    if (llOldPos != llNewPos) cPlayback.SetPosition(static_cast<win32_t>(llNewPos));
 
     // Song's over
     if (!m_bPaused && ((m_dSpeed < 0) ? (m_llStartTime < m_llMinTime) : (m_llStartTime > m_llMaxTime))) {
