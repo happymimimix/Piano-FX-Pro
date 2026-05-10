@@ -507,12 +507,18 @@ fileln_t MIDI::ParseMIDI(const unsigned char* pcData, fileln_t iMaxSize)
         // SMF 3
         iTotal += Parse16BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iNumTracks);
         iTotal += Parse16BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iDivision);
-        iTotal += Parse32BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iNumChannels);
+        iTotal += Parse64BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), reinterpret_cast<uint64_t*>(&m_Info.llTotalMicroSecs));
+        iTotal += Parse64BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), reinterpret_cast<uint64_t*>(&m_Info.iTotalTicks));
+        iTotal += Parse32BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iEventCount);
+        iTotal += Parse64BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), reinterpret_cast<uint64_t*>(&m_Info.llFirstNote));
+        iTotal += Parse32BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iNoteCount);
+        iTotal += Parse8Bit(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iMinNote);
+        iTotal += Parse8Bit(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iMaxNote);
         uint32_t FeatureFlags = 0;
         iTotal += Parse32BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &FeatureFlags);
-        if (iTotal != 22 || m_Info.iDivision == 0) return 0;
+        if (iTotal != 44 || m_Info.iDivision == 0) return 0;
         // Parse the rest of the file
-        iTotal += iHdrSize - 14;
+        iTotal += iHdrSize - 36;
         // We need to use a swap space to transfer the parsed events to GameState in PostProcess().
         this->__SMF3_SWAP_SPACE = new SWAP();
         // SMF3 32 bit feature flags: 
@@ -633,6 +639,7 @@ fileln_t MIDI::ParseTracksF3(const unsigned char* pcData, fileln_t iMaxSize)
         if (iCount > 0)
         {
             m_vTracks.push_back(track);
+            m_Info.iNumChannels += track->GetInfo().iNumChannels;
             g_LoadingProgress.progress++;
         }
         else {
@@ -1069,6 +1076,10 @@ fileln_t MIDITrack::ParseTrackF3(const unsigned char* pcData, fileln_t iMaxSize)
     delete[] Buffer;
     MIDI::Parse64BitLE(pcData + iTotal, iMaxSize - iTotal, reinterpret_cast<uint64_t*>(&m_TrackInfo.llTotalMicroSecs));
     MIDI::Parse64BitLE(pcData + iTotal, iMaxSize - iTotal, reinterpret_cast<uint64_t*>(&m_TrackInfo.iTotalTicks));
+    MIDI::Parse32BitLE(pcData + iTotal, iMaxSize - iTotal, &m_TrackInfo.iEventCount);
+    MIDI::Parse32BitLE(pcData + iTotal, iMaxSize - iTotal, &m_TrackInfo.iNoteCount);
+    MIDI::Parse8Bit(pcData + iTotal, iMaxSize - iTotal, &m_TrackInfo.iMinNote);
+    MIDI::Parse8Bit(pcData + iTotal, iMaxSize - iTotal, &m_TrackInfo.iMaxNote);
     for (chan_t ch = 0; ch < (1<<4); ch++) iTotal += MIDI::Parse32BitLE(pcData + iTotal, iMaxSize - iTotal, &m_TrackInfo.aNoteCount[ch]);
     for (chan_t ch = 0; ch < (1<<4); ch++) iTotal += MIDI::Parse8Bit(pcData + iTotal, iMaxSize - iTotal, &m_TrackInfo.aProgram[ch]);
     for (chan_t ch = 0; ch < (1<<4); ch++) {
