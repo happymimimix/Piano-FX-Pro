@@ -507,10 +507,7 @@ fileln_t MIDI::ParseMIDI(const unsigned char* pcData, fileln_t iMaxSize)
         // SMF 3
         iTotal += Parse16BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iNumTracks);
         iTotal += Parse16BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iDivision);
-        iTotal += Parse64BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), reinterpret_cast<uint64_t*>(&m_Info.llTotalMicroSecs));
-        iTotal += Parse64BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), reinterpret_cast<uint64_t*>(&m_Info.iTotalTicks));
         iTotal += Parse32BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iEventCount);
-        iTotal += Parse64BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), reinterpret_cast<uint64_t*>(&m_Info.llFirstNote));
         iTotal += Parse32BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iNoteCount);
         iTotal += Parse8Bit(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iMinNote);
         iTotal += Parse8Bit(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iMaxNote);
@@ -1074,12 +1071,10 @@ fileln_t MIDITrack::ParseTrackF3(const unsigned char* pcData, fileln_t iMaxSize)
     iTotal += MIDI::ParseNChars(pcData + iTotal, TrackNameLength, iMaxSize - iTotal, Buffer);
     m_TrackInfo.sSequenceName.assign(Buffer, TrackNameLength);
     delete[] Buffer;
-    MIDI::Parse64BitLE(pcData + iTotal, iMaxSize - iTotal, reinterpret_cast<uint64_t*>(&m_TrackInfo.llTotalMicroSecs));
-    MIDI::Parse64BitLE(pcData + iTotal, iMaxSize - iTotal, reinterpret_cast<uint64_t*>(&m_TrackInfo.iTotalTicks));
-    MIDI::Parse32BitLE(pcData + iTotal, iMaxSize - iTotal, &m_TrackInfo.iEventCount);
-    MIDI::Parse32BitLE(pcData + iTotal, iMaxSize - iTotal, &m_TrackInfo.iNoteCount);
-    MIDI::Parse8Bit(pcData + iTotal, iMaxSize - iTotal, &m_TrackInfo.iMinNote);
-    MIDI::Parse8Bit(pcData + iTotal, iMaxSize - iTotal, &m_TrackInfo.iMaxNote);
+    iTotal += MIDI::Parse32BitLE(pcData + iTotal, iMaxSize - iTotal, &m_TrackInfo.iEventCount);
+    iTotal += MIDI::Parse32BitLE(pcData + iTotal, iMaxSize - iTotal, &m_TrackInfo.iNoteCount);
+    iTotal += MIDI::Parse8Bit(pcData + iTotal, iMaxSize - iTotal, &m_TrackInfo.iMinNote);
+    iTotal += MIDI::Parse8Bit(pcData + iTotal, iMaxSize - iTotal, &m_TrackInfo.iMaxNote);
     for (chan_t ch = 0; ch < (1<<4); ch++) iTotal += MIDI::Parse32BitLE(pcData + iTotal, iMaxSize - iTotal, &m_TrackInfo.aNoteCount[ch]);
     for (chan_t ch = 0; ch < (1<<4); ch++) iTotal += MIDI::Parse8Bit(pcData + iTotal, iMaxSize - iTotal, &m_TrackInfo.aProgram[ch]);
     for (chan_t ch = 0; ch < (1<<4); ch++) {
