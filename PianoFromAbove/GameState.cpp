@@ -1274,7 +1274,7 @@ GameState::GameError MainScreen::Logic() {
 
     // Update track colors
     if (m_bUpdateTrackColor) {
-        m_bUpdateTrackColor = false;
+        // We don't set value to false immediately here, we need to wait for the renderer. 
         auto* track_colors = m_pRenderer->GetTrackColors();
         for (track_t i = 0; i < min(m_vTrackSettings.size(), MaxTrackColors); i++) {
             for (chan_t j = 0; j < MaxChannelColors; j++) {
@@ -1699,9 +1699,17 @@ mms_t MainScreen::GetTickTime(mtk_t iTick) {
 
 mms_t MainScreen::GetTickTime(mtk_t iTick, mtk_t iLastTempoTick, mms_t llLastTempoTime, bpm_t iMicroSecsPerBeat) {
     uint16_t iDivision = m_MIDI.GetInfo().iDivision;
-    if (!(iDivision & 0x8000))
+    if (!(iDivision & 0x8000)) {
         return llLastTempoTime + (static_cast<mms_t>(iMicroSecsPerBeat) * (iTick - iLastTempoTick)) / iDivision;
-    return -1;
+    }
+    else {
+        unsigned char iFramesPerSec = static_cast<unsigned char>(-static_cast<signed char>(m_MIDI.GetInfo().iDivision >> 8));
+        unsigned char iTicksPerFrame = m_MIDI.GetInfo().iDivision & 0xFF;
+        iFramesPerSec |= !iFramesPerSec; // Clamp to > 0
+        iTicksPerFrame |= !iTicksPerFrame; // Clamp to > 0
+        double dTicksPerMicrosecond = static_cast<double>(iTicksPerFrame * iFramesPerSec) / static_cast<double>(S);
+        return static_cast<mms_t>(static_cast<double>(iTick) / dTicksPerMicrosecond);
+    }
 }
 
 // Rounds up to the nearest beat
@@ -1725,8 +1733,10 @@ bpm_t MainScreen::GetBeat(mtk_t iTick, bpm_t iBeatType, mtk_t iLastSignatureTick
 // Rounds up to the nearest beat
 mtk_t MainScreen::GetBeatTick(mtk_t iTick, bpm_t iBeatType, mtk_t iLastSignatureTick) {
     uint16_t iDivision = m_MIDI.GetInfo().iDivision;
-    if (!(iDivision & 0x8000)) { return iLastSignatureTick + (GetBeat(iTick, iBeatType, iLastSignatureTick) * iDivision * 4) / iBeatType; }
-    return -1;
+    if (iDivision & 0x8000) { return -1; }
+    else {
+        return iLastSignatureTick + (GetBeat(iTick, iBeatType, iLastSignatureTick) * iDivision * 4) / iBeatType;
+    }
 }
 
 const float MainScreen::SharpRatio = 0.65f;
@@ -1904,7 +1914,7 @@ void MainScreen::RenderLines() {
                 iNextBeatTick > m_vMetaEvents[itNextTempo->second]->GetAbsTick())
             {
                 MIDIMetaEvent* pEvent = m_vMetaEvents[itNextTempo->second];
-                MIDI::Parse24Bit(pEvent->GetData(), 3, (uint32_t*)&iMicroSecsPerBeat);
+                MIDI::Parse24Bit(pEvent->GetData(), 3, reinterpret_cast<uint32_t*>(&iMicroSecsPerBeat));
                 iMicroSecsPerBeat |= !iMicroSecsPerBeat;// Clamp to > 0
                 iLastTempoTick = pEvent->GetAbsTick();
                 llLastTempoTime = pEvent->GetAbsMicroSec();
@@ -2367,14 +2377,14 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         m_pRenderer->AddGDIRect(prcStatus->left, prcStatus->top, prcStatus->right - prcStatus->left, prcStatus->bottom - prcStatus->top, 0x80000000);
     }
 
-    string TotalTimeFormatted = to_string(m_llMaxTime);
+    string TotalTimeFormatted = to_string(abs(m_llMaxTime));
     uint8_t Splits = 0;
     for (signed short i = TotalTimeFormatted.length() - 3; Splits < 2 && i > 0; i -= 3, Splits++)
         TotalTimeFormatted.insert(i, " ");
     if (m_llMaxTime < 0)
         TotalTimeFormatted.insert(0, "-");
     
-    string BeginTimeFormatted = to_string(m_llMinTime);
+    string BeginTimeFormatted = to_string(abs(m_llMinTime));
     Splits = 0;
     for (signed short i = BeginTimeFormatted.length() - 3; Splits < 2 && i > 0; i -= 3, Splits++)
         BeginTimeFormatted.insert(i, " ");

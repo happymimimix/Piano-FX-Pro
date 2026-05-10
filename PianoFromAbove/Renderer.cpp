@@ -367,9 +367,9 @@ HRESULT Renderer11::ClearAndBeginScene(DWORD color) {
         memcpy(&m_OldFixedConstants, &m_FixedConstants, sizeof(FixedSizeConstants));
         m_pContext->UpdateSubresource(m_pFixedBuffer.Get(), 0, NULL, &m_FixedConstants, 0, 0);
     }
-    if (memcmp(&m_TrackColors, &m_OldTrackColors, sizeof(m_TrackColors))) {
-        memcpy(&m_OldTrackColors, &m_TrackColors, sizeof(m_TrackColors));
+    if (PointersInitialized && *Ptr_to_m_bUpdateTrackColor) {
         m_pContext->UpdateSubresource(m_pTrackColorBuffer.Get(), 0, NULL, &m_TrackColors, 0, 0);
+        *Ptr_to_m_bUpdateTrackColor = false;
     }
 
     // Set up render state

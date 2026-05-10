@@ -182,7 +182,6 @@ private:
     FixedSizeConstants m_FixedConstants = {};
     FixedSizeConstants m_OldFixedConstants = {};
     TrackColor m_TrackColors[MaxTrackColors * MaxChannelColors] = {};
-    TrackColor m_OldTrackColors[MaxTrackColors * MaxChannelColors] = {};
 
     ComPtr<ID3D11Texture2D> m_pBackgroundTexture;
     ComPtr<ID3D11ShaderResourceView> m_pBackgroundTextureSRV;
