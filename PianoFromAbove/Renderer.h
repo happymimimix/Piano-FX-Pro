@@ -180,7 +180,6 @@ private:
 
     RootConstants m_RootConstants = {};
     FixedSizeConstants m_FixedConstants = {};
-    FixedSizeConstants m_OldFixedConstants = {};
     TrackColor m_TrackColors[MaxTrackColors * MaxChannelColors] = {};
 
     ComPtr<ID3D11Texture2D> m_pBackgroundTexture;

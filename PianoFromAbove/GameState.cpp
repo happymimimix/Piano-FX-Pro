@@ -108,10 +108,12 @@ GameState::GameError IntroScreen::MsgProc(HWND, UINT msg, WPARAM wParam, LPARAM 
 }
 
 GameState::GameError IntroScreen::Init() {
+    PointersInitialized = false;
     return Success;
 }
 
 GameState::GameError IntroScreen::Logic() {
+    PointersInitialized = false;
     return Success;
 }
 
@@ -253,7 +255,6 @@ void SplashScreen::InitState() {
     static Config& config = Config::GetConfig();
     static const PlaybackSettings& cPlayback = config.GetPlaybackSettings();
     static const VisualSettings& cVisual = config.GetVisualSettings();
-    static const AudioSettings& cAudio = config.GetAudioSettings();
 
     m_iStartPos = 0;
     m_iEndPos = -1;
@@ -262,6 +263,13 @@ void SplashScreen::InitState() {
 
     SetChannelSettings(vector<bool>(), vector<bool>(), vector<color_t>(cVisual.colors, cVisual.colors + sizeof(cVisual.colors) / sizeof(cVisual.colors[0])));
 
+    m_bUpdateNotePos = true;
+}
+
+GameState::GameError SplashScreen::Init() {
+    PointersInitialized = false;
+    static Config& config = Config::GetConfig();
+    static const AudioSettings& cAudio = config.GetAudioSettings();
     if (cAudio.bKDMAPI) {
         m_OutDevice.OpenKDMAPI();
     }
@@ -269,14 +277,11 @@ void SplashScreen::InitState() {
         if (cAudio.iOutDevice >= 0)
             m_OutDevice.Open(cAudio.iOutDevice);
     }
-    m_OutDevice.SetVolume(1.0);
 
+    m_OutDevice.Reset();
+    m_OutDevice.SetVolume(1.0);
     m_Timer.Init(false);
 
-    m_bUpdateNotePos = true;
-}
-
-GameState::GameError SplashScreen::Init() {
     return Success;
 }
 
@@ -328,6 +333,7 @@ void SplashScreen::SetChannelSettings(const vector<bool>&, const vector<bool>&, 
             }
         }
     }
+    m_bUpdateNotePos = true;
 }
 
 GameState::GameError SplashScreen::MsgProc(HWND, UINT msg, WPARAM wParam, LPARAM lParam) {
@@ -412,6 +418,8 @@ GameState::GameError SplashScreen::Logic() {
         }
         m_iStartPos++;
     }
+
+    PointersInitialized = false;
 
     return Success;
 }
@@ -676,7 +684,6 @@ void MainScreen::InitState() {
 
     // m_Timer will be initialized *later*
     m_RealTimer.Init(false);
-
     m_bUpdateTrackColor = true;
     m_bUpdateNotePos = true;
 
@@ -714,11 +721,11 @@ void MainScreen::InitState() {
     Ptr_to_CheatEngineCaption = &CheatEngineCaption[0];
     Ptr_to_CaptionContent = &CheatEngineCaption[1];
     Ptr_to_Difficulty = &Difficulty[0];
-    PointersInitialized = true;
 }
 
 // Called immediately before changing to this state
 GameState::GameError MainScreen::Init() {
+    PointersInitialized = false;
     static Config& config = Config::GetConfig();
     static const AudioSettings& cAudio = config.GetAudioSettings();
     if (cAudio.bKDMAPI) {
@@ -800,9 +807,11 @@ void MainScreen::SetChannelSettings(const vector<bool>& vMuted, const vector<boo
                 }
                 iPos++;
             }
-            }
         }
     }
+    m_bUpdateTrackColor = true;
+    m_bUpdateNotePos = true;
+}
 
 GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     // Not thread safe, blah
@@ -1187,12 +1196,12 @@ GameState::GameError MainScreen::Logic() {
                     }
                     if (key == MIDIChannelEvent::RPNData && Next_is_PBS[pEvent->GetChannel()]) {
                         m_pBendsRange[pEvent->GetChannel()] = vel;
-
-                    PitchBendUpdate: // Update PB display. 
+                        PitchBendUpdate: // Update PB display. 
                         float NoteWidth = (m_pRenderer->GetBufferWidth() * abs(m_fZoomX) * abs(m_fTempZoomX)) / (m_iEndNote - m_iStartNote);
                         float ShiftAmount = m_pBendsRange[pEvent->GetChannel()] == 0 ? 0 : m_pBendsValue[pEvent->GetChannel()] / ((1 << 13) / m_pBendsRange[pEvent->GetChannel()]);
                         if (m_bFlipKeyboard) ShiftAmount *= -1;
                         m_pBends[pEvent->GetChannel()] = NoteWidth * ShiftAmount;
+                        m_bUpdateNotePos = true;
                     }
                 }
                 m_OutDevice.PlayEvent(pEvent->GetEventCode(), key, vel);
@@ -1253,8 +1262,7 @@ GameState::GameError MainScreen::Logic() {
         cPlayback.SetPaused(true, true);
     }
 
-    if (m_Timer.m_bManualTimer)
-        m_Timer.IncrementFrame();
+    if (m_Timer.m_bManualTimer) m_Timer.IncrementFrame();
 
     // Update root constants
     auto& root_consts = m_pRenderer->GetRootConstants();
@@ -1262,15 +1270,17 @@ GameState::GameError MainScreen::Logic() {
     root_consts.notes_y = m_fNotesY;
     root_consts.notes_cy = m_fNotesCY;
     root_consts.white_cx = m_fWhiteCX;
-    root_consts.timespan = (float)m_llTimeSpan;
+    root_consts.timespan = static_cast<float>(m_llTimeSpan);
 
     // Update fixed size constants
-    auto& fixed_consts = m_pRenderer->GetFixedSizeConstants();
-    memcpy(&fixed_consts.note_x, &notex_table, sizeof(float) * 128);
-    if (cVideo.bVisualizePitchBends)
-        memcpy(&fixed_consts.bends, &m_pBends, sizeof(float) * 16);
-    else
-        memset(&fixed_consts.bends, 0, sizeof(float) * 16);
+    if (m_bUpdateNotePos) {
+        auto& fixed_consts = m_pRenderer->GetFixedSizeConstants();
+        memcpy(&fixed_consts.note_x, &notex_table, sizeof(float) * 128);
+        if (cVideo.bVisualizePitchBends)
+            memcpy(&fixed_consts.bends, &m_pBends, sizeof(float) * 16);
+        else
+            memset(&fixed_consts.bends, 0, sizeof(float) * 16);
+    }
 
     // Update track colors
     if (m_bUpdateTrackColor) {
@@ -1286,6 +1296,8 @@ GameState::GameError MainScreen::Logic() {
             }
         }
     }
+
+    PointersInitialized = true;
 
     return Success;
 }
@@ -1440,7 +1452,7 @@ SkipSearch:
 void MainScreen::ApplyColor(MIDIMetaEvent * event) {
     const auto size = event->GetDataLen();
     const auto data = event->GetData();
-    if (event->GetMetaEventType() == MIDIMetaEvent::GenericTextA &&
+    if (event->GetMetaEventType() == MIDIMetaEvent::ArduanoKivaCompatibleColorEvent &&
         (size == 8 || size == 12) &&
         data[0] == 0x00 && data[1] == 0x0F &&
         (data[2] < 16 || data[2] == 0x7F) &&
@@ -2070,7 +2082,6 @@ void MainScreen::RenderNote(const MIDIChannelEvent * pNote) {
 }
 
 void MainScreen::GenNoteXTable() {
-    m_bUpdateNotePos = false; //We don't need to do this on every single frame! 
     float NoteWidth = (m_pRenderer->GetBufferWidth() * abs(m_fZoomX) * abs(m_fTempZoomX)) / (m_iEndNote - m_iStartNote);
     for (chan_t ch = 0; ch < MaxChannelColors; ch++) {
         float ShiftAmount = m_pBendsRange[ch] == 0 ? 0 : m_pBendsValue[ch] / ((1 << 13) / m_pBendsRange[ch]);

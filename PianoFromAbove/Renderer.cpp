@@ -363,9 +363,9 @@ HRESULT Renderer11::ClearAndBeginScene(DWORD color) {
     m_pContext->PSSetConstantBuffers(0, 1, m_pConstantBuffer.GetAddressOf());
 
     // Upload fixed constants if changed
-    if (memcmp(&m_FixedConstants, &m_OldFixedConstants, sizeof(FixedSizeConstants))) {
-        memcpy(&m_OldFixedConstants, &m_FixedConstants, sizeof(FixedSizeConstants));
+    if (PointersInitialized && *Ptr_to_m_bUpdateNotePos) {
         m_pContext->UpdateSubresource(m_pFixedBuffer.Get(), 0, NULL, &m_FixedConstants, 0, 0);
+        *Ptr_to_m_bUpdateNotePos = false;
     }
     if (PointersInitialized && *Ptr_to_m_bUpdateTrackColor) {
         m_pContext->UpdateSubresource(m_pTrackColorBuffer.Get(), 0, NULL, &m_TrackColors, 0, 0);

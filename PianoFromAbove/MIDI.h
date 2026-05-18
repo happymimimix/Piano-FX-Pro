@@ -11,8 +11,9 @@
 
 #include <Windows.h>
 #include <vector>
-#include <string>
+#include <array>
 #include <map>
+#include <string>
 #include <atomic>
 #include <stdint.h>
 #include <Misc.h>
@@ -96,10 +97,22 @@ typedef vector<idx_t> notevec_t;
 class MIDI
 {
 public:
-    enum Note { A, AS, B, C, CS, D, DS, E, F, FS, G, GS };
+    enum Note : uint8_t { A, AS, B, C, CS, D, DS, E, F, FS, G, GS };
 
     static const key_t KEYS = 1 << 7;
     static const wstring Instruments[(1 << 7) + 1];
+
+    static constexpr DWORD SMF3FEATURES__$CERTIFICATE = DWORD(INT32_MAX) + 1ul;
+    static constexpr DWORD SMF3FEATURES__$BIGIDXRANGE = SMF3FEATURES__$CERTIFICATE >> 1ul;
+    static constexpr DWORD SMF3FEATURES__$MICROSECOND = SMF3FEATURES__$BIGIDXRANGE >> 1ul;
+    static constexpr DWORD SMF3FEATURES__$NOTEPAIRING = SMF3FEATURES__$MICROSECOND >> 1ul;
+    static constexpr DWORD SMF3FEATURES__$PITCHTABLES = SMF3FEATURES__$NOTEPAIRING >> 1ul;
+    static constexpr DWORD SMF3FEATURES__$SIMULTANITY = SMF3FEATURES__$PITCHTABLES >> 1ul;
+    static constexpr DWORD SMF3FEATURES__$TRACKLAYOUT = SMF3FEATURES__$SIMULTANITY >> 1ul;
+    static constexpr DWORD SMF3FEATURES__$REPLAYTABLE = SMF3FEATURES__$TRACKLAYOUT >> 1ul;
+
+    enum SMF3Errors : uint8_t {NoCertificate, UnknownGenerator, Unsupported64Bit, MissingMicrosecond, MissingNotePairing, MissingTrackLayout};
+    static const wstring SMF3ErrorText[];
 
     __forceinline static const wstring& NoteName(key_t iNote)
     {
@@ -154,6 +167,7 @@ public:
     fileln_t ParseTracksF3(const unsigned char* pcData, fileln_t iMaxSize);
     fileln_t ParseEventsF3(const unsigned char* pcData, fileln_t iMaxSize, msg_t eChunkFormat);
     bool IsValid() const { return (m_vTracks.size() > 0 && m_Info.iNoteCount > 0 && m_Info.iDivision > 0 && (m_Info.iFormatType == 0 || m_Info.iFormatType == 1 || m_Info.iFormatType == 768)); }
+    bool SkipUnknownSMF3Chunk(unsigned char* Buffer, size_t* Offset, uint32_t* FeatureFlags);
 
     bool PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMetaEvent*>* vMetaEvents = nullptr, eventvec_t* vTempo = nullptr, eventvec_t* vSignature = nullptr, eventvec_t* vMarkers = nullptr, eventvec_t* vColors = nullptr, vector<MIDISysExEvent*>* vSysExEvents = nullptr);
     void ConnectNotes();
@@ -211,10 +225,20 @@ private:
         }
     };
 
+    struct __attribute__((packed)) PendingItem {
+        array<char, '\r'> Identifier;
+        unsigned char* Data;
+        size_t Offset;
+        size_t Size;
+    };
+
     MIDIInfo m_Info;
     vector<MIDITrack*> m_vTracks;
     vector<EventPool> event_pools;
     SWAP* __SMF3_SWAP_SPACE = nullptr;
+    vector<PendingItem> ValidatePending;
+    pair<uint32_t, unsigned char*> PublicKey;
+    map<array<char,'\r'>, pair<uint32_t, unsigned char*>> CertLookup;
 
     static wstring aNoteNames[KEYS + 1];
     static Note aNoteVal[KEYS];
@@ -351,8 +375,8 @@ public:
     ~MIDIMetaEvent() { if (m_pcData) delete[] m_pcData; }
 
     enum MetaEventType : msg_t {
-        TextEvent = 0x01, Copyright, SequenceName, InstrumentName, Lyric, Marker, CuePoint,
-        GenericTextA = 0x0a, ChannelPrefix = 0x20, PortPrefix, EndOfTrack = 0x2F,
+        TextEvent = 0x01, Copyright, SequenceName, InstrumentName, Lyric, Marker, CuePoint, ProgramName, DeviceName,
+        ArduanoKivaCompatibleColorEvent, ChannelPrefix = 0x20, PortPrefix, EndOfTrack = 0x2F,
         SetTempo = 0x51, SMPTEOffset = 0x54, TimeSignature = 0x58, KeySignature, Proprietary = 0x7F
     };
     fileln_t ParseEvent(const unsigned char* pcData, fileln_t iMaxSize);

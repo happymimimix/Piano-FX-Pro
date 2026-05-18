@@ -8,13 +8,22 @@
 *
 *************************************************************************************************/
 #include <fstream>
-#include <stack>
-#include <array>
+#include <queue>
 #include <ppl.h>
 #include <lzma.h>
 #include <Globals.h>
 #include <MIDI.h>
 MIDILoadingProgress g_LoadingProgress;
+
+const wstring MIDI::SMF3ErrorText[] =
+{
+    L"Missing digital signature.",
+    L"This file was produced by an untrusted generator.",
+    L"Unsupported 64bit event indexing.",
+    L"This file does not contain pre-computed microseconds.",
+    L"This file does not provide note pair linking.",
+    L"This file does not contain track layout summary."
+};
 
 //-----------------------------------------------------------------------------
 // MIDIPos functions
@@ -507,26 +516,37 @@ fileln_t MIDI::ParseMIDI(const unsigned char* pcData, fileln_t iMaxSize)
         // SMF 3
         iTotal += Parse16BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iNumTracks);
         iTotal += Parse16BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iDivision);
+        DWORD FeatureFlags = 0;
+        iTotal += Parse32BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), reinterpret_cast<uint32_t*>(&FeatureFlags));
+        if (FeatureFlags & SMF3FEATURES__$BIGIDXRANGE) {
+            MessageBoxW(g_hWnd, SMF3ErrorText[Unsupported64Bit].c_str(), L"Error", MB_OK);
+            return 0;
+        }
+        if (!(FeatureFlags & SMF3FEATURES__$CERTIFICATE)) {
+            MessageBoxW(g_hWnd, SMF3ErrorText[NoCertificate].c_str(), L"Error", MB_OK);
+            return 0;
+        }
+        if (!(FeatureFlags & SMF3FEATURES__$MICROSECOND)) {
+            MessageBoxW(g_hWnd, SMF3ErrorText[MissingMicrosecond].c_str(), L"Error", MB_OK);
+            return 0;
+        }
+        if (!(FeatureFlags & SMF3FEATURES__$NOTEPAIRING)) {
+            MessageBoxW(g_hWnd, SMF3ErrorText[MissingNotePairing].c_str(), L"Error", MB_OK);
+            return 0;
+        }
+        if (!(FeatureFlags & SMF3FEATURES__$TRACKLAYOUT)) {
+            MessageBoxW(g_hWnd, SMF3ErrorText[MissingTrackLayout].c_str(), L"Error", MB_OK);
+            return 0;
+        }
         iTotal += Parse32BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iEventCount);
         iTotal += Parse32BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iNoteCount);
         iTotal += Parse8Bit(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iMinNote);
         iTotal += Parse8Bit(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iMaxNote);
-        uint32_t FeatureFlags = 0;
-        iTotal += Parse32BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &FeatureFlags);
         if (iTotal != 44 || m_Info.iDivision == 0) return 0;
         // Parse the rest of the file
         iTotal += iHdrSize - 36;
         // We need to use a swap space to transfer the parsed events to GameState in PostProcess().
         this->__SMF3_SWAP_SPACE = new SWAP();
-        // SMF3 32 bit feature flags: 
-        // Bit 31 - Includes digital signature
-        // Bit 30 - Provides pre-computed microseconds
-        // Bit 29 - Uses 64 bit event indexing
-        // Bit 28 - Provides note pair linking
-        // Bit 27 - Provides packed note structure grouped by note pitch
-        // Bit 26 - Provides polyphony count label
-        // Bit 25 - Provides track layout summary
-        // Bit 24~0 - Reserved for future
         uint8_t FirstPass = 0x1E; // Safe guard for potential duplicated chunks
         while (iMaxSize - iTotal > 0) {
             // SMF3's chunk signatures are always 13 bytes long. (God knows how long it took me to align this shit!)
@@ -931,7 +951,7 @@ bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
                     if (vMarkers)
                         vMarkers->push_back(pair<mms_t, idx_t>(pEvent->GetAbsMicroSec(), vMetaEvents->size() - 1));
                     break;
-                case MIDIMetaEvent::GenericTextA:
+                case MIDIMetaEvent::ArduanoKivaCompatibleColorEvent:
                     if (vColors)
                         vColors->push_back(pair<mms_t, idx_t>(pEvent->GetAbsMicroSec(), vMetaEvents->size() - 1));
                     break;
@@ -984,7 +1004,7 @@ bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
 
 void MIDI::ConnectNotes()
 {
-    vector<array<stack<idx_t>, 128>> vStacks;
+    vector<array<queue<idx_t>, 128>> vStacks;
     vStacks.resize(m_vTracks.size() * 16);
 
     g_LoadingProgress.stage = MIDILoadingProgress::Stage::ConnectNotes;
@@ -1005,7 +1025,7 @@ void MIDI::ConnectNotes()
                     }
                     else {
                         if (!sStack.empty()) {
-                            auto pTop = sStack.top();
+                            auto pTop = sStack.front();
                             sStack.pop();
                             pEvent->SetSisterIdx(pTop);
                             reinterpret_cast<MIDIChannelEvent*>(vEvents[pTop])->SetSisterIdx(i);
@@ -1073,13 +1093,11 @@ fileln_t MIDITrack::ParseTrackF3(const unsigned char* pcData, fileln_t iMaxSize)
     delete[] Buffer;
     iTotal += MIDI::Parse32BitLE(pcData + iTotal, iMaxSize - iTotal, &m_TrackInfo.iEventCount);
     iTotal += MIDI::Parse32BitLE(pcData + iTotal, iMaxSize - iTotal, &m_TrackInfo.iNoteCount);
-    iTotal += MIDI::Parse8Bit(pcData + iTotal, iMaxSize - iTotal, &m_TrackInfo.iMinNote);
-    iTotal += MIDI::Parse8Bit(pcData + iTotal, iMaxSize - iTotal, &m_TrackInfo.iMaxNote);
     for (chan_t ch = 0; ch < (1<<4); ch++) iTotal += MIDI::Parse32BitLE(pcData + iTotal, iMaxSize - iTotal, &m_TrackInfo.aNoteCount[ch]);
     for (chan_t ch = 0; ch < (1<<4); ch++) iTotal += MIDI::Parse8Bit(pcData + iTotal, iMaxSize - iTotal, &m_TrackInfo.aProgram[ch]);
-    for (chan_t ch = 0; ch < (1<<4); ch++) {
-        if (!m_TrackInfo.aNoteCount[ch]) m_TrackInfo.iNumChannels++;
-    }
+    iTotal += MIDI::Parse8Bit(pcData + iTotal, iMaxSize - iTotal, &m_TrackInfo.iMinNote);
+    iTotal += MIDI::Parse8Bit(pcData + iTotal, iMaxSize - iTotal, &m_TrackInfo.iMaxNote);
+    for (chan_t ch = 0; ch < (1<<4); ch++) if (m_TrackInfo.aNoteCount[ch]) m_TrackInfo.iNumChannels++;
     return iTotal;
 }
 
