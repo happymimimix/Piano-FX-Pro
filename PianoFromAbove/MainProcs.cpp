@@ -461,7 +461,7 @@ LRESULT WINAPI BarProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             iCode == TB_PAGEDOWN || iCode == TB_THUMBTRACK || iCode == TB_THUMBPOSITION)
         {
             HWND hWndTrackbar = (HWND)lParam;
-            win32_t iPos = (iCode == TB_THUMBTRACK || iCode == TB_THUMBPOSITION ? static_cast<winword_t>(HIWORD(wParam)) : (win32_t)SendMessage(hWndTrackbar, TBM_GETPOS, 0, 0));
+            win32_t iPos = (iCode == TB_THUMBTRACK || iCode == TB_THUMBPOSITION ? static_cast<win32_t>(HIWORD(wParam)) : static_cast<win32_t>(SendMessage(hWndTrackbar, TBM_GETPOS, 0, 0)));
             win32_t iId = GetDlgCtrlID(hWndTrackbar);
             switch (iId)
             {
@@ -786,7 +786,6 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         RECT rcChannel, rcThumbOld;
         GetChannelRect(hWnd, &rcChannel);
         GetThumbRect(hWnd, iPosition, &rcChannel, &rcThumbOld);
-
         winword_t iPositionNew = GetThumbPosition(iXPos, &rcChannel);
         MoveThumbPosition(iPositionNew, iPosition, hWnd, &rcChannel, &rcThumbOld);
         return 0;
@@ -796,7 +795,7 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         RECT rcChannel, rcThumbOld;
         GetChannelRect(hWnd, &rcChannel);
         GetThumbRect(hWnd, iPosition, &rcChannel, &rcThumbOld);
-        winword_t iPositionNew = max(min((lParam < -16384 ? static_cast<uint16_t>(lParam) : static_cast<int16_t>(lParam)), INT16_MAX), 0);
+        winword_t iPositionNew = max(min((winword_t(LOWORD(lParam)) < -16384 ? static_cast<uint16_t>(winword_t(LOWORD(lParam))) : static_cast<int16_t>(winword_t(LOWORD(lParam)))), INT16_MAX), 0);
         MoveThumbPosition(iPositionNew, iPosition, hWnd, &rcChannel, &rcThumbOld, FALSE);
         return 0;
     }
@@ -834,7 +833,7 @@ VOID GetThumbRect(HWND hWnd, winword_t iPosition, const RECT* rcChannel, RECT* r
 winword_t GetThumbPosition(winword_t iXPos, RECT* rcChannel)
 {
     win32_t iPositionNew = (2 * INT16_MAX * (iXPos - rcChannel->left) + rcChannel->right - rcChannel->left) / (2 * (rcChannel->right - rcChannel->left));
-    return max(min((iPositionNew < -16384 ? static_cast<uint16_t>(iPositionNew) : static_cast<int16_t>(iPositionNew)), INT16_MAX), 0);
+    return max(min((winword_t(LOWORD(iPositionNew)) < -16384 ? static_cast<uint16_t>(winword_t(LOWORD(iPositionNew))) : static_cast<int16_t>(winword_t(LOWORD(iPositionNew)))), INT16_MAX), 0);
 }
 
 VOID MoveThumbPosition(winword_t iPositionNew, winword_t& iPosition, HWND hWnd, RECT* rcChannel, RECT* rcThumbOld, BOOL bUpdateGame)

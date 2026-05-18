@@ -901,7 +901,7 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
     case TBM_SETPOS:
     {
         bool StartTimer = (JumpTarget == ~0);
-        JumpTarget = m_llMinTime + ((m_llMaxTime - m_llMinTime) * lParam) / INT16_MAX;
+        JumpTarget = m_llMinTime + ((m_llMaxTime - m_llMinTime) * max(min((winword_t(LOWORD(lParam)) < -16384 ? static_cast<uint16_t>(winword_t(LOWORD(lParam))) : static_cast<int16_t>(winword_t(LOWORD(lParam)))), INT16_MAX), 0)) / INT16_MAX;
         if (StartTimer) SetTimer(g_hWnd, IDC_POSNDELAY, nxtdelay, NULL); //Async JumpTo process
         break;
     }
@@ -1248,7 +1248,7 @@ GameState::GameError MainScreen::Logic() {
     // Update the position slider
     mms_t llOldPos = ((llOldStartTime - m_llMinTime) * INT16_MAX) / (m_llMaxTime - m_llMinTime);
     mms_t llNewPos = ((m_llStartTime - m_llMinTime) * INT16_MAX) / (m_llMaxTime - m_llMinTime);
-    if (llOldPos != llNewPos && JumpTarget == ~0) cPlayback.SetPosition(static_cast<win32_t>(llNewPos));
+    if (llOldPos != llNewPos && JumpTarget == ~0) cPlayback.SetPosition(static_cast<winword_t>(llNewPos));
 
     // Song's over
     if (!m_bPaused && ((m_dSpeed < 0) ? (m_llStartTime < m_llMinTime) : (m_llStartTime > m_llMaxTime))) {
@@ -1439,8 +1439,8 @@ SkipSearch:
     if (!loadingMode)
     {
         static PlaybackSettings& cPlayback = Config::GetConfig().GetPlaybackSettings();
-        win32_t llNewPos = static_cast<win32_t>(((m_llStartTime - m_llMinTime) * INT16_MAX) / (m_llMaxTime - m_llMinTime));
-        cPlayback.SetPosition(llNewPos);
+        mms_t llNewPos = ((m_llStartTime - m_llMinTime) * INT16_MAX) / (m_llMaxTime - m_llMinTime);
+        //cPlayback.SetPosition(static_cast<winword_t>(llNewPos));
     }
 
     IsLastFrameReversed = false;
