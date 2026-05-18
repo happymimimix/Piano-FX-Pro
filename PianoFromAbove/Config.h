@@ -103,7 +103,7 @@ public:
 
     void ToggleMute(bool bUpdateGUI = false) { SetMute(!m_bMute, bUpdateGUI); }
     void TogglePaused(bool bUpdateGUI = false) { SetPaused(!m_bPaused, bUpdateGUI); }
-    void SetPosition(int iPosition) { ::SetPosition(iPosition); }
+    void SetPosition(winword_t iPosition) { ::SetPosition(iPosition); }
 
     // Set accessors. A bit more advanced because they optionally update the GUI
     void SetPlayMode(GameState::State ePlayMode, bool bUpdateGUI = false) { if (bUpdateGUI) ::SetPlayMode(ePlayMode); m_ePlayMode = ePlayMode; }

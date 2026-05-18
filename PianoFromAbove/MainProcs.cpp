@@ -796,7 +796,7 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         RECT rcChannel, rcThumbOld;
         GetChannelRect(hWnd, &rcChannel);
         GetThumbRect(hWnd, iPosition, &rcChannel, &rcThumbOld);
-        winword_t iPositionNew = max(min((winword_t)lParam, INT16_MAX), 0);
+        winword_t iPositionNew = max(min((lParam < -16384 ? static_cast<uint16_t>(lParam) : static_cast<int16_t>(lParam)), INT16_MAX), 0);
         MoveThumbPosition(iPositionNew, iPosition, hWnd, &rcChannel, &rcThumbOld, FALSE);
         return 0;
     }
@@ -833,9 +833,8 @@ VOID GetThumbRect(HWND hWnd, winword_t iPosition, const RECT* rcChannel, RECT* r
 
 winword_t GetThumbPosition(winword_t iXPos, RECT* rcChannel)
 {
-    winword_t iPositionNew = (2 * INT16_MAX * (iXPos - rcChannel->left) + rcChannel->right - rcChannel->left) / (2 * (rcChannel->right - rcChannel->left));
-    iPositionNew = max(min(iPositionNew, INT16_MAX), 0);
-    return iPositionNew;
+    win32_t iPositionNew = (2 * INT16_MAX * (iXPos - rcChannel->left) + rcChannel->right - rcChannel->left) / (2 * (rcChannel->right - rcChannel->left));
+    return max(min((iPositionNew < -16384 ? static_cast<uint16_t>(iPositionNew) : static_cast<int16_t>(iPositionNew)), INT16_MAX), 0);
 }
 
 VOID MoveThumbPosition(winword_t iPositionNew, winword_t& iPosition, HWND hWnd, RECT* rcChannel, RECT* rcThumbOld, BOOL bUpdateGame)
@@ -1006,7 +1005,7 @@ VOID SetVolume(DOUBLE dVolume)
     SendMessage(hWndVolume, TBM_SETPOS, TRUE, (LONG)(100 * dVolume + .5));
 }
 
-VOID SetPosition(INT iPosition)
+VOID SetPosition(winword_t iPosition)
 {
     HWND hWndPosn = GetDlgItem(g_hWndBar, IDC_POSNCTRL);
     PostMessage(hWndPosn, TBM_SETPOS, 0, iPosition);
@@ -1018,7 +1017,7 @@ VOID SetPlayable(BOOL bPlayable)
     SendMessage(hWndToolbar, TB_ENABLEBUTTON, ID_PLAY_PLAY, bPlayable);
 }
 
-VOID SetPlayMode(INT ePlayMode)
+VOID SetPlayMode(uint8_t ePlayMode)
 {
     HWND hWndToolbar = GetDlgItem(g_hWndBar, IDC_TOPTOOLBAR);
     HMENU hMenu = GetMainMenu();
