@@ -1248,7 +1248,7 @@ GameState::GameError MainScreen::Logic() {
     // Update the position slider
     mms_t llOldPos = ((llOldStartTime - m_llMinTime) * INT16_MAX) / (m_llMaxTime - m_llMinTime);
     mms_t llNewPos = ((m_llStartTime - m_llMinTime) * INT16_MAX) / (m_llMaxTime - m_llMinTime);
-    if (llOldPos != llNewPos && JumpTarget == ~0) cPlayback.SetPosition(static_cast<winword_t>(llNewPos));
+    if (llOldPos != llNewPos && JumpTarget == ~0) cPlayback.SetPosition(LOWORD(llNewPos));
 
     // Song's over
     if (!m_bPaused && ((m_dSpeed < 0) ? (m_llStartTime < m_llMinTime) : (m_llStartTime > m_llMaxTime))) {
@@ -1440,7 +1440,7 @@ SkipSearch:
     {
         static PlaybackSettings& cPlayback = Config::GetConfig().GetPlaybackSettings();
         mms_t llNewPos = ((m_llStartTime - m_llMinTime) * INT16_MAX) / (m_llMaxTime - m_llMinTime);
-        cPlayback.SetPosition(static_cast<winword_t>(llNewPos));
+        cPlayback.SetPosition(LOWORD(llNewPos));
     }
 
     IsLastFrameReversed = false;
@@ -1524,8 +1524,7 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
             m_iLastTempoTick = pPrevious->GetAbsTick();
             m_llLastTempoTime = pPrevious->GetAbsMicroSec();
         }
-        else
-        {
+        else {
             m_iMicroSecsPerBeat = 500000;
             m_llLastTempoTime = m_iLastTempoTick = 0;
         }
@@ -1538,8 +1537,7 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
             m_iClocksPerMet = pPrevious->GetData()[2];
             m_iLastSignatureTick = pPrevious->GetAbsTick();
         }
-        else
-        {
+        else {
             m_iBeatsPerMeasure = 4;
             m_iBeatType = 4;
             m_iClocksPerMet = 24;
@@ -1562,38 +1560,42 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
     else
     {
         if (m_dSpeed < 0) {
-            m_itNextTempo = upper_bound(m_vTempo.begin(), m_vTempo.end(), pair<mms_t, idx_t>(llTime, m_vMetaEvents.size()));
-            MIDIMetaEvent* pPrevious = GetPrevious(m_itNextTempo, m_vTempo, 3);
-            if (pPrevious)
+            while (m_itNextTempo != m_vTempo.begin() && (m_itNextTempo - 1)->first > llTime) --m_itNextTempo;
+            if (m_itNextTempo != m_vTempo.begin())
             {
-                MIDI::Parse24Bit(pPrevious->GetData(), 3, (uint32_t*)&m_iMicroSecsPerBeat);
-                m_iMicroSecsPerBeat |= !m_iMicroSecsPerBeat;// Clamp to > 0
-                m_iLastTempoTick = pPrevious->GetAbsTick();
-                m_llLastTempoTime = pPrevious->GetAbsMicroSec();
+                MIDIMetaEvent* pEvent = m_vMetaEvents[(m_itNextTempo - 1)->second];
+                if (pEvent->GetDataLen() == 3)
+                {
+                    MIDI::Parse24Bit(pEvent->GetData(), 3, (uint32_t*)&m_iMicroSecsPerBeat);
+                    m_iMicroSecsPerBeat |= !m_iMicroSecsPerBeat;// Clamp to > 0
+                    m_iLastTempoTick = pEvent->GetAbsTick();
+                    m_llLastTempoTime = pEvent->GetAbsMicroSec();
+                }
             }
-            else
-            {
+            else {
                 m_iMicroSecsPerBeat = 500000;
                 m_llLastTempoTime = m_iLastTempoTick = 0;
             }
-            m_itNextSignature = upper_bound(m_vSignature.begin(), m_vSignature.end(), pair<mms_t, idx_t>(llTime, m_vMetaEvents.size()));
-            pPrevious = GetPrevious(m_itNextSignature, m_vSignature, 4);
-            if (pPrevious)
+            while (m_itNextSignature != m_vSignature.begin() && (m_itNextSignature - 1)->first > llTime) --m_itNextSignature;
+            if (m_itNextSignature != m_vSignature.begin())
             {
-                m_iBeatsPerMeasure = pPrevious->GetData()[0];
-                m_iBeatType = 1 << pPrevious->GetData()[1];
-                m_iClocksPerMet = pPrevious->GetData()[2];
-                m_iLastSignatureTick = pPrevious->GetAbsTick();
+                MIDIMetaEvent* pEvent = m_vMetaEvents[(m_itNextSignature - 1)->second];
+                if (pEvent->GetDataLen() == 4)
+                {
+                    m_iBeatsPerMeasure = pEvent->GetData()[0];
+                    m_iBeatType = 1 << pEvent->GetData()[1];
+                    m_iClocksPerMet = pEvent->GetData()[2];
+                    m_iLastSignatureTick = pEvent->GetAbsTick();
+                }
             }
-            else
-            {
+            else {
                 m_iBeatsPerMeasure = 4;
                 m_iBeatType = 4;
                 m_iClocksPerMet = 24;
                 m_iLastSignatureTick = 0;
             }
             auto itCurMarker = m_itNextMarker;
-            m_itNextMarker = upper_bound(m_vMarkers.begin(), m_vMarkers.end(), pair<mms_t, idx_t>(llTime, m_vMetaEvents.size()));
+            while (m_itNextMarker != m_vMarkers.begin() && (m_itNextMarker - 1)->first > llTime) --m_itNextMarker;
             if (itCurMarker != m_itNextMarker) {
                 if (m_itNextMarker != m_vMarkers.begin() && (m_itNextMarker - 1)->second != -1) {
                     const auto eEvent = m_vMetaEvents[(m_itNextMarker - 1)->second];
