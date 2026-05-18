@@ -1440,7 +1440,7 @@ SkipSearch:
     {
         static PlaybackSettings& cPlayback = Config::GetConfig().GetPlaybackSettings();
         mms_t llNewPos = ((m_llStartTime - m_llMinTime) * INT16_MAX) / (m_llMaxTime - m_llMinTime);
-        //cPlayback.SetPosition(static_cast<winword_t>(llNewPos));
+        cPlayback.SetPosition(static_cast<winword_t>(llNewPos));
     }
 
     IsLastFrameReversed = false;
