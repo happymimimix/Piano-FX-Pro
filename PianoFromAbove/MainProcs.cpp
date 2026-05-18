@@ -313,7 +313,7 @@ VOID SizeWindows(win32_t iMainWidth, win32_t iMainHeight)
 {
     static const ViewSettings& cView = Config::GetConfig().GetViewSettings();
     static const ControlsSettings& cControls = Config::GetConfig().GetControlsSettings();
-    win32_t iBarHeight = 0, iLibWidth = 0;
+    win32_t iBarHeight = 0;
     UINT swpFlags = SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOOWNERZORDER;
 
     if (!iMainWidth || !iMainHeight)
@@ -333,8 +333,7 @@ VOID SizeWindows(win32_t iMainWidth, win32_t iMainHeight)
         if (hdwp) hdwp = DeferWindowPos(hdwp, g_hWndBar, NULL, 0, 0, iMainWidth, iBarHeight, swpFlags);
     }
     if (cView.GetFullScreen() && !cControls.bAlwaysShowControls) iBarHeight = 0;
-    if (cView.GetFullScreen()) iLibWidth = 0;
-    if (hdwp) hdwp = DeferWindowPos(hdwp, g_hWndGfx, NULL, iLibWidth, iBarHeight, iMainWidth - iLibWidth, iMainHeight - iBarHeight, swpFlags);
+    if (hdwp) hdwp = DeferWindowPos(hdwp, g_hWndGfx, NULL, NULL, iBarHeight, iMainWidth, iMainHeight - iBarHeight, swpFlags);
     if (hdwp) EndDeferWindowPos(hdwp);
 }
 
@@ -466,15 +465,13 @@ LRESULT WINAPI BarProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             switch (iId)
             {
             case IDC_VOLUME:
-                cPlayback.SetVolume(iPos / 100.0, false);
+                cPlayback.SetVolume(iPos / 100.0f, false);
                 return 0;
             case IDC_SPEED:
-                if (iPos < 108 && iPos > 92 && iPos != 100) cPlayback.SetSpeed(1.0, true);
-                else cPlayback.SetSpeed(iPos / 100.0, false);
+                cPlayback.SetSpeed(iPos / 100.0f, false);
                 return 0;
             case IDC_NSPEED:
-                if (iPos < 108 && iPos > 92 && iPos != 100) cPlayback.SetNSpeed(1.0, true);
-                else cPlayback.SetNSpeed((200 - iPos) / 100.0, false);
+                cPlayback.SetNSpeed((200.0f - iPos) / 100.0f, false);
                 return 0;
             }
         }
@@ -795,7 +792,7 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         RECT rcChannel, rcThumbOld;
         GetChannelRect(hWnd, &rcChannel);
         GetThumbRect(hWnd, iPosition, &rcChannel, &rcThumbOld);
-        winword_t iPositionNew = max(min((winword_t(LOWORD(lParam)) < -16384 ? static_cast<uint16_t>(winword_t(LOWORD(lParam))) : static_cast<int16_t>(winword_t(LOWORD(lParam)))), INT16_MAX), 0);
+        winword_t iPositionNew = LOWORD(lParam);
         MoveThumbPosition(iPositionNew, iPosition, hWnd, &rcChannel, &rcThumbOld, FALSE);
         return 0;
     }
