@@ -1372,7 +1372,7 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
     NoteOnFound:
         // Found it!
         auto TargetNote = itMiddle;
-        if ((*TargetNote)->GetSisterIdx() >= m_iStartPos) {
+        if ((*TargetNote)->HasSister() && (*TargetNote)->GetSisterIdx() >= m_iStartPos) {
             m_pState->Activate(TargetNote - m_vEvents.begin());
         }
         // Search for more held notes...
@@ -1383,10 +1383,10 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
             {
                 itMiddle--;
                 if (IsOn((*itMiddle)->GetChannelEventType(), (*itMiddle)->GetParam2())) {
-                    if ((*itMiddle)->GetSisterIdx() >= TargetNote - m_vEvents.begin()) {
+                    if ((*itMiddle)->HasSister() && (*itMiddle)->GetSisterIdx() >= TargetNote - m_vEvents.begin()) {
                         iFound++;
                     }
-                    if ((*itMiddle)->GetSisterIdx() >= m_iStartPos) {
+                    if ((*itMiddle)->HasSister() && (*itMiddle)->GetSisterIdx() >= m_iStartPos) {
                         m_pState->Activate(itMiddle - m_vEvents.begin());
                     }
                 }
