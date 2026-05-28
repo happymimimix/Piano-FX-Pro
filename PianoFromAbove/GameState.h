@@ -387,10 +387,11 @@ private:
     vector<MIDIChannelEvent*> m_vEvents; // The channel events of the song
     vector<MIDIMetaEvent*> m_vMetaEvents; // The meta events of the song
     vector<MIDISysExEvent*> m_vSysExEvents; // The SysEx events of the song
-    eventvec_t m_vTempo; // Tracked for drawing measure lines
-    eventvec_t m_vSignature; // Measure lines again
-    eventvec_t m_vMarkers; // Tracked for section names in some longer MIDIs
-    eventvec_t m_vColors; // Tracked for section names in some longer MIDIs
+    eventvec_t m_vTempo;
+    eventvec_t m_vSignature;
+    eventvec_t m_vMarkers;
+    eventvec_t m_vColors;
+    eventvec_t m_vReplayTable;
     eventvec_t::const_iterator m_itNextTempo;
     eventvec_t::const_iterator m_itNextSignature;
     eventvec_t::const_iterator m_itNextMarker;

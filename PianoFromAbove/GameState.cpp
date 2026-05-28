@@ -571,7 +571,7 @@ MainScreen::MainScreen(wstring sMIDIFile, HWND hWnd, Renderer11* pRenderer) : Ga
     if (!m_MIDI.IsValid()) return;
     m_MIDI.ConnectNotes(); // Order's important here
     m_vEvents.reserve(m_MIDI.GetInfo().iEventCount);
-    bool IsPostProcessOK = m_MIDI.PostProcess(m_vEvents, &m_vMetaEvents, &m_vTempo, &m_vSignature, &m_vMarkers, &m_vColors, &m_vSysExEvents);
+    bool IsPostProcessOK = m_MIDI.PostProcess(m_vEvents, &m_vMetaEvents, &m_vTempo, &m_vSignature, &m_vMarkers, &m_vReplayTable, &m_vColors, &m_vSysExEvents);
     if (!IsPostProcessOK) {
         MessageBoxW(hWnd, Errors[GameError::OutOfMemory].c_str(), L"Error", MB_OK);
         return;
@@ -1184,7 +1184,7 @@ GameState::GameError MainScreen::Logic() {
 
             if (IsNotNote(pEvent->GetChannelEventType())) {
                 if (pEvent->GetChannelEventType() == MIDIChannelEvent::ProgramChange && config.m_bPianoOverride) {
-                    key &= 0x00;
+                    goto SkipPlayEvent;
                 }
                 if (pEvent->GetChannelEventType() == MIDIChannelEvent::PitchBend) {
                     m_pBendsValue[pEvent->GetChannel()] = ((vel << 7) | key) - (1 << 13);
@@ -1205,6 +1205,7 @@ GameState::GameError MainScreen::Logic() {
                     }
                 }
                 m_OutDevice.PlayEvent(pEvent->GetEventCode(), key, vel);
+                SkipPlayEvent:;
             }
             else if (!m_bMute && !m_vTrackSettings[pEvent->GetTrack() % MaxTrackColors].aChannels[pEvent->GetChannel()].bMuted && vel > velthrshld && pEvent->HasSister()) {
                 // We're playing a note! 
@@ -1554,7 +1555,7 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
                 ApplyMarker(nullptr, 0);
             }
         }
-        m_itNextColor = lower_bound(m_vColors.begin(), m_vColors.end(), pair<mms_t, idx_t>(llTime, m_vMetaEvents.size()));
+        m_itNextColor = lower_bound(m_vColors.begin(), m_vColors.end(), pair<mms_t, idx_t>(llTime, NULL));
         m_itNextSysEx = lower_bound(m_vSysExEvents.begin(), m_vSysExEvents.end(), llTime, [](const MIDISysExEvent* message, mms_t target) {return message->GetAbsMicroSec() < target; });
     }
     else

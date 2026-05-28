@@ -862,7 +862,7 @@ void MIDI::MIDIInfo::AddTrackInfo(const MIDITrack& mTrack)
 
 // Sets absolute time variables. A lot of code for not much happening...
 // Has to be EXACT. Even a little drift and things start messing up a few minutes in (metronome, etc)
-bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMetaEvent*>* vMetaEvents, eventvec_t* vTempo, eventvec_t* vSignature, eventvec_t* vMarkers, eventvec_t* vColors, vector<MIDISysExEvent*>* vSysExEvents)
+bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMetaEvent*>* vMetaEvents, eventvec_t* vTempo, eventvec_t* vSignature, eventvec_t* vMarkers, eventvec_t* vReplay, eventvec_t* vColors, vector<MIDISysExEvent*>* vSysExEvents)
 {
     // Iterator like class
     MIDIPos midiPos(*this);
@@ -902,7 +902,7 @@ bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
         {
             MIDIChannelEvent* pChannelEvent = reinterpret_cast<MIDIChannelEvent*>(pEvent);
             pChannelEvent->SetSimultaneous(iSimultaneous);
-            if (pChannelEvent->HasSister())
+            if (IsNote(pChannelEvent->GetChannelEventType()) && pChannelEvent->HasSister())
             {
                 if (IsOn(pChannelEvent->GetChannelEventType(), pChannelEvent->GetParam2()))
                 {
@@ -919,6 +919,14 @@ bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
                 else {
                     sister->SetSisterIdx(vChannelEvents.size());
                     sister->SetPassDone(true);
+                }
+            }
+            else {
+                if (vChannelEvents.size() >= IDX_MAX) {
+                    return false;
+                }
+                else {
+                    vReplay->push_back(pair<mms_t, idx_t>(pEvent->GetAbsMicroSec(), vChannelEvents.size()));
                 }
             }
             vChannelEvents.push_back(pChannelEvent);

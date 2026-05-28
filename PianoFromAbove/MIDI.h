@@ -169,7 +169,7 @@ public:
     bool IsValid() const { return (m_vTracks.size() > 0 && m_Info.iNoteCount > 0 && m_Info.iDivision > 0 && (m_Info.iFormatType == 0 || m_Info.iFormatType == 1 || m_Info.iFormatType == 768)); }
     bool SkipUnknownSMF3Chunk(unsigned char* Buffer, size_t* Offset, uint32_t* FeatureFlags);
 
-    bool PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMetaEvent*>* vMetaEvents = nullptr, eventvec_t* vTempo = nullptr, eventvec_t* vSignature = nullptr, eventvec_t* vMarkers = nullptr, eventvec_t* vColors = nullptr, vector<MIDISysExEvent*>* vSysExEvents = nullptr);
+    bool PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMetaEvent*>* vMetaEvents = nullptr, eventvec_t* vTempo = nullptr, eventvec_t* vSignature = nullptr, eventvec_t* vMarkers = nullptr, eventvec_t* vReplay = nullptr, eventvec_t* vColors = nullptr, vector<MIDISysExEvent*>* vSysExEvents = nullptr);
     void ConnectNotes();
     void clear(void);
 
