@@ -356,6 +356,10 @@
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
       <BufferSecurityCheck>false</BufferSecurityCheck>
+      <StringPooling>true</StringPooling>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <GuardEHContMetadata>false</GuardEHContMetadata>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -368,6 +372,9 @@
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>
       <AdditionalManifestDependencies>"type='Win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'";%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
+      <AllowIsolation>true</AllowIsolation>
+      <AdditionalOptions>/MAP</AdditionalOptions>
+      <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -449,6 +456,10 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
       <BufferSecurityCheck>false</BufferSecurityCheck>
+      <StringPooling>true</StringPooling>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <GuardEHContMetadata>false</GuardEHContMetadata>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -461,6 +472,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>
       <AdditionalManifestDependencies>"type='Win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'";%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
+      <AllowIsolation>true</AllowIsolation>
+      <AdditionalOptions>/MAP</AdditionalOptions>
+      <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -542,6 +556,10 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
       <BufferSecurityCheck>false</BufferSecurityCheck>
+      <StringPooling>true</StringPooling>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <GuardEHContMetadata>false</GuardEHContMetadata>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -554,6 +572,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>
       <AdditionalManifestDependencies>"type='Win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'";%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
+      <AllowIsolation>true</AllowIsolation>
+      <AdditionalOptions>/MAP</AdditionalOptions>
+      <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -635,6 +656,10 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
       <BufferSecurityCheck>false</BufferSecurityCheck>
+      <StringPooling>true</StringPooling>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <GuardEHContMetadata>false</GuardEHContMetadata>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -647,6 +672,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>
       <AdditionalManifestDependencies>"type='Win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'";%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
+      <AllowIsolation>true</AllowIsolation>
+      <AdditionalOptions>/MAP</AdditionalOptions>
+      <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -728,6 +756,10 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
       <BufferSecurityCheck>false</BufferSecurityCheck>
+      <StringPooling>true</StringPooling>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <GuardEHContMetadata>false</GuardEHContMetadata>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -740,6 +772,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>
       <AdditionalManifestDependencies>"type='Win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'";%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
+      <AllowIsolation>true</AllowIsolation>
+      <AdditionalOptions>/MAP</AdditionalOptions>
+      <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -821,6 +856,10 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
       <BufferSecurityCheck>false</BufferSecurityCheck>
+      <StringPooling>true</StringPooling>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <GuardEHContMetadata>false</GuardEHContMetadata>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -833,6 +872,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>
       <AdditionalManifestDependencies>"type='Win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'";%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
+      <AllowIsolation>true</AllowIsolation>
+      <AdditionalOptions>/MAP</AdditionalOptions>
+      <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -914,6 +956,10 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
       <BufferSecurityCheck>false</BufferSecurityCheck>
+      <StringPooling>true</StringPooling>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <GuardEHContMetadata>false</GuardEHContMetadata>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -926,6 +972,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>
       <AdditionalManifestDependencies>"type='Win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'";%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
+      <AllowIsolation>true</AllowIsolation>
+      <AdditionalOptions>/MAP</AdditionalOptions>
+      <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1007,6 +1056,10 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
       <BufferSecurityCheck>false</BufferSecurityCheck>
+      <StringPooling>true</StringPooling>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <GuardEHContMetadata>false</GuardEHContMetadata>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -1019,6 +1072,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>
       <AdditionalManifestDependencies>"type='Win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'";%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
+      <AllowIsolation>true</AllowIsolation>
+      <AdditionalOptions>/MAP</AdditionalOptions>
+      <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1100,6 +1156,10 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
       <BufferSecurityCheck>false</BufferSecurityCheck>
+      <StringPooling>true</StringPooling>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <GuardEHContMetadata>false</GuardEHContMetadata>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -1112,6 +1172,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>
       <AdditionalManifestDependencies>"type='Win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'";%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
+      <AllowIsolation>true</AllowIsolation>
+      <AdditionalOptions>/MAP</AdditionalOptions>
+      <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1191,6 +1254,10 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
       <BufferSecurityCheck>false</BufferSecurityCheck>
+      <StringPooling>true</StringPooling>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <GuardEHContMetadata>false</GuardEHContMetadata>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -1203,6 +1270,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>
       <AdditionalManifestDependencies>"type='Win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'";%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
+      <AllowIsolation>true</AllowIsolation>
+      <AdditionalOptions>/MAP</AdditionalOptions>
+      <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1284,6 +1354,10 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
       <BufferSecurityCheck>false</BufferSecurityCheck>
+      <StringPooling>true</StringPooling>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <GuardEHContMetadata>false</GuardEHContMetadata>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -1296,6 +1370,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>
       <AdditionalManifestDependencies>"type='Win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'";%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
+      <AllowIsolation>true</AllowIsolation>
+      <AdditionalOptions>/MAP</AdditionalOptions>
+      <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1375,6 +1452,10 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
       <BufferSecurityCheck>false</BufferSecurityCheck>
+      <StringPooling>true</StringPooling>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <GuardEHContMetadata>false</GuardEHContMetadata>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -1387,6 +1468,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>
       <AdditionalManifestDependencies>"type='Win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'";%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
+      <AllowIsolation>true</AllowIsolation>
+      <AdditionalOptions>/MAP</AdditionalOptions>
+      <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1438,6 +1522,11 @@ rename .\Widths.hh Widths.h</Command>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>false</OmitFramePointers>
       <BufferSecurityCheck>true</BufferSecurityCheck>
+      <ControlFlowGuard>Guard</ControlFlowGuard>
+      <FloatingPointExceptions>true</FloatingPointExceptions>
+      <GuardEHContMetadata>true</GuardEHContMetadata>
+      <StringPooling>false</StringPooling>
+      <SmallerTypeCheck>true</SmallerTypeCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -1450,6 +1539,9 @@ rename .\Widths.hh Widths.h</Command>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>
       <AdditionalManifestDependencies>"type='Win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'";%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
+      <AllowIsolation>true</AllowIsolation>
+      <AdditionalOptions>/MAP</AdditionalOptions>
+      <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
