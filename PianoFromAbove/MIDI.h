@@ -371,8 +371,7 @@ static_assert(sizeof(MIDIChannelEvent) == 32);
 class __attribute__((packed)) MIDIMetaEvent : public MIDIEvent
 {
 public:
-    MIDIMetaEvent() : m_pcData(0) { }
-    ~MIDIMetaEvent() { if (m_pcData) delete[] m_pcData; }
+    MIDIMetaEvent() : m_pcData(nullptr) { }
 
     enum MetaEventType : msg_t {
         TextEvent = 0x01, Copyright, SequenceName, InstrumentName, Lyric, Marker, CuePoint, ProgramName, DeviceName,
@@ -399,8 +398,7 @@ static_assert(sizeof(MIDIMetaEvent) == 32);
 class __attribute__((packed)) MIDISysExEvent : public MIDIEvent
 {
 public:
-    MIDISysExEvent() : m_pcData(0) { }
-    ~MIDISysExEvent() { if (m_pcData) delete[] m_pcData; }
+    MIDISysExEvent() : m_pcData(nullptr) { }
 
     __forceinline fileln_t ParseEvent(const unsigned char* pcData, fileln_t iMaxSize);
     __forceinline msgln_t GetDataLen() const { return m_iDataLen; }

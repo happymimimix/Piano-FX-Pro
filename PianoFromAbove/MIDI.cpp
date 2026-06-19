@@ -396,7 +396,7 @@ MIDI::~MIDI(void)
 
 #define EVENT_POOL_MAX (1<<19)
 MIDIChannelEvent* MIDI::AllocChannelEvent() {
-    if (event_pools.size() == 0 || event_pools.back().count == EVENT_POOL_MAX) {
+    if (event_pools.size() == 0 || event_pools.back().count >= EVENT_POOL_MAX) {
         // Currently, MIDIChannelEvent is 32 bytes large.
         // This is conveniently exactly half the size of an x86 cache line.
         // Making sure the pool allocation is aligned to at least 32 bytes should ensure that all member accesses are in cache.
@@ -490,7 +490,7 @@ void MIDI::InitArrays()
 void MIDI::clear(void)
 {
     for (vector<MIDITrack*>::iterator it = m_vTracks.begin(); it != m_vTracks.end(); ++it)
-        delete* it;
+        delete *it;
     m_vTracks.clear();
     m_Info.clear();
     for (auto& pool : event_pools)
@@ -968,7 +968,7 @@ bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
                 }
             }
             else {
-                delete pMetaEvent; // caller doesn't want meta events, free it
+                delete pMetaEvent->GetData(); // caller doesn't want meta events, free it
             }
         }
         else if (pEvent->GetEventType() == MIDIEvent::SysExEvent)
@@ -993,7 +993,7 @@ bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
                 }
             }
             else {
-                delete pSysExEvent; // caller doesn't want sysex events, free it
+                delete pSysExEvent->GetData(); // caller doesn't want sysex events, free it
             }
         }
 
@@ -1251,8 +1251,8 @@ fileln_t MIDIEvent::MakeNextEvent(MIDI& midi, const unsigned char* pcData, filel
     switch (eEventType)
     {
     case ChannelEvent: *pOutEvent = midi.AllocChannelEvent(); break;
-    case MetaEvent: *pOutEvent = new MIDIMetaEvent(); break;
-    case SysExEvent: *pOutEvent = new MIDISysExEvent(); break;
+    case MetaEvent: *pOutEvent = midi.AllocChannelEvent(); break;
+    case SysExEvent: *pOutEvent = midi.AllocChannelEvent(); break;
     default: break;
     }
     (*pOutEvent)->m_eEventType = eEventType;

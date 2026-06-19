@@ -204,6 +204,12 @@ public:
     }
 };
 
+struct EmptyRegion {
+    mms_t EmptyBegin;
+    mms_t EmptyEnd;
+    EmptyRegion* NextRegion = nullptr;
+};
+
 //Abstract base class
 class GameState
 {
@@ -322,8 +328,8 @@ public:
         PointersInitialized = false;
         delete[] m_vNCTable;
         delete m_pState;
-        for (auto* p : m_vMetaEvents) delete p;
-        for (auto* p : m_vSysExEvents) delete p;
+        for (auto* p : m_vMetaEvents) delete p->GetData();
+        for (auto* p : m_vSysExEvents) delete p->GetData();
     }
 
     // GameState functions

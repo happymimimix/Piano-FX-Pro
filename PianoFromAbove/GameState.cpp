@@ -2065,13 +2065,12 @@ void MainScreen::RenderNote(const MIDIChannelEvent * pNote) {
         : llNoteStart - m_llRndStartTime + (m_fZoomX * m_fTempZoomX < 0 ? m_llTimeSpan : 0)
         );
     // Watch the magic happen! 
-    union { float f; uint32_t i; } uLength;
-    uLength.f = static_cast<float>(llNoteEnd - llNoteStart);
+    float fLength = static_cast<float>(llNoteEnd - llNoteStart);
     iNote |= ((iVel & 0x01) << 7);
     iChannel |= ((iVel & 0x1E) << 3);
-    uLength.i &= 0x7FFFFFFE;
-    uLength.i |= (iVel & 0x20) << 26;
-    uLength.i |= (iVel >> 6) & 0x01;
+    *reinterpret_cast<unsigned int*>(&fLength) &= 0x7FFFFFFE;
+    *reinterpret_cast<unsigned int*>(&fLength) |= (iVel & 0x20) << 26;
+    *reinterpret_cast<unsigned int*>(&fLength) |= (iVel >> 6) & 0x01;
     // Push it to the GPU. 
     m_pRenderer->PushNoteData(
         NoteData{
@@ -2079,7 +2078,7 @@ void MainScreen::RenderNote(const MIDIChannelEvent * pNote) {
             .channel = iChannel,
             .track = iTrack,
             .pos = fPos,
-            .length = uLength.f,
+            .length = fLength,
         }
     );
 }
