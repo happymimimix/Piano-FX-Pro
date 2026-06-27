@@ -98,17 +98,17 @@ struct dynamic_bitset {
 
     __forceinline void Activate(idx_t idx) {
         idx_t word = idx >> WORD_DIV_SHR;
-        bits[word] |= (size_t(1) << (idx & WORD_MASK));
+        bits[word] |= (size_t(1u) << (idx & WORD_MASK));
         minWord = min(minWord, word);
         maxWord = max(maxWord, word);
     }
 
     __forceinline void Deactivate(idx_t idx) {
-        bits[idx >> WORD_DIV_SHR] &= ~(size_t(1) << (idx & WORD_MASK));
+        bits[idx >> WORD_DIV_SHR] &= ~(size_t(1u) << (idx & WORD_MASK));
     }
 
     __forceinline bool IsActive(idx_t idx) const {
-        return bits[idx >> WORD_DIV_SHR] & (size_t(1) << (idx & WORD_MASK));
+        return bits[idx >> WORD_DIV_SHR] & (size_t(1u) << (idx & WORD_MASK));
     }
 
     static __forceinline idx_t CTZ(size_t word) {
@@ -129,7 +129,7 @@ struct dynamic_bitset {
         idx_t newMin = wordCount - 1;
         idx_t newMax = 0;
         bool first = true;
-        for (idx_t word_id = minWord; word_id <= maxWord; word_id++) {
+        for (idx_t word_id = minWord; word_id <= maxWord && word_id != IDX_MAX; word_id++) {
             size_t word = bits[word_id];
             if (word) {
                 if (first) {
@@ -141,7 +141,7 @@ struct dynamic_bitset {
             while (word) {
                 idx_t bit = CTZ(word);
                 FuncPtr((word_id << WORD_DIV_SHR) | bit);
-                word &= word - 1;
+                word ^= size_t(1u) << bit;
             }
         }
         minWord = newMin;
@@ -168,7 +168,7 @@ struct dynamic_bitset {
             while (word) {
                 idx_t bit = WORD_MASK - CLZ(word);
                 FuncPtr((word_id << WORD_DIV_SHR) | bit);
-                word ^= size_t(1) << bit;
+                word ^= size_t(1u) << bit;
             }
         }
         minWord = newMin;
@@ -292,7 +292,7 @@ private:
     // MIDI info
     MIDI m_MIDI; // The song to display
     vector<MIDIChannelEvent*> m_vEvents; // The channel events of the song
-    sidx_t m_iStartPos, m_iEndPos;
+    idx_t m_iStartPos, m_iEndPos;
     mms_t m_llStartTime;
     dynamic_bitset* m_pState = nullptr;
     Timer m_Timer; // Frame timers
@@ -419,7 +419,7 @@ private:
     short m_pBendsRange[16] = { 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12 };
 
     // Playback
-    sidx_t m_iStartPos, m_iEndPos, m_iPrevStartPos; // Postions of the start and end events that occur in the current window
+    idx_t m_iStartPos, m_iEndPos, m_iPrevStartPos; // Postions of the start and end events that occur in the current window
     mms_t m_llStartTime, m_llPrevTime, m_llTimeSpan, m_llMinTime, m_llMaxTime;  // Times of the start and end events of the current window
     mtk_t m_iStartTick, m_iPrevTick; // Tick that corresponds with m_llStartTime, used to help with beat and metronome detection
     dynamic_bitset* m_pState;

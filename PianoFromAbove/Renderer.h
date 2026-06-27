@@ -188,7 +188,7 @@ private:
 
     vector<RectVertex> m_vRectsIntermediate;
     vector<NoteData> m_vNotesIntermediate;
-    sidx_t m_iRectSplit = -1;
+    idx_t m_iRectSplit = IDX_MAX;
     
     struct TextCommand {
         wstring Text;

@@ -256,8 +256,8 @@ void SplashScreen::InitState() {
     static const PlaybackSettings& cPlayback = config.GetPlaybackSettings();
     static const VisualSettings& cVisual = config.GetVisualSettings();
 
-    m_iStartPos = 0;
-    m_iEndPos = -1;
+    m_iStartPos = NULL;
+    m_iEndPos = IDX_MAX;
     m_llStartTime = m_MIDI.GetInfo().llFirstNote - 1000000;
     m_bMute = cPlayback.GetMute();
 
@@ -385,8 +385,8 @@ GameState::GameError SplashScreen::Logic() {
     // Figure out start and end times for display
     if (m_llStartTime > m_MIDI.GetInfo().llTotalMicroSecs + 300000) {
         m_llStartTime = m_MIDI.GetInfo().llFirstNote - 1000000;
-        m_iStartPos = 0;
-        m_iEndPos = -1;
+        m_iStartPos = NULL;
+        m_iEndPos = IDX_MAX;
     }
     m_llStartTime = m_llStartTime + llElapsed;
     mms_t llEndTime = m_llStartTime + TimeSpan;
@@ -395,11 +395,10 @@ GameState::GameError SplashScreen::Logic() {
     RenderGlobals();
 
     // Advance end position
-    idx_t iEventCount = static_cast<idx_t>(m_vEvents.size());
-    while (m_iEndPos + 1 < iEventCount && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() < llEndTime) m_iEndPos++;
+    while (m_iEndPos + 1 < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() < llEndTime) m_iEndPos++;
 
     // Advance start position
-    while (m_iStartPos < iEventCount && m_vEvents[m_iStartPos]->GetAbsMicroSec() <= m_llStartTime)
+    while (m_iStartPos < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iStartPos]->GetAbsMicroSec() <= m_llStartTime)
     {
         const MIDIChannelEvent* pEvent = m_vEvents[m_iStartPos];
         if (IsNotNote(pEvent->GetChannelEventType())) {
@@ -414,7 +413,7 @@ GameState::GameError SplashScreen::Logic() {
             }
         }
         if (IsNote(pEvent->GetChannelEventType()) && pEvent->HasSister()) {
-            UpdateState(static_cast<idx_t>(m_iStartPos), IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()) ? IDX_MAX : pEvent->GetSisterIdx());
+            UpdateState(m_iStartPos, IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()) ? IDX_MAX : pEvent->GetSisterIdx());
         }
         m_iStartPos++;
     }
@@ -485,8 +484,7 @@ void SplashScreen::RenderGlobals() {
 
 void SplashScreen::RenderNotes() {
     // Do we have any notes to render?
-    if (m_iEndPos < 0 || m_iStartPos >= m_vEvents.size())
-        return;
+    if (m_iStartPos >= static_cast<idx_t>(m_vEvents.size()) || m_iEndPos >= static_cast<idx_t>(m_vEvents.size())) return;
 
     // White held notes
     m_pState->ForEach([&](idx_t idx) {
@@ -495,7 +493,7 @@ void SplashScreen::RenderNotes() {
         }
         });
     // White falling notes
-    for (sidx_t i = m_iStartPos; i <= m_iEndPos; i++) {
+    for (idx_t i = m_iStartPos; i <= m_iEndPos && i != IDX_MAX; i++) {
         MIDIChannelEvent* pEvent = m_vEvents[i];
         if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()) && pEvent->HasSister() &&
             !MIDI::IsSharp(pEvent->GetParam1()) &&
@@ -510,7 +508,7 @@ void SplashScreen::RenderNotes() {
         }
         });
     // Sharp falling notes
-    for (sidx_t i = m_iStartPos; i <= m_iEndPos; i++) {
+    for (idx_t i = m_iStartPos; i <= m_iEndPos && i != IDX_MAX; i++) {
         MIDIChannelEvent* pEvent = m_vEvents[i];
         if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()) && pEvent->HasSister() &&
             MIDI::IsSharp(pEvent->GetParam1()) &&
@@ -631,9 +629,8 @@ void MainScreen::InitState() {
     static const ViewSettings& cView = config.GetViewSettings();
     static const ControlsSettings& cControls = config.GetControlsSettings();
 
-    m_iStartPos = 0;
-    m_iPrevStartPos = 0;
-    m_iEndPos = -1;
+    m_iStartPos = NULL;
+    m_iEndPos = IDX_MAX;
     m_llMinTime = m_MIDI.GetInfo().llFirstNote - 3000000;
     m_llMaxTime = m_MIDI.GetInfo().llTotalMicroSecs + 500000;
     m_llStartTime = m_llMinTime;
@@ -1121,31 +1118,7 @@ GameState::GameError MainScreen::Logic() {
     }
     m_iPrevTick = m_iStartTick;
 
-    idx_t iEventCount = static_cast<idx_t>(m_vEvents.size());
     RenderGlobals();
-
-    // We must advance the end position AFTER start position when drawing in reversed order! 
-    // So let's skip this section for now, then come back to do it later. 
-    if (dNSpeed >= 0) {
-    AdvanceEnd:
-        if (m_bTickMode) {
-            while (m_iEndPos > 0 && (m_iEndPos + 1 >= iEventCount || m_vEvents[m_iEndPos + 1]->GetAbsTick() > llEndTime)) {
-                m_iEndPos--; //Make sure we're 10000% not drawing any unnecessary notes! 
-            }
-            while (m_iEndPos + 1 < iEventCount && m_vEvents[m_iEndPos + 1]->GetAbsTick() < llEndTime) {
-                m_iEndPos++;
-            }
-        }
-        else {
-            while (m_iEndPos > 0 && (m_iEndPos + 1 >= iEventCount || m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() > llEndTime)) {
-                m_iEndPos--; //Make sure we're 10000% not drawing any unnecessary notes! 
-            }
-            while (m_iEndPos + 1 < iEventCount && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() < llEndTime) {
-                m_iEndPos++;
-            }
-        }
-        if (dNSpeed < 0) goto DoneAdvance;
-    }
 
     // Advance the start position! 
     if (!m_bPaused)
@@ -1163,9 +1136,9 @@ GameState::GameError MainScreen::Logic() {
         // We want to use a different loop head in different scenario. 
         if (Reverse) goto ReversedLoopCondition; else goto NormalLoopCondition;
     ReversedLoopCondition:
-        if (m_iStartPos > 0 && m_vEvents[m_iStartPos]->GetAbsMicroSec() >= m_llStartTime) goto LoopBody; else goto LoopEnd;
+        if (m_iStartPos < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iStartPos]->GetAbsMicroSec() >= m_llStartTime) goto LoopBody; else goto LoopEnd;
     NormalLoopCondition:
-        if (m_iStartPos < iEventCount && m_vEvents[m_iStartPos]->GetAbsMicroSec() <= m_llStartTime) goto LoopBody; else goto LoopEnd;
+        if (m_iStartPos < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iStartPos]->GetAbsMicroSec() <= m_llStartTime) goto LoopBody; else goto LoopEnd;
 
         // Here comes the loop body! 
     LoopBody:
@@ -1232,19 +1205,26 @@ GameState::GameError MainScreen::Logic() {
                 goto NormalLoopCondition;
             }
         }
-    LoopEnd:
-        ;
+    LoopEnd:;
     }
 
-    // Advance the end position for negative note speed. 
-    if (dNSpeed < 0) {
-        m_iEndPos += (m_iPrevStartPos - m_iEndPos) * 2;
-        m_iEndPos = max(m_iEndPos, 0);
-        goto AdvanceEnd;
-    DoneAdvance:
-        m_iEndPos += (m_iStartPos - m_iEndPos) * 2;
+    // Advance the end position! 
+    if (m_bTickMode) {
+        while (m_iEndPos != IDX_MAX && (m_iEndPos + 1 >= static_cast<idx_t>(m_vEvents.size()) || m_vEvents[m_iEndPos + 1]->GetAbsTick() > llEndTime)) {
+            m_iEndPos--; //Make sure we're 10000% not drawing any unnecessary notes! 
+        }
+        while (m_iEndPos + 1 < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iEndPos + 1]->GetAbsTick() < llEndTime) {
+            m_iEndPos++;
+        }
     }
-    m_iPrevStartPos = m_iStartPos;
+    else {
+        while (m_iEndPos != IDX_MAX && (m_iEndPos + 1 >= static_cast<idx_t>(m_vEvents.size()) || m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() > llEndTime)) {
+            m_iEndPos--; //Make sure we're 10000% not drawing any unnecessary notes! 
+        }
+        while (m_iEndPos + 1 < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() < llEndTime) {
+            m_iEndPos++;
+        }
+    }
 
     // Update the position slider
     mms_t llOldPos = ((llOldStartTime - m_llMinTime) * INT16_MAX) / (m_llMaxTime - m_llMinTime);
@@ -1406,35 +1386,15 @@ SkipSearch:
     m_iStartTick = GetCurrentTick(m_llStartTime);
 
     // End position: a little tricky. Same as logic code. Only needed for paused jumping.
-    if (m_dNSpeed < 0) {
-        if (m_bTickMode) {
-            m_iEndPos = m_iStartPos + 1;
-            idx_t iEventCount = static_cast<idx_t>(m_vEvents.size());
-            while (m_iEndPos > 0 && (m_iEndPos + 1 >= iEventCount || m_vEvents[m_iEndPos + 1]->GetAbsTick() > llEndTime))
-                m_iEndPos--;
-            m_iEndPos += (m_iStartPos - m_iEndPos) * 2;
-        }
-        else {
-            m_iEndPos = m_iStartPos + 1;
-            idx_t iEventCount = static_cast<idx_t>(m_vEvents.size());
-            while (m_iEndPos > 0 && (m_iEndPos + 1 >= iEventCount || m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() > llEndTime))
-                m_iEndPos--;
-            m_iEndPos += (m_iStartPos - m_iEndPos) * 2;
-        }
+    if (m_bTickMode) {
+        m_iEndPos = m_iStartPos - 1;
+        while (m_iEndPos + 1 < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iEndPos + 1]->GetAbsTick() < llEndTime)
+            m_iEndPos++;
     }
     else {
-        if (m_bTickMode) {
-            m_iEndPos = m_iStartPos - 1;
-            idx_t iEventCount = static_cast<idx_t>(m_vEvents.size());
-            while (m_iEndPos + 1 < iEventCount && m_vEvents[m_iEndPos + 1]->GetAbsTick() < llEndTime)
-                m_iEndPos++;
-        }
-        else {
-            m_iEndPos = m_iStartPos - 1;
-            idx_t iEventCount = static_cast<idx_t>(m_vEvents.size());
-            while (m_iEndPos + 1 < iEventCount && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() < llEndTime)
-                m_iEndPos++;
-        }
+        m_iEndPos = m_iStartPos - 1;
+        while (m_iEndPos + 1 < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() < llEndTime)
+            m_iEndPos++;
     }
 
     if (!loadingMode)
@@ -1447,7 +1407,6 @@ SkipSearch:
     IsLastFrameReversed = false;
     m_llPrevTime = m_llStartTime;
     m_iPrevTick = m_iStartTick;
-    m_iPrevStartPos = m_iStartPos;
 }
 
 void MainScreen::ApplyColor(MIDIMetaEvent * event) {
@@ -1963,10 +1922,8 @@ void MainScreen::RenderLines() {
 }
 
 void MainScreen::RenderNotes() {
-    sidx_t iStartPos = m_dNSpeed < 0 ? m_iStartPos - (m_iEndPos - m_iStartPos) + 1 : m_iStartPos;
-    sidx_t iEndPos = m_dNSpeed < 0 ? m_iEndPos - (m_iEndPos - m_iStartPos) - 1 : m_iEndPos;
-
-    if (iStartPos < 0 || iEndPos >= static_cast<sidx_t>(m_vEvents.size())) return; // the note speed has been changed after processing these positions but before reaching here. 
+    // Do we have any notes to render?
+    if (m_iStartPos >= static_cast<idx_t>(m_vEvents.size()) || m_iEndPos >= static_cast<idx_t>(m_vEvents.size())) return;
 
     // Ensure that any rects rendered after this point render over the notes
     m_pRenderer->SplitRect();
@@ -1987,22 +1944,11 @@ void MainScreen::RenderNotes() {
     };
 
     if (Config::GetConfig().GetVideoSettings().bOR) {
-        if (m_dNSpeed < 0) {
-            for (sidx_t i = iStartPos; i <= iEndPos; i++) {
-                MIDIChannelEvent* pEvent = m_vEvents[i];
-                if (IsOff(pEvent->GetChannelEventType(), pEvent->GetParam2()) && pEvent->HasSister() &&
-                    m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
-                    RenderNote(pEvent->GetSister(m_vEvents));
-                }
-            }
-        }
-        else {
-            for (sidx_t i = iEndPos; i >= iStartPos; i--) {
-                MIDIChannelEvent* pEvent = m_vEvents[i];
-                if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()) && pEvent->HasSister() &&
-                    m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
-                    RenderNote(pEvent);
-                }
+        for (idx_t i = m_iEndPos; i >= m_iStartPos && i != IDX_MAX; i+= m_dNSpeed < 0 ? 1 : -1) {
+            MIDIChannelEvent* pEvent = m_vEvents[i];
+            if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()) && pEvent->HasSister() &&
+                m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
+                RenderNote(pEvent);
             }
         }
         m_iPolyphony = 0;
@@ -2015,7 +1961,7 @@ void MainScreen::RenderNotes() {
                 }
             }
             m_iPolyphony++;
-            });
+        });
     }
     else {
         m_iPolyphony = 0;
@@ -2026,23 +1972,12 @@ void MainScreen::RenderNotes() {
                 PressAndBlend(pEvent);
             }
             m_iPolyphony++;
-            });
-        if (m_dNSpeed < 0) {
-            for (sidx_t i = iEndPos; i >= iStartPos; i--) {
-                MIDIChannelEvent* pEvent = m_vEvents[i];
-                if (IsOff(pEvent->GetChannelEventType(), pEvent->GetParam2()) && pEvent->HasSister() &&
-                    m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
-                    RenderNote(pEvent->GetSister(m_vEvents));
-                }
-            }
-        }
-        else {
-            for (sidx_t i = iStartPos; i <= iEndPos; i++) {
-                MIDIChannelEvent* pEvent = m_vEvents[i];
-                if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()) && pEvent->HasSister() &&
-                    m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
-                    RenderNote(pEvent);
-                }
+        });
+        for (idx_t i = m_iStartPos; i <= m_iEndPos && i != IDX_MAX; i += m_dNSpeed < 0 ? -1 : 1) {
+            MIDIChannelEvent* pEvent = m_vEvents[i];
+            if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()) && pEvent->HasSister() &&
+                m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
+                RenderNote(pEvent);
             }
         }
     }

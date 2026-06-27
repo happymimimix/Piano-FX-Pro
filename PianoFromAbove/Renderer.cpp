@@ -351,7 +351,7 @@ HRESULT Renderer11::ClearAndBeginScene(DWORD color) {
     m_vRectsIntermediate.clear();
     m_vNotesIntermediate.clear();
     m_vTextCommands.clear();
-    m_iRectSplit = -1;
+    m_iRectSplit = IDX_MAX;
 
     // Upload constant buffer
     D3D11_MAPPED_SUBRESOURCE mapped;
@@ -448,7 +448,7 @@ HRESULT Renderer11::EndScene(bool draw_bg) {
 
     // Flush the intermediate rect buffer
     size_t rect_count = m_vRectsIntermediate.size();
-    size_t rect_split = min(m_iRectSplit < 0 ? rect_count : (size_t)m_iRectSplit, rect_count);
+    size_t rect_split = min(m_iRectSplit == IDX_MAX ? rect_count : (size_t)m_iRectSplit, rect_count);
 
     // First rect batch (before notes)
     res = DrawRectRange(0, rect_split);

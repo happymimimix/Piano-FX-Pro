@@ -738,17 +738,17 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 switch (lpnmlv->iSubItem)
                 {
                 case 4:
-                    for (idx_t i = 0; i < vMuted.size(); i++) bAllChecked &= vMuted[i];
-                    for (idx_t i = 0; i < vMuted.size(); i++) vMuted[i] = !bAllChecked;
+                    for (idx_t i = 0; i < static_cast<idx_t>(vMuted.size()); i++) bAllChecked &= vMuted[i];
+                    for (idx_t i = 0; i < static_cast<idx_t>(vMuted.size()); i++) vMuted[i] = !bAllChecked;
                     InvalidateRect(lpnmlv->hdr.hwndFrom, NULL, FALSE);
                     return TRUE;
                 case 5:
-                    for (idx_t i = 0; i < vHidden.size(); i++) bAllChecked &= vHidden[i];
-                    for (idx_t i = 0; i < vHidden.size(); i++) vHidden[i] = !bAllChecked;
+                    for (idx_t i = 0; i < static_cast<idx_t>(vHidden.size()); i++) bAllChecked &= vHidden[i];
+                    for (idx_t i = 0; i < static_cast<idx_t>(vHidden.size()); i++) vHidden[i] = !bAllChecked;
                     InvalidateRect(lpnmlv->hdr.hwndFrom, NULL, FALSE);
                     return TRUE;
                 case 6:
-                    for (idx_t i = 0; i < vColors.size(); i++)
+                    for (idx_t i = 0; i < static_cast<idx_t>(vColors.size()); i++)
                         if (cVisual.bRandomizeColor) {
                             vColors[i] = Util::RandColor() & 0x00FFFFFF | (cVisual.colors[i % 16] & 0xFF000000);
                         }

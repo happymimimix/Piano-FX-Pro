@@ -26,9 +26,10 @@ typedef uint8_t msg_t; // Midi message type
 typedef uint32_t msgln_t; // Midi message length type (always 32bit unsigned)
 typedef int64_t fileln_t; // File length type (always 64bit signed)
 typedef uint32_t idx_t; // Array indexing type
-typedef int64_t sidx_t; // Array indexing type (signed)
-constexpr idx_t IDX_MAX = static_cast<idx_t>(-1); // Maximum array size
-constexpr track_t TRACK_INVALID = static_cast<track_t>(-1); // A track ID that is impossible for any regular midi track to get
+//typedef int64_t idx_t; // Array indexing type (signed)
+//typedef int64_t idx_t; // Array indexing type (signed)
+constexpr idx_t IDX_MAX = static_cast<idx_t>(~0); // Maximum array size
+constexpr track_t TRACK_INVALID = static_cast<track_t>(~0); // A track ID that is impossible for any regular midi track to get
 typedef uint32_t color_t; // RGBA combined color type
 typedef signed long bpm_t; // Anything that has something to do with tempo, beat, and measure
 typedef signed int win32_t; // Classic signed 32bit integer, aka dword, used for interfacing with Win32 API (should not appear in any game logic)
