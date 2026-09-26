@@ -1170,8 +1170,8 @@ GameState::GameError MainScreen::Logic() {
                     if (key == MIDIChannelEvent::RPNData && Next_is_PBS[pEvent->GetChannel()]) {
                         m_pBendsRange[pEvent->GetChannel()] = vel;
                         PitchBendUpdate: // Update PB display. 
-                        float NoteWidth = (m_pRenderer->GetBufferWidth() * abs(m_fZoomX) * abs(m_fTempZoomX)) / (m_iEndNote - m_iStartNote);
-                        float ShiftAmount = m_pBendsRange[pEvent->GetChannel()] == 0 ? 0 : m_pBendsValue[pEvent->GetChannel()] / ((1 << 13) / m_pBendsRange[pEvent->GetChannel()]);
+                        float NoteWidth = m_fNotesCX / static_cast<float>(m_iEndNote - m_iStartNote);
+                        float ShiftAmount = m_pBendsRange[pEvent->GetChannel()] == 0 ? 0.0f : static_cast<float>(m_pBendsValue[pEvent->GetChannel()]) * (static_cast<float>(m_pBendsRange[pEvent->GetChannel()]) / static_cast<float>(1<<13));
                         if (m_bFlipKeyboard) ShiftAmount *= -1;
                         m_pBends[pEvent->GetChannel()] = NoteWidth * ShiftAmount;
                         m_bUpdateNotePos = true;
@@ -2019,9 +2019,9 @@ void MainScreen::RenderNote(const MIDIChannelEvent * pNote) {
 }
 
 void MainScreen::GenNoteXTable() {
-    float NoteWidth = (m_pRenderer->GetBufferWidth() * abs(m_fZoomX) * abs(m_fTempZoomX)) / (m_iEndNote - m_iStartNote);
+    float NoteWidth = m_fNotesCX / static_cast<float>(m_iEndNote - m_iStartNote);
     for (chan_t ch = 0; ch < MaxChannelColors; ch++) {
-        float ShiftAmount = m_pBendsRange[ch] == 0 ? 0 : m_pBendsValue[ch] / ((1 << 13) / m_pBendsRange[ch]);
+        float ShiftAmount = m_pBendsRange[ch] == 0 ? 0.0f : static_cast<float>(m_pBendsValue[ch]) * (static_cast<float>(m_pBendsRange[ch]) / static_cast<float>(1<<13));
         if (m_bFlipKeyboard) ShiftAmount *= -1;
         m_pBends[ch] = NoteWidth * ShiftAmount;
     }

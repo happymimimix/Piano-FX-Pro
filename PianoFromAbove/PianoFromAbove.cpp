@@ -1511,6 +1511,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
 
     //Debug console
     AllocConsole();
+    freopen("CONIN$", "r", stdin);
     freopen("CONOUT$", "w", stdout);
     SetConsoleOutputCP(65001);
     cin.imbue(locale("en_US.UTF-8"));
