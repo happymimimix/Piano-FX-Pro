@@ -1246,7 +1246,7 @@ GameState::GameError MainScreen::Logic() {
                 NoteOnFound:
                 // Found it!
                 auto TargetNote = itMiddle;
-                if ((*TargetNote)->HasSister() && (*TargetNote)->GetSisterIdx() >= m_iEndPos) {
+                if ((*TargetNote)->HasSister() && (*TargetNote)->GetSisterIdx() >= m_iEndPos + 1) {
                     pState->Activate(TargetNote - m_vEvents.begin());
                 }
                 // Search for more held notes...
@@ -1259,7 +1259,7 @@ GameState::GameError MainScreen::Logic() {
                             if ((*itMiddle)->HasSister() && (*itMiddle)->GetSisterIdx() >= static_cast<idx_t>(TargetNote - itBegin)) {
                                 iFound++;
                             }
-                            if ((*itMiddle)->HasSister() && (*itMiddle)->GetSisterIdx() >= m_iEndPos) {
+                            if ((*itMiddle)->HasSister() && (*itMiddle)->GetSisterIdx() >= m_iEndPos + 1) {
                                 pState->Activate(itMiddle - m_vEvents.begin());
                             }
                         }
@@ -1285,7 +1285,7 @@ GameState::GameError MainScreen::Logic() {
     }
     unsigned char StateUpdateReturn = 0;
     if (m_bTickMode) {
-        while (m_iEndPos != IDX_MAX && (m_iEndPos + 1 >= static_cast<idx_t>(m_vEvents.size()) || m_vEvents[m_iEndPos + 1]->GetAbsTick() > llEndTime)) {
+        while (m_iEndPos != IDX_MAX && (m_iEndPos >= static_cast<idx_t>(m_vEvents.size()) || m_vEvents[m_iEndPos]->GetAbsTick() >= llEndTime)) {
             if (m_pStateReversed) {
                 StateUpdateReturn = 0;
                 Reverse = true;
@@ -1312,17 +1312,19 @@ GameState::GameError MainScreen::Logic() {
             m_iEndPos--; //Make sure we're 10000% not drawing any unnecessary notes! 
         }
         while (m_iEndPos + 1 < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iEndPos + 1]->GetAbsTick() < llEndTime) {
-            m_iEndPos++;
             if (m_pStateReversed) {
                 StateUpdateReturn = 1;
                 Reverse = false;
+                m_iEndPos++;
                 goto ReversedStateUpdate;
-                StateUpdateReturnLocation_01:;
+                StateUpdateReturnLocation_01:
+                m_iEndPos--;
             }
+            m_iEndPos++;
         }
     }
     else {
-        while (m_iEndPos != IDX_MAX && (m_iEndPos + 1 >= static_cast<idx_t>(m_vEvents.size()) || m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() > llEndTime)) {
+        while (m_iEndPos != IDX_MAX && (m_iEndPos >= static_cast<idx_t>(m_vEvents.size()) || m_vEvents[m_iEndPos]->GetAbsMicroSec() >= llEndTime)) {
             if (m_pStateReversed) {
                 StateUpdateReturn = 2;
                 Reverse = true;
@@ -1332,13 +1334,15 @@ GameState::GameError MainScreen::Logic() {
             m_iEndPos--; //Make sure we're 10000% not drawing any unnecessary notes! 
         }
         while (m_iEndPos + 1 < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() < llEndTime) {
-            m_iEndPos++;
             if (m_pStateReversed) {
                 StateUpdateReturn = 3;
                 Reverse = false;
+                m_iEndPos++;
                 goto ReversedStateUpdate;
-                StateUpdateReturnLocation_03:;
+                StateUpdateReturnLocation_03:
+                m_iEndPos--;
             }
+            m_iEndPos++;
         }
     }
 
@@ -1430,7 +1434,7 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
         m_llStartTime = min(max(llStartTime, m_llMinTime), m_llMaxTime);
     }
 
-    AdvanceIterators(llStartTime, true);
+    AdvanceIterators(m_llStartTime, true);
     m_iStartTick = GetCurrentTick(m_llStartTime);
     mms_t llEndTime;
     if (m_dNSpeed < 0) {
@@ -1511,7 +1515,7 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
 
     // End position: a little tricky. Same as logic code. Only needed for paused jumping.
     if (m_bTickMode) {
-        while (m_iEndPos != IDX_MAX && (m_iEndPos + 1 >= static_cast<idx_t>(m_vEvents.size()) || m_vEvents[m_iEndPos + 1]->GetAbsTick() > llEndTime)) {
+        while (m_iEndPos != IDX_MAX && (m_iEndPos >= static_cast<idx_t>(m_vEvents.size()) || m_vEvents[m_iEndPos]->GetAbsTick() >= llEndTime)) {
             m_iEndPos--; //Make sure we're 10000% not drawing any unnecessary notes! 
         }
         while (m_iEndPos + 1 < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iEndPos + 1]->GetAbsTick() < llEndTime) {
@@ -1519,7 +1523,7 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
         }
     }
     else {
-        while (m_iEndPos != IDX_MAX && (m_iEndPos + 1 >= static_cast<idx_t>(m_vEvents.size()) || m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() > llEndTime)) {
+        while (m_iEndPos != IDX_MAX && (m_iEndPos >= static_cast<idx_t>(m_vEvents.size()) || m_vEvents[m_iEndPos]->GetAbsMicroSec() >= llEndTime)) {
             m_iEndPos--; //Make sure we're 10000% not drawing any unnecessary notes! 
         }
         while (m_iEndPos + 1 < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() < llEndTime) {
@@ -1535,7 +1539,7 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
         else {
             m_pStateReversed->Clear();
         }
-        itMiddle = m_iEndPos + 1 + m_vEvents.begin();
+        itMiddle = m_iEndPos + m_vEvents.begin();
         pState = m_pStateReversed;
         m_iEndPos++;
         goto SearchProcedure;
@@ -2071,6 +2075,8 @@ void MainScreen::RenderNotes() {
     // Even when there are no notes on screen we still gotta do this!
     InitKeyColor();
     m_iPolyphony = 0;
+    if (m_pStateReversed) m_iStartPos++;
+    if (m_pStateReversed) m_iEndPos++;
 
     // Do we have any notes to render?
     if (m_iStartPos >= static_cast<idx_t>(m_vEvents.size()) || m_iEndPos >= static_cast<idx_t>(m_vEvents.size())) return;
@@ -2144,6 +2150,8 @@ void MainScreen::RenderNotes() {
             }
         }
     }
+    if (m_pStateReversed) m_iStartPos--;
+    if (m_pStateReversed) m_iEndPos--;
 }
 
 void MainScreen::RenderNote(const MIDIChannelEvent * pNote) {
