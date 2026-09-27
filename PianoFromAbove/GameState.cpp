@@ -1136,14 +1136,13 @@ GameState::GameError MainScreen::Logic() {
 
         // We want to use a different loop head in different scenario. 
         if (Reverse) goto ReversedLoopCondition; else goto NormalLoopCondition;
-    ReversedLoopCondition:
+        ReversedLoopCondition:
         if (m_iStartPos < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iStartPos]->GetAbsMicroSec() >= m_llStartTime) goto LoopBody; else goto LoopEnd;
-    NormalLoopCondition:
+        NormalLoopCondition:
         if (m_iStartPos < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iStartPos]->GetAbsMicroSec() <= m_llStartTime) goto LoopBody; else goto LoopEnd;
 
         // Here comes the loop body! 
-    LoopBody:
-        {
+        LoopBody: {
             const MIDIChannelEvent* pEvent = m_vEvents[m_iStartPos];
             key_t key = pEvent->GetParam1();
             key_t vel = pEvent->GetParam2();
@@ -1206,10 +1205,22 @@ GameState::GameError MainScreen::Logic() {
                 goto NormalLoopCondition;
             }
         }
-    LoopEnd:;
+        LoopEnd:;
     }
 
     // Advance the end position! 
+    if (dNSpeed < 0) {
+        if (!m_pStateReversed) {
+            // Entering reversed drawing state
+            m_pStateReversed = new dynamic_bitset(static_cast<idx_t>(m_vEvents.size()));
+        }
+    } else {
+    	if (m_pStateReversed) {
+            // Leaving reversed drawing state
+            delete m_pStateReversed;
+            m_pStateReversed = nullptr;
+        }
+    }
     if (m_bTickMode) {
         while (m_iEndPos != IDX_MAX && (m_iEndPos + 1 >= static_cast<idx_t>(m_vEvents.size()) || m_vEvents[m_iEndPos + 1]->GetAbsTick() > llEndTime)) {
             m_iEndPos--; //Make sure we're 10000% not drawing any unnecessary notes! 
@@ -1350,7 +1361,7 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
                 goto SkipSearch;
             }
         }
-    NoteOnFound:
+        NoteOnFound:
         // Found it!
         auto TargetNote = itMiddle;
         if ((*TargetNote)->HasSister() && (*TargetNote)->GetSisterIdx() >= m_iStartPos) {
@@ -1376,24 +1387,23 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
                     goto EndSearch;
                 }
             }
-        EndSearch:
+            EndSearch:
             if (iFound != iSimultaneous) {
                 MessageBoxW(g_hWnd, Errors[GameError::JumpToFailure].c_str(), L"Error", MB_OK);
             }
         }
     }
-SkipSearch:
+    SkipSearch:
     AdvanceIterators(llStartTime, true);
     m_iStartTick = GetCurrentTick(m_llStartTime);
 
     // End position: a little tricky. Same as logic code. Only needed for paused jumping.
+    m_iEndPos = m_iStartPos - 1;
     if (m_bTickMode) {
-        m_iEndPos = m_iStartPos - 1;
         while (m_iEndPos + 1 < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iEndPos + 1]->GetAbsTick() < llEndTime)
             m_iEndPos++;
     }
     else {
-        m_iEndPos = m_iStartPos - 1;
         while (m_iEndPos + 1 < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() < llEndTime)
             m_iEndPos++;
     }
@@ -1945,7 +1955,7 @@ void MainScreen::RenderNotes() {
     };
 
     if (Config::GetConfig().GetVideoSettings().bOR) {
-        for (idx_t i = m_iEndPos; i >= m_iStartPos && i != IDX_MAX; i+= m_dNSpeed < 0 ? 1 : -1) {
+        for (idx_t i = m_iEndPos; i >= m_iStartPos && i != IDX_MAX; i--) {
             MIDIChannelEvent* pEvent = m_vEvents[i];
             if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()) && pEvent->HasSister() &&
                 m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
@@ -1974,7 +1984,7 @@ void MainScreen::RenderNotes() {
             }
             m_iPolyphony++;
         });
-        for (idx_t i = m_iStartPos; i <= m_iEndPos && i != IDX_MAX; i += m_dNSpeed < 0 ? -1 : 1) {
+        for (idx_t i = m_iStartPos; i <= m_iEndPos && i != IDX_MAX; i++) {
             MIDIChannelEvent* pEvent = m_vEvents[i];
             if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()) && pEvent->HasSister() &&
                 m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {

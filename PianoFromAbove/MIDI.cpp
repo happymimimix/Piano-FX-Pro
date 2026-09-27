@@ -953,7 +953,7 @@ bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
                     return false;
                 }
                 else {
-                    vReplay->push_back(pair<mms_t, idx_t>(pEvent->GetAbsMicroSec(), vChannelEvents.size()));
+                    if(vReplay) vReplay->push_back(pair<mms_t, idx_t>(pEvent->GetAbsMicroSec(), vChannelEvents.size()));
                 }
             }
             vChannelEvents.push_back(pChannelEvent);

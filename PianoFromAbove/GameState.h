@@ -328,6 +328,7 @@ public:
         PointersInitialized = false;
         delete[] m_vNCTable;
         delete m_pState;
+        delete m_pStateReversed;
         // Event payloads are released by the pool in m_MIDI's destructor; these vectors are views.
     }
 
@@ -357,7 +358,7 @@ private:
 
     // Logic
     void UpdateState(idx_t idx, idx_t sister_idx);
-    void UpdateStateBackwards(idx_t start, idx_t end);
+    void UpdateStateBackwards(idx_t idx, idx_t sister_idx);
     void JumpTo(mms_t llStartTime, bool loadingMode = false);
     void ApplyMarker(unsigned char* data, msgln_t size);
     void ApplyColor(MIDIMetaEvent* event);
@@ -422,6 +423,7 @@ private:
     mms_t m_llStartTime, m_llPrevTime, m_llTimeSpan, m_llMinTime, m_llMaxTime;  // Times of the start and end events of the current window
     mtk_t m_iStartTick, m_iPrevTick; // Tick that corresponds with m_llStartTime, used to help with beat and metronome detection
     dynamic_bitset* m_pState;
+    dynamic_bitset* m_pStateReversed;
     NoteColor m_pKeyColors[128]; // Per-key blended color for keyboard rendering.
     __uint128_t m_bKeyPressed; // Is key pressed?
     __forceinline bool IsPressed(key_t Key) { return m_bKeyPressed & (static_cast<__uint128_t>(1) << Key); }

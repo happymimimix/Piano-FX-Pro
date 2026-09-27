@@ -1138,6 +1138,7 @@ BOOL PlayFile(const wstring& sFile)
     if (!pGameState->IsValid())
     {
         MessageBox(g_hWnd, (ErrorOpenSong + sFile).c_str(), TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
+        delete pGameState;
         return FALSE;
     }
 

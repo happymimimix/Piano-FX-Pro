@@ -318,5 +318,5 @@ __forceinline void BlendNoteColor(NoteColor* Dst, NoteColor* Src) {
     uint64_t Tmp02 = Div255_64(sGPGVGD * Alpha + dGPGVGD * InvertAlpha, PLUS02, MASK05) & MASK05;
     *P64Dst |= Tmp02 & MASK02;
     Dst->iVeryDarkRGB = Div255_32(sRVBV * Alpha + dRVBV * InvertAlpha, PLUS04, MASK04) & MASK04;
-    Dst->iVeryDarkRGB |= static_cast<uint32_t>(*reinterpret_cast<uint32_t*>(reinterpret_cast<uint16_t*>(&Tmp02) + 1) & 0x0000FF00);
+    Dst->iVeryDarkRGB |= static_cast<uint32_t>((Tmp02 >> 16) & 0x0000FF00);
 }
