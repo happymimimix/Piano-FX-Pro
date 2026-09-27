@@ -1218,6 +1218,67 @@ GameState::GameError MainScreen::Logic() {
     }
 
     // Advance the end position! 
+    if (dNSpeed < 0) {
+        if (!m_pStateReversed) {
+            // Entering reversed drawing state
+            m_pStateReversed = new dynamic_bitset(static_cast<idx_t>(m_vEvents.size()));
+            auto itBegin = m_vEvents.begin();
+            auto itEnd = m_vEvents.end();
+            auto itMiddle = m_iEndPos + 1 + m_vEvents.begin();
+            auto pState = m_pStateReversed;
+            if (itMiddle != itEnd && itMiddle != itBegin)
+            {
+                // Find the previous note on...
+                while (true) {
+                    itMiddle--;
+                    if (IsOn((*itMiddle)->GetChannelEventType(), (*itMiddle)->GetParam2())) {
+                        goto NoteOnFound;
+                    }
+                    else if (itMiddle == itBegin) {
+                        // We already reached the start and it has still not been found?
+                        goto SkipSearch;
+                    }
+                }
+                NoteOnFound:
+                // Found it!
+                auto TargetNote = itMiddle;
+                if ((*TargetNote)->HasSister() && (*TargetNote)->GetSisterIdx() >= m_iEndPos) {
+                    pState->Activate(TargetNote - m_vEvents.begin());
+                }
+                // Search for more held notes...
+                idx_t iFound = 0;
+                idx_t iSimultaneous = (*TargetNote)->GetSimultaneous();
+                if (iSimultaneous > 0 && itMiddle != itBegin) {
+                    while (true) {
+                        itMiddle--;
+                        if (IsOn((*itMiddle)->GetChannelEventType(), (*itMiddle)->GetParam2())) {
+                            if ((*itMiddle)->HasSister() && (*itMiddle)->GetSisterIdx() >= static_cast<idx_t>(TargetNote - itBegin)) {
+                                iFound++;
+                            }
+                            if ((*itMiddle)->HasSister() && (*itMiddle)->GetSisterIdx() >= m_iEndPos) {
+                                pState->Activate(itMiddle - m_vEvents.begin());
+                            }
+                        }
+                        if (itMiddle == itBegin || iFound >= iSimultaneous) {
+                            // Either we've found enough or we've reached the start of the array
+                            goto EndSearch;
+                        }
+                    }
+                    EndSearch:
+                    if (iFound != iSimultaneous) {
+                        MessageBoxW(g_hWnd, Errors[GameError::JumpToFailure].c_str(), L"Error", MB_OK);
+                    }
+                }
+            }
+            SkipSearch:;
+        }
+    } else {
+    	if (m_pStateReversed) {
+            // Leaving reversed drawing state
+            delete m_pStateReversed;
+            m_pStateReversed = nullptr;
+        }
+    }
     if (m_bTickMode) {
         while (m_iEndPos != IDX_MAX && (m_iEndPos + 1 >= static_cast<idx_t>(m_vEvents.size()) || m_vEvents[m_iEndPos + 1]->GetAbsTick() > llEndTime)) {
             m_iEndPos--; //Make sure we're 10000% not drawing any unnecessary notes! 
@@ -1232,22 +1293,6 @@ GameState::GameError MainScreen::Logic() {
         }
         while (m_iEndPos + 1 < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() < llEndTime) {
             m_iEndPos++;
-        }
-    }
-    if (dNSpeed < 0) {
-        if (!m_pStateReversed) {
-            // Entering reversed drawing state
-            m_pStateReversed = new dynamic_bitset(static_cast<idx_t>(m_vEvents.size()));
-            auto itBegin = m_vEvents.begin();
-            auto itEnd = m_vEvents.end();
-            auto itMiddle = m_iEndPos + m_vEvents.begin() + 1;
-            auto pState = m_pStateReversed;
-        }
-    } else {
-    	if (m_pStateReversed) {
-            // Leaving reversed drawing state
-            delete m_pStateReversed;
-            m_pStateReversed = nullptr;
         }
     }
 
@@ -1319,8 +1364,15 @@ void MainScreen::UpdateState(idx_t idx, idx_t sister_idx) {
     }
 }
 
-void MainScreen::UpdateStateBackwards(idx_t start, idx_t end) {
-    // To do
+void MainScreen::UpdateStateBackwards(idx_t idx, idx_t sister_idx) {
+    if (sister_idx == IDX_MAX) {
+        if (m_pStateReversed->IsActive(idx) && JumpTarget == ~0) MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
+        m_pStateReversed->Activate(idx);
+    }
+    else {
+        if (!m_pStateReversed->IsActive(sister_idx) && JumpTarget == ~0) MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
+        m_pStateReversed->Deactivate(sister_idx);
+    }
 }
 
 void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
@@ -1356,7 +1408,7 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
     auto itMiddle = lower_bound(itBegin, itEnd, llStartTime, [&](MIDIChannelEvent* lhs, const mms_t rhs) {
         return lhs->GetAbsMicroSec() < rhs;
         });
-    m_iStartPos = m_iEndPos = itMiddle - m_vEvents.begin();
+    m_iEndPos = m_iStartPos = itMiddle - m_vEvents.begin();
 
     // Find the notes that occur simultaneously with the previous note on...
     m_pState->Clear();
@@ -1412,6 +1464,7 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
     m_iStartTick = GetCurrentTick(m_llStartTime);
 
     // End position: a little tricky. Same as logic code. Only needed for paused jumping.
+    m_iEndPos--;
     if (m_bTickMode) {
         while (m_iEndPos != IDX_MAX && (m_iEndPos + 1 >= static_cast<idx_t>(m_vEvents.size()) || m_vEvents[m_iEndPos + 1]->GetAbsTick() > llEndTime)) {
             m_iEndPos--; //Make sure we're 10000% not drawing any unnecessary notes! 
@@ -1437,7 +1490,7 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
         else {
             m_pStateReversed->Clear();
         }
-        itMiddle = m_iEndPos + m_vEvents.begin();
+        itMiddle = m_iEndPos + 1 + m_vEvents.begin();
         pState = m_pStateReversed;
         goto SearchProcedure;
         ReversedSearchReturn:;
