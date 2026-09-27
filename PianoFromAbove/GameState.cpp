@@ -1510,7 +1510,6 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
     if (pState == m_pStateReversed) goto ReversedSearchReturn;
 
     // End position: a little tricky. Same as logic code. Only needed for paused jumping.
-    m_iEndPos--;
     if (m_bTickMode) {
         while (m_iEndPos != IDX_MAX && (m_iEndPos + 1 >= static_cast<idx_t>(m_vEvents.size()) || m_vEvents[m_iEndPos + 1]->GetAbsTick() > llEndTime)) {
             m_iEndPos--; //Make sure we're 10000% not drawing any unnecessary notes! 
@@ -1538,8 +1537,10 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
         }
         itMiddle = m_iEndPos + 1 + m_vEvents.begin();
         pState = m_pStateReversed;
+        m_iEndPos++;
         goto SearchProcedure;
-        ReversedSearchReturn:;
+        ReversedSearchReturn:
+        m_iEndPos--;
     }
 
     if (!loadingMode)
