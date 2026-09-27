@@ -328,8 +328,9 @@ public:
         PointersInitialized = false;
         delete[] m_vNCTable;
         delete m_pState;
-        for (auto* p : m_vMetaEvents) delete p->GetData();
-        for (auto* p : m_vSysExEvents) delete p->GetData();
+        // Events live in MIDI's shared pool; only release their heap payloads (new[] -> delete[]).
+        for (auto* p : m_vMetaEvents) p->ReleaseData();
+        for (auto* p : m_vSysExEvents) p->ReleaseData();
     }
 
     // GameState functions

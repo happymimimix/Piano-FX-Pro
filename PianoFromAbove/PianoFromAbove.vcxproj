@@ -1,6 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="AlwaysBIG|x64">
+      <Configuration>AlwaysBIG</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Arinoglish|x64">
       <Configuration>Arinoglish</Configuration>
       <Platform>x64</Platform>
@@ -15,6 +19,10 @@
     </ProjectConfiguration>
     <ProjectConfiguration Include="DPRK|x64">
       <Configuration>DPRK</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="BIG|x64">
+      <Configuration>BIG</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="SoftwareRender|x64">
@@ -160,6 +168,24 @@
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BIG|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>ClangCL</PlatformToolset>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <EnableASAN>false</EnableASAN>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>ClangCL</PlatformToolset>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <EnableASAN>false</EnableASAN>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -212,6 +238,12 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='BIG|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
@@ -306,6 +338,22 @@
     <OutDir>$(SolutionDir)\Release\</OutDir>
     <IntDir>Release\</IntDir>
     <TargetName>Piano-FX-Pro-LimitedTrackColoring</TargetName>
+    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)\Release\</OutDir>
+    <IntDir>Release\</IntDir>
+    <TargetName>Piano-FX-Pro-ExtendedArrayIndexing</TargetName>
+    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)\Release\</OutDir>
+    <IntDir>Release\</IntDir>
+    <TargetName>Piano-FX-Pro-ExtendedArrayIndexingBenchmark</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
@@ -1425,6 +1473,206 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <PreprocessorDefinitions>ENG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;LZMA_API_STATIC;BIG_INDEX;INCLUDE_FFMPEG;ENG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <GuardSignedReturns>false</GuardSignedReturns>
+      <OpenMPSupport>false</OpenMPSupport>
+      <WarningLevel>Level4</WarningLevel>
+      <CallingConvention>FastCall</CallingConvention>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>
+      </PrecompiledHeaderOutputFile>
+      <DiagnosticsFormat>Caret</DiagnosticsFormat>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <ShowIncludes>false</ShowIncludes>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <StringPooling>true</StringPooling>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <GuardEHContMetadata>false</GuardEHContMetadata>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>liblzma.lib;dxgi.lib;d3d11.lib;Psapi.lib;Shlwapi.lib;Dwmapi.lib;Comctl32.lib;WinMM.lib;UxTheme.lib;Advapi32.lib;Msimg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <Version>
+      </Version>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>false</DataExecutionPrevention>
+      <AdditionalManifestDependencies>"type='Win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'";%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
+      <AllowIsolation>true</AllowIsolation>
+      <AdditionalOptions>/MAP</AdditionalOptions>
+      <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+    </Link>
+    <PreBuildEvent>
+      <Command>cd /d "$(ProjectDir)"
+del ..\Release /f /s /q
+rmdir ..\Release /s /q
+msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
+msbuild ..\Colorizer\Colorizer.sln -t:Clean -p:Configuration=Release /p:Platform=x64
+msbuild ..\PFXGDI\PFXGDI.sln -t:Clean -p:Configuration=Release /p:Platform=x86
+del .\Colorizer.exe /f /q
+del .\Colorizer.exe.h /f /q
+del .\PFXGDI.exe /f /q
+del .\PFXGDI.exe.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
+del .\Widths.h /f /q
+msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
+msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
+xxd -i Colorizer.exe &gt; Colorizer.exe.h
+xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content LanguagePacks.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 LanguagePacks.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content FallbackStrings.h -Encoding Unicode; (@(''), $lines) | Set-Content -Encoding UTF8 FallbackStrings.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.hpp ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\FallbackStrings.hpp ^|.\tmp.exe ^&gt;^&gt;.\Widths.h
+del .\tmp.exe /f /q
+del .\tmp.obj /f /q
+Powershell -ExecutionPolicy Bypass -Command "Get-Content Widths.h -Encoding UTF8 | Select-Object -skip 1 | Set-Content -Encoding Unicode Widths.hh"
+del .\Widths.h /f /q
+rename .\Widths.hh Widths.h</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>cd /d "$(ProjectDir)"
+copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
+msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
+del .\Widths.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
+del ..\.vs /f /s /q
+rmdir ..\.vs /s /q
+del .\Release /f /s /q
+rmdir .\Release /s /q
+del ..\Release /f /s /q
+rmdir ..\Release /s /q
+mkdir ..\Release
+move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
+    </PostBuildEvent>
+    <ResourceCompile>
+      <ShowProgress>true</ShowProgress>
+      <PreprocessorDefinitions>ENG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;LZMA_API_STATIC;BIG_INDEX;ALWAYS_BIG;INCLUDE_FFMPEG;ENG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <GuardSignedReturns>false</GuardSignedReturns>
+      <OpenMPSupport>false</OpenMPSupport>
+      <WarningLevel>Level4</WarningLevel>
+      <CallingConvention>FastCall</CallingConvention>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>
+      </PrecompiledHeaderOutputFile>
+      <DiagnosticsFormat>Caret</DiagnosticsFormat>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+      <ShowIncludes>false</ShowIncludes>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <StringPooling>true</StringPooling>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <GuardEHContMetadata>false</GuardEHContMetadata>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>liblzma.lib;dxgi.lib;d3d11.lib;Psapi.lib;Shlwapi.lib;Dwmapi.lib;Comctl32.lib;WinMM.lib;UxTheme.lib;Advapi32.lib;Msimg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <Version>
+      </Version>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>false</DataExecutionPrevention>
+      <AdditionalManifestDependencies>"type='Win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'";%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
+      <AllowIsolation>true</AllowIsolation>
+      <AdditionalOptions>/MAP</AdditionalOptions>
+      <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+    </Link>
+    <PreBuildEvent>
+      <Command>cd /d "$(ProjectDir)"
+del ..\Release /f /s /q
+rmdir ..\Release /s /q
+msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
+msbuild ..\Colorizer\Colorizer.sln -t:Clean -p:Configuration=Release /p:Platform=x64
+msbuild ..\PFXGDI\PFXGDI.sln -t:Clean -p:Configuration=Release /p:Platform=x86
+del .\Colorizer.exe /f /q
+del .\Colorizer.exe.h /f /q
+del .\PFXGDI.exe /f /q
+del .\PFXGDI.exe.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
+del .\Widths.h /f /q
+msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
+msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
+xxd -i Colorizer.exe &gt; Colorizer.exe.h
+xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content LanguagePacks.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 LanguagePacks.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content FallbackStrings.h -Encoding Unicode; (@(''), $lines) | Set-Content -Encoding UTF8 FallbackStrings.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.hpp ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\FallbackStrings.hpp ^|.\tmp.exe ^&gt;^&gt;.\Widths.h
+del .\tmp.exe /f /q
+del .\tmp.obj /f /q
+Powershell -ExecutionPolicy Bypass -Command "Get-Content Widths.h -Encoding UTF8 | Select-Object -skip 1 | Set-Content -Encoding Unicode Widths.hh"
+del .\Widths.h /f /q
+rename .\Widths.hh Widths.h</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>cd /d "$(ProjectDir)"
+copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
+msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
+del .\Widths.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
+del ..\.vs /f /s /q
+rmdir ..\.vs /s /q
+del .\Release /f /s /q
+rmdir .\Release /s /q
+del ..\Release /f /s /q
+rmdir ..\Release /s /q
+mkdir ..\Release
+move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
+    </PostBuildEvent>
+    <ResourceCompile>
+      <ShowProgress>true</ShowProgress>
+      <PreprocessorDefinitions>ENG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -1579,6 +1827,8 @@ rename .\Widths.hh Widths.h</Command>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Tutorials.cpp" />
@@ -1608,6 +1858,8 @@ rename .\Widths.hh Widths.h</Command>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">false</ExcludedFromBuild>
@@ -1661,6 +1913,8 @@ rename .\Widths.hh Widths.h</Command>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">true</ExcludedFromBuild>
     </ClInclude>
@@ -1740,8 +1994,12 @@ rename .\Widths.hh Widths.h</Command>
       <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">false</SuppressStartupBanner>
       <Culture Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">0x0411</Culture>
       <Culture Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">0x0411</Culture>
+      <Culture Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">0x0411</Culture>
+      <Culture Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">0x0411</Culture>
       <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">false</SuppressStartupBanner>
       <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">false</SuppressStartupBanner>
+      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">false</SuppressStartupBanner>
+      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">false</SuppressStartupBanner>
       <Culture Condition="'$(Configuration)|$(Platform)'=='Release|x64'">0x0411</Culture>
       <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</SuppressStartupBanner>
       <Culture Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">0x0411</Culture>
@@ -1784,6 +2042,8 @@ rename .\Widths.hh Widths.h</Command>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">Pixel</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
@@ -1797,6 +2057,8 @@ rename .\Widths.hh Widths.h</Command>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">5.0</ShaderModel>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">g_pBackgroundPixelShader</VariableName>
@@ -1810,6 +2072,8 @@ rename .\Widths.hh Widths.h</Command>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">g_pBackgroundPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">g_pBackgroundPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">g_pBackgroundPixelShader</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">g_pBackgroundPixelShader</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">g_pBackgroundPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_pBackgroundPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">g_pBackgroundPixelShader</VariableName>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
@@ -1823,6 +2087,8 @@ rename .\Widths.hh Widths.h</Command>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -1847,6 +2113,10 @@ rename .\Widths.hh Widths.h</Command>
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">
       </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">
+      </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">
+      </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">
@@ -1864,6 +2134,8 @@ rename .\Widths.hh Widths.h</Command>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
@@ -1877,6 +2149,8 @@ rename .\Widths.hh Widths.h</Command>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">5.0</ShaderModel>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
@@ -1890,6 +2164,8 @@ rename .\Widths.hh Widths.h</Command>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -1914,6 +2190,10 @@ rename .\Widths.hh Widths.h</Command>
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">
       </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">
+      </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">
+      </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">
@@ -1929,12 +2209,16 @@ rename .\Widths.hh Widths.h</Command>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">g_pBackgroundVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">g_pBackgroundVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">g_pBackgroundVertexShader</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">g_pBackgroundVertexShader</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">g_pBackgroundVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_pBackgroundVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">g_pBackgroundVertexShader</VariableName>
     </FxCompile>
     <FxCompile Include="note_vs_samewidth.hlsl">
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">5.0</ShaderModel>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_pNoteVertexShaderSameWidth</VariableName>
@@ -1949,6 +2233,8 @@ rename .\Widths.hh Widths.h</Command>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">Vertex</ShaderType>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
@@ -1960,9 +2246,15 @@ rename .\Widths.hh Widths.h</Command>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">g_pNoteVertexShaderSameWidth</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">g_pNoteVertexShaderSameWidth</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">g_pNoteVertexShaderSameWidth</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">g_pNoteVertexShaderSameWidth</VariableName>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">
+      </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">
+      </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">
       </ObjectFileOutput>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">5.0</ShaderModel>
@@ -1993,6 +2285,8 @@ rename .\Widths.hh Widths.h</Command>
       </ObjectFileOutput>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">Vertex</ShaderType>
@@ -2024,6 +2318,8 @@ rename .\Widths.hh Widths.h</Command>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">Pixel</ShaderType>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
@@ -2037,6 +2333,8 @@ rename .\Widths.hh Widths.h</Command>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -2061,6 +2359,10 @@ rename .\Widths.hh Widths.h</Command>
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">
       </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">
+      </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">
+      </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">
@@ -2076,6 +2378,8 @@ rename .\Widths.hh Widths.h</Command>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">g_pNotePixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">g_pNotePixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">g_pNotePixelShader</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">g_pNotePixelShader</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">g_pNotePixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_pNotePixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">g_pNotePixelShader</VariableName>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
@@ -2089,6 +2393,8 @@ rename .\Widths.hh Widths.h</Command>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">5.0</ShaderModel>
     </FxCompile>
@@ -2104,6 +2410,8 @@ rename .\Widths.hh Widths.h</Command>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">Vertex</ShaderType>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">g_pNoteVertexShader</VariableName>
@@ -2117,6 +2425,8 @@ rename .\Widths.hh Widths.h</Command>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">g_pNoteVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">g_pNoteVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">g_pNoteVertexShader</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">g_pNoteVertexShader</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">g_pNoteVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_pNoteVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">g_pNoteVertexShader</VariableName>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -2141,6 +2451,10 @@ rename .\Widths.hh Widths.h</Command>
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">
       </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">
+      </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">
+      </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">
@@ -2156,6 +2470,8 @@ rename .\Widths.hh Widths.h</Command>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
@@ -2169,6 +2485,8 @@ rename .\Widths.hh Widths.h</Command>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">5.0</ShaderModel>
     </FxCompile>
@@ -2184,6 +2502,8 @@ rename .\Widths.hh Widths.h</Command>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">Pixel</ShaderType>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">g_pRectPixelShader</VariableName>
@@ -2197,6 +2517,8 @@ rename .\Widths.hh Widths.h</Command>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">g_pRectPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">g_pRectPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">g_pRectPixelShader</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">g_pRectPixelShader</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">g_pRectPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_pRectPixelShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">g_pRectPixelShader</VariableName>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
@@ -2210,6 +2532,8 @@ rename .\Widths.hh Widths.h</Command>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -2234,6 +2558,10 @@ rename .\Widths.hh Widths.h</Command>
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">
       </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">
+      </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">
+      </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">
@@ -2249,6 +2577,8 @@ rename .\Widths.hh Widths.h</Command>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">5.0</ShaderModel>
     </FxCompile>
@@ -2264,6 +2594,8 @@ rename .\Widths.hh Widths.h</Command>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">Vertex</ShaderType>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">g_pRectVertexShader</VariableName>
@@ -2277,6 +2609,8 @@ rename .\Widths.hh Widths.h</Command>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">g_pRectVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">g_pRectVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">g_pRectVertexShader</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">g_pRectVertexShader</VariableName>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">g_pRectVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_pRectVertexShader</VariableName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">g_pRectVertexShader</VariableName>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
@@ -2290,6 +2624,8 @@ rename .\Widths.hh Widths.h</Command>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -2314,6 +2650,10 @@ rename .\Widths.hh Widths.h</Command>
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">
       </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">
+      </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">
+      </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">
@@ -2329,6 +2669,8 @@ rename .\Widths.hh Widths.h</Command>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">5.0</ShaderModel>
     </FxCompile>

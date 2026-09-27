@@ -792,7 +792,7 @@ fileln_t MIDI::ParseEventsF3(const unsigned char* pcData, fileln_t iMaxSize, msg
                 }
             }
             else {
-                delete pMetaEvent; // caller doesn't want meta events, free it
+                pMetaEvent->ReleaseData(); // caller doesn't want meta events, free it
             }
         }
         else if (pEvent->GetEventType() == MIDIEvent::SysExEvent)
@@ -810,14 +810,14 @@ fileln_t MIDI::ParseEventsF3(const unsigned char* pcData, fileln_t iMaxSize, msg
                     memcpy(pNewData, pPrev->GetData(), iOldLen);
                     memcpy(pNewData + iOldLen, pSysExEvent->GetData(), iAddLen);
                     pPrev->TakeData(pNewData, iNewLen);
-                    delete pSysExEvent; // ownership not transferred to vector, free here
+                    pSysExEvent->ReleaseData(); // ownership not transferred to vector, free here
                 }
                 else {
                     vSysExEvents->push_back(pSysExEvent);
                 }
             }
             else {
-                delete pSysExEvent; // caller doesn't want sysex events, free it
+                pSysExEvent->ReleaseData(); // caller doesn't want sysex events, free it
             }
         }
 
@@ -968,7 +968,7 @@ bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
                 }
             }
             else {
-                delete pMetaEvent->GetData(); // caller doesn't want meta events, free it
+                pMetaEvent->ReleaseData(); // caller doesn't want meta events, free it
             }
         }
         else if (pEvent->GetEventType() == MIDIEvent::SysExEvent)
@@ -986,14 +986,14 @@ bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
                     memcpy(pNewData, pPrev->GetData(), iOldLen);
                     memcpy(pNewData + iOldLen, pSysExEvent->GetData(), iAddLen);
                     pPrev->TakeData(pNewData, iNewLen);
-                    delete pSysExEvent; // ownership not transferred to vector, free here
+                    pSysExEvent->ReleaseData(); // ownership not transferred to vector, free here
                 }
                 else {
                     vSysExEvents->push_back(pSysExEvent);
                 }
             }
             else {
-                delete pSysExEvent->GetData(); // caller doesn't want sysex events, free it
+                pSysExEvent->ReleaseData(); // caller doesn't want sysex events, free it
             }
         }
 
@@ -1062,8 +1062,12 @@ void MIDITrack::clear(void)
 {
     // TODO: this is fucking awful
     for (auto it = m_vEvents.begin(); it != m_vEvents.end(); ++it) {
-        if ((*it)->GetEventType() != MIDIEvent::EventType::ChannelEvent)
-            delete* it;
+        switch ((*it)->GetEventType()) {
+        case MIDIEvent::EventType::ChannelEvent: reinterpret_cast<MIDIChannelEvent*>(*it)->ReleaseWideIndex(); break;
+        case MIDIEvent::EventType::MetaEvent: reinterpret_cast<MIDIMetaEvent*>(*it)->ReleaseData(); break;
+        case MIDIEvent::EventType::SysExEvent: reinterpret_cast<MIDISysExEvent*>(*it)->ReleaseData(); break;
+        default: break;
+        }
     }
     m_vEvents.clear();
     m_TrackInfo.clear();
@@ -1133,9 +1137,6 @@ fileln_t MIDITrack::ParseEvents(const unsigned char* pcData, fileln_t iMaxSize, 
                 iTotal += iDTCode + iCount;
                 m_vEvents.push_back(pEvent);
                 m_TrackInfo.AddEventInfo(*pEvent);
-            }
-            else {
-                delete pEvent;
             }
         }
     }
@@ -1251,8 +1252,9 @@ fileln_t MIDIEvent::MakeNextEvent(MIDI& midi, const unsigned char* pcData, filel
     switch (eEventType)
     {
     case ChannelEvent: *pOutEvent = midi.AllocChannelEvent(); break;
-    case MetaEvent: *pOutEvent = midi.AllocChannelEvent(); break;
-    case SysExEvent: *pOutEvent = midi.AllocChannelEvent(); break;
+    // Meta/SysEx reuse a pool slot: construct the real type over it so its ctor runs (m_pcData = nullptr).
+    case MetaEvent: *pOutEvent = new (midi.AllocChannelEvent()) MIDIMetaEvent(); break;
+    case SysExEvent: *pOutEvent = new (midi.AllocChannelEvent()) MIDISysExEvent(); break;
     default: break;
     }
     (*pOutEvent)->m_eEventType = eEventType;
@@ -1270,7 +1272,7 @@ fileln_t MIDIChannelEvent::ParseEvent(const unsigned char* pcData, fileln_t iMax
     if (static_cast<ChannelEventType>(m_iEventCode >> 4) == ProgramChange || static_cast<ChannelEventType>(m_iEventCode >> 4) == ChannelAftertouch)
     {
         if (iMaxSize < 1) return 0;
-        m_cParam1 = pcData[0];
+        m_cParam1 = pcData[0] & 0x7f;
         m_cParam2 = 0x00;
         return 1;
     }
@@ -1278,8 +1280,8 @@ fileln_t MIDIChannelEvent::ParseEvent(const unsigned char* pcData, fileln_t iMax
     else
     {
         if (iMaxSize < 2) return 0;
-        m_cParam1 = pcData[0];
-        m_cParam2 = pcData[1];
+        m_cParam1 = pcData[0] & 0x7f;
+        m_cParam2 = pcData[1] & 0x7f;
         return 2;
     }
 }

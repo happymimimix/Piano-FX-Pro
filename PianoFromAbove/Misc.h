@@ -11,6 +11,9 @@
 
 #include <string>
 using namespace std;
+#ifdef DBG
+#include <DebugLanguageOverride.h>
+#endif
 
 #define VersionString L"4.3"
 
@@ -25,10 +28,14 @@ typedef uint32_t TnC_t; // Any code that does `track * 16 + channel` must use th
 typedef uint8_t msg_t; // Midi message type
 typedef uint32_t msgln_t; // Midi message length type (always 32bit unsigned)
 typedef int64_t fileln_t; // File length type (always 64bit signed)
+#ifndef BIG_INDEX
 typedef uint32_t idx_t; // Array indexing type
-//typedef int64_t idx_t; // Array indexing type (signed)
-//typedef int64_t idx_t; // Array indexing type (signed)
+#else
+typedef uint64_t idx_t; // Array indexing type
+#endif
+typedef uint32_t sidx_t; // Small array indexing type
 constexpr idx_t IDX_MAX = static_cast<idx_t>(~0); // Maximum array size
+constexpr sidx_t SIDX_MAX = static_cast<sidx_t>(~0); // Maximum small array size
 constexpr track_t TRACK_INVALID = static_cast<track_t>(~0); // A track ID that is impossible for any regular midi track to get
 typedef uint32_t color_t; // RGBA combined color type
 typedef signed long bpm_t; // Anything that has something to do with tempo, beat, and measure

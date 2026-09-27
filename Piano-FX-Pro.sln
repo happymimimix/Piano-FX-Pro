@@ -7,7 +7,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PianoFromAbove", "PianoFrom
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		AlwaysBIG|x64 = AlwaysBIG|x64
 		Arinoglish|x64 = Arinoglish|x64
+		BIG|x64 = BIG|x64
 		Chinese|x64 = Chinese|x64
 		Debug|x64 = Debug|x64
 		DoubleArinoglish|x64 = DoubleArinoglish|x64
@@ -22,9 +24,15 @@ Global
 		SoftwareRender|x64 = SoftwareRender|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DD4C822F-844F-40BF-8113-129B04EDE199}.AlwaysBIG|x64.ActiveCfg = AlwaysBIG|x64
+		{DD4C822F-844F-40BF-8113-129B04EDE199}.AlwaysBIG|x64.Build.0 = AlwaysBIG|x64
+		{DD4C822F-844F-40BF-8113-129B04EDE199}.AlwaysBIG|x64.Deploy.0 = AlwaysBIG|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Arinoglish|x64.ActiveCfg = Arinoglish|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Arinoglish|x64.Build.0 = Arinoglish|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Arinoglish|x64.Deploy.0 = Arinoglish|x64
+		{DD4C822F-844F-40BF-8113-129B04EDE199}.BIG|x64.ActiveCfg = AlwaysBIG|x64
+		{DD4C822F-844F-40BF-8113-129B04EDE199}.BIG|x64.Build.0 = AlwaysBIG|x64
+		{DD4C822F-844F-40BF-8113-129B04EDE199}.BIG|x64.Deploy.0 = AlwaysBIG|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Chinese|x64.ActiveCfg = Chinese|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Chinese|x64.Build.0 = Chinese|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Chinese|x64.Deploy.0 = Chinese|x64

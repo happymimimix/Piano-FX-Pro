@@ -220,8 +220,9 @@ private:
         eventvec_t m_vColors; // Tracked for section names in some longer MIDIs
         notevec_t m_vNoteOns; // Tracked for note on events in some large MIDIs
         ~SWAP() {
-            for (auto* p : m_vMetaEvents) delete p;
-            for (auto* p : m_vSysExEvents) delete p;
+            for (auto* p : m_vEvents) p->ReleaseWideIndex();
+            for (auto* p : m_vMetaEvents) p->ReleaseData();
+            for (auto* p : m_vSysExEvents) p->ReleaseData();
         }
     };
 
@@ -289,9 +290,13 @@ private:
     MIDI& m_MIDI;
 };
 
-//Base Event class
-//Should really be a single class with unions for the different events. much faster that way.
-//Might be forced to convert if batch processing is too slow
+#ifdef BIG_INDEX
+struct BigIndex {
+    idx_t m_wiSisterIdx = 0;
+    idx_t m_wiSimultaneous = 0;
+};
+#endif
+
 class __attribute__((packed)) MIDIEvent
 {
 public:
@@ -311,11 +316,11 @@ public:
     __forceinline void SetAbsMicroSec(mms_t llAbsMicroSec) { m_llAbsMicroSec = llAbsMicroSec; };
 
 private:
-    mms_t m_llAbsMicroSec;
-    mtk_t m_iAbsTick;
-    msg_t m_eEventType;
-    msg_t m_iEventCode;
-    track_t m_iTrack;
+    mms_t m_llAbsMicroSec = 0;
+    mtk_t m_iAbsTick = 0;
+    msg_t m_eEventType = 0;
+    msg_t m_iEventCode = 0;
+    track_t m_iTrack = 0;
 
     friend class MIDIChannelEvent;
     friend class MIDIMetaEvent;
@@ -323,12 +328,9 @@ private:
     friend fileln_t MIDI::ParseEventsF3(const unsigned char* pcData, fileln_t iMaxSize, msg_t eChunkFormat);
 };
 
-//Channel Event: notes and whatnot
 class __attribute__((packed)) MIDIChannelEvent : public MIDIEvent
 {
 public:
-    MIDIChannelEvent() : Completed(false), m_iSisterIdx(IDX_MAX), m_iSimultaneous(0) { }
-
     enum ChannelEventType : msg_t { NoteOff = 8, NoteOn, NoteAftertouch, Controller, ProgramChange, ChannelAftertouch, PitchBend };
     enum RPN : msg_t { RPNType = 100, PBSRPNID = 0, RPNData = 6 };
     fileln_t ParseEvent(const unsigned char* pcData, fileln_t iMaxSize);
@@ -340,39 +342,91 @@ public:
     __forceinline key_t GetParam1() const { return m_cParam1 & 0x7F; }
     __forceinline key_t GetParam2() const { return m_cParam2 & 0x7F; }
     __forceinline MIDIChannelEvent* GetSister(const vector<MIDIChannelEvent*>&events) const {
-        return m_iSisterIdx == IDX_MAX ? nullptr : events[m_iSisterIdx];
+        idx_t sister = GetSisterIdx();
+        return sister == IDX_MAX ? nullptr : events[sister];
     }
-    __forceinline MIDIChannelEvent* GetSister(const vector<MIDIEvent*>&events) const {
-        return m_iSisterIdx == IDX_MAX ? nullptr : (MIDIChannelEvent*)events[m_iSisterIdx];
+    __forceinline idx_t GetSisterIdx() const { 
+#ifndef BIG_INDEX
+        return m_iSisterIdx;
+#else
+        return m_cParam2 & 0x80 ? (*reinterpret_cast<BigIndex*const*>(&m_iSisterIdx))->m_wiSisterIdx : (m_iSisterIdx == SIDX_MAX ? IDX_MAX : static_cast<idx_t>(m_iSisterIdx));
+#endif
     }
-    __forceinline idx_t GetSisterIdx() const { return m_iSisterIdx; }
-    __forceinline idx_t GetSimultaneous() const { return m_iSimultaneous; }
-    __forceinline bool GetPassDone() const { return Completed; }
+    __forceinline idx_t GetSimultaneous() const {
+#ifndef BIG_INDEX
+        return m_iSimultaneous;
+#else
+        return m_cParam2 & 0x80 ? (*reinterpret_cast<BigIndex*const*>(&m_iSisterIdx))->m_wiSimultaneous : static_cast<idx_t>(m_iSimultaneous);
+#endif
+    }
+    __forceinline bool GetPassDone() const { return m_cParam1 & 0x80; }
 
-    __forceinline void SetSisterIdx(idx_t iSisterIdx) { m_iSisterIdx = iSisterIdx; }
-    __forceinline void SetSimultaneous(idx_t iSimultaneous) { m_iSimultaneous = iSimultaneous; }
-    __forceinline void SetPassDone(bool done) { Completed = done; }
-
-    __forceinline bool HasSister() const { return m_iSisterIdx != IDX_MAX; }
+    __forceinline void SetSisterIdx(idx_t iSisterIdx) {
+#ifndef BIG_INDEX
+        m_iSisterIdx = iSisterIdx;
+#else
+        if (m_cParam2 & 0x80) {
+            (*reinterpret_cast<BigIndex**>(&m_iSisterIdx))->m_wiSisterIdx = iSisterIdx;
+        }
+#ifndef ALWAYS_BIG
+        else if (iSisterIdx >= SIDX_MAX) {
+#else
+        else if (iSisterIdx >= zero) {
+#endif
+            idx_t iSimultaneous = m_iSimultaneous;
+            *reinterpret_cast<BigIndex**>(&m_iSisterIdx) = new BigIndex();
+            m_cParam2 |= 0x80;
+            (*reinterpret_cast<BigIndex**>(&m_iSisterIdx))->m_wiSisterIdx = iSisterIdx;
+            (*reinterpret_cast<BigIndex**>(&m_iSisterIdx))->m_wiSimultaneous = iSimultaneous;
+        }
+        else {
+            m_iSisterIdx = static_cast<sidx_t>(iSisterIdx);
+        }
+#endif
+    }
+    __forceinline void SetSimultaneous(idx_t iSimultaneous) {
+#ifndef BIG_INDEX
+        m_iSimultaneous = iSimultaneous;
+#else
+        if (m_cParam2 & 0x80) {
+            (*reinterpret_cast<BigIndex**>(&m_iSisterIdx))->m_wiSimultaneous = iSimultaneous;
+        }
+#ifndef ALWAYS_BIG
+        else if (iSimultaneous >= SIDX_MAX) {
+#else
+        else if (iSimultaneous >= zero) {
+#endif
+            idx_t iSisterIdx = m_iSisterIdx;
+            *reinterpret_cast<BigIndex**>(&m_iSisterIdx) = new BigIndex();
+            m_cParam2 |= 0x80;
+            (*reinterpret_cast<BigIndex**>(&m_iSisterIdx))->m_wiSisterIdx = iSisterIdx;
+            (*reinterpret_cast<BigIndex**>(&m_iSisterIdx))->m_wiSimultaneous = iSimultaneous;
+        }
+        else {
+            m_iSimultaneous = static_cast<sidx_t>(iSimultaneous);
+        }
+#endif
+    }
+    __forceinline void SetPassDone(bool done) { m_cParam1 = m_cParam1 & 0x7f | (done ? 0x80 : 0x00); }
+    __forceinline bool HasSister() const { return GetSisterIdx() != IDX_MAX; }
+#ifdef BIG_INDEX
+    __forceinline void ReleaseWideIndex() { if (m_cParam2 & 0x80) delete reinterpret_cast<BigIndex*>(m_iSisterIdx); m_cParam2 &= 0x7f; }
+#endif
 
 private:
-    key_t m_cParam1;
-    key_t m_cParam2;
-    bool Completed;
-    unsigned char ALIGNMENT = ~0;
-    idx_t m_iSisterIdx;
-    idx_t m_iSimultaneous;
+    key_t m_cParam1 = 0;
+    key_t m_cParam2 = 0;
+    volatile short zero = 0; // Prevent optimization in benchmark mode! 
+    sidx_t m_iSisterIdx = SIDX_MAX;
+    sidx_t m_iSimultaneous = 0;
 
     friend fileln_t MIDI::ParseEventsF3(const unsigned char* pcData, fileln_t iMaxSize, msg_t eChunkFormat);
 };
 static_assert(sizeof(MIDIChannelEvent) == 32);
 
-//Meta Event: info about the notes and whatnot
 class __attribute__((packed)) MIDIMetaEvent : public MIDIEvent
 {
 public:
-    MIDIMetaEvent() : m_pcData(nullptr) { }
-
     enum MetaEventType : msg_t {
         TextEvent = 0x01, Copyright, SequenceName, InstrumentName, Lyric, Marker, CuePoint, ProgramName, DeviceName,
         ArduanoKivaCompatibleColorEvent, ChannelPrefix = 0x20, PortPrefix, EndOfTrack = 0x2F,
@@ -384,25 +438,24 @@ public:
     __forceinline MetaEventType GetMetaEventType() const { return static_cast<MetaEventType>(m_iEventCode); }
     __forceinline msgln_t GetDataLen() const { return m_iDataLen; }
     __forceinline unsigned char* GetData() const { return m_pcData; }
+    __forceinline void ReleaseData() { delete[] m_pcData; m_pcData = nullptr; m_iDataLen = 0; }
 
 private:
-    msgln_t m_iDataLen;
-    unsigned char* m_pcData;
+    msgln_t m_iDataLen = 0;
+    unsigned char* m_pcData = nullptr;
 
     msg_t GetEventCode() const {} // PLEASE DO NOT USE THIS!
     friend fileln_t MIDI::ParseEventsF3(const unsigned char* pcData, fileln_t iMaxSize, msg_t eChunkFormat);
 };
 static_assert(sizeof(MIDIMetaEvent) == 32);
 
-//SysEx Event: forwarded to MIDI output device
 class __attribute__((packed)) MIDISysExEvent : public MIDIEvent
 {
 public:
-    MIDISysExEvent() : m_pcData(nullptr) { }
-
     __forceinline fileln_t ParseEvent(const unsigned char* pcData, fileln_t iMaxSize);
     __forceinline msgln_t GetDataLen() const { return m_iDataLen; }
     __forceinline unsigned char* GetData() const { return m_pcData; }
+    __forceinline void ReleaseData() { delete[] m_pcData; m_pcData = nullptr; m_iDataLen = 0; }
     __forceinline bool HasMoreData() const { return m_iEventCode == 0xF0 && m_iDataLen > 0 && m_pcData[m_iDataLen - 1] != 0xF7; }
     __forceinline bool IsNew() const { return m_iEventCode != 0xF7; }
     __forceinline void TakeData(unsigned char* pcData, msgln_t iLen) {
@@ -412,8 +465,8 @@ public:
     }
 
 private:
-    msgln_t m_iDataLen;
-    unsigned char* m_pcData;
+    msgln_t m_iDataLen = 0;
+    unsigned char* m_pcData = nullptr;
 
     friend fileln_t MIDI::ParseEventsF3(const unsigned char* pcData, fileln_t iMaxSize, msg_t eChunkFormat);
 };

@@ -35,7 +35,12 @@ inline bool* PtrToIsWrapRenderer = nullptr;
 #else
 #define PF_COL EmptyWstr
 #endif
-#define TitlePostFix PF_SWR+PF_COL
+#ifdef BIG_INDEX
+#define PF_BIG TitleGapEmpty+MainWindowTitle0
+#else
+#define PF_BIG EmptyWstr
+#endif
+#define TitlePostFix PF_SWR+PF_COL+PF_BIG
 #define TitlePlay wstring(EmptyWstr+TitleVersionInfo+MainWindowTitle3+L"%ws"+TitlePostFix).c_str()
 #define TitleRender wstring(EmptyWstr+TitleVersionInfo+MainWindowTitle4+L"%ws"+TitlePostFix).c_str()
 #define TitleSplash wstring(EmptyWstr+TitleVersionInfo+MainWindowTitle3+MainWindowTitle6+TitlePostFix).c_str()
