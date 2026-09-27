@@ -328,9 +328,7 @@ public:
         PointersInitialized = false;
         delete[] m_vNCTable;
         delete m_pState;
-        // Events live in MIDI's shared pool; only release their heap payloads (new[] -> delete[]).
-        for (auto* p : m_vMetaEvents) p->ReleaseData();
-        for (auto* p : m_vSysExEvents) p->ReleaseData();
+        // Event payloads are released by the pool in m_MIDI's destructor; these vectors are views.
     }
 
     // GameState functions

@@ -493,8 +493,20 @@ void MIDI::clear(void)
         delete *it;
     m_vTracks.clear();
     m_Info.clear();
-    for (auto& pool : event_pools)
+    for (auto& pool : event_pools) {
+        for (sidx_t i = 0; i < pool.count; i++) {
+            MIDIEvent* pEvent = &pool.events[i];
+            switch (pEvent->GetEventType()) {
+#ifdef BIG_INDEX
+            case MIDIEvent::EventType::ChannelEvent: static_cast<MIDIChannelEvent*>(pEvent)->ReleaseWideIndex(); break;
+#endif
+            case MIDIEvent::EventType::MetaEvent: reinterpret_cast<MIDIMetaEvent*>(pEvent)->ReleaseData(); break;
+            case MIDIEvent::EventType::SysExEvent: reinterpret_cast<MIDISysExEvent*>(pEvent)->ReleaseData(); break;
+            default: break;
+            }
+        }
         _aligned_free(pool.events);
+    }
     event_pools.clear();
 }
 
@@ -957,33 +969,25 @@ bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
                 iLastTempoTick = iTick;
                 llLastTempoTime = llTime;
             }
-
             if (vMetaEvents) {
                 MIDIMetaEvent::MetaEventType eEventType = pMetaEvent->GetMetaEventType();
                 vMetaEvents->push_back(pMetaEvent);
                 switch (eEventType) {
                 case MIDIMetaEvent::SetTempo:
-                    if (vTempo)
-                        vTempo->push_back(pair<mms_t, idx_t>(pEvent->GetAbsMicroSec(), vMetaEvents->size() - 1));
+                    if (vTempo) vTempo->push_back(pair<mms_t, idx_t>(pEvent->GetAbsMicroSec(), vMetaEvents->size() - 1));
                     break;
                 case MIDIMetaEvent::TimeSignature:
-                    if (vSignature)
-                        vSignature->push_back(pair<mms_t, idx_t>(pEvent->GetAbsMicroSec(), vMetaEvents->size() - 1));
+                    if (vSignature) vSignature->push_back(pair<mms_t, idx_t>(pEvent->GetAbsMicroSec(), vMetaEvents->size() - 1));
                     break;
                 case MIDIMetaEvent::Marker:
-                    if (vMarkers)
-                        vMarkers->push_back(pair<mms_t, idx_t>(pEvent->GetAbsMicroSec(), vMetaEvents->size() - 1));
+                    if (vMarkers) vMarkers->push_back(pair<mms_t, idx_t>(pEvent->GetAbsMicroSec(), vMetaEvents->size() - 1));
                     break;
                 case MIDIMetaEvent::ArduanoKivaCompatibleColorEvent:
-                    if (vColors)
-                        vColors->push_back(pair<mms_t, idx_t>(pEvent->GetAbsMicroSec(), vMetaEvents->size() - 1));
+                    if (vColors) vColors->push_back(pair<mms_t, idx_t>(pEvent->GetAbsMicroSec(), vMetaEvents->size() - 1));
                     break;
                 default:
                     break;
                 }
-            }
-            else {
-                pMetaEvent->ReleaseData(); // caller doesn't want meta events, free it
             }
         }
         else if (pEvent->GetEventType() == MIDIEvent::SysExEvent)
@@ -1001,14 +1005,11 @@ bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
                     memcpy(pNewData, pPrev->GetData(), iOldLen);
                     memcpy(pNewData + iOldLen, pSysExEvent->GetData(), iAddLen);
                     pPrev->TakeData(pNewData, iNewLen);
-                    pSysExEvent->ReleaseData(); // ownership not transferred to vector, free here
+                    pSysExEvent->ReleaseData();
                 }
                 else {
                     vSysExEvents->push_back(pSysExEvent);
                 }
-            }
-            else {
-                pSysExEvent->ReleaseData(); // caller doesn't want sysex events, free it
             }
         }
 
@@ -1016,8 +1017,7 @@ bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
     }
 
     // We don't need the track vectors anymore (saves 8 bytes per event!)
-    for (auto track : m_vTracks)
-        track->ClearEvents();
+    for (auto track : m_vTracks) track->ClearEvents();
 
     m_Info.llTotalMicroSecs = llTime;
     m_Info.llFirstNote = max(0LL, llFirstNote);
@@ -1075,17 +1075,6 @@ MIDITrack::~MIDITrack(void)
 
 void MIDITrack::clear(void)
 {
-    // TODO: this is fucking awful
-    for (auto it = m_vEvents.begin(); it != m_vEvents.end(); ++it) {
-        switch ((*it)->GetEventType()) {
-#ifdef BIG_INDEX
-        case MIDIEvent::EventType::ChannelEvent: reinterpret_cast<MIDIChannelEvent*>(*it)->ReleaseWideIndex(); break;
-#endif
-        case MIDIEvent::EventType::MetaEvent: reinterpret_cast<MIDIMetaEvent*>(*it)->ReleaseData(); break;
-        case MIDIEvent::EventType::SysExEvent: reinterpret_cast<MIDISysExEvent*>(*it)->ReleaseData(); break;
-        default: break;
-        }
-    }
     m_vEvents.clear();
     m_TrackInfo.clear();
 }
