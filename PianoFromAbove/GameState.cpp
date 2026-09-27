@@ -1081,24 +1081,6 @@ GameState::GameError MainScreen::Logic() {
         m_iStartTick = GetCurrentTick(m_llStartTime);
     }
     
-    mms_t llEndTime;
-    if (m_bTickMode) {
-        if (dNSpeed < 0) {
-            llEndTime = m_iStartTick - m_llTimeSpan;
-        }
-        else {
-            llEndTime = m_iStartTick + m_llTimeSpan;
-        }
-    }
-    else {
-        if (dNSpeed < 0) {
-            llEndTime = m_llStartTime - m_llTimeSpan;
-        }
-        else {
-            llEndTime = m_llStartTime + m_llTimeSpan;
-        }
-    }
-
     if (abs(llOldStartTime - m_llPrevTime) && JumpTarget == ~0) { // Handle time jump from cheat engine
         JumpTarget = m_llStartTime;
         JumpTo(m_llStartTime, true);
@@ -1131,6 +1113,24 @@ GameState::GameError MainScreen::Logic() {
         JumpTarget = ~0;
     }
     m_iPrevTick = m_iStartTick;
+
+    mms_t llEndTime;
+    if (m_bTickMode) {
+        if (dNSpeed < 0) {
+            llEndTime = m_iStartTick - m_llTimeSpan;
+        }
+        else {
+            llEndTime = m_iStartTick + m_llTimeSpan;
+        }
+    }
+    else {
+        if (dNSpeed < 0) {
+            llEndTime = m_llStartTime - m_llTimeSpan;
+        }
+        else {
+            llEndTime = m_llStartTime + m_llTimeSpan;
+        }
+    }
 
     RenderGlobals();
     bool Reverse = m_dSpeed < 0;
