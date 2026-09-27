@@ -222,7 +222,9 @@ private:
         eventvec_t m_vColors; // Tracked for section names in some longer MIDIs
         notevec_t m_vNoteOns; // Tracked for note on events in some large MIDIs
         ~SWAP() {
+#ifdef BIG_INDEX
             for (auto* p : m_vEvents) p->ReleaseWideIndex();
+#endif
             for (auto* p : m_vMetaEvents) p->ReleaseData();
             for (auto* p : m_vSysExEvents) p->ReleaseData();
         }
@@ -335,7 +337,6 @@ struct BigIndex {
 class __attribute__((packed)) MIDIChannelEvent : public MIDIEvent
 {
 public:
-    MIDIChannelEvent(const MIDIChannelEvent&) = delete;
     MIDIChannelEvent& operator=(const MIDIChannelEvent&) = delete;
     enum ChannelEventType : msg_t { NoteOff = 8, NoteOn, NoteAftertouch, Controller, ProgramChange, ChannelAftertouch, PitchBend };
     enum RPN : msg_t { RPNType = 100, PBSRPNID = 0, RPNData = 6 };
@@ -418,7 +419,7 @@ public:
 #endif
     }
 #ifdef BIG_INDEX
-    __forceinline void ReleaseWideIndex() { if (m_cParam2 & 0x80) delete reinterpret_cast<BigIndex*>(m_iSisterIdx); m_cParam2 &= 0x7f; }
+    __forceinline void ReleaseWideIndex() { if (m_cParam2 & 0x80) delete *reinterpret_cast<BigIndex**>(&m_iSisterIdx); m_cParam2 &= 0x7f; }
 #endif
 
 private:
@@ -435,7 +436,6 @@ static_assert(sizeof(MIDIChannelEvent) == 32);
 class __attribute__((packed)) MIDIMetaEvent : public MIDIEvent
 {
 public:
-    MIDIMetaEvent(const MIDIMetaEvent&) = delete;
     MIDIMetaEvent& operator=(const MIDIMetaEvent&) = delete;
     enum MetaEventType : msg_t {
         TextEvent = 0x01, Copyright, SequenceName, InstrumentName, Lyric, Marker, CuePoint, ProgramName, DeviceName,
@@ -462,7 +462,6 @@ static_assert(sizeof(MIDIMetaEvent) == 32);
 class __attribute__((packed)) MIDISysExEvent : public MIDIEvent
 {
 public:
-    MIDISysExEvent(const MIDISysExEvent&) = delete;
     MIDISysExEvent& operator=(const MIDISysExEvent&) = delete;
     __forceinline fileln_t ParseEvent(const unsigned char* pcData, fileln_t iMaxSize);
     __forceinline msgln_t GetDataLen() const { return m_iDataLen; }

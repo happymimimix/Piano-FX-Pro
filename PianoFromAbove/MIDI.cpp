@@ -1078,7 +1078,9 @@ void MIDITrack::clear(void)
     // TODO: this is fucking awful
     for (auto it = m_vEvents.begin(); it != m_vEvents.end(); ++it) {
         switch ((*it)->GetEventType()) {
+#ifdef BIG_INDEX
         case MIDIEvent::EventType::ChannelEvent: reinterpret_cast<MIDIChannelEvent*>(*it)->ReleaseWideIndex(); break;
+#endif
         case MIDIEvent::EventType::MetaEvent: reinterpret_cast<MIDIMetaEvent*>(*it)->ReleaseData(); break;
         case MIDIEvent::EventType::SysExEvent: reinterpret_cast<MIDISysExEvent*>(*it)->ReleaseData(); break;
         default: break;
