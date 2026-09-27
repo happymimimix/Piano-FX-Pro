@@ -156,7 +156,8 @@ SplashScreen::SplashScreen(HWND hWnd, Renderer11* pRenderer) : GameState(hWnd, p
         new (&m_MIDI) MIDI(cControls.sSplashMIDI);
         if (!m_MIDI.IsValid()) {
             MessageBox(hWnd, L"The custom splash MIDI failed to load. Please choose a different MIDI.", L"", MB_ICONWARNING);
-            m_MIDI = MIDI();
+            m_MIDI.~MIDI();
+            new (&m_MIDI) MIDI();
             goto SplashFailed;
         }
     }

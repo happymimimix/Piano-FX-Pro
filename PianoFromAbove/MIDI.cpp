@@ -519,8 +519,12 @@ fileln_t MIDI::ParseMIDI(const unsigned char* pcData, fileln_t iMaxSize)
         DWORD FeatureFlags = 0;
         iTotal += Parse32BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), reinterpret_cast<uint32_t*>(&FeatureFlags));
         if (FeatureFlags & SMF3FEATURES__$BIGIDXRANGE) {
+#ifndef BIG_INDEX
             MessageBoxW(g_hWnd, SMF3ErrorText[Unsupported64Bit].c_str(), L"Error", MB_OK);
             return 0;
+#else
+            m_Info.iFormatType = 769;
+#endif
         }
         if (!(FeatureFlags & SMF3FEATURES__$CERTIFICATE)) {
             MessageBoxW(g_hWnd, SMF3ErrorText[NoCertificate].c_str(), L"Error", MB_OK);
@@ -538,8 +542,19 @@ fileln_t MIDI::ParseMIDI(const unsigned char* pcData, fileln_t iMaxSize)
             MessageBoxW(g_hWnd, SMF3ErrorText[MissingTrackLayout].c_str(), L"Error", MB_OK);
             return 0;
         }
+#ifndef BIG_INDEX
         iTotal += Parse32BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iEventCount);
         iTotal += Parse32BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iNoteCount);
+#else
+        if (m_Info.iFormatType == 769) {
+            iTotal += Parse64BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iEventCount);
+            iTotal += Parse64BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iNoteCount);
+        }
+        else {
+            iTotal += Parse32BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), reinterpret_cast<uint32_t*>(&m_Info.iEventCount));
+            iTotal += Parse32BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), reinterpret_cast<uint32_t*>(&m_Info.iNoteCount));
+        }
+#endif
         iTotal += Parse8Bit(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iMinNote);
         iTotal += Parse8Bit(pcData + iTotal, iHdrSize - (iTotal - 8), &m_Info.iMaxNote);
         if (iTotal != 44 || m_Info.iDivision == 0) return 0;
@@ -560,7 +575,7 @@ fileln_t MIDI::ParseMIDI(const unsigned char* pcData, fileln_t iMaxSize)
             if (ParseNChars(pcData + iTotal, '\r', iMaxSize - iTotal, F3pcBuf) != '\r') return 0;
             else if (strncmp(F3pcBuf, "F3Certificate", '\r') == 0 && FirstPass & 0x10) {
                 iTotal += '\r';
-                iTotal += ParseTracksF3(pcData + iTotal, iMaxSize - iTotal);
+                //iTotal += ParseTracksF3(pcData + iTotal, iMaxSize - iTotal);
                 FirstPass &= 0xEF;
             }
             else if (strncmp(F3pcBuf, "F3TrackLayout", '\r') == 0 && FirstPass & 0x10) {

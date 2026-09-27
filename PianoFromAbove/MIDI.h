@@ -157,6 +157,8 @@ public:
     MIDI(void) {};
     MIDI(const wstring& sFilename);
     ~MIDI(void);
+    MIDI(const MIDI&) = delete;
+    MIDI& operator=(const MIDI&) = delete;
 
     // shitty memory pool allocator
     MIDIChannelEvent* AllocChannelEvent();
@@ -253,6 +255,8 @@ class __attribute__((packed)) MIDITrack
 public:
     MIDITrack(MIDI& midi);
     ~MIDITrack(void);
+    MIDITrack(const MIDITrack&) = delete;
+    MIDITrack& operator=(const MIDITrack&) = delete;
 
     //Parsing functions that load data into the instance
     fileln_t ParseTrack(const unsigned char* pcData, fileln_t iMaxSize, track_t iTrack);
@@ -331,6 +335,8 @@ private:
 class __attribute__((packed)) MIDIChannelEvent : public MIDIEvent
 {
 public:
+    MIDIChannelEvent(const MIDIChannelEvent&) = delete;
+    MIDIChannelEvent& operator=(const MIDIChannelEvent&) = delete;
     enum ChannelEventType : msg_t { NoteOff = 8, NoteOn, NoteAftertouch, Controller, ProgramChange, ChannelAftertouch, PitchBend };
     enum RPN : msg_t { RPNType = 100, PBSRPNID = 0, RPNData = 6 };
     fileln_t ParseEvent(const unsigned char* pcData, fileln_t iMaxSize);
@@ -341,10 +347,8 @@ public:
     __forceinline chan_t GetChannel() const { return m_iEventCode & 0x0F; }
     __forceinline key_t GetParam1() const { return m_cParam1 & 0x7F; }
     __forceinline key_t GetParam2() const { return m_cParam2 & 0x7F; }
-    __forceinline MIDIChannelEvent* GetSister(const vector<MIDIChannelEvent*>&events) const {
-        idx_t sister = GetSisterIdx();
-        return sister == IDX_MAX ? nullptr : events[sister];
-    }
+    __forceinline bool GetPassDone() const { return m_cParam1 & 0x80; }
+    __forceinline void SetPassDone(bool done) { m_cParam1 = (m_cParam1 & 0x7f) | (done ? 0x80 : 0x00); }
     __forceinline idx_t GetSisterIdx() const { 
 #ifndef BIG_INDEX
         return m_iSisterIdx;
@@ -352,6 +356,11 @@ public:
         return m_cParam2 & 0x80 ? (*reinterpret_cast<BigIndex*const*>(&m_iSisterIdx))->m_wiSisterIdx : (m_iSisterIdx == SIDX_MAX ? IDX_MAX : static_cast<idx_t>(m_iSisterIdx));
 #endif
     }
+    __forceinline MIDIChannelEvent* GetSister(const vector<MIDIChannelEvent*>&events) const {
+        idx_t sister = GetSisterIdx();
+        return sister == IDX_MAX ? nullptr : events[sister];
+    }
+    __forceinline bool HasSister() const { return GetSisterIdx() != IDX_MAX; }
     __forceinline idx_t GetSimultaneous() const {
 #ifndef BIG_INDEX
         return m_iSimultaneous;
@@ -359,14 +368,15 @@ public:
         return m_cParam2 & 0x80 ? (*reinterpret_cast<BigIndex*const*>(&m_iSisterIdx))->m_wiSimultaneous : static_cast<idx_t>(m_iSimultaneous);
 #endif
     }
-    __forceinline bool GetPassDone() const { return m_cParam1 & 0x80; }
-
     __forceinline void SetSisterIdx(idx_t iSisterIdx) {
 #ifndef BIG_INDEX
         m_iSisterIdx = iSisterIdx;
 #else
         if (m_cParam2 & 0x80) {
             (*reinterpret_cast<BigIndex**>(&m_iSisterIdx))->m_wiSisterIdx = iSisterIdx;
+        }
+        else if (iSisterIdx == IDX_MAX) {
+            m_iSisterIdx = SIDX_MAX;
         }
 #ifndef ALWAYS_BIG
         else if (iSisterIdx >= SIDX_MAX) {
@@ -392,7 +402,7 @@ public:
             (*reinterpret_cast<BigIndex**>(&m_iSisterIdx))->m_wiSimultaneous = iSimultaneous;
         }
 #ifndef ALWAYS_BIG
-        else if (iSimultaneous >= SIDX_MAX) {
+        else if (iSimultaneous > SIDX_MAX) {
 #else
         else if (iSimultaneous >= zero) {
 #endif
@@ -407,8 +417,6 @@ public:
         }
 #endif
     }
-    __forceinline void SetPassDone(bool done) { m_cParam1 = m_cParam1 & 0x7f | (done ? 0x80 : 0x00); }
-    __forceinline bool HasSister() const { return GetSisterIdx() != IDX_MAX; }
 #ifdef BIG_INDEX
     __forceinline void ReleaseWideIndex() { if (m_cParam2 & 0x80) delete reinterpret_cast<BigIndex*>(m_iSisterIdx); m_cParam2 &= 0x7f; }
 #endif
