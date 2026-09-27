@@ -403,6 +403,7 @@ private:
     eventvec_t::const_iterator m_itNextMarker;
     eventvec_t::const_iterator m_itNextColor;
     vector<MIDISysExEvent*>::const_iterator m_itNextSysEx;
+    eventvec_t::const_iterator m_itReplayPosition;
     idx_t* m_vNCTable;
     bpm_t m_iMicroSecsPerBeat; // Tempo
     mtk_t m_iLastTempoTick; // Tempo

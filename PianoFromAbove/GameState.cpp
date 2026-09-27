@@ -589,6 +589,7 @@ MainScreen::MainScreen(wstring sMIDIFile, HWND hWnd, Renderer11* pRenderer) : Ga
     m_itNextMarker = m_vMarkers.begin();
     m_itNextColor = m_vColors.begin();
     m_itNextSysEx = m_vSysExEvents.begin();
+    m_itReplayPosition = m_vReplayTable.begin();
 
     g_LoadingProgress.stage = MIDILoadingProgress::Stage::NCTable;
     g_LoadingProgress.progress = 0;
@@ -1170,10 +1171,11 @@ GameState::GameError MainScreen::Logic() {
 
             if (IsNotNote(pEvent->GetChannelEventType())) {
                 if (pEvent->GetChannelEventType() == MIDIChannelEvent::ProgramChange && config.m_bPianoOverride) {
-                    goto SkipPlayEvent;
+                    key = NULL;
+                    vel = NULL;
                 }
                 if (pEvent->GetChannelEventType() == MIDIChannelEvent::PitchBend) {
-                    m_pBendsValue[pEvent->GetChannel()] = ((vel << 7) | key) - (1 << 13);
+                    m_pBendsValue[pEvent->GetChannel()] = ((vel << 7) | key) - (1<<13);
                     goto PitchBendUpdate; // Update PB display. 
                 }
                 if (pEvent->GetChannelEventType() == MIDIChannelEvent::Controller) {
@@ -1191,7 +1193,6 @@ GameState::GameError MainScreen::Logic() {
                     }
                 }
                 m_OutDevice.PlayEvent(pEvent->GetEventCode(), key, vel);
-                SkipPlayEvent:;
             }
             else if (!m_bMute && !m_vTrackSettings[pEvent->GetTrack() % MaxTrackColors].aChannels[pEvent->GetChannel()].bMuted && vel > velthrshld && pEvent->HasSister()) {
                 // We're playing a note! 
@@ -1430,12 +1431,17 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
     if (!loadingMode) m_OutDevice.AllNotesOff();
 
     // Start time. Piece of cake!
-    if (!loadingMode) {
-        m_llStartTime = min(max(llStartTime, m_llMinTime), m_llMaxTime);
-    }
+    if (!loadingMode) m_llStartTime = min(max(llStartTime, m_llMinTime), m_llMaxTime);
 
+    // Cache the old iterators.
+    auto prev_itNextColor = m_itNextColor;
+    auto prev_itNextSysEx = m_itNextSysEx;
+    auto prev_itReplayPosition = m_itReplayPosition;
+    // Advance them to the new position.
     AdvanceIterators(m_llStartTime, true);
     m_iStartTick = GetCurrentTick(m_llStartTime);
+
+    // End time. Also piece of cake!
     mms_t llEndTime;
     if (m_dNSpeed < 0) {
         if (m_bTickMode) {
@@ -1539,7 +1545,7 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
         else {
             m_pStateReversed->Clear();
         }
-        itMiddle = m_iEndPos + m_vEvents.begin();
+        itMiddle = m_iEndPos + 1 + m_vEvents.begin();
         pState = m_pStateReversed;
         m_iEndPos++;
         goto SearchProcedure;
@@ -1557,6 +1563,54 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
     IsLastFrameReversed = false;
     m_llPrevTime = m_llStartTime;
     m_iPrevTick = m_iStartTick;
+
+    // Play skipped control change and program change: 
+    if (!loadingMode) {
+        m_OutDevice.Reset();
+        if (m_itNextColor < prev_itNextColor) prev_itNextColor = m_vColors.begin();
+        for (; prev_itNextColor != m_vColors.end() && prev_itNextColor != m_itNextColor; ++prev_itNextColor)
+        {
+            MIDIMetaEvent* pEvent = m_vMetaEvents[prev_itNextColor->second];
+            ApplyColor(pEvent);
+        }
+        if (m_itNextSysEx < prev_itNextSysEx) prev_itNextSysEx = m_vSysExEvents.begin();
+        for (; prev_itNextSysEx != m_vSysExEvents.end() && prev_itNextSysEx != m_itNextSysEx; ++prev_itNextSysEx)
+        {
+            SendSysEx(*prev_itNextSysEx);
+        }
+        if (m_itReplayPosition < prev_itReplayPosition) prev_itReplayPosition = m_vReplayTable.begin();
+        for (; prev_itReplayPosition != m_vReplayTable.end() && prev_itReplayPosition != m_itReplayPosition; ++prev_itReplayPosition) {
+            MIDIChannelEvent* pEvent = m_vEvents[prev_itReplayPosition->second];
+            key_t key = pEvent->GetParam1();
+            key_t vel = pEvent->GetParam2();
+
+            if (IsNotNote(pEvent->GetChannelEventType())) {
+                if (pEvent->GetChannelEventType() == MIDIChannelEvent::ProgramChange && Config::GetConfig().m_bPianoOverride) {
+                    key = NULL;
+                    vel = NULL;
+                }
+                if (pEvent->GetChannelEventType() == MIDIChannelEvent::PitchBend) {
+                    m_pBendsValue[pEvent->GetChannel()] = ((vel << 7) | key) - (1<<13);
+                    goto PitchBendUpdate; // Update PB display. 
+                }
+                if (pEvent->GetChannelEventType() == MIDIChannelEvent::Controller) {
+                    if (key == MIDIChannelEvent::RPNType) {
+                        Next_is_PBS[pEvent->GetChannel()] = (vel == MIDIChannelEvent::PBSRPNID);
+                    }
+                    if (key == MIDIChannelEvent::RPNData && Next_is_PBS[pEvent->GetChannel()]) {
+                        m_pBendsRange[pEvent->GetChannel()] = vel;
+                        PitchBendUpdate: // Update PB display. 
+                        float NoteWidth = m_fNotesCX / static_cast<float>(m_iEndNote - m_iStartNote);
+                        float ShiftAmount = m_pBendsRange[pEvent->GetChannel()] == 0 ? 0.0f : static_cast<float>(m_pBendsValue[pEvent->GetChannel()]) * (static_cast<float>(m_pBendsRange[pEvent->GetChannel()]) / static_cast<float>(1 << 13));
+                        if (m_bFlipKeyboard) ShiftAmount *= -1;
+                        m_pBends[pEvent->GetChannel()] = NoteWidth * ShiftAmount;
+                        m_bUpdateNotePos = true;
+                    }
+                }
+                m_OutDevice.PlayEvent(pEvent->GetEventCode(), key, vel);
+            }
+        }
+    }
 }
 
 void MainScreen::ApplyColor(MIDIMetaEvent * event) {
@@ -1666,6 +1720,7 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
         }
         m_itNextColor = lower_bound(m_vColors.begin(), m_vColors.end(), pair<mms_t, idx_t>(llTime, NULL));
         m_itNextSysEx = lower_bound(m_vSysExEvents.begin(), m_vSysExEvents.end(), llTime, [](const MIDISysExEvent* message, mms_t target) {return message->GetAbsMicroSec() < target; });
+        m_itReplayPosition = lower_bound(m_vReplayTable.begin(), m_vReplayTable.end(), pair<mms_t, idx_t>(llTime, NULL));
     }
     else
     {
@@ -1724,6 +1779,7 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
             {
                 SendSysEx(*(m_itNextSysEx - 1));
             }
+            for (; m_itReplayPosition != m_vReplayTable.begin() && (m_itReplayPosition - 1)->first >= llTime; --m_itReplayPosition) {}
         }
         else {
             for (; m_itNextTempo != m_vTempo.end() && m_itNextTempo->first <= llTime; ++m_itNextTempo)
@@ -1768,6 +1824,7 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
             {
                 SendSysEx(*m_itNextSysEx);
             }
+            for (; m_itReplayPosition != m_vReplayTable.end() && m_itReplayPosition->first <= llTime; ++m_itReplayPosition) {}
         }
     }
 }
@@ -2075,11 +2132,12 @@ void MainScreen::RenderNotes() {
     // Even when there are no notes on screen we still gotta do this!
     InitKeyColor();
     m_iPolyphony = 0;
-    if (m_pStateReversed) m_iStartPos++;
+    if (m_pStateReversed && !IsLastFrameReversed) m_iStartPos--;
+    if (!m_pStateReversed && IsLastFrameReversed) m_iStartPos++;
     if (m_pStateReversed) m_iEndPos++;
 
     // Do we have any notes to render?
-    if (m_iStartPos >= static_cast<idx_t>(m_vEvents.size()) || m_iEndPos >= static_cast<idx_t>(m_vEvents.size())) return;
+    if (m_iStartPos >= static_cast<idx_t>(m_vEvents.size()) || m_iEndPos >= static_cast<idx_t>(m_vEvents.size())) goto ret;
 
     // Ensure that any rects rendered after this point render over the notes
     m_pRenderer->SplitRect();
@@ -2150,7 +2208,9 @@ void MainScreen::RenderNotes() {
             }
         }
     }
-    if (m_pStateReversed) m_iStartPos--;
+    ret:
+    if (m_pStateReversed && !IsLastFrameReversed) m_iStartPos++;
+    if (!m_pStateReversed && IsLastFrameReversed) m_iStartPos--;
     if (m_pStateReversed) m_iEndPos--;
 }
 
