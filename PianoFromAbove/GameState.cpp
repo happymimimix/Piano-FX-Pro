@@ -1129,11 +1129,11 @@ GameState::GameError MainScreen::Logic() {
     m_iPrevTick = m_iStartTick;
 
     RenderGlobals();
+    bool Reverse = m_dSpeed < 0;
 
     // Advance the start position! 
     if (!m_bPaused)
     {
-        bool Reverse = m_dSpeed < 0;
         if (Reverse) {
             if (!IsLastFrameReversed) m_iStartPos--;
             IsLastFrameReversed = true;
@@ -1279,19 +1279,61 @@ GameState::GameError MainScreen::Logic() {
             m_pStateReversed = nullptr;
         }
     }
+    unsigned char StateUpdateReturn = 0;
     if (m_bTickMode) {
         while (m_iEndPos != IDX_MAX && (m_iEndPos + 1 >= static_cast<idx_t>(m_vEvents.size()) || m_vEvents[m_iEndPos + 1]->GetAbsTick() > llEndTime)) {
+            if (m_pStateReversed) {
+                StateUpdateReturn = 0;
+                Reverse = true;
+            ReversedStateUpdate:
+                const MIDIChannelEvent* pEvent = m_vEvents[m_iEndPos];
+                idx_t ogsistidx = pEvent->GetSisterIdx();
+                if (IsNote(pEvent->GetChannelEventType()) && pEvent->HasSister() && Reverse) {
+                    pEvent = m_vEvents[ogsistidx];
+                }
+                if (IsNote(pEvent->GetChannelEventType()) && pEvent->HasSister()) {
+                    idx_t idx = Reverse ? ogsistidx : static_cast<idx_t>(m_iEndPos);
+                    idx_t sister = IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()) ? IDX_MAX : (Reverse ? static_cast<idx_t>(m_iEndPos) : ogsistidx);
+                    UpdateReversedState(idx, sister);
+                }
+                if (StateUpdateReturn) {
+                    switch (StateUpdateReturn) {
+                    case 1: goto StateUpdateReturnLocation_01;
+                    case 2: goto StateUpdateReturnLocation_02;
+                    case 3: goto StateUpdateReturnLocation_03;
+                    default: MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
+                    }
+                }
+            }
             m_iEndPos--; //Make sure we're 10000% not drawing any unnecessary notes! 
         }
         while (m_iEndPos + 1 < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iEndPos + 1]->GetAbsTick() < llEndTime) {
+            if (m_pStateReversed) {
+                StateUpdateReturn = 1;
+                Reverse = false;
+                goto ReversedStateUpdate;
+                StateUpdateReturnLocation_01:;
+            }
             m_iEndPos++;
         }
     }
     else {
         while (m_iEndPos != IDX_MAX && (m_iEndPos + 1 >= static_cast<idx_t>(m_vEvents.size()) || m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() > llEndTime)) {
+            if (m_pStateReversed) {
+                StateUpdateReturn = 2;
+                Reverse = true;
+                goto ReversedStateUpdate;
+                StateUpdateReturnLocation_02:;
+            }
             m_iEndPos--; //Make sure we're 10000% not drawing any unnecessary notes! 
         }
         while (m_iEndPos + 1 < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() < llEndTime) {
+            if (m_pStateReversed) {
+                StateUpdateReturn = 3;
+                Reverse = false;
+                goto ReversedStateUpdate;
+                StateUpdateReturnLocation_03:;
+            }
             m_iEndPos++;
         }
     }
@@ -1364,7 +1406,7 @@ void MainScreen::UpdateState(idx_t idx, idx_t sister_idx) {
     }
 }
 
-void MainScreen::UpdateStateBackwards(idx_t idx, idx_t sister_idx) {
+void MainScreen::UpdateReversedState(idx_t idx, idx_t sister_idx) {
     if (sister_idx == IDX_MAX) {
         if (m_pStateReversed->IsActive(idx) && JumpTarget == ~0) MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
         m_pStateReversed->Activate(idx);
@@ -2046,6 +2088,18 @@ void MainScreen::RenderNotes() {
     };
 
     if (Config::GetConfig().GetVideoSettings().bOR) {
+
+        if (m_pStateReversed) {
+            m_pStateReversed->ForEachReversed([&](idx_t idx) {
+                MIDIChannelEvent* pEvent = m_vEvents[idx];
+                if (m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
+                    RenderNote(pEvent);
+                    if (!IsPressed(pEvent->GetParam1())) {
+                        PressAndBlend(pEvent);
+                    }
+                }
+            });
+        }
         for (idx_t i = m_iEndPos; i >= m_iStartPos && i != IDX_MAX; i--) {
             MIDIChannelEvent* pEvent = m_vEvents[i];
             if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()) && pEvent->HasSister() &&
@@ -2054,11 +2108,13 @@ void MainScreen::RenderNotes() {
             }
         }
         m_pState->ForEachReversed([&](idx_t idx) {
-            MIDIChannelEvent* pEvent = m_vEvents[idx];
-            if (m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
-                RenderNote(pEvent);
-                if (!IsPressed(pEvent->GetParam1())) {
-                    PressAndBlend(pEvent);
+            if (!m_pStateReversed) {
+                MIDIChannelEvent* pEvent = m_vEvents[idx];
+                if (m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
+                    RenderNote(pEvent);
+                    if (!IsPressed(pEvent->GetParam1())) {
+                        PressAndBlend(pEvent);
+                    }
                 }
             }
             m_iPolyphony++;
@@ -2066,10 +2122,12 @@ void MainScreen::RenderNotes() {
     }
     else {
         m_pState->ForEach([&](idx_t idx) {
-            MIDIChannelEvent* pEvent = m_vEvents[idx];
-            if (m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
-                RenderNote(pEvent);
-                PressAndBlend(pEvent);
+            if (!m_pStateReversed) {
+                MIDIChannelEvent* pEvent = m_vEvents[idx];
+                if (m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
+                    RenderNote(pEvent);
+                    PressAndBlend(pEvent);
+                }
             }
             m_iPolyphony++;
         });
@@ -2079,6 +2137,17 @@ void MainScreen::RenderNotes() {
                 m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
                 RenderNote(pEvent);
             }
+        }
+        if (m_pStateReversed) {
+            m_pStateReversed->ForEach([&](idx_t idx) {
+                MIDIChannelEvent* pEvent = m_vEvents[idx];
+                if (m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
+                    RenderNote(pEvent);
+                    if (!IsPressed(pEvent->GetParam1())) {
+                        PressAndBlend(pEvent);
+                    }
+                }
+            });
         }
     }
 }

@@ -358,7 +358,7 @@ private:
 
     // Logic
     void UpdateState(idx_t idx, idx_t sister_idx);
-    void UpdateStateBackwards(idx_t idx, idx_t sister_idx);
+    void UpdateReversedState(idx_t idx, idx_t sister_idx);
     void JumpTo(mms_t llStartTime, bool loadingMode = false);
     void ApplyMarker(unsigned char* data, msgln_t size);
     void ApplyColor(MIDIMetaEvent* event);
