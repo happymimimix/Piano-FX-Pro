@@ -294,13 +294,6 @@ private:
     MIDI& m_MIDI;
 };
 
-#ifdef BIG_INDEX
-struct BigIndex {
-    idx_t m_wiSisterIdx = 0;
-    idx_t m_wiSimultaneous = 0;
-};
-#endif
-
 class __attribute__((packed)) MIDIEvent
 {
 public:
@@ -331,6 +324,13 @@ private:
     friend class MIDISysExEvent;
     friend fileln_t MIDI::ParseEventsF3(const unsigned char* pcData, fileln_t iMaxSize, msg_t eChunkFormat);
 };
+
+#ifdef BIG_INDEX
+struct BigIndex {
+    idx_t m_wiSisterIdx = 0;
+    idx_t m_wiSimultaneous = 0;
+};
+#endif
 
 class __attribute__((packed)) MIDIChannelEvent : public MIDIEvent
 {
@@ -435,6 +435,8 @@ static_assert(sizeof(MIDIChannelEvent) == 32);
 class __attribute__((packed)) MIDIMetaEvent : public MIDIEvent
 {
 public:
+    MIDIMetaEvent(const MIDIMetaEvent&) = delete;
+    MIDIMetaEvent& operator=(const MIDIMetaEvent&) = delete;
     enum MetaEventType : msg_t {
         TextEvent = 0x01, Copyright, SequenceName, InstrumentName, Lyric, Marker, CuePoint, ProgramName, DeviceName,
         ArduanoKivaCompatibleColorEvent, ChannelPrefix = 0x20, PortPrefix, EndOfTrack = 0x2F,
@@ -460,6 +462,8 @@ static_assert(sizeof(MIDIMetaEvent) == 32);
 class __attribute__((packed)) MIDISysExEvent : public MIDIEvent
 {
 public:
+    MIDISysExEvent(const MIDISysExEvent&) = delete;
+    MIDISysExEvent& operator=(const MIDISysExEvent&) = delete;
     __forceinline fileln_t ParseEvent(const unsigned char* pcData, fileln_t iMaxSize);
     __forceinline msgln_t GetDataLen() const { return m_iDataLen; }
     __forceinline unsigned char* GetData() const { return m_pcData; }
