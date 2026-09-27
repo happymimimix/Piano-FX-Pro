@@ -141,6 +141,7 @@ GameState::GameError IntroScreen::Render() {
 //-----------------------------------------------------------------------------
 
 SplashScreen::SplashScreen(HWND hWnd, Renderer11* pRenderer) : GameState(hWnd, pRenderer) {
+    m_pState = nullptr;
     HRSRC hResInfo = FindResource(NULL, MAKEINTRESOURCE(IDR_SPLASHMIDI), TEXT("MIDI"));
     HGLOBAL hRes = LoadResource(NULL, hResInfo);
     win32_t iSize = SizeofResource(NULL, hResInfo);
@@ -566,6 +567,9 @@ float SplashScreen::GetNoteX(key_t iNote) {
 //-----------------------------------------------------------------------------
 
 MainScreen::MainScreen(wstring sMIDIFile, HWND hWnd, Renderer11* pRenderer) : GameState(hWnd, pRenderer), m_MIDI(sMIDIFile) {
+    // Don't free uninitialized pointers!
+    m_pState = nullptr;
+    m_pStateReversed = nullptr;
     // Finish off midi processing
     if (!m_MIDI.IsValid()) return;
     m_MIDI.ConnectNotes(); // Order's important here
@@ -1285,7 +1289,7 @@ GameState::GameError MainScreen::Logic() {
             if (m_pStateReversed) {
                 StateUpdateReturn = 0;
                 Reverse = true;
-            ReversedStateUpdate:
+                ReversedStateUpdate:
                 const MIDIChannelEvent* pEvent = m_vEvents[m_iEndPos];
                 idx_t ogsistidx = pEvent->GetSisterIdx();
                 if (IsNote(pEvent->GetChannelEventType()) && pEvent->HasSister() && Reverse) {
@@ -1308,13 +1312,13 @@ GameState::GameError MainScreen::Logic() {
             m_iEndPos--; //Make sure we're 10000% not drawing any unnecessary notes! 
         }
         while (m_iEndPos + 1 < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iEndPos + 1]->GetAbsTick() < llEndTime) {
+            m_iEndPos++;
             if (m_pStateReversed) {
                 StateUpdateReturn = 1;
                 Reverse = false;
                 goto ReversedStateUpdate;
                 StateUpdateReturnLocation_01:;
             }
-            m_iEndPos++;
         }
     }
     else {
@@ -1328,13 +1332,13 @@ GameState::GameError MainScreen::Logic() {
             m_iEndPos--; //Make sure we're 10000% not drawing any unnecessary notes! 
         }
         while (m_iEndPos + 1 < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() < llEndTime) {
+            m_iEndPos++;
             if (m_pStateReversed) {
                 StateUpdateReturn = 3;
                 Reverse = false;
                 goto ReversedStateUpdate;
                 StateUpdateReturnLocation_03:;
             }
-            m_iEndPos++;
         }
     }
 
@@ -2088,19 +2092,15 @@ void MainScreen::RenderNotes() {
     };
 
     if (Config::GetConfig().GetVideoSettings().bOR) {
-
         if (m_pStateReversed) {
             m_pStateReversed->ForEachReversed([&](idx_t idx) {
                 MIDIChannelEvent* pEvent = m_vEvents[idx];
                 if (m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
                     RenderNote(pEvent);
-                    if (!IsPressed(pEvent->GetParam1())) {
-                        PressAndBlend(pEvent);
-                    }
                 }
             });
         }
-        for (idx_t i = m_iEndPos; i >= m_iStartPos && i != IDX_MAX; i--) {
+        for (idx_t i = (m_pStateReversed ? m_iStartPos : m_iEndPos); i >= (m_pStateReversed ? m_iEndPos: m_iStartPos) && i != IDX_MAX; i--) {
             MIDIChannelEvent* pEvent = m_vEvents[i];
             if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()) && pEvent->HasSister() &&
                 m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
@@ -2108,13 +2108,11 @@ void MainScreen::RenderNotes() {
             }
         }
         m_pState->ForEachReversed([&](idx_t idx) {
-            if (!m_pStateReversed) {
-                MIDIChannelEvent* pEvent = m_vEvents[idx];
-                if (m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
-                    RenderNote(pEvent);
-                    if (!IsPressed(pEvent->GetParam1())) {
-                        PressAndBlend(pEvent);
-                    }
+            MIDIChannelEvent* pEvent = m_vEvents[idx];
+            if (m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
+                if (!m_pStateReversed) RenderNote(pEvent);
+                if (!IsPressed(pEvent->GetParam1())) {
+                    PressAndBlend(pEvent);
                 }
             }
             m_iPolyphony++;
@@ -2122,16 +2120,14 @@ void MainScreen::RenderNotes() {
     }
     else {
         m_pState->ForEach([&](idx_t idx) {
-            if (!m_pStateReversed) {
-                MIDIChannelEvent* pEvent = m_vEvents[idx];
-                if (m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
-                    RenderNote(pEvent);
-                    PressAndBlend(pEvent);
-                }
+            MIDIChannelEvent* pEvent = m_vEvents[idx];
+            if (m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
+                if (!m_pStateReversed) RenderNote(pEvent);
+                PressAndBlend(pEvent);
             }
             m_iPolyphony++;
         });
-        for (idx_t i = m_iStartPos; i <= m_iEndPos && i != IDX_MAX; i++) {
+        for (idx_t i = (m_pStateReversed ? m_iEndPos : m_iStartPos); i <= (m_pStateReversed ? m_iStartPos : m_iEndPos) && i != IDX_MAX; i++) {
             MIDIChannelEvent* pEvent = m_vEvents[i];
             if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()) && pEvent->HasSister() &&
                 m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
@@ -2143,9 +2139,6 @@ void MainScreen::RenderNotes() {
                 MIDIChannelEvent* pEvent = m_vEvents[idx];
                 if (m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
                     RenderNote(pEvent);
-                    if (!IsPressed(pEvent->GetParam1())) {
-                        PressAndBlend(pEvent);
-                    }
                 }
             });
         }
