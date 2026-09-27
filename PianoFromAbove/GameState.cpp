@@ -579,6 +579,12 @@ MainScreen::MainScreen(wstring sMIDIFile, HWND hWnd, Renderer11* pRenderer) : Ga
     m_vTrackSettings.clear();
     m_vTrackSettings.resize(min(m_MIDI.GetInfo().iNumTracks, MaxTrackColors));
     m_pState = new dynamic_bitset(m_vEvents.size());
+    m_pStateReversed = nullptr;
+    m_itNextTempo = m_vTempo.begin();
+    m_itNextSignature = m_vSignature.begin();
+    m_itNextMarker = m_vMarkers.begin();
+    m_itNextColor = m_vColors.begin();
+    m_itNextSysEx = m_vSysExEvents.begin();
 
     g_LoadingProgress.stage = MIDILoadingProgress::Stage::NCTable;
     g_LoadingProgress.progress = 0;
@@ -629,6 +635,7 @@ void MainScreen::InitState() {
     static const PlaybackSettings& cPlayback = config.GetPlaybackSettings();
     static const ViewSettings& cView = config.GetViewSettings();
     static const ControlsSettings& cControls = config.GetControlsSettings();
+    static const VideoSettings& cVideo = config.GetVideoSettings();
 
     m_iStartPos = NULL;
     m_iEndPos = IDX_MAX;
@@ -644,6 +651,9 @@ void MainScreen::InitState() {
     m_llFPSTime = 0;
     m_llPrevTime = m_llStartTime;
     m_iPrevTick = m_iStartTick;
+    m_pMarkerData = nullptr;
+    m_iMarkerSize = 0;
+    m_iCurEncoding = cVideo.eMarkerEncoding;
 
     m_fZoomX = cView.GetZoomX();
     m_fOffsetX = cView.GetOffsetX();
@@ -654,7 +664,6 @@ void MainScreen::InitState() {
     m_dNSpeed = cPlayback.GetNSpeed();
     m_llTimeSpan = static_cast<mms_t>(3.0 * abs(m_dNSpeed) * 1000000);
     IsLastFrameReversed = m_dSpeed < 0;
-    IsReversedStateInitialized = false;
     RECT rect = {};
     GetWindowRect(g_hWndGfx, &rect);
     m_iScreenWidth = rect.right - rect.left;
@@ -1209,18 +1218,6 @@ GameState::GameError MainScreen::Logic() {
     }
 
     // Advance the end position! 
-    if (dNSpeed < 0) {
-        if (!m_pStateReversed) {
-            // Entering reversed drawing state
-            m_pStateReversed = new dynamic_bitset(static_cast<idx_t>(m_vEvents.size()));
-        }
-    } else {
-    	if (m_pStateReversed) {
-            // Leaving reversed drawing state
-            delete m_pStateReversed;
-            m_pStateReversed = nullptr;
-        }
-    }
     if (m_bTickMode) {
         while (m_iEndPos != IDX_MAX && (m_iEndPos + 1 >= static_cast<idx_t>(m_vEvents.size()) || m_vEvents[m_iEndPos + 1]->GetAbsTick() > llEndTime)) {
             m_iEndPos--; //Make sure we're 10000% not drawing any unnecessary notes! 
@@ -1235,6 +1232,22 @@ GameState::GameError MainScreen::Logic() {
         }
         while (m_iEndPos + 1 < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() < llEndTime) {
             m_iEndPos++;
+        }
+    }
+    if (dNSpeed < 0) {
+        if (!m_pStateReversed) {
+            // Entering reversed drawing state
+            m_pStateReversed = new dynamic_bitset(static_cast<idx_t>(m_vEvents.size()));
+            auto itBegin = m_vEvents.begin();
+            auto itEnd = m_vEvents.end();
+            auto itMiddle = m_iEndPos + m_vEvents.begin() + 1;
+            auto pState = m_pStateReversed;
+        }
+    } else {
+    	if (m_pStateReversed) {
+            // Leaving reversed drawing state
+            delete m_pStateReversed;
+            m_pStateReversed = nullptr;
         }
     }
 
@@ -1343,11 +1356,12 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
     auto itMiddle = lower_bound(itBegin, itEnd, llStartTime, [&](MIDIChannelEvent* lhs, const mms_t rhs) {
         return lhs->GetAbsMicroSec() < rhs;
         });
-    // We've found it! Set m_iStartPos to our latest findings now.
-    m_iStartPos = itMiddle - m_vEvents.begin();
+    m_iStartPos = m_iEndPos = itMiddle - m_vEvents.begin();
 
     // Find the notes that occur simultaneously with the previous note on...
     m_pState->Clear();
+    auto pState = m_pState;
+    SearchProcedure:
     if (itMiddle != itEnd && itMiddle != itBegin)
     {
         // Find the previous note on...
@@ -1364,22 +1378,21 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
         NoteOnFound:
         // Found it!
         auto TargetNote = itMiddle;
-        if ((*TargetNote)->HasSister() && (*TargetNote)->GetSisterIdx() >= m_iStartPos) {
-            m_pState->Activate(TargetNote - m_vEvents.begin());
+        if ((*TargetNote)->HasSister() && (*TargetNote)->GetSisterIdx() >= m_iEndPos) {
+            pState->Activate(TargetNote - m_vEvents.begin());
         }
         // Search for more held notes...
         idx_t iFound = 0;
         idx_t iSimultaneous = (*TargetNote)->GetSimultaneous();
         if (iSimultaneous > 0 && itMiddle != itBegin) {
-            while (true)
-            {
+            while (true) {
                 itMiddle--;
                 if (IsOn((*itMiddle)->GetChannelEventType(), (*itMiddle)->GetParam2())) {
-                    if ((*itMiddle)->HasSister() && (*itMiddle)->GetSisterIdx() >= TargetNote - m_vEvents.begin()) {
+                    if ((*itMiddle)->HasSister() && (*itMiddle)->GetSisterIdx() >= static_cast<idx_t>(TargetNote - itBegin)) {
                         iFound++;
                     }
-                    if ((*itMiddle)->HasSister() && (*itMiddle)->GetSisterIdx() >= m_iStartPos) {
-                        m_pState->Activate(itMiddle - m_vEvents.begin());
+                    if ((*itMiddle)->HasSister() && (*itMiddle)->GetSisterIdx() >= m_iEndPos) {
+                        pState->Activate(itMiddle - m_vEvents.begin());
                     }
                 }
                 if (itMiddle == itBegin || iFound >= iSimultaneous) {
@@ -1394,18 +1407,40 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
         }
     }
     SkipSearch:
+    if (pState == m_pStateReversed) goto ReversedSearchReturn;
     AdvanceIterators(llStartTime, true);
     m_iStartTick = GetCurrentTick(m_llStartTime);
 
     // End position: a little tricky. Same as logic code. Only needed for paused jumping.
-    m_iEndPos = m_iStartPos - 1;
     if (m_bTickMode) {
-        while (m_iEndPos + 1 < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iEndPos + 1]->GetAbsTick() < llEndTime)
+        while (m_iEndPos != IDX_MAX && (m_iEndPos + 1 >= static_cast<idx_t>(m_vEvents.size()) || m_vEvents[m_iEndPos + 1]->GetAbsTick() > llEndTime)) {
+            m_iEndPos--; //Make sure we're 10000% not drawing any unnecessary notes! 
+        }
+        while (m_iEndPos + 1 < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iEndPos + 1]->GetAbsTick() < llEndTime) {
             m_iEndPos++;
+        }
     }
     else {
-        while (m_iEndPos + 1 < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() < llEndTime)
+        while (m_iEndPos != IDX_MAX && (m_iEndPos + 1 >= static_cast<idx_t>(m_vEvents.size()) || m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() > llEndTime)) {
+            m_iEndPos--; //Make sure we're 10000% not drawing any unnecessary notes! 
+        }
+        while (m_iEndPos + 1 < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() < llEndTime) {
             m_iEndPos++;
+        }
+    }
+
+    if (m_dNSpeed < 0) {
+        if (!m_pStateReversed) {
+            // Entering reversed drawing state
+            m_pStateReversed = new dynamic_bitset(static_cast<idx_t>(m_vEvents.size()));
+        }
+        else {
+            m_pStateReversed->Clear();
+        }
+        itMiddle = m_iEndPos + m_vEvents.begin();
+        pState = m_pStateReversed;
+        goto SearchProcedure;
+        ReversedSearchReturn:;
     }
 
     if (!loadingMode)
@@ -1933,12 +1968,15 @@ void MainScreen::RenderLines() {
 }
 
 void MainScreen::RenderNotes() {
+    // Even when there are no notes on screen we still gotta do this!
+    InitKeyColor();
+    m_iPolyphony = 0;
+
     // Do we have any notes to render?
     if (m_iStartPos >= static_cast<idx_t>(m_vEvents.size()) || m_iEndPos >= static_cast<idx_t>(m_vEvents.size())) return;
 
     // Ensure that any rects rendered after this point render over the notes
     m_pRenderer->SplitRect();
-    InitKeyColor();
 
     auto PressAndBlend = [&](const MIDIChannelEvent* pEvent) __attribute__((always_inline)) {
         ChannelSettings CS = m_vTrackSettings[pEvent->GetTrack() % MaxTrackColors].aChannels[pEvent->GetChannel()];
@@ -1962,7 +2000,6 @@ void MainScreen::RenderNotes() {
                 RenderNote(pEvent);
             }
         }
-        m_iPolyphony = 0;
         m_pState->ForEachReversed([&](idx_t idx) {
             MIDIChannelEvent* pEvent = m_vEvents[idx];
             if (m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
@@ -1975,7 +2012,6 @@ void MainScreen::RenderNotes() {
         });
     }
     else {
-        m_iPolyphony = 0;
         m_pState->ForEach([&](idx_t idx) {
             MIDIChannelEvent* pEvent = m_vEvents[idx];
             if (m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
