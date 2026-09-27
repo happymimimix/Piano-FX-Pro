@@ -1430,6 +1430,8 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
         m_llStartTime = min(max(llStartTime, m_llMinTime), m_llMaxTime);
     }
 
+    AdvanceIterators(llStartTime, true);
+    m_iStartTick = GetCurrentTick(m_llStartTime);
     mms_t llEndTime;
     if (m_dNSpeed < 0) {
         if (m_bTickMode) {
@@ -1451,7 +1453,7 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
     // Find start position...
     auto itBegin = m_vEvents.begin();
     auto itEnd = m_vEvents.end();
-    auto itMiddle = lower_bound(itBegin, itEnd, llStartTime, [&](MIDIChannelEvent* lhs, const mms_t rhs) {
+    auto itMiddle = lower_bound(itBegin, itEnd, m_llStartTime, [&](MIDIChannelEvent* lhs, const mms_t rhs) {
         return lhs->GetAbsMicroSec() < rhs;
         });
     m_iEndPos = m_iStartPos = itMiddle - m_vEvents.begin();
@@ -1506,8 +1508,6 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
     }
     SkipSearch:
     if (pState == m_pStateReversed) goto ReversedSearchReturn;
-    AdvanceIterators(llStartTime, true);
-    m_iStartTick = GetCurrentTick(m_llStartTime);
 
     // End position: a little tricky. Same as logic code. Only needed for paused jumping.
     m_iEndPos--;
@@ -2092,6 +2092,13 @@ void MainScreen::RenderNotes() {
     };
 
     if (Config::GetConfig().GetVideoSettings().bOR) {
+        for (idx_t i = (m_pStateReversed ? m_iStartPos : m_iEndPos); i >= (m_pStateReversed ? m_iEndPos: m_iStartPos) && i != IDX_MAX; i--) {
+            MIDIChannelEvent* pEvent = m_vEvents[i];
+            if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()) && pEvent->HasSister() &&
+                m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
+                RenderNote(pEvent);
+            }
+        }
         if (m_pStateReversed) {
             m_pStateReversed->ForEachReversed([&](idx_t idx) {
                 MIDIChannelEvent* pEvent = m_vEvents[idx];
@@ -2099,13 +2106,6 @@ void MainScreen::RenderNotes() {
                     RenderNote(pEvent);
                 }
             });
-        }
-        for (idx_t i = (m_pStateReversed ? m_iStartPos : m_iEndPos); i >= (m_pStateReversed ? m_iEndPos: m_iStartPos) && i != IDX_MAX; i--) {
-            MIDIChannelEvent* pEvent = m_vEvents[i];
-            if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()) && pEvent->HasSister() &&
-                m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
-                RenderNote(pEvent);
-            }
         }
         m_pState->ForEachReversed([&](idx_t idx) {
             MIDIChannelEvent* pEvent = m_vEvents[idx];
@@ -2127,13 +2127,6 @@ void MainScreen::RenderNotes() {
             }
             m_iPolyphony++;
         });
-        for (idx_t i = (m_pStateReversed ? m_iEndPos : m_iStartPos); i <= (m_pStateReversed ? m_iStartPos : m_iEndPos) && i != IDX_MAX; i++) {
-            MIDIChannelEvent* pEvent = m_vEvents[i];
-            if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()) && pEvent->HasSister() &&
-                m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
-                RenderNote(pEvent);
-            }
-        }
         if (m_pStateReversed) {
             m_pStateReversed->ForEach([&](idx_t idx) {
                 MIDIChannelEvent* pEvent = m_vEvents[idx];
@@ -2141,6 +2134,13 @@ void MainScreen::RenderNotes() {
                     RenderNote(pEvent);
                 }
             });
+        }
+        for (idx_t i = (m_pStateReversed ? m_iEndPos : m_iStartPos); i <= (m_pStateReversed ? m_iStartPos : m_iEndPos) && i != IDX_MAX; i++) {
+            MIDIChannelEvent* pEvent = m_vEvents[i];
+            if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()) && pEvent->HasSister() &&
+                m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
+                RenderNote(pEvent);
+            }
         }
     }
 }
