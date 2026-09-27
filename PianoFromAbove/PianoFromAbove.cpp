@@ -1763,7 +1763,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
             do {
                 pos -= LZMA_STREAM_HEADER_SIZE;
                 uint64_t footer_pos;
-                while (true) {
+                for (;;) {
                     footer_pos = pos;
 
                     int i = 2;
@@ -1831,7 +1831,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
         cout << "Actual: ";
         cout << offset;
         cout << "\n";
-        while (true) {
+        for (;;) {
 
         }
     }

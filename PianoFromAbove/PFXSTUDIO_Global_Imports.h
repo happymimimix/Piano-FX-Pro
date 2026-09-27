@@ -41,7 +41,7 @@ void inline 🖥() {
         cout << "[1;1H[40m[91mERROR: Unable to get console font size. \n\nReason: \n";
         cout << GetLastError();
         cout << "\nThe program will now stop. \n";
-        while (true) {
+        for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
         }

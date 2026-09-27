@@ -15,7 +15,7 @@ void TabSwitcher::EnableAll() {
     if (Tab1 != nullptr || Tab2 != nullptr || Tab3 != nullptr || Tab4 != nullptr) {
         cout << "[1;1H[40m[91mERROR: Trying to enable a TouchEventListener that is already enabled. \n";
         cout << "\nThe program will now stop. \n";
-        while (true) {
+        for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
         }
@@ -155,7 +155,7 @@ void TabSwitcher::EnableTab(uint8_t Tab) {
         cout << "3 (Colorize)\n";
         cout << "4 (GDI)\n";
         cout << "\nThe program will now stop. \n";
-        while (true) {
+        for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
         }
@@ -186,7 +186,7 @@ void TabSwitcher::DisableTab(uint8_t Tab) {
         cout << "3 (Colorize)\n";
         cout << "4 (GDI)\n";
         cout << "\nThe program will now stop. \n";
-        while (true) {
+        for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
         }

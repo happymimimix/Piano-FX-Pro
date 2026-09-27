@@ -23,7 +23,7 @@ void DisplayTutorial(Tutorials DocumentName) {
 		cout << "[1;1H[40m[91mERROR: Unknown tutorial document: ";
 		cout << (short)DocumentName;
 		cout << "\nThe program will now stop. \n";
-		while (true) {
+		for (;;) {
 			// Make the program hang instead of closing! 
 			// This way the user can clearly see the error message. 
 		}

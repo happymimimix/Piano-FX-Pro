@@ -269,7 +269,7 @@ MIDI::MIDI(const wstring& sFilename)
 
                 // Locate and decode stream footer
                 uint64_t footer_pos;
-                while (true) {
+                for (;;) {
                     if (pos < LZMA_STREAM_HEADER_SIZE) {
                         MessageBoxA(NULL, "Locating stream footer failed. Corrupted file?", "Piano-FX Pro", MB_OK | MB_ICONERROR);
                         lzma_index_end(index, NULL);

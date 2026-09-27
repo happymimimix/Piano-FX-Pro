@@ -8,7 +8,7 @@ inline void ConsoleInit() {
         cout << "[1;1H[40m[91mERROR: Cannot obtain console output mode. \n\nReason: \n";
         cout << GetLastError();
         cout << "\nThe program will now stop. \n";
-        while (true) {
+        for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
         }
@@ -18,7 +18,7 @@ inline void ConsoleInit() {
         cout << "[1;1H[40m[91mERROR: Cannot change console output mode. \n\nReason: \n";
         cout << GetLastError();
         cout << "\nThe program will now stop. \n";
-        while (true) {
+        for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
         }
@@ -27,7 +27,7 @@ inline void ConsoleInit() {
         cout << "[1;1H[40m[91mERROR: Cannot obtain console input mode. \n\nReason: \n";
         cout << GetLastError();
         cout << "\nThe program will now stop. \n";
-        while (true) {
+        for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
         }
@@ -39,7 +39,7 @@ inline void ConsoleInit() {
         cout << "[1;1H[40m[91mERROR: Cannot change console input mode. \n\nReason: \n";
         cout << GetLastError();
         cout << "\nThe program will now stop. \n";
-        while (true) {
+        for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
         }
@@ -49,7 +49,7 @@ inline void ConsoleInit() {
         cout << "[1;1H[40m[91mERROR: Unable to set console code page. \n\nReason: \n";
         cout << GetLastError();
         cout << "\nThe program will now stop. \n";
-        while (true) {
+        for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
         }
@@ -65,7 +65,7 @@ inline void ConsoleInit() {
         cout << "[1;1H[40m[91mERROR: Unable to set console font. \n\nReason: \n";
         cout << GetLastError();
         cout << "\nThe program will now stop. \n";
-        while (true) {
+        for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
         }
@@ -87,7 +87,7 @@ inline void ConsoleInit() {
         cout << "[1;1H[40m[91mERROR: Unable to set console buffer size. \n\nReason: \n";
         cout << GetLastError();
         cout << "\nThe program will now stop. \n";
-        while (true) {
+        for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
         }
@@ -96,7 +96,7 @@ inline void ConsoleInit() {
         cout << "[1;1H[40m[91mERROR: Unable to set console window size. \n\nReason: \n";
         cout << GetLastError();
         cout << "\nThe program will now stop. \n";
-        while (true) {
+        for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
         }
@@ -118,7 +118,7 @@ inline void ConsoleInitNoMouse() {
         cout << "[1;1H[40m[91mERROR: Cannot obtain console output mode. \n\nReason: \n";
         cout << GetLastError();
         cout << "\nThe program will now stop. \n";
-        while (true) {
+        for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
         }
@@ -128,7 +128,7 @@ inline void ConsoleInitNoMouse() {
         cout << "[1;1H[40m[91mERROR: Cannot change console output mode. \n\nReason: \n";
         cout << GetLastError();
         cout << "\nThe program will now stop. \n";
-        while (true) {
+        for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
         }
@@ -137,7 +137,7 @@ inline void ConsoleInitNoMouse() {
         cout << "[1;1H[40m[91mERROR: Cannot obtain console input mode. \n\nReason: \n";
         cout << GetLastError();
         cout << "\nThe program will now stop. \n";
-        while (true) {
+        for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
         }
@@ -149,7 +149,7 @@ inline void ConsoleInitNoMouse() {
         cout << "[1;1H[40m[91mERROR: Cannot change console input mode. \n\nReason: \n";
         cout << GetLastError();
         cout << "\nThe program will now stop. \n";
-        while (true) {
+        for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
         }
@@ -159,7 +159,7 @@ inline void ConsoleInitNoMouse() {
         cout << "[1;1H[40m[91mERROR: Unable to set console code page. \n\nReason: \n";
         cout << GetLastError();
         cout << "\nThe program will now stop. \n";
-        while (true) {
+        for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
         }
@@ -175,7 +175,7 @@ inline void ConsoleInitNoMouse() {
         cout << "[1;1H[40m[91mERROR: Unable to set console font. \n\nReason: \n";
         cout << GetLastError();
         cout << "\nThe program will now stop. \n";
-        while (true) {
+        for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
         }
@@ -197,7 +197,7 @@ inline void ConsoleInitNoMouse() {
         cout << "[1;1H[40m[91mERROR: Unable to set console buffer size. \n\nReason: \n";
         cout << GetLastError();
         cout << "\nThe program will now stop. \n";
-        while (true) {
+        for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
         }
@@ -206,7 +206,7 @@ inline void ConsoleInitNoMouse() {
         cout << "[1;1H[40m[91mERROR: Unable to set console window size. \n\nReason: \n";
         cout << GetLastError();
         cout << "\nThe program will now stop. \n";
-        while (true) {
+        for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
         }

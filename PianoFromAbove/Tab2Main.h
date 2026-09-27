@@ -12,7 +12,7 @@ void Tab2::EnableAll() {
     if (AnyGoodPtr(Btn1,Btn2,Btn3,Btn4)) {
         cout << "[1;1H[40m[91mERROR: Trying to enable a TouchEventListener that is already enabled. \n";
         cout << "\nThe program will now stop. \n";
-        while (true) {
+        for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
         }
@@ -106,7 +106,7 @@ void Tab2::DisableAll() {
     if (AnyNullPtr(Btn1, Btn2, Btn3, Btn4)) {
         cout << "[1;1H[40m[91mERROR: Trying to disable a tab that isn't enabled. \n";
         cout << "\nThe program will now stop. \n";
-        while (true) {
+        for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
         }
@@ -123,7 +123,7 @@ void Tab2::Draw() {
     if (AnyNullPtr(Btn1, Btn2, Btn3, Btn4)) {
         cout << "[1;1H[40m[91mERROR: Trying to render a button that doesn't exist. \n";
         cout << "\nThe program will now stop. \n";
-        while (true) {
+        for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
         }

@@ -213,7 +213,7 @@ size_t BraceMatch(const wstring& text, size_t index) {
     int depth = 1;
     size_t pos = index;
 
-    while (true) {
+    for (;;) {
         if (direction > 0) {
             pos++;
             if (pos >= text.size()) break;

@@ -8,7 +8,7 @@ struct ConsoleTextbox {
         if (this->hTextbox != NULL) {
             cout << "[1;1H[40m[91mERROR: Trying to create a text box that already exist! \n";
             cout << "\nThe program will now stop. \n";
-            while (true) {
+            for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
             }
@@ -39,7 +39,7 @@ struct ConsoleTextbox {
         else {
             cout << "[1;1H[40m[91mERROR: Trying to grab text from a text box that doesn't exist! \n";
             cout << "\nThe program will now stop. \n";
-            while (true) {
+            for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
             }
@@ -54,7 +54,7 @@ struct ConsoleTextbox {
         else {
             cout << "[1;1H[40m[91mERROR: Trying to set text to a text box that doesn't exist! \n";
             cout << "\nThe program will now stop. \n";
-            while (true) {
+            for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
             }
@@ -70,7 +70,7 @@ struct ConsoleTextbox {
         else {
             cout << "[1;1H[40m[91mERROR: Trying to delete a text box that doesn't exist! \n";
             cout << "\nThe program will now stop. \n";
-            while (true) {
+            for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
             }
@@ -85,7 +85,7 @@ struct ConsoleTextbox {
         else {
             cout << "[1;1H[40m[91mERROR: Trying to hide a text box that doesn't exist! \n";
             cout << "\nThe program will now stop. \n";
-            while (true) {
+            for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
             }
@@ -100,7 +100,7 @@ struct ConsoleTextbox {
         else {
             cout << "[1;1H[40m[91mERROR: Trying to show a text box that doesn't exist! \n";
             cout << "\nThe program will now stop. \n";
-            while (true) {
+            for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
             }
@@ -115,7 +115,7 @@ struct ConsoleTextbox {
         else {
             cout << "[1;1H[40m[91mERROR: Trying to disable a text box that doesn't exist! \n";
             cout << "\nThe program will now stop. \n";
-            while (true) {
+            for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
             }
@@ -130,7 +130,7 @@ struct ConsoleTextbox {
         else {
             cout << "[1;1H[40m[91mERROR: Trying to enable a text box that doesn't exist! \n";
             cout << "\nThe program will now stop. \n";
-            while (true) {
+            for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
             }

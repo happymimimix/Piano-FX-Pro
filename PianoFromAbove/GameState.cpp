@@ -176,7 +176,7 @@ SplashScreen::SplashScreen(HWND hWnd, Renderer11* pRenderer) : GameState(hWnd, p
             do {
                 pos -= LZMA_STREAM_HEADER_SIZE;
                 uint64_t footer_pos;
-                while (true) {
+                for (;;) {
                     footer_pos = pos;
 
                     int i = 2;
@@ -1234,7 +1234,7 @@ GameState::GameError MainScreen::Logic() {
             if (itMiddle != itEnd && itMiddle != itBegin)
             {
                 // Find the previous note on...
-                while (true) {
+                for (;;) {
                     itMiddle--;
                     if (IsOn((*itMiddle)->GetChannelEventType(), (*itMiddle)->GetParam2())) {
                         goto NoteOnFound;
@@ -1254,7 +1254,7 @@ GameState::GameError MainScreen::Logic() {
                 idx_t iFound = 0;
                 idx_t iSimultaneous = (*TargetNote)->GetSimultaneous();
                 if (iSimultaneous > 0 && itMiddle != itBegin) {
-                    while (true) {
+                    for (;;) {
                         itMiddle--;
                         if (IsOn((*itMiddle)->GetChannelEventType(), (*itMiddle)->GetParam2())) {
                             if ((*itMiddle)->HasSister() && (*itMiddle)->GetSisterIdx() >= static_cast<idx_t>(TargetNote - itBegin)) {
@@ -1475,7 +1475,7 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
     if (itMiddle != itEnd && itMiddle != itBegin)
     {
         // Find the previous note on...
-        while (true) {
+        for (;;) {
             itMiddle--;
             if (IsOn((*itMiddle)->GetChannelEventType(), (*itMiddle)->GetParam2())) {
                 goto NoteOnFound;
@@ -1495,7 +1495,7 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
         idx_t iFound = 0;
         idx_t iSimultaneous = (*TargetNote)->GetSimultaneous();
         if (iSimultaneous > 0 && itMiddle != itBegin) {
-            while (true) {
+            for (;;) {
                 itMiddle--;
                 if (IsOn((*itMiddle)->GetChannelEventType(), (*itMiddle)->GetParam2())) {
                     if ((*itMiddle)->HasSister() && (*itMiddle)->GetSisterIdx() >= static_cast<idx_t>(TargetNote - itBegin)) {

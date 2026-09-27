@@ -28,7 +28,7 @@ struct Tab1Graphics {
             cout << (int)state;
             cout << ", should only be 1(normal), 2(hovered), or 3(touched). \n";
             cout << "\nThe program will now stop. \n";
-            while (true) {
+            for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
             }
@@ -60,7 +60,7 @@ struct Tab1Graphics {
             cout << (int)state;
             cout << ", should only be 1(normal), 2(hovered), or 3(touched). \n";
             cout << "\nThe program will now stop. \n";
-            while (true) {
+            for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
             }
@@ -92,7 +92,7 @@ struct Tab1Graphics {
             cout << (int)state;
             cout << ", should only be 1(normal), 2(hovered), or 3(touched). \n";
             cout << "\nThe program will now stop. \n";
-            while (true) {
+            for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
             }
@@ -124,7 +124,7 @@ struct Tab1Graphics {
             cout << (int)state;
             cout << ", should only be 1(normal), 2(hovered), or 3(touched). \n";
             cout << "\nThe program will now stop. \n";
-            while (true) {
+            for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
             }
@@ -156,7 +156,7 @@ struct Tab1Graphics {
             cout << (int)state;
             cout << ", should only be 1(normal), 2(hovered), or 3(touched). \n";
             cout << "\nThe program will now stop. \n";
-            while (true) {
+            for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
             }
@@ -197,7 +197,7 @@ struct Tab1Graphics {
                 cout << (int)state;
                 cout << ", should only be 1(normal), 2(hovered), or 3(touched). \n";
                 cout << "\nThe program will now stop. \n";
-                while (true) {
+                for (;;) {
                     // Make the program hang instead of closing! 
                     // This way the user can clearly see the error message. 
                 }
@@ -223,7 +223,7 @@ struct Tab1Graphics {
                 cout << (int)state;
                 cout << ", should only be 1(normal), 2(hovered), or 3(touched). \n";
                 cout << "\nThe program will now stop. \n";
-                while (true) {
+                for (;;) {
                     // Make the program hang instead of closing! 
                     // This way the user can clearly see the error message. 
                 }
@@ -265,7 +265,7 @@ struct Tab1Graphics {
                 cout << (int)state;
                 cout << ", should only be 1(normal), 2(hovered), or 3(touched). \n";
                 cout << "\nThe program will now stop. \n";
-                while (true) {
+                for (;;) {
                     // Make the program hang instead of closing! 
                     // This way the user can clearly see the error message. 
                 }
@@ -291,7 +291,7 @@ struct Tab1Graphics {
                 cout << (int)state;
                 cout << ", should only be 1(normal), 2(hovered), or 3(touched). \n";
                 cout << "\nThe program will now stop. \n";
-                while (true) {
+                for (;;) {
                     // Make the program hang instead of closing! 
                     // This way the user can clearly see the error message. 
                 }

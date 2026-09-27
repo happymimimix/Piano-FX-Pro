@@ -6,7 +6,7 @@ void Tab4::EnableAll() {
     if (Btn1 != nullptr) {
         cout << "[1;1H[40m[91mERROR: Trying to enable a TouchEventListener that is already enabled. \n";
         cout << "\nThe program will now stop. \n";
-        while (true) {
+        for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
         }
@@ -29,7 +29,7 @@ void Tab4::Draw() {
     if (Btn1 == nullptr) {
         cout << "[1;1H[40m[91mERROR: Trying to render a button that doesn't exist. \n";
         cout << "\nThe program will now stop. \n";
-        while (true) {
+        for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
         }

@@ -42,7 +42,7 @@ void SetDocumentLength(uint16_t Length) {
         cout << "[1;1H[40m[91mERROR: Unable to set console buffer size. \n\nReason: \n";
         cout << GetLastError();
         cout << "\nThe program will now stop. \n";
-        while (true) {
+        for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
         }
@@ -66,7 +66,7 @@ void DrawBMP(Diagram BMP) {
         cout << "[1;1H[40m[91mERROR: Cannot obtain console buffer info. \n\nReason: \n";
         cout << GetLastError();
         cout << "\nThe program will now stop. \n";
-        while (true) {
+        for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
         }
@@ -95,7 +95,7 @@ void OpenTutorialDocument(TutorialDocument Document) {
     ConsoleInitNoMouse();
     SetDocumentLength(Document.DocumentLength);
     ShowText(Document.TextContent);
-    while (true) {
+    for (;;) {
         for (Diagram BMP : Document.DiagramsList) {
             DrawBMP(BMP);
         }

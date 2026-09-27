@@ -9,7 +9,7 @@ struct ConsoleNumberSpinner {
         if (this->hEdit != NULL || this->hSpin != NULL) {
             cout << "[1;1H[40m[91mERROR: Trying to create a spinner that already exist! \n";
             cout << "\nThe program will now stop. \n";
-            while (true) {
+            for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
             }
@@ -49,7 +49,7 @@ struct ConsoleNumberSpinner {
         else {
         cout << "[1;1H[40m[91mERROR: Trying to set limit to a spinner that doesn't exist! \n";
         cout << "\nThe program will now stop. \n";
-        while (true) {
+        for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
         }
@@ -66,7 +66,7 @@ struct ConsoleNumberSpinner {
         else {
             cout << "[1;1H[40m[91mERROR: Trying to grab number from a spinner that doesn't exist! \n";
             cout << "\nThe program will now stop. \n";
-            while (true) {
+            for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
             }
@@ -81,7 +81,7 @@ struct ConsoleNumberSpinner {
         else {
             cout << "[1;1H[40m[91mERROR: Trying to set number to a spinner that doesn't exist! \n";
             cout << "\nThe program will now stop. \n";
-            while (true) {
+            for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
             }
@@ -99,7 +99,7 @@ struct ConsoleNumberSpinner {
         else {
             cout << "[1;1H[40m[91mERROR: Trying to delete a number spinner that doesn't exist! \n";
             cout << "\nThe program will now stop. \n";
-            while (true) {
+            for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
             }
@@ -115,7 +115,7 @@ struct ConsoleNumberSpinner {
         else {
             cout << "[1;1H[40m[91mERROR: Trying to hide a number spinner that doesn't exist! \n";
             cout << "\nThe program will now stop. \n";
-            while (true) {
+            for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
             }
@@ -131,7 +131,7 @@ struct ConsoleNumberSpinner {
         else {
             cout << "[1;1H[40m[91mERROR: Trying to show a number spinner that doesn't exist! \n";
             cout << "\nThe program will now stop. \n";
-            while (true) {
+            for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
             }
@@ -147,7 +147,7 @@ struct ConsoleNumberSpinner {
         else {
             cout << "[1;1H[40m[91mERROR: Trying to disable a number spinner that doesn't exist! \n";
             cout << "\nThe program will now stop. \n";
-            while (true) {
+            for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
             }
@@ -163,7 +163,7 @@ struct ConsoleNumberSpinner {
         else {
             cout << "[1;1H[40m[91mERROR: Trying to enable a number spinner that doesn't exist! \n";
             cout << "\nThe program will now stop. \n";
-            while (true) {
+            for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
             }

@@ -43,7 +43,7 @@ struct TouchEventManager {
         if (ListenerPointer == nullptr) {
             cout << "[1;1H[40m[91mERROR: Trying to remove a touch event listener that doesn't exist! \n";
             cout << "\nThe program will now stop. \n";
-            while (true) {
+            for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
             }
@@ -90,7 +90,7 @@ struct TouchEventManager {
                     cout << (int)CurrentListener->H;
                     cout << "! \n";
                     cout << "\nThe program will now stop. \n";
-                    while (true) {
+                    for (;;) {
                         // Make the program hang instead of closing! 
                         // This way the user can clearly see the error message. 
                     }
