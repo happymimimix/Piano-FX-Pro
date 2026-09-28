@@ -285,7 +285,7 @@ private:
 
     void RenderGlobals();
     void RenderNotes();
-    void RenderNote(MIDIChannelEvent* pNote);
+    void RenderNote(MIDIChannelEvent* pNote, bool Highlight);
     float GetNoteX(key_t iNote);
     void GenNoteXTable();
 

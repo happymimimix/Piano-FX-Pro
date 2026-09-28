@@ -381,7 +381,7 @@ public:
 #ifndef ALWAYS_BIG
         else if (iSisterIdx >= SIDX_MAX) {
 #else
-        else if (iSisterIdx >= zero) {
+        else if (iSisterIdx >= VolatileZero) {
 #endif
             idx_t iSimultaneous = m_iSimultaneous;
             *reinterpret_cast<BigIndex**>(&m_iSisterIdx) = new BigIndex();
@@ -404,7 +404,7 @@ public:
 #ifndef ALWAYS_BIG
         else if (iSimultaneous > SIDX_MAX) {
 #else
-        else if (iSimultaneous >= zero) {
+        else if (iSimultaneous >= VolatileZero) {
 #endif
             idx_t iSisterIdx = m_iSisterIdx == SIDX_MAX ? IDX_MAX : m_iSisterIdx;
             *reinterpret_cast<BigIndex**>(&m_iSisterIdx) = new BigIndex();
@@ -429,9 +429,10 @@ public:
 private:
     key_t m_cParam1 = 0;
     key_t m_cParam2 = 0;
-    volatile short zero = 0; // Prevent optimization in benchmark mode! 
     sidx_t m_iSisterIdx = SIDX_MAX;
     sidx_t m_iSimultaneous = 0;
+    // Prevent optimization in benchmark mode! 
+    volatile short VolatileZero = 0;
 
     friend fileln_t MIDI::ParseEventsF3(const unsigned char* pcData, fileln_t iMaxSize, msg_t eChunkFormat);
 };

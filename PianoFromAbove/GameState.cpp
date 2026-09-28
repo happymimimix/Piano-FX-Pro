@@ -491,7 +491,7 @@ void SplashScreen::RenderNotes() {
     // White held notes
     m_pState->ForEach([&](idx_t idx) {
         if (!MIDI::IsSharp(m_vEvents[idx]->GetParam1())) {
-            RenderNote(m_vEvents[idx]);
+            RenderNote(m_vEvents[idx], true);
         }
         });
     // White falling notes
@@ -500,13 +500,13 @@ void SplashScreen::RenderNotes() {
         if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()) && pEvent->HasSister() &&
             !MIDI::IsSharp(pEvent->GetParam1()) &&
             m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
-            RenderNote(pEvent);
+            RenderNote(pEvent, false);
         }
     }
     // Sharp held notes
     m_pState->ForEach([&](idx_t idx) {
         if (MIDI::IsSharp(m_vEvents[idx]->GetParam1())) {
-            RenderNote(m_vEvents[idx]);
+            RenderNote(m_vEvents[idx], true);
         }
         });
     // Sharp falling notes
@@ -515,12 +515,12 @@ void SplashScreen::RenderNotes() {
         if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2()) && pEvent->HasSister() &&
             MIDI::IsSharp(pEvent->GetParam1()) &&
             m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
-            RenderNote(pEvent);
+            RenderNote(pEvent, false);
         }
     }
 }
 
-void SplashScreen::RenderNote(MIDIChannelEvent* pNote) {
+void SplashScreen::RenderNote(MIDIChannelEvent* pNote, bool Highlight) {
     key_t iNote = pNote->GetParam1();
     track_t iTrack = pNote->GetTrack() % MaxTrackColors;
     chan_t iChannel = pNote->GetChannel();
@@ -535,12 +535,25 @@ void SplashScreen::RenderNote(MIDIChannelEvent* pNote) {
     float cy = max(round(m_fNotesCY * static_cast<float>(llNoteEnd - llNoteStart) / TimeSpan), 0.0f) + 1.0f;
     float fDeflate = clamp(round(m_fWhiteCX * 0.15f / 2.0f), 1.0f, 3.0f);
     // Visualize!
-    color_t iAlpha1 = min(max(static_cast<mms_t>(0xFF * (m_fNotesCY - y) / m_fNotesCY), 0x00), 0xFF) << 24;
-    color_t iAlpha2 = min(max(static_cast<mms_t>(0xFF * (m_fNotesCY - (y + cy)) / m_fNotesCY), 0x00), 0xFF) << 24;
-    color_t iAlpha3 = min(max(static_cast<mms_t>(0x7F * (m_fNotesCY - y) / m_fNotesCY), 0x00), 0xFF) << 24;
-    color_t iAlpha4 = min(max(static_cast<mms_t>(0x7F * (m_fNotesCY - (y + cy)) / m_fNotesCY), 0x00), 0xFF) << 24;
+    color_t iAlpha1 = (clamp(static_cast<mms_t>(0xFF * ((y - cy) / m_fNotesCY)),mms_t(0x00), mms_t(0xFF)) ^ 0xFF) << 24;
+    color_t iAlpha2 = (clamp(static_cast<mms_t>(0xFF * (y / m_fNotesCY)), mms_t(0x00), mms_t(0xFF)) ^ 0xFF) << 24;
+    color_t iAlpha3 = (clamp(static_cast<mms_t>(0x7F * ((y - cy) / m_fNotesCY)), mms_t(0x00), mms_t(0xFF)) ^ 0xFF) << 24;
+    color_t iAlpha4 = (clamp(static_cast<mms_t>(0x7F * (y / m_fNotesCY)), mms_t(0x00), mms_t(0xFF)) ^ 0xFF) << 24;
+    float fMinY = m_fNotesY - 5.0f;
+    float fMaxY = m_fNotesY + m_fNotesCY + 5.0f;
+    if (y > fMaxY)
+    {
+        cy -= (y - fMaxY);
+        y = fMaxY;
+    }
+    if (y - cy < fMinY)
+    {
+        cy -= (fMinY - (y - cy));
+        y = fMinY + cy;
+    }
     m_pRenderer->DrawRect(x, y - cy, cx, cy, csTrack.iVeryDarkRGB & 0x00FFFFFF | iAlpha3, csTrack.iVeryDarkRGB & 0x00FFFFFF | iAlpha3, csTrack.iVeryDarkRGB & 0x00FFFFFF | iAlpha4, csTrack.iVeryDarkRGB & 0x00FFFFFF | iAlpha4);
     m_pRenderer->DrawRect(x + fDeflate, y - cy + fDeflate, cx - fDeflate * 2.0f, cy - fDeflate * 2.0f, csTrack.iPrimaryRGB & 0x00FFFFFF | iAlpha1, csTrack.iDarkRGB & 0x00FFFFFF | iAlpha1, csTrack.iDarkRGB & 0x00FFFFFF | iAlpha2, csTrack.iPrimaryRGB & 0x00FFFFFF | iAlpha2);
+    if (Highlight) m_pRenderer->DrawRect(x, y - cy, cx, cy, 0x3FFFFFFF);
 }
 
 void SplashScreen::GenNoteXTable() {
@@ -1566,7 +1579,6 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
 
     // Play skipped control change and program change: 
     if (!loadingMode) {
-        m_OutDevice.Reset();
         if (m_itNextColor < prev_itNextColor) prev_itNextColor = m_vColors.begin();
         for (; prev_itNextColor != m_vColors.end() && prev_itNextColor != m_itNextColor; ++prev_itNextColor)
         {
@@ -1578,12 +1590,12 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
         {
             SendSysEx(*prev_itNextSysEx);
         }
+        // I know there are more efficient ways to implement this, but this should be fast enough to be acceptable in practice.
         if (m_itReplayPosition < prev_itReplayPosition) prev_itReplayPosition = m_vReplayTable.begin();
         for (; prev_itReplayPosition != m_vReplayTable.end() && prev_itReplayPosition != m_itReplayPosition; ++prev_itReplayPosition) {
             MIDIChannelEvent* pEvent = m_vEvents[prev_itReplayPosition->second];
             key_t key = pEvent->GetParam1();
             key_t vel = pEvent->GetParam2();
-
             if (IsNotNote(pEvent->GetChannelEventType())) {
                 if (pEvent->GetChannelEventType() == MIDIChannelEvent::ProgramChange && Config::GetConfig().m_bPianoOverride) {
                     key = NULL;
