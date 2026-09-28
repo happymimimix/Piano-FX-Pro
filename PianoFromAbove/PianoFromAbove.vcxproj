@@ -474,7 +474,7 @@
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <TargetName>Piano-FX-Pro</TargetName>
+    <TargetName>Piano-FX-Pro-i386</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
     <LinkIncremental>false</LinkIncremental>
@@ -490,7 +490,7 @@
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Arinoglish|Win32'">
-    <TargetName>Piano-FX-Pro-ARN</TargetName>
+    <TargetName>Piano-FX-Pro-ARN-i386</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
     <LinkIncremental>false</LinkIncremental>
@@ -506,7 +506,7 @@
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|Win32'">
-    <TargetName>Piano-FX-Pro-DRN</TargetName>
+    <TargetName>Piano-FX-Pro-DRN-i386</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
     <LinkIncremental>false</LinkIncremental>
@@ -522,7 +522,7 @@
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Korean|Win32'">
-    <TargetName>Piano-FX-Pro-KOR</TargetName>
+    <TargetName>Piano-FX-Pro-KOR-i386</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
     <LinkIncremental>false</LinkIncremental>
@@ -538,7 +538,7 @@
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DPRK|Win32'">
-    <TargetName>Piano-FX-Pro-KOP</TargetName>
+    <TargetName>Piano-FX-Pro-KOP-i386</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
     <LinkIncremental>false</LinkIncremental>
@@ -554,7 +554,7 @@
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Russian|Win32'">
-    <TargetName>Piano-FX-Pro-RUS</TargetName>
+    <TargetName>Piano-FX-Pro-RUS-i386</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
     <LinkIncremental>false</LinkIncremental>
@@ -570,7 +570,7 @@
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Chinese|Win32'">
-    <TargetName>Piano-FX-Pro-CHN</TargetName>
+    <TargetName>Piano-FX-Pro-CHN-i386</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
     <LinkIncremental>false</LinkIncremental>
@@ -586,7 +586,7 @@
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Japanese|Win32'">
-    <TargetName>Piano-FX-Pro-JPN</TargetName>
+    <TargetName>Piano-FX-Pro-JPN-i386</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
     <LinkIncremental>false</LinkIncremental>
@@ -602,7 +602,7 @@
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Hiragana|Win32'">
-    <TargetName>Piano-FX-Pro-HRG</TargetName>
+    <TargetName>Piano-FX-Pro-HRG-i386</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
     <LinkIncremental>false</LinkIncremental>
@@ -618,7 +618,7 @@
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|Win32'">
-    <TargetName>Piano-FX-Pro-EnforcedSoftwareRendering</TargetName>
+    <TargetName>Piano-FX-Pro-EnforcedSoftwareRendering-i386</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
     <LinkIncremental>false</LinkIncremental>
@@ -634,7 +634,7 @@
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='LimitedColor|Win32'">
-    <TargetName>Piano-FX-Pro-LimitedTrackColoring</TargetName>
+    <TargetName>Piano-FX-Pro-LimitedTrackColoring-i386</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
     <LinkIncremental>false</LinkIncremental>
@@ -650,7 +650,7 @@
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BIG|Win32'">
-    <TargetName>Piano-FX-Pro-ExtendedArrayIndexing</TargetName>
+    <TargetName>Piano-FX-Pro-ExtendedArrayIndexing-i386</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
     <LinkIncremental>false</LinkIncremental>
@@ -666,7 +666,7 @@
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|Win32'">
-    <TargetName>Piano-FX-Pro-ExtendedArrayIndexingBenchmark</TargetName>
+    <TargetName>Piano-FX-Pro-ExtendedArrayIndexingBenchmark-i386</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
     <LinkIncremental>false</LinkIncremental>
@@ -677,12 +677,12 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)\Release\</OutDir>
     <IntDir>Release\</IntDir>
-    <TargetName>Piano-FX-Pro</TargetName>
+    <TargetName>Piano-FX-Pro-Debug</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <TargetName>Piano-FX-Pro</TargetName>
+    <TargetName>Piano-FX-Pro-Debug-i386</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
     <LinkIncremental>true</LinkIncremental>
@@ -693,12 +693,12 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)\Release\</OutDir>
     <IntDir>Release\</IntDir>
-    <TargetName>Piano-FX-Pro</TargetName>
+    <TargetName>Piano-FX-Pro-Debug</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NoOptimization|Win32'">
-    <TargetName>Piano-FX-Pro</TargetName>
+    <TargetName>Piano-FX-Pro-Debug-i386</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
     <LinkIncremental>true</LinkIncremental>
