@@ -22,9 +22,10 @@ int main() {
     SetConsoleOutputCP(65001);
     wcin.imbue(locale("en_US.UTF-8"));
     wcout.imbue(locale("en_US.UTF-8"));
-    cerr << "Calculating text widths..." << endl;
+    wcerr << L"Calculating text widths..." << endl;
     HWND cmd = GetConsoleWindow();
     HDC cmdDC = GetDC(cmd);
+    wcerr << L"System DPI: "<< GetDeviceCaps(cmdDC, LOGPIXELSY) << endl;
     HFONT hFont = CreateFontW(
         -MulDiv(FontSize, GetDeviceCaps(cmdDC, LOGPIXELSY), 72), //FontHeight
         0, //FontWidth
@@ -41,13 +42,19 @@ int main() {
         0, //PitchAndFamily
         TEXT(FontName) //FaceName
     );
-    TEXTMETRIC cmdTM;
-    GetTextMetricsW(cmdDC, &cmdTM);
-    SelectObject(cmdDC, hFont);
+    HGDIOBJ oldfont = SelectObject(cmdDC, hFont);
     SetBkMode(cmdDC, 1);
     SetTextColor(cmdDC, 0x0000FF);
     HBRUSH hBrush = CreateSolidBrush(0x0000FF);
-    SelectObject(cmdDC, hBrush);
+    HGDIOBJ oldbrush = SelectObject(cmdDC, hBrush);
+    TEXTMETRIC cmdTM;
+    GetTextMetricsW(cmdDC, &cmdTM);
+    // I have no idea what this shit is but this is what OpenNT 4.5 is doing.
+    static WCHAR wszAvgChars[] = L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    SIZE AlphabetSize;
+    GetTextExtentPointW(cmdDC, wszAvgChars, (sizeof(wszAvgChars)/sizeof(WCHAR)) - 1, &AlphabetSize);
+    LONG baseX = ((AlphabetSize.cx / 26) + 1) / 2;
+    LONG baseY = cmdTM.tmHeight;
     wstring Line = L"";
     while (getline(wcin, Line)) {
         if (Line.length() < 8 || Line.substr(0, 8) != L"#define ") {
@@ -79,21 +86,28 @@ int main() {
                 ReplaceAll(DefString, L"\\b", L"\b");
                 ReplaceAll(DefString, L"\\\\", L"\\");
                 SIZE TextSize;
-                GetTextExtentPoint32W(cmdDC, DefString.c_str(), DefString.length(), &TextSize);
-                wcout << L"#define " << DefName << L"W " << MulDiv(TextSize.cx, 4, cmdTM.tmAveCharWidth*(0x1.fffffffffffffp-1)) << L" //Text: " << LineNdef.substr(Splitter + 1, LineNdef.length() - Splitter - 1) << endl;
+                GetTextExtentPointW(cmdDC, DefString.c_str(), DefString.length(), &TextSize);
+                wcout << L"#define " << DefName << L"W " << MulDiv(TextSize.cx, 4, baseX) << L" //Text: " << LineNdef.substr(Splitter + 1, LineNdef.length() - Splitter - 1) << endl;
                 RECT cmdRECT;
                 GetClientRect(cmd, &cmdRECT);
                 LONG W = cmdRECT.right - cmdRECT.left;
                 LONG H = cmdRECT.bottom - cmdRECT.top;
-                BitBlt(cmdDC, 0, 0, W, H - cmdTM.tmHeight, cmdDC, 0, cmdTM.tmHeight, SRCCOPY);
-                PatBlt(cmdDC, 0, H - cmdTM.tmHeight, W, cmdTM.tmHeight, BLACKNESS);
-                TextOutW(cmdDC, 0, H - cmdTM.tmHeight, DefString.c_str(), DefString.length());
-                PatBlt(cmdDC, TextSize.cx, H - cmdTM.tmHeight, 1, cmdTM.tmHeight, PATCOPY);
+                BitBlt(cmdDC, 0, 0, W, H - baseY, cmdDC, 0, baseY, SRCCOPY);
+                PatBlt(cmdDC, 0, H - baseY, W, baseY, BLACKNESS);
+                TextOutW(cmdDC, 0, H - baseY, DefString.c_str(), DefString.length());
+                PatBlt(cmdDC, TextSize.cx, H - baseY, 1, baseY, PATCOPY);
+                wstring WidthText = L" <- " + to_wstring(MulDiv(TextSize.cx, 4, baseX));
+                TextOutW(cmdDC, TextSize.cx, H - baseY, WidthText.c_str(), WidthText.length());
+                HDC NULLDC = GetDC(NULL);
+                PatBlt(NULLDC, 0, 0, 1, 1, PATINVERT);
                 GdiFlush();
+                ReleaseDC(NULL, NULLDC);
             }
         }
     }
+    SelectObject(cmdDC, oldfont);
     DeleteObject(hFont);
+    SelectObject(cmdDC, oldbrush);
     DeleteObject(hBrush);
     ReleaseDC(cmd, cmdDC);
     return 0;
