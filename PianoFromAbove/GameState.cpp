@@ -712,7 +712,7 @@ void MainScreen::InitState() {
     if (m_bDumpFrames) {
         //Running ffmpeg
         wchar_t buf[LONG_MAX_PATH] = {};
-        swprintf(buf, sizeof(buf), L"cd /d \"%s\" && md \"%s\\PianoFX_Framedump\" & start cmd /k ffmpeg -r 60 -f rawvideo -s %dx%d -pix_fmt bgra -i async:\\\\.\\pipe\\PFXdump -c:v h264 -qp 19 -pix_fmt yuv420p \"%s\\PianoFX_Framedump\\Output.mp4\"", GetExePath().c_str(), GetExePath().c_str(), m_iScreenWidth, m_iScreenHeight, GetExePath().c_str());
+        swprintf(buf, _countof(buf), L"cd /d \"%s\" && md \"%s\\PianoFX_Framedump\" & start cmd /k ffmpeg -r 60 -f rawvideo -s %dx%d -pix_fmt bgra -i async:\\\\.\\pipe\\PFXdump -c:v h264 -qp 19 -pix_fmt yuv420p \"%s\\PianoFX_Framedump\\Output.mp4\"", GetExePath().c_str(), GetExePath().c_str(), m_iScreenWidth, m_iScreenHeight, GetExePath().c_str());
         m_hVideoPipe = CreateNamedPipe(TEXT("\\\\.\\pipe\\PFXdump"), PIPE_ACCESS_OUTBOUND, PIPE_TYPE_BYTE | PIPE_WAIT, PIPE_UNLIMITED_INSTANCES, static_cast<DWORD>(m_iScreenWidth * m_iScreenHeight * 4 * 120), 0, 0, nullptr);
         _wsystem(buf);
         ConnectNamedPipe(m_hVideoPipe, NULL);
@@ -2602,14 +2602,14 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
     RenderStatusLine(cur_line++, StatisticsText1, L"%s", L"v" VersionString);
     RenderStatusLine(cur_line++, StatisticsText2, L"");
     RenderStatusLine(cur_line++, L"", L"");
-    RenderStatusLine(cur_line++, StatisticsText3, L"%s%lld:%02d.%d / %s%lld:%02d.%d",
+    RenderStatusLine(cur_line++, StatisticsText3, L"%s%lld:%02lld.%lld / %s%lld:%02lld.%lld",
         m_llStartTime < 0 ? L"-" : L"",
         min, sec, cs,
         m_llMaxTime < 0 ? L"-" : L"",
         tmin, tsec, tcs);
-    RenderStatusLine(cur_line++, StatisticsText4, L"%d/%d", m_iStartTick, m_MIDI.GetInfo().iDivision);
+    RenderStatusLine(cur_line++, StatisticsText4, L"%lld/%hu", m_iStartTick, m_MIDI.GetInfo().iDivision);
     if (cVideo.bDebug) {
-        RenderStatusLine(cur_line++, StatisticsText5, L"%d", m_llStartTime);
+        RenderStatusLine(cur_line++, StatisticsText5, L"%lld", m_llStartTime);
     }
     if (!cControls.bDumpFrames) {
         RenderStatusLine(cur_line++, StatisticsText6, L"%.2lf", m_dFPS);
@@ -2619,7 +2619,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         unsigned char iTicksPerFrame = m_MIDI.GetInfo().iDivision & 0xFF;
         iFramesPerSec |= !iFramesPerSec; // Clamp to > 0
         iTicksPerFrame |= !iTicksPerFrame; // Clamp to > 0
-        RenderStatusLine(cur_line++, StatisticsText7, L"%d TPF @%d FPS", iTicksPerFrame, iFramesPerSec);
+        RenderStatusLine(cur_line++, StatisticsText7, L"%hhu TPF @%hhu FPS", iTicksPerFrame, iFramesPerSec);
     }
     else {
         RenderStatusLine(cur_line++, StatisticsText7, L"%.3lf BPM", tempo);
@@ -2635,7 +2635,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         RenderStatusLine(cur_line++, StatisticsText13, L"%s", polyFormatted.c_str());
     }
     if (cVideo.bDebug) {
-        RenderStatusLine(cur_line++, StatisticsText14, L"%d", m_pRenderer->GetRenderedNotesCount());
+        RenderStatusLine(cur_line++, StatisticsText14, L"%zu", m_pRenderer->GetRenderedNotesCount());
         if (m_bMute) {
             RenderStatusLine(cur_line++, StatisticsText15, L"%s", StatisticsText16);
         }
@@ -2664,13 +2664,13 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         }
     }
     if (cVideo.bDebug) {
-        RenderStatusLine(cur_line++, StatisticsText18, L"%f", cPlayback.GetNSpeed());
+        RenderStatusLine(cur_line++, StatisticsText18, L"%lf", cPlayback.GetNSpeed());
         RenderStatusLine(cur_line++, StatisticsText19, L"%f", cView.GetOffsetX() + m_fTempOffsetX);
         RenderStatusLine(cur_line++, StatisticsText20, L"%f", cView.GetOffsetY() + m_fTempOffsetY);
         RenderStatusLine(cur_line++, StatisticsText21, L"%f", cView.GetZoomX() * m_fTempZoomX);
         RenderStatusLine(cur_line++, StatisticsText22, L"%d*%d", m_iScreenWidth, m_iScreenHeight);
-        RenderStatusLine(cur_line++, StatisticsText23, L"%d~%d", m_bFlipKeyboard ? m_iEndNote : m_iStartNote, m_bFlipKeyboard ? m_iStartNote : m_iEndNote);
-        RenderStatusLine(cur_line++, StatisticsText24, L"%d", cControls.iVelocityThreshold);
+        RenderStatusLine(cur_line++, StatisticsText23, L"%hhu~%hhu", m_bFlipKeyboard ? m_iEndNote : m_iStartNote, m_bFlipKeyboard ? m_iStartNote : m_iEndNote);
+        RenderStatusLine(cur_line++, StatisticsText24, L"%hhu", cControls.iVelocityThreshold);
     }
     if (cControls.bPhigros) {
         RenderStatusLine(cur_line++, StatisticsText25, L"%07.0f", (m_iPassed == m_MIDI.GetInfo().iNoteCount ? 1000000 : floor(static_cast<float>(m_iPassed) / static_cast<float>(m_MIDI.GetInfo().iNoteCount) * 1000000)));

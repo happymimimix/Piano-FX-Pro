@@ -146,29 +146,6 @@ char* Util::WstringToString(const wstring& s)
     return m_sBuf;
 }
 
-void Util::ParseLongHex(const string& sText, string& sVal)
-{
-    size_t iLen = (sText.length() + 1) / 2;
-    sVal.clear();
-    sVal.resize(iLen);
-
-    size_t iStart = sText.length() % 2;
-    for (size_t i = iStart; i < iLen; i++)
-    {
-        size_t byte = 0;
-        if (sscanf_s(sText.c_str() + 2 * i - iStart, "%2X", &byte) > 0)
-            sVal[sVal.length() - 1 - i] = byte;
-    }
-
-    if (iStart == 1)
-    {
-        char buf[3] = { '0', sText[0] };
-        size_t byte = 0;
-        if (sscanf_s(buf, "%2X", &byte) > 0)
-            sVal[sVal.length() - 1] = byte;
-    }
-}
-
 color_t Util::RandColor()
 {
     color_t R, G, B;

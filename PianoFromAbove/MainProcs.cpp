@@ -1097,13 +1097,13 @@ INT_PTR CALLBACK LoadingProc(HWND hwnd, UINT msg, WPARAM, LPARAM) {
 
         SetWindowText(GetDlgItem(hwnd, IDC_LOADINGDESC), desc.c_str());
 
-        swprintf(buf, sizeof(buf), L"%llu / %llu", prog, g_LoadingProgress.max);
+        swprintf(buf, _countof(buf), L"%llu / %llu", prog, g_LoadingProgress.max);
         SetWindowText(GetDlgItem(hwnd, IDC_LOADINGNUM), buf);
 
         PROCESS_MEMORY_COUNTERS mem{};
         mem.cb = sizeof(mem);
         GetProcessMemoryInfo(GetCurrentProcess(), &mem, sizeof(mem));
-        swprintf(buf, sizeof(buf), L"%llu MB", mem.PagefileUsage / 1048576);
+        swprintf(buf, _countof(buf), L"%zu MB", mem.PagefileUsage / 1048576);
         SetWindowText(GetDlgItem(hwnd, IDC_MEMUSAGE), buf);
 
         return true;

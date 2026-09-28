@@ -21,7 +21,7 @@
     <RemoteDebuggerCommand>$(SystemDrive)\Piano-FX-Pro_Debug\$(TargetFileName)</RemoteDebuggerCommand>
     <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
     <DeploymentDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</DeploymentDirectory>
-    <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
+    <AdditionalFiles>$(ProjectDir)WOW6432Node\winmm.dll</AdditionalFiles>
     <RemoteDebuggerAmpDefaultAccelerator />
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</RemoteDebuggerWorkingDirectory>
@@ -51,7 +51,7 @@
     <RemoteDebuggerCommand>$(SystemDrive)\Piano-FX-Pro_Debug\$(TargetFileName)</RemoteDebuggerCommand>
     <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
     <DeploymentDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</DeploymentDirectory>
-    <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
+    <AdditionalFiles>$(ProjectDir)WOW6432Node\winmm.dll</AdditionalFiles>
     <RemoteDebuggerAmpDefaultAccelerator />
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</RemoteDebuggerWorkingDirectory>
@@ -81,7 +81,7 @@
     <RemoteDebuggerCommand>$(SystemDrive)\Piano-FX-Pro_Debug\$(TargetFileName)</RemoteDebuggerCommand>
     <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
     <DeploymentDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</DeploymentDirectory>
-    <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
+    <AdditionalFiles>$(ProjectDir)WOW6432Node\winmm.dll</AdditionalFiles>
     <RemoteDebuggerAmpDefaultAccelerator />
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</RemoteDebuggerWorkingDirectory>
@@ -111,7 +111,7 @@
     <RemoteDebuggerCommand>$(SystemDrive)\Piano-FX-Pro_Debug\$(TargetFileName)</RemoteDebuggerCommand>
     <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
     <DeploymentDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</DeploymentDirectory>
-    <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
+    <AdditionalFiles>$(ProjectDir)WOW6432Node\winmm.dll</AdditionalFiles>
     <RemoteDebuggerAmpDefaultAccelerator />
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</RemoteDebuggerWorkingDirectory>
@@ -141,7 +141,7 @@
     <RemoteDebuggerCommand>$(SystemDrive)\Piano-FX-Pro_Debug\$(TargetFileName)</RemoteDebuggerCommand>
     <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
     <DeploymentDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</DeploymentDirectory>
-    <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
+    <AdditionalFiles>$(ProjectDir)WOW6432Node\winmm.dll</AdditionalFiles>
     <RemoteDebuggerAmpDefaultAccelerator />
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</RemoteDebuggerWorkingDirectory>
@@ -171,7 +171,7 @@
     <RemoteDebuggerCommand>$(SystemDrive)\Piano-FX-Pro_Debug\$(TargetFileName)</RemoteDebuggerCommand>
     <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
     <DeploymentDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</DeploymentDirectory>
-    <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
+    <AdditionalFiles>$(ProjectDir)WOW6432Node\winmm.dll</AdditionalFiles>
     <RemoteDebuggerAmpDefaultAccelerator />
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</RemoteDebuggerWorkingDirectory>
@@ -201,7 +201,7 @@
     <RemoteDebuggerCommand>$(SystemDrive)\Piano-FX-Pro_Debug\$(TargetFileName)</RemoteDebuggerCommand>
     <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
     <DeploymentDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</DeploymentDirectory>
-    <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
+    <AdditionalFiles>$(ProjectDir)WOW6432Node\winmm.dll</AdditionalFiles>
     <RemoteDebuggerAmpDefaultAccelerator />
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</RemoteDebuggerWorkingDirectory>
@@ -231,7 +231,7 @@
     <RemoteDebuggerCommand>$(SystemDrive)\Piano-FX-Pro_Debug\$(TargetFileName)</RemoteDebuggerCommand>
     <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
     <DeploymentDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</DeploymentDirectory>
-    <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
+    <AdditionalFiles>$(ProjectDir)WOW6432Node\winmm.dll</AdditionalFiles>
     <RemoteDebuggerAmpDefaultAccelerator />
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</RemoteDebuggerWorkingDirectory>
@@ -261,7 +261,7 @@
     <RemoteDebuggerCommand>$(SystemDrive)\Piano-FX-Pro_Debug\$(TargetFileName)</RemoteDebuggerCommand>
     <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
     <DeploymentDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</DeploymentDirectory>
-    <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
+    <AdditionalFiles>$(ProjectDir)WOW6432Node\winmm.dll</AdditionalFiles>
     <RemoteDebuggerAmpDefaultAccelerator />
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</RemoteDebuggerWorkingDirectory>
@@ -291,7 +291,7 @@
     <RemoteDebuggerCommand>$(SystemDrive)\Piano-FX-Pro_Debug\$(TargetFileName)</RemoteDebuggerCommand>
     <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
     <DeploymentDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</DeploymentDirectory>
-    <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
+    <AdditionalFiles>$(ProjectDir)WOW6432Node\winmm.dll</AdditionalFiles>
     <RemoteDebuggerAmpDefaultAccelerator />
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</RemoteDebuggerWorkingDirectory>
@@ -321,7 +321,7 @@
     <RemoteDebuggerCommand>$(SystemDrive)\Piano-FX-Pro_Debug\$(TargetFileName)</RemoteDebuggerCommand>
     <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
     <DeploymentDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</DeploymentDirectory>
-    <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
+    <AdditionalFiles>$(ProjectDir)WOW6432Node\winmm.dll</AdditionalFiles>
     <RemoteDebuggerAmpDefaultAccelerator />
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</RemoteDebuggerWorkingDirectory>
@@ -352,7 +352,7 @@
     <RemoteDebuggerCommand>$(SystemDrive)\Piano-FX-Pro_Debug\$(TargetFileName)</RemoteDebuggerCommand>
     <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
     <DeploymentDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</DeploymentDirectory>
-    <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
+    <AdditionalFiles>$(ProjectDir)WOW6432Node\winmm.dll</AdditionalFiles>
     <RemoteDebuggerAmpDefaultAccelerator />
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</RemoteDebuggerWorkingDirectory>
@@ -383,7 +383,7 @@
     <RemoteDebuggerCommand>$(SystemDrive)\Piano-FX-Pro_Debug\$(TargetFileName)</RemoteDebuggerCommand>
     <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
     <DeploymentDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</DeploymentDirectory>
-    <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
+    <AdditionalFiles>$(ProjectDir)WOW6432Node\winmm.dll</AdditionalFiles>
     <RemoteDebuggerAmpDefaultAccelerator />
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</RemoteDebuggerWorkingDirectory>
@@ -413,7 +413,7 @@
     <RemoteDebuggerCommand>$(SystemDrive)\Piano-FX-Pro_Debug\$(TargetFileName)</RemoteDebuggerCommand>
     <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
     <DeploymentDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</DeploymentDirectory>
-    <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
+    <AdditionalFiles>$(ProjectDir)WOW6432Node\winmm.dll</AdditionalFiles>
     <RemoteDebuggerAmpDefaultAccelerator />
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</RemoteDebuggerWorkingDirectory>
@@ -443,7 +443,7 @@
     <RemoteDebuggerCommand>$(SystemDrive)\Piano-FX-Pro_Debug\$(TargetFileName)</RemoteDebuggerCommand>
     <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
     <DeploymentDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</DeploymentDirectory>
-    <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
+    <AdditionalFiles>$(ProjectDir)WOW6432Node\winmm.dll</AdditionalFiles>
     <RemoteDebuggerAmpDefaultAccelerator />
     <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
     <RemoteDebuggerWorkingDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</RemoteDebuggerWorkingDirectory>

@@ -31,6 +31,7 @@ typedef int64_t fileln_t; // File length type (always 64bit signed)
 #ifndef BIG_INDEX
 typedef uint32_t idx_t; // Array indexing type
 #else
+static_assert(sizeof(void*) == 8, "CRITICAL ERROR: BIG INDEX IS NOT SUPPORTED IN 32BIT!");
 typedef uint64_t idx_t; // Array indexing type
 #endif
 typedef uint32_t sidx_t; // Small array indexing type
@@ -157,7 +158,6 @@ class Util
 public:
     static wchar_t* StringToWstring(const string& s);
     static char* WstringToString(const wstring& s);
-    static void ParseLongHex(const string& sText, string& sVal);
     static color_t RandColor();
     static void RGBtoHSV(color_t R, color_t G, color_t B, color_t& H, color_t& S, color_t& V);
     static void HSVtoRGB(color_t H, color_t S, color_t V, color_t& R, color_t& G, color_t& B);

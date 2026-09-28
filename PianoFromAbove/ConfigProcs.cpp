@@ -406,7 +406,7 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         CheckDlgButton(hWnd, IDC_SHOWCONTROLS, cControls.bAlwaysShowControls);
         CheckDlgButton(hWnd, IDC_PHIGROS, cControls.bPhigros);
         SetDlgItemTextW(hWnd, IDC_SPLASHMIDI, cControls.sSplashMIDI.c_str());
-        _stprintf_s(buf, TEXT("%d"), cControls.iVelocityThreshold);
+        _stprintf_s(buf, TEXT("%hhu"), cControls.iVelocityThreshold);
         SetWindowText(hWndVelStrshld, buf);
         CheckDlgButton(hWnd, IDC_FFMPEG, cControls.bDumpFrames);
 
@@ -584,10 +584,14 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         // Fill out the static text vals
         SetWindowText(GetDlgItem(hWnd, IDC_FILE), mInfo.sFilename.c_str() + mInfo.sFilename.find_last_of(L'\\') + 1);
         SetWindowText(GetDlgItem(hWnd, IDC_FOLDER), mInfo.sFilename.substr(0, mInfo.sFilename.find_last_of(L'\\')).c_str());
-        _stprintf_s(buf, TEXT("%llu"), mInfo.iNoteCount);
+        wstring Formatted = to_wstring(mInfo.iNoteCount);
+        for (signed short i = Formatted.length() - DigitSeparate; i > 0; i -= DigitSeparate) Formatted.insert(i, L",");
+        _stprintf_s(buf, TEXT("%s"), Formatted.c_str());
         SetWindowText(GetDlgItem(hWnd, IDC_NOTES), buf);
-        _stprintf_s(buf, TEXT("%lld:%02.0lf"), mInfo.llTotalMicroSecs / 60000000,
-            (mInfo.llTotalMicroSecs % 60000000) / 1000000.0);
+        mms_t tmin = abs(mInfo.llTotalMicroSecs) / 60000000;
+        mms_t tsec = (abs(mInfo.llTotalMicroSecs) % 60000000) / 1000000;
+        mms_t tcs = (abs(mInfo.llTotalMicroSecs) % 1000000) / 100000;
+        _stprintf_s(buf, TEXT("%lld:%02lld.%lld"), tmin, tsec, tcs);
         SetWindowText(GetDlgItem(hWnd, IDC_LENGTH), buf);
 
         // Initialize the state vars
@@ -640,7 +644,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         lvi.mask = LVIF_TEXT;
         lvi.pszText = buf;
 
-        idx_t iPos = 0;
+        TnC_t iPos = 0;
         for (track_t i = 0; i < min(mInfo.iNumTracks, MaxTrackColors); i++) {
             const MIDITrack::MIDITrackInfo& mTrackInfo = vTracks[i]->GetInfo();
             for (chan_t j = 0; j < MaxChannelColors; j++) {
@@ -650,7 +654,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 if (mTrackInfo.aNoteCount[j] > 0) {
 #endif
                     lvi.iSubItem = 0;
-                    _stprintf_s(buf, TEXT("%d"), iPos + 1);
+                    _stprintf_s(buf, TEXT("%u"), iPos + 1);
                     lvi.iItem = (win32_t)SendMessage(hWndTracks, LVM_INSERTITEM, 0, (LPARAM)&lvi);
 
                     lvi.iSubItem++;
@@ -683,7 +687,9 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                     SendMessage(hWndTracks, LVM_SETITEM, 0, (LPARAM)&lvi);
 
                     lvi.iSubItem++;
-                    _stprintf_s(buf, TEXT("%llu"), mTrackInfo.aNoteCount[j]);
+                    wstring Formatted = to_wstring(mTrackInfo.aNoteCount[j]);
+                    for (signed short i = Formatted.length() - DigitSeparate; i > 0; i -= DigitSeparate) Formatted.insert(i, L",");
+                    _stprintf_s(buf, TEXT("%s"), Formatted.c_str());
                     SendMessage(hWndTracks, LVM_SETITEM, 0, (LPARAM)&lvi);
 
                     lvi.iItem++;
