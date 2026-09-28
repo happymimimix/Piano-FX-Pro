@@ -394,7 +394,11 @@ MIDI::~MIDI(void)
     clear();
 }
 
+#if __SIZEOF_POINTER__ == 4
+#define EVENT_POOL_MAX (1<<17)
+#else
 #define EVENT_POOL_MAX (1<<19)
+#endif
 MIDIChannelEvent* MIDI::AllocChannelEvent() {
     if (event_pools.size() == 0 || event_pools.back().count >= EVENT_POOL_MAX) {
         // Currently, MIDIChannelEvent is 32 bytes large.
