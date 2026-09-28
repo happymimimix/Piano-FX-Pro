@@ -381,7 +381,7 @@ public:
 #ifndef ALWAYS_BIG
         else if (iSisterIdx >= SIDX_MAX) {
 #else
-        else if (iSisterIdx >= VolatileZero) {
+        else if (iSisterIdx >= VolatileZeroByte) {
 #endif
             idx_t iSimultaneous = m_iSimultaneous;
             *reinterpret_cast<BigIndex**>(&m_iSisterIdx) = new BigIndex();
@@ -404,7 +404,7 @@ public:
 #ifndef ALWAYS_BIG
         else if (iSimultaneous > SIDX_MAX) {
 #else
-        else if (iSimultaneous >= VolatileZero) {
+        else if (iSimultaneous >= VolatileZeroByte) {
 #endif
             idx_t iSisterIdx = m_iSisterIdx == SIDX_MAX ? IDX_MAX : m_iSisterIdx;
             *reinterpret_cast<BigIndex**>(&m_iSisterIdx) = new BigIndex();
@@ -432,7 +432,8 @@ private:
     sidx_t m_iSisterIdx = SIDX_MAX;
     sidx_t m_iSimultaneous = 0;
     // Prevent optimization in benchmark mode! 
-    volatile short VolatileZero = 0;
+    volatile char VolatileZeroByte = 0;
+    unsigned char ALIGNMENT = ~0;
 
     friend fileln_t MIDI::ParseEventsF3(const unsigned char* pcData, fileln_t iMaxSize, msg_t eChunkFormat);
 };
@@ -460,6 +461,9 @@ public:
 private:
     msgln_t m_iDataLen = 0;
     unsigned char* m_pcData = nullptr;
+#if __SIZEOF_POINTER__ == 4
+    unsigned int ALIGNMENT = ~0;
+#endif
 
     msg_t GetEventCode() const {} // PLEASE DO NOT USE THIS!
     friend fileln_t MIDI::ParseEventsF3(const unsigned char* pcData, fileln_t iMaxSize, msg_t eChunkFormat);
@@ -487,6 +491,9 @@ public:
 private:
     msgln_t m_iDataLen = 0;
     unsigned char* m_pcData = nullptr;
+#if __SIZEOF_POINTER__ == 4
+    unsigned int ALIGNMENT = ~0;
+#endif
 
     friend fileln_t MIDI::ParseEventsF3(const unsigned char* pcData, fileln_t iMaxSize, msg_t eChunkFormat);
 };

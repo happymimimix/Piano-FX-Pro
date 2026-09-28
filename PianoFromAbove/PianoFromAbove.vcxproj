@@ -134,7 +134,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -142,7 +142,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'" Label="Configuration">
@@ -150,7 +150,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Arinoglish|Win32'" Label="Configuration">
@@ -158,7 +158,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'" Label="Configuration">
@@ -166,7 +166,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|Win32'" Label="Configuration">
@@ -174,7 +174,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Korean|x64'" Label="Configuration">
@@ -182,7 +182,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Korean|Win32'" Label="Configuration">
@@ -190,7 +190,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'" Label="Configuration">
@@ -198,7 +198,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DPRK|Win32'" Label="Configuration">
@@ -206,7 +206,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Russian|x64'" Label="Configuration">
@@ -214,7 +214,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Russian|Win32'" Label="Configuration">
@@ -222,7 +222,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'" Label="Configuration">
@@ -230,7 +230,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Chinese|Win32'" Label="Configuration">
@@ -238,7 +238,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'" Label="Configuration">
@@ -246,7 +246,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Japanese|Win32'" Label="Configuration">
@@ -254,7 +254,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'" Label="Configuration">
@@ -262,7 +262,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Hiragana|Win32'" Label="Configuration">
@@ -270,7 +270,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'" Label="Configuration">
@@ -278,7 +278,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|Win32'" Label="Configuration">
@@ -286,7 +286,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'" Label="Configuration">
@@ -294,7 +294,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='LimitedColor|Win32'" Label="Configuration">
@@ -302,7 +302,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BIG|x64'" Label="Configuration">
@@ -310,7 +310,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BIG|Win32'" Label="Configuration">
@@ -318,7 +318,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'" Label="Configuration">
@@ -326,7 +326,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|Win32'" Label="Configuration">
@@ -334,7 +334,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -342,7 +342,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -350,7 +350,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'" Label="Configuration">
@@ -359,7 +359,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>true</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NoOptimization|Win32'" Label="Configuration">
@@ -368,7 +368,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>true</EnableASAN>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -3680,8 +3680,6 @@ rename .\Widths.hh Widths.h</Command>
     <ClInclude Include="ffmpeg2.h" />
     <ClInclude Include="ffmpeg3.h" />
     <ClInclude Include="ffmpeg4.h" />
-    <ClInclude Include="ffmpeg5.h" />
-    <ClInclude Include="ffmpeg6.h" />
     <ClInclude Include="flpTools.h" />
     <ClInclude Include="Fonts.h" />
     <ClInclude Include="GameState.h" />

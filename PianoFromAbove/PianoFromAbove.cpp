@@ -16,8 +16,6 @@
 #include <ffmpeg2.h>
 #include <ffmpeg3.h>
 #include <ffmpeg4.h>
-#include <ffmpeg5.h>
-#include <ffmpeg6.h>
 #endif
 #include <resource.h>
 #include <PackWrapper.hpp>
@@ -1746,10 +1744,6 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
     offset += sizeof(ffmpeg3);
     memcpy(pData + offset, ffmpeg4, sizeof(ffmpeg4));
     offset += sizeof(ffmpeg4);
-    memcpy(pData + offset, ffmpeg5, sizeof(ffmpeg5));
-    offset += sizeof(ffmpeg5);
-    memcpy(pData + offset, ffmpeg6, sizeof(ffmpeg6));
-    offset += sizeof(ffmpeg6);
     if (offset == ffmpeg_len) {
         constexpr uint8_t lzma_magic[] = { 0xFD, 0x37, 0x7A, 0x58, 0x5A, 0x00 };
         while (ffmpeg_len >= LZMA_STREAM_HEADER_SIZE * 2 && !memcmp(pData, lzma_magic, sizeof(lzma_magic))) {

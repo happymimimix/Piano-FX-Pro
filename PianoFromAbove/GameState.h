@@ -426,11 +426,22 @@ private:
     dynamic_bitset* m_pState;
     dynamic_bitset* m_pStateReversed;
     NoteColor m_pKeyColors[128]; // Per-key blended color for keyboard rendering.
+#if __SIZEOF_POINTER__ == 4
+    size_t m_bKeyPressed[4]; // Is key pressed?
+    __forceinline bool IsPressed(key_t Key) { return m_bKeyPressed[Key >> 5] & (1u << (Key & 0x1F)); }
+    __forceinline void PushKey(key_t Key) { m_bKeyPressed[Key >> 5] |= (1u << (Key & 0x1F)); }
+#else
     __uint128_t m_bKeyPressed; // Is key pressed?
     __forceinline bool IsPressed(key_t Key) { return m_bKeyPressed & (static_cast<__uint128_t>(1) << Key); }
     __forceinline void PushKey(key_t Key) { m_bKeyPressed |= (static_cast<__uint128_t>(1) << Key); }
+#endif
+
     __forceinline void InitKeyColor() {
+#if __SIZEOF_POINTER__ == 4
+        m_bKeyPressed[0] = m_bKeyPressed[1] = m_bKeyPressed[2] = m_bKeyPressed[3] = 0;
+#else
         m_bKeyPressed = 0;
+#endif
         for (key_t i = 0; i < 12; i++) {
             const ChannelSettings& cs = MIDI::IsSharp(i) ? m_csKBSharp : m_csKBWhite;
             m_pKeyColors[i] = { cs.iPrimaryRGB, cs.iDarkRGB, cs.iVeryDarkRGB };
