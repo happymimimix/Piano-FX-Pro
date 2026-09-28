@@ -356,7 +356,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
     <PreferredToolArchitecture>x86</PreferredToolArchitecture>
@@ -365,7 +365,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NoOptimization|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>ClangCL</PlatformToolset>
     <PreferredToolArchitecture>x86</PreferredToolArchitecture>
@@ -680,6 +680,7 @@
     <TargetName>Piano-FX-Pro-Debug</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
+    <EnableManagedIncrementalBuild>true</EnableManagedIncrementalBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>Piano-FX-Pro-Debug-i386</TargetName>
@@ -688,6 +689,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)\Release\</OutDir>
     <IntDir>Release\</IntDir>
+    <EnableManagedIncrementalBuild>true</EnableManagedIncrementalBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -696,6 +698,7 @@
     <TargetName>Piano-FX-Pro-Debug</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
+    <EnableManagedIncrementalBuild>true</EnableManagedIncrementalBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NoOptimization|Win32'">
     <TargetName>Piano-FX-Pro-Debug-i386</TargetName>
@@ -704,6 +707,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)\Release\</OutDir>
     <IntDir>Release\</IntDir>
+    <EnableManagedIncrementalBuild>true</EnableManagedIncrementalBuild>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnabled>false</VcpkgEnabled>
@@ -757,6 +761,9 @@
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -857,6 +864,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -957,6 +967,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1057,6 +1070,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1157,6 +1173,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1257,6 +1276,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1357,6 +1379,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1457,6 +1482,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1557,6 +1585,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1657,6 +1688,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1757,6 +1791,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1857,6 +1894,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1957,6 +1997,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -2057,6 +2100,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -2157,6 +2203,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -2257,6 +2306,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -2357,6 +2409,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -2457,6 +2512,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -2557,6 +2615,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -2657,6 +2718,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -2757,6 +2821,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -2857,6 +2924,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -2957,6 +3027,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -3057,6 +3130,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -3157,6 +3233,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -3257,6 +3336,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -3357,6 +3439,9 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -3427,6 +3512,9 @@ rename .\Widths.hh Widths.h</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -3498,6 +3586,9 @@ rename .\Widths.hh Widths.h</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -3569,6 +3660,9 @@ rename .\Widths.hh Widths.h</Command>
       <AllowIsolation>true</AllowIsolation>
       <AdditionalOptions>/MAP</AdditionalOptions>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"

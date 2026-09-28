@@ -49,6 +49,13 @@ wstring GetProcessName() {
     return (pos != string::npos) ? fullPath.substr(pos + 1) : fullPath;
 }
 
+string ProgramPath() {
+    char szFilePath[MAX_PATH + 1] = {};
+    GetModuleFileNameA(NULL, szFilePath, MAX_PATH);
+    (strrchr(szFilePath, '\\'))[0] = 0;
+    return szFilePath;
+}
+
 string MultiInstanceGuardInit() {
     string Code = "";
     Code += "if _G.Working then\n";

@@ -2,7 +2,7 @@
 #include <PFXSTUDIO_Global_Imports.h>
 #include <TouchEventListener.h>
 
-//Tab switcher forward declearations
+//Tab switcher forward declarations
 struct TabSwitcher {
     static TouchEventListener* Tab1;
     static TouchEventListener* Tab2;

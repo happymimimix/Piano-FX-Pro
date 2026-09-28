@@ -1,2 +1,2 @@
-﻿//Forward declearation for StudioMain()
+﻿//Forward declaration for StudioMain()
 void StudioMain();
