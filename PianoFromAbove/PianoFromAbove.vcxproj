@@ -735,7 +735,6 @@
       <PrecompiledHeaderOutputFile />
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
@@ -764,6 +763,8 @@
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -838,7 +839,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <PrecompiledHeaderOutputFile />
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
@@ -867,6 +867,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -941,7 +943,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <PrecompiledHeaderOutputFile />
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
@@ -970,6 +971,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1044,7 +1047,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <PrecompiledHeaderOutputFile />
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
@@ -1073,6 +1075,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1147,7 +1151,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <PrecompiledHeaderOutputFile />
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
@@ -1176,6 +1179,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1250,7 +1255,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <PrecompiledHeaderOutputFile />
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
@@ -1279,6 +1283,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1353,7 +1359,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <PrecompiledHeaderOutputFile />
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
@@ -1382,6 +1387,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1456,7 +1463,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <PrecompiledHeaderOutputFile />
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
@@ -1485,6 +1491,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1559,7 +1567,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <PrecompiledHeaderOutputFile />
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
@@ -1588,6 +1595,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1662,7 +1671,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <PrecompiledHeaderOutputFile />
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
@@ -1691,6 +1699,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1765,7 +1775,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <PrecompiledHeaderOutputFile />
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
@@ -1794,6 +1803,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1868,7 +1879,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <PrecompiledHeaderOutputFile />
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
@@ -1897,6 +1907,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -1971,7 +1983,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <PrecompiledHeaderOutputFile />
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
@@ -2000,6 +2011,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -2074,7 +2087,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <PrecompiledHeaderOutputFile />
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
@@ -2103,6 +2115,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -2177,7 +2191,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <PrecompiledHeaderOutputFile />
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
@@ -2206,6 +2219,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -2280,7 +2295,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <PrecompiledHeaderOutputFile />
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
@@ -2309,6 +2323,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -2383,7 +2399,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <PrecompiledHeaderOutputFile />
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
@@ -2412,6 +2427,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -2486,7 +2503,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <PrecompiledHeaderOutputFile />
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
@@ -2515,6 +2531,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -2589,7 +2607,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <PrecompiledHeaderOutputFile />
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
@@ -2618,6 +2635,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -2692,7 +2711,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <PrecompiledHeaderOutputFile />
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
@@ -2721,6 +2739,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -2795,7 +2815,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <PrecompiledHeaderOutputFile />
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
@@ -2824,6 +2843,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -2898,7 +2919,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <PrecompiledHeaderOutputFile />
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
@@ -2927,6 +2947,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -3001,7 +3023,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <PrecompiledHeaderOutputFile />
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
@@ -3030,6 +3051,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -3104,7 +3127,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <PrecompiledHeaderOutputFile />
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
@@ -3133,6 +3155,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -3207,7 +3231,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <PrecompiledHeaderOutputFile />
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
@@ -3236,6 +3259,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -3310,7 +3335,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <PrecompiledHeaderOutputFile />
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
@@ -3339,6 +3363,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -3413,7 +3439,6 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <PrecompiledHeaderOutputFile />
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
@@ -3442,6 +3467,8 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -3486,7 +3513,6 @@ rename .\Widths.hh Widths.h</Command>
       <PrecompiledHeaderOutputFile />
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
@@ -3515,6 +3541,8 @@ rename .\Widths.hh Widths.h</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -3559,7 +3587,6 @@ rename .\Widths.hh Widths.h</Command>
       <PrecompiledHeaderOutputFile />
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>false</OmitFramePointers>
@@ -3589,6 +3616,8 @@ rename .\Widths.hh Widths.h</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
@@ -3633,7 +3662,6 @@ rename .\Widths.hh Widths.h</Command>
       <PrecompiledHeaderOutputFile />
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
       <ShowIncludes>true</ShowIncludes>
       <ExceptionHandling>Async</ExceptionHandling>
       <OmitFramePointers>false</OmitFramePointers>
@@ -3663,6 +3691,8 @@ rename .\Widths.hh Widths.h</Command>
       <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <LargeAddressAware>true</LargeAddressAware>
       <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PreBuildEvent>
       <Command>cd /d "$(ProjectDir)"
