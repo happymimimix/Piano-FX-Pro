@@ -56,12 +56,12 @@ Built-in frame dump pipeline via named pipes to FFmpeg. Renders frames at full q
 
 ## Building
 
-Piano-FX Pro uses the **Clang-CL** toolset (LLVM) and targets **x64 only**.
+Piano-FX Pro uses the **Clang-CL** toolset (LLVM) and targets **amd64 and i386**.
 
 ### Prerequisites
 
-- Visual Studio 2022 with the **C++ Clang-CL** toolset installed
-- Windows SDK
+- Visual Studio 2019 with the **C++ Clang-CL** toolset installed
+- Windows 10.0.19041 SDK
 
 ### Standard Build
 
