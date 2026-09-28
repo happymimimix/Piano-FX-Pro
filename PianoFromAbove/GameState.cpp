@@ -553,7 +553,7 @@ void SplashScreen::RenderNote(MIDIChannelEvent* pNote, bool Highlight) {
     }
     m_pRenderer->DrawRect(x, y - cy, cx, cy, csTrack.iVeryDarkRGB & 0x00FFFFFF | iAlpha3, csTrack.iVeryDarkRGB & 0x00FFFFFF | iAlpha3, csTrack.iVeryDarkRGB & 0x00FFFFFF | iAlpha4, csTrack.iVeryDarkRGB & 0x00FFFFFF | iAlpha4);
     m_pRenderer->DrawRect(x + fDeflate, y - cy + fDeflate, cx - fDeflate * 2.0f, cy - fDeflate * 2.0f, csTrack.iPrimaryRGB & 0x00FFFFFF | iAlpha1, csTrack.iDarkRGB & 0x00FFFFFF | iAlpha1, csTrack.iDarkRGB & 0x00FFFFFF | iAlpha2, csTrack.iPrimaryRGB & 0x00FFFFFF | iAlpha2);
-    if (Highlight) m_pRenderer->DrawRect(x, y - cy, cx, cy, 0x3FFFFFFF);
+    if (Highlight) m_pRenderer->DrawRect(x, y - cy, cx, cy, 0xFF000000, 0xFF000000, (((1<<7)+(1<<6))<<24) | 0x00FFFFFF,(((1<<7)+(1<<6))<<24) | 0x00FFFFFF);
 }
 
 void SplashScreen::GenNoteXTable() {
