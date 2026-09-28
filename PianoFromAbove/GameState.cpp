@@ -539,21 +539,17 @@ void SplashScreen::RenderNote(MIDIChannelEvent* pNote, bool Highlight) {
     color_t iAlpha2 = (clamp(static_cast<mms_t>(0xFF * (y / m_fNotesCY)), mms_t(0x00), mms_t(0xFF)) ^ 0xFF) << 24;
     color_t iAlpha3 = (clamp(static_cast<mms_t>(0x7F * ((y - cy) / m_fNotesCY)), mms_t(0x00), mms_t(0xFF)) ^ 0xFF) << 24;
     color_t iAlpha4 = (clamp(static_cast<mms_t>(0x7F * (y / m_fNotesCY)), mms_t(0x00), mms_t(0xFF)) ^ 0xFF) << 24;
-    float fMinY = m_fNotesY - 5.0f;
-    float fMaxY = m_fNotesY + m_fNotesCY + 5.0f;
-    if (y > fMaxY)
-    {
-        cy -= (y - fMaxY);
-        y = fMaxY;
-    }
-    if (y - cy < fMinY)
-    {
-        cy -= (fMinY - (y - cy));
-        y = fMinY + cy;
-    }
+    float fMinY = m_fNotesY - fDeflate;
+    float fMaxY = m_fNotesY + m_fNotesCY + fDeflate;
+    if (y > fMaxY) { cy -= (y - fMaxY); y = fMaxY; }
+    if (y - cy < fMinY) { cy -= (fMinY - (y - cy)); y = fMinY + cy; }
     m_pRenderer->DrawRect(x, y - cy, cx, cy, csTrack.iVeryDarkRGB & 0x00FFFFFF | iAlpha3, csTrack.iVeryDarkRGB & 0x00FFFFFF | iAlpha3, csTrack.iVeryDarkRGB & 0x00FFFFFF | iAlpha4, csTrack.iVeryDarkRGB & 0x00FFFFFF | iAlpha4);
     m_pRenderer->DrawRect(x + fDeflate, y - cy + fDeflate, cx - fDeflate * 2.0f, cy - fDeflate * 2.0f, csTrack.iPrimaryRGB & 0x00FFFFFF | iAlpha1, csTrack.iDarkRGB & 0x00FFFFFF | iAlpha1, csTrack.iDarkRGB & 0x00FFFFFF | iAlpha2, csTrack.iPrimaryRGB & 0x00FFFFFF | iAlpha2);
-    if (Highlight) m_pRenderer->DrawRect(x, y - cy, cx, cy, 0xFF000000, 0xFF000000, (((1<<7)+(1<<6))<<24) | 0x00FFFFFF,(((1<<7)+(1<<6))<<24) | 0x00FFFFFF);
+    fMinY += fDeflate;
+    fMaxY -= fDeflate;
+    if (y > fMaxY) { cy -= (y - fMaxY); y = fMaxY; }
+    if (y - cy < fMinY) { cy -= (fMinY - (y - cy)); y = fMinY + cy; }
+    if (Highlight) m_pRenderer->DrawRect(x, y - cy, cx, cy, 0xFF000000, 0xFF000000, 0x7FFFFFFF, 0x7FFFFFFF);
 }
 
 void SplashScreen::GenNoteXTable() {
@@ -1095,14 +1091,14 @@ GameState::GameError MainScreen::Logic() {
         m_iStartTick = GetCurrentTick(m_llStartTime);
     }
     
-    if (abs(llOldStartTime - m_llPrevTime) && JumpTarget == ~0) { // Handle time jump from cheat engine
+    if (llOldStartTime != m_llPrevTime && JumpTarget == ~0) { // Handle time jump from cheat engine
         JumpTarget = m_llStartTime;
         JumpTo(m_llStartTime, true);
         JumpTarget = ~0;
     }
     m_llPrevTime = m_llStartTime;
     
-    if (abs(iOldStartTick - m_iPrevTick) && JumpTarget == ~0) { // Handle tick jump from cheat engine
+    if (iOldStartTick != m_iPrevTick && JumpTarget == ~0) { // Handle tick jump from cheat engine
         // We need to find the tempo region that this jump lands in first, here we use upper_bound.
         m_itNextTempo = upper_bound(m_vTempo.begin(), m_vTempo.end(), iOldStartTick, [&](mtk_t target, const pair<mms_t, idx_t>& entry) {return target < m_vMetaEvents[entry.second]->GetAbsTick();});
         MIDIMetaEvent* pPrevious = GetPrevious(m_itNextTempo, m_vTempo, 3);
