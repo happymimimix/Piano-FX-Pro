@@ -45,7 +45,7 @@ int main() {
     HGDIOBJ oldfont = SelectObject(cmdDC, hFont);
     SetBkMode(cmdDC, 1);
     SetTextColor(cmdDC, 0x0000FF);
-    HBRUSH hBrush = CreateSolidBrush(0x0000FF);
+    HBRUSH hBrush = CreateSolidBrush(0x00FFFF);
     HGDIOBJ oldbrush = SelectObject(cmdDC, hBrush);
     TEXTMETRIC cmdTM;
     GetTextMetricsW(cmdDC, &cmdTM);
