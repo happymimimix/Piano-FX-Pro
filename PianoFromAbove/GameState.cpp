@@ -535,7 +535,7 @@ void SplashScreen::RenderNote(MIDIChannelEvent* pNote, bool Highlight) {
     float cy = max(round(m_fNotesCY * static_cast<float>(llNoteEnd - llNoteStart) / TimeSpan), 0.0f) + 1.0f;
     float fDeflate = clamp(round(m_fWhiteCX * 0.15f / 2.0f), 1.0f, 3.0f);
     // Visualize!
-    color_t iAlpha1 = (clamp(static_cast<mms_t>(0xFF * ((y - cy) / m_fNotesCY)),mms_t(0x00), mms_t(0xFF)) ^ 0xFF) << 24;
+    color_t iAlpha1 = (clamp(static_cast<mms_t>(0xFF * ((y - cy) / m_fNotesCY)), mms_t(0x00), mms_t(0xFF)) ^ 0xFF) << 24;
     color_t iAlpha2 = (clamp(static_cast<mms_t>(0xFF * (y / m_fNotesCY)), mms_t(0x00), mms_t(0xFF)) ^ 0xFF) << 24;
     color_t iAlpha3 = (clamp(static_cast<mms_t>(0x7F * ((y - cy) / m_fNotesCY)), mms_t(0x00), mms_t(0xFF)) ^ 0xFF) << 24;
     color_t iAlpha4 = (clamp(static_cast<mms_t>(0x7F * (y / m_fNotesCY)), mms_t(0x00), mms_t(0xFF)) ^ 0xFF) << 24;
@@ -1100,7 +1100,7 @@ GameState::GameError MainScreen::Logic() {
     
     if (iOldStartTick != m_iPrevTick && JumpTarget == ~0) { // Handle tick jump from cheat engine
         // We need to find the tempo region that this jump lands in first, here we use upper_bound.
-        m_itNextTempo = upper_bound(m_vTempo.begin(), m_vTempo.end(), iOldStartTick, [&](mtk_t target, const pair<mms_t, idx_t>& entry) {return target < m_vMetaEvents[entry.second]->GetAbsTick();});
+        m_itNextTempo = upper_bound(m_vTempo.begin(), m_vTempo.end(), iOldStartTick, [&](mtk_t target, const pair<mms_t, idx_t>& entry) {return target < m_vMetaEvents[entry.second]->GetAbsTick(); });
         MIDIMetaEvent* pPrevious = GetPrevious(m_itNextTempo, m_vTempo, 3);
         if (pPrevious)
         {
@@ -2594,7 +2594,9 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
     for (signed short i = npsFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
         npsFormatted.insert(i, L",");
 
-    m_iPassed = m_vNCTable[min(max(m_llStartTime / MS, 0LL), iMaxMS)];
+    // Passed note count = current position in event stream minus all encountered non-note events plus all currently held notes divide by two.
+    // We must plus all currently held notes before dividing by two because the "off" part is not included between the start of the event stream and the current position in event stream!
+    m_iPassed = (m_iStartPos + (IsLastFrameReversed ? 1 : 0) - (m_itReplayPosition - m_vReplayTable.begin()) + m_iPolyphony) / 2;
     wstring passedFormatted = to_wstring(m_iPassed);
     for (signed short i = passedFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
         passedFormatted.insert(i, L",");

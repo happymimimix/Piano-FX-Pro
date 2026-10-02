@@ -25,9 +25,8 @@ int main() {
     wcerr << L"Calculating text widths..." << endl;
     HWND cmd = GetConsoleWindow();
     HDC cmdDC = GetDC(cmd);
-    wcerr << L"System DPI: "<< GetDeviceCaps(cmdDC, LOGPIXELSY) << endl;
     HFONT hFont = CreateFontW(
-        -MulDiv(FontSize, GetDeviceCaps(cmdDC, LOGPIXELSY), 72), //FontHeight
+        -MulDiv(FontSize, 96, 72), //FontHeight
         0, //FontWidth
         0, //Escapement
         0, //Orientation

@@ -91,7 +91,6 @@ private:
 };
 
 typedef vector<pair<mms_t, idx_t>> eventvec_t;
-typedef vector<idx_t> notevec_t;
 
 //Holds MIDI data
 class MIDI
@@ -213,14 +212,14 @@ private:
     };
 
     struct SWAP {
-        vector<MIDIChannelEvent*> m_vEvents; // The channel events of the song
-        vector<MIDIMetaEvent*> m_vMetaEvents; // The meta events of the song
-        vector<MIDISysExEvent*> m_vSysExEvents; // The SysEx events of the song
-        eventvec_t m_vTempo; // Tracked for drawing measure lines
-        eventvec_t m_vSignature; // Measure lines again
-        eventvec_t m_vMarkers; // Tracked for section names in some longer MIDIs
-        eventvec_t m_vColors; // Tracked for section names in some longer MIDIs
-        notevec_t m_vNoteOns; // Tracked for note on events in some large MIDIs
+        vector<MIDIChannelEvent*> m_vEvents;
+        vector<MIDIMetaEvent*> m_vMetaEvents;
+        vector<MIDISysExEvent*> m_vSysExEvents;
+        eventvec_t m_vTempo;
+        eventvec_t m_vSignature;
+        eventvec_t m_vMarkers;
+        eventvec_t m_vColors;
+        eventvec_t m_vReplayTable;
     };
 
     struct __attribute__((packed)) PendingItem {
