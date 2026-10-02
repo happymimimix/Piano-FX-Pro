@@ -2184,9 +2184,7 @@ void MainScreen::RenderNotes() {
             MIDIChannelEvent* pEvent = m_vEvents[idx];
             if (m_iStartNote <= pEvent->GetParam1() && pEvent->GetParam1() <= m_iEndNote) {
                 if (!m_pStateReversed) RenderNote(pEvent);
-                if (!IsPressed(pEvent->GetParam1())) {
-                    PressAndBlend(pEvent);
-                }
+                if (!IsPressed(pEvent->GetParam1())) PressAndBlend(pEvent);
             }
             m_iPolyphony++;
         });
@@ -2596,7 +2594,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
 
     // Passed note count = current position in event stream minus all encountered non-note events plus all currently held notes divide by two.
     // We must plus all currently held notes before dividing by two because the "off" part is not included between the start of the event stream and the current position in event stream!
-    m_iPassed = (m_iStartPos - (m_itReplayPosition - m_vReplayTable.begin()) + m_iPolyphony) / 2;
+    m_iPassed = (m_iStartPos + (IsLastFrameReversed ? 1 : 0) - (m_itReplayPosition - m_vReplayTable.begin()) + m_iPolyphony) / 2;
     wstring passedFormatted = to_wstring(m_iPassed);
     for (signed short i = passedFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
         passedFormatted.insert(i, L",");
