@@ -120,6 +120,13 @@ D:.
 „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „¤„Ÿ„Ÿ„ŸVertex removal
 „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „¥„Ÿ„Ÿ„ŸPort dependent pitchbend visualization
+„    „    „¥„Ÿ„Ÿ„ŸLogic loop
+„    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „¥„Ÿ„Ÿ„ŸNoteX table
+„    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „¤„Ÿ„Ÿ„ŸParse track port events correctly
+„    „        „¤„Ÿ„Ÿ„ŸTODO
 „    „¥„Ÿ„Ÿ„ŸReorganize preferences
 „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Dump audio output' to track selection
 „    „    „    „¤„Ÿ„Ÿ„ŸTODO
@@ -139,6 +146,11 @@ D:.
 „    „        „¤„Ÿ„Ÿ„ŸTODO
 „    „¥„Ÿ„Ÿ„ŸReplay skipped events
 „    „    „¤„Ÿ„Ÿ„ŸDONE
+„    „¥„Ÿ„Ÿ„ŸResouce script
+„    „    „¥„Ÿ„Ÿ„Ÿv2 Math formula auto generated RC
+„    „    „    „¤„Ÿ„Ÿ„ŸDONE
+„    „    „¤„Ÿ„Ÿ„Ÿv3 Pointer navigated RC (Easier to add and remove components)
+„    „        „¤„Ÿ„Ÿ„ŸTODO
 „    „¥„Ÿ„Ÿ„ŸReversed note rendering
 „    „    „¥„Ÿ„Ÿ„ŸNote drawing
 „    „    „    „¤„Ÿ„Ÿ„ŸDONE
