@@ -1,0 +1,232 @@
+Folder PATH listing for volume Data
+Volume serial number is 9DB5-5629
+D:.
+„¥„ŸDirectX 11 backport
+„   „¥„ŸCore
+„   „   „¥„Ÿhlsl Shaders
+„   „   „   „¤„ŸDONE
+„   „   „¤„ŸRenderer.cpp
+„   „       „¤„ŸDONE
+„   „¥„ŸFinally get rid of the fucking imgui and freetype bloat!
+„   „   „¤„ŸDONE
+„   „¥„ŸNew 1000x more lightweight GDI-based text renderer
+„   „   „¤„ŸDONE
+„   „¤„ŸWindows 7 support
+„       „¤„ŸDONE
+„¥„ŸMore architecture and operating system support
+„   „¥„ŸWindows amd64
+„   „   „¤„ŸAlready supported since 2010
+„   „¥„ŸWindows i386
+„   „   „¤„ŸDONE
+„   „¥„ŸWineHQ amd64
+„   „   „¤„ŸTODO
+„   „¥„ŸWineHQ arm
+„   „   „¤„ŸTODO
+„   „¥„ŸWineHQ arm64
+„   „   „¤„ŸTODO
+„   „¤„ŸWineHQ i386
+„       „¤„ŸTODO
+„¥„ŸPiano-FX Pro
+„   „¥„Ÿ64bit array index
+„   „   „¥„ŸAllocate 64bit index on heap
+„   „   „   „¥„ŸClean up
+„   „   „   „   „¤„ŸDONE
+„   „   „   „¥„ŸMemory leak check
+„   „   „   „   „¤„ŸDONE
+„   „   „   „¤„ŸSmart allocation
+„   „   „       „¤„ŸDONE
+„   „   „¤„ŸRetire signed index type completely
+„   „       „¤„ŸDONE
+„   „¥„ŸBitset based state tracking
+„   „   „¤„ŸDONE
+„   „¥„ŸDump played events
+„   „   „¥„ŸBasic SMF0 writer
+„   „   „   „¤„ŸTODO
+„   „   „¤„ŸLogic loop
+„   „       „¤„ŸTODO
+„   „¥„ŸExponential search optimization
+„   „   „¤„ŸTODO
+„   „¥„ŸHighlight playing notes
+„   „   „¥„ŸMainScreen
+„   „   „   „¥„ŸPixelShaders
+„   „   „   „   „¤„ŸTODO
+„   „   „   „¥„ŸVertexDataUpload
+„   „   „   „   „¤„ŸTODO
+„   „   „   „¤„ŸVertexShaders
+„   „   „       „¤„ŸTODO
+„   „   „¤„ŸSplashScreen
+„   „       „¤„ŸDONE
+„   „¥„ŸImprove pitchbend visualization accuracy
+„   „   „¤„ŸDONE
+„   „¥„ŸKeyboard flip
+„   „   „¥„ŸHorizontal flip
+„   „   „   „¤„ŸDONE
+„   „   „¤„ŸVertical flip
+„   „       „¤„ŸDONE
+„   „¥„ŸLanguag pack upgrade
+„   „   „¥„ŸArinoglish
+„   „   „   „¤„ŸUpdates required
+„   „   „¥„ŸChinese
+„   „   „   „¤„ŸUpdates required
+„   „   „¥„ŸDoubleArinoglish
+„   „   „   „¤„ŸUpdates required
+„   „   „¥„ŸEnglish
+„   „   „   „¤„ŸUpdated 2026-10-02
+„   „   „¥„ŸJapanese
+„   „   „   „¤„ŸUpdates required
+„   „   „¥„ŸKanjilessJapanese
+„   „   „   „¤„ŸUpdates required
+„   „   „¥„ŸKorean
+„   „   „   „¤„ŸUpdates required
+„   „   „¥„ŸNorthKorean
+„   „   „   „¤„ŸUpdates required
+„   „   „¤„ŸRussian
+„   „       „¤„ŸUpdates required
+„   „¥„ŸNew git-based about screen
+„   „   „¥„ŸParse commit
+„   „   „   „¤„ŸTODO
+„   „   „¥„ŸParse contributors
+„   „   „   „¥„ŸCommit sum
+„   „   „   „   „¤„ŸTODO
+„   „   „   „¤„ŸConfigurable contributor alias
+„   „   „       „¤„ŸTODO
+„   „   „¤„ŸParse tags
+„   „       „¤„ŸTODO
+„   „¥„ŸNew jumpless reversed playback
+„   „   „¥„ŸAudio
+„   „   „   „¥„ŸLogic loop
+„   „   „   „   „¤„ŸDONE
+„   „   „   „¤„ŸNote on off swap
+„   „   „       „¤„ŸDONE
+„   „   „¤„ŸVisual
+„   „       „¥„ŸRenderNote()
+„   „       „   „¤„ŸDONE
+„   „       „¥„ŸRenderNotes()
+„   „       „   „¤„ŸDONE
+„   „       „¤„ŸReversed state update
+„   „           „¤„ŸDONE
+„   „¥„ŸNew note counter
+„   „   „¥„Ÿv2 ms indexed NC Table
+„   „   „   „¤„ŸDONE
+„   „   „¤„Ÿv3 zero memory iterator based NC
+„   „       „¥„ŸNPS
+„   „       „   „¤„ŸTODO
+„   „       „¥„ŸPassed
+„   „       „   „¤„ŸDONE
+„   „       „¤„ŸPolyphony
+„   „           „¤„ŸDONE
+„   „¥„ŸOverlap removal
+„   „   „¥„ŸDepth testing
+„   „   „   „¤„ŸDONE
+„   „   „¤„ŸVertex removal
+„   „       „¤„ŸTODO
+„   „¥„ŸReorganize preferences
+„   „   „¥„ŸAdd '[ ] Dump audio output' to track selection
+„   „   „   „¤„ŸTODO
+„   „   „¥„ŸAdd '[ ] Full screen capture' to controls (Next to video output)
+„   „   „   „¤„ŸTODO
+„   „   „¥„ŸAdd '[ ] Highlight playing notes' to render
+„   „   „   „¤„ŸTODO
+„   „   „¥„ŸAdd '[ ] Live loading (SMF3 Exclusive)' to controls
+„   „   „   „¤„ŸTODO
+„   „   „¥„ŸAdd '[ ] Show lyrics' to render
+„   „   „   „¤„ŸTODO
+„   „   „¥„ŸAdd '[x] Allow unknown SMF3 generators' to controls
+„   „   „   „¤„ŸTODO
+„   „   „¥„ŸAdd '[x] Auto Play (Not implemented and probably never will)' to controls
+„   „   „   „¤„ŸTODO
+„   „   „¤„ŸMove '[ ] Piano override' to controls
+„   „       „¤„ŸTODO
+„   „¥„ŸReplay skipped events
+„   „   „¤„ŸDONE
+„   „¥„ŸReversed note rendering
+„   „   „¥„ŸNote drawing
+„   „   „   „¤„ŸDONE
+„   „   „¤„ŸReversed state tracking
+„   „       „¤„ŸDONE
+„   „¤„ŸSMF3
+„       „¥„ŸGenerator
+„       „   „¥„ŸCore
+„       „   „   „¤„ŸTODO
+„       „   „¥„ŸOptional flags
+„       „   „   „¥„Ÿ(24) SMF3FEATURES__$REPLAYTABLE
+„       „   „   „   „¤„ŸTODO
+„       „   „   „¥„Ÿ(25) SMF3FEATURES__$TRACKLAYOUT
+„       „   „   „   „¤„ŸTODO
+„       „   „   „¥„Ÿ(26) SMF3FEATURES__$SIMULTANITY
+„       „   „   „   „¤„ŸTODO
+„       „   „   „¥„Ÿ(27) SMF3FEATURES__$PITCHTABLES
+„       „   „   „   „¤„ŸTODO
+„       „   „   „¥„Ÿ(28) SMF3FEATURES__$NOTEPAIRING
+„       „   „   „   „¤„ŸTODO
+„       „   „   „¥„Ÿ(29) SMF3FEATURES__$MICROSECOND
+„       „   „   „   „¤„ŸTODO
+„       „   „   „¥„Ÿ(30) SMF3FEATURES__$BIGIDXRANGE
+„       „   „   „   „¤„ŸTODO
+„       „   „   „¤„Ÿ(31) SMF3FEATURES__$CERTIFICATE
+„       „   „       „¥„ŸBasic signing
+„       „   „       „   „¤„ŸTODO
+„       „   „       „¥„ŸGenerate private key on build if missing
+„       „   „       „   „¤„ŸTODO
+„       „   „       „¤„ŸPrivate key obfuscation
+„       „   „           „¤„ŸTODO
+„       „   „¤„ŸUI
+„       „       „¥„ŸDesign
+„       „       „   „¤„ŸDONE
+„       „       „¤„ŸImplementation
+„       „           „¤„ŸTODO
+„       „¥„ŸParser
+„       „   „¥„ŸBig index support
+„       „   „   „¤„ŸTODO
+„       „   „¥„ŸCore
+„       „   „   „¤„ŸTODO
+„       „   „¥„ŸDigital signature validation
+„       „   „   „¥„ŸCore
+„       „   „   „   „¤„ŸTODO
+„       „   „   „¤„ŸCustomizable white list
+„       „   „       „¤„ŸTODO
+„       „   „¤„ŸLive mode
+„       „       „¤„ŸTODO
+„       „¤„ŸSpecification
+„           „¤„ŸDONE
+„¥„ŸPiano-FX Studio
+„   „¥„ŸAnimate
+„   „   „¤„ŸAnimation engine v2
+„   „       „¥„ŸDebug window
+„   „       „   „¤„ŸDONE
+„   „       „¥„ŸPesudo multi-threading engine v2
+„   „       „   „¤„ŸDONE
+„   „       „¤„ŸReal multi-threadding
+„   „           „¤„ŸGave up because of the Lua heap corruption nightmare
+„   „¥„ŸColorize
+„   „   „¤„ŸNew C++ colorizer that supports SMF3
+„   „       „¤„ŸTODO
+„   „¥„ŸDocumentation
+„   „   „¥„ŸHow to create animation documentation
+„   „   „   „¤„ŸTODO
+„   „   „¥„ŸHow to create GDI effects documentation
+„   „   „   „¤„ŸTODO
+„   „   „¥„ŸHow to use color events documentation
+„   „   „   „¤„ŸTODO
+„   „   „¥„ŸHow to use visualize pitch bend documentation
+„   „   „   „¤„ŸTODO
+„   „   „¤„ŸSMF3 Format documentation
+„   „       „¤„ŸTODO
+„   „¥„ŸGDI
+„   „   „¤„ŸShader engine v2
+„   „       „¥„ŸClean up flag
+„   „       „   „¤„ŸDONE
+„   „       „¥„ŸPersistent state management
+„   „       „   „¤„ŸDONE
+„   „       „¤„ŸStacking shaders
+„   „           „¤„ŸDONE
+„   „¤„ŸSetup
+„       „¤„ŸTODO
+„¤„ŸSource code level modding system
+    „¥„ŸMod code injection pipeline
+    „   „¥„ŸPost-build clean up
+    „   „   „¤„ŸTODO
+    „   „¤„ŸPre-build injection
+    „       „¤„ŸTODO
+    „¤„ŸModding API
+        „¤„ŸTODO

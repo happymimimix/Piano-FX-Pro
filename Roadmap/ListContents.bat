@@ -1,4 +1,3 @@
-@echo off
 cd /d "%~dp0"
-tree /a
-pause
+tree >Tree.txt
+start "Roadmap" notepad.exe Tree.txt
