@@ -72,6 +72,11 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „¤„Ÿ„Ÿ„ŸUpdates required
 „    „    „¥„Ÿ„Ÿ„ŸEnglish
 „    „    „    „¤„Ÿ„Ÿ„ŸUpdated 2026-10-02
+„    „    „¥„Ÿ„Ÿ„ŸFallback
+„    „    „    „¥„Ÿ„Ÿ„ŸPackWrapper.h
+„    „    „    „    „¤„Ÿ„Ÿ„ŸUpdates required
+„    „    „    „¤„Ÿ„Ÿ„ŸWidthWrapper.h
+„    „    „        „¤„Ÿ„Ÿ„ŸUpdates required
 „    „    „¥„Ÿ„Ÿ„ŸJapanese
 „    „    „    „¤„Ÿ„Ÿ„ŸUpdates required
 „    „    „¥„Ÿ„Ÿ„ŸKanjilessJapanese
