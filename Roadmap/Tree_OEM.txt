@@ -1,6 +1,6 @@
 Folder PATH listing for volume Data
 Volume serial number is 9DB5-5629
-D:.
+D:\PIANO-FX-PRO\ROADMAP
 „¥„Ÿ„Ÿ„ŸDirectX 11 backport
 „    „¥„Ÿ„Ÿ„ŸCore
 „    „    „¥„Ÿ„Ÿ„Ÿhlsl Shaders
@@ -137,6 +137,7 @@ D:.
 „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Live loading (SMF3 Exclusive)' to controls
 „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Port dependent pitchbend visualization' to controls
+„    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Show lyrics' to render
 „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „¥„Ÿ„Ÿ„ŸAdd '[x] Allow unknown SMF3 generators' to controls
