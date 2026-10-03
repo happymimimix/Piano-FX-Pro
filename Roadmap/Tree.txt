@@ -63,7 +63,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   └───DONE
 │   │   └───Vertical flip
 │   │       └───DONE
-│   ├───Languag pack upgrade
+│   ├───Language pack upgrade
 │   │   ├───Arinoglish
 │   │   │   └───Updates required
 │   │   ├───Chinese
