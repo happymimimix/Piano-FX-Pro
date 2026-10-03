@@ -278,15 +278,18 @@ struct NoteColor
     color_t iPrimaryRGB, iDarkRGB, iVeryDarkRGB;
 };
 
-__forceinline uint64_t Div255_64(uint64_t Input, uint64_t AddPattern, uint64_t LaneMask) {
+__forceinline uint64_t Div255_64(uint64_t Input, uint64_t AddPattern, uint64_t LaneMask)
+{
     return ((Input + AddPattern) + (((Input + AddPattern) >> 8) & LaneMask)) >> 8;
 }
 
-__forceinline uint32_t Div255_32(uint32_t Input, uint32_t AddPattern, uint32_t LaneMask) {
+__forceinline uint32_t Div255_32(uint32_t Input, uint32_t AddPattern, uint32_t LaneMask)
+{
     return ((Input + AddPattern) + (((Input + AddPattern) >> 8) & LaneMask)) >> 8;
 }
 
-__forceinline void BlendNoteColor(NoteColor* Dst, NoteColor* Src) {
+__forceinline void BlendNoteColor(NoteColor* Dst, NoteColor* Src)
+{
     uint8_t InvertAlpha = (Src->iPrimaryRGB >> 24) & 0xFF;
     if (InvertAlpha == 0xFF) { return; }
     else if (InvertAlpha == 0x00) {

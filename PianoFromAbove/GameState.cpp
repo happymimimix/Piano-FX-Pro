@@ -682,8 +682,8 @@ void MainScreen::InitState() {
     GetWindowRect(g_hWndGfx, &rect);
     m_iScreenWidth = rect.right - rect.left;
     m_iScreenHeight = rect.bottom - rect.top;
-
-    if (m_MIDI.GetInfo().iNoteCount < 100000) { strcpy(Difficulty, "EZ Lv.1"); }
+    
+         if (m_MIDI.GetInfo().iNoteCount < 100000) { strcpy(Difficulty, "EZ Lv.1"); }
     else if (m_MIDI.GetInfo().iNoteCount < 200000) { strcpy(Difficulty, "EZ Lv.2"); }
     else if (m_MIDI.GetInfo().iNoteCount < 400000) { strcpy(Difficulty, "EZ Lv.3"); }
     else if (m_MIDI.GetInfo().iNoteCount < 600000) { strcpy(Difficulty, "EZ Lv.4"); }
@@ -702,7 +702,7 @@ void MainScreen::InitState() {
     else if (m_MIDI.GetInfo().iNoteCount < 200000000) { strcpy(Difficulty, "AT Lv.17"); }
     else if (m_MIDI.GetInfo().iNoteCount < 400000000) { strcpy(Difficulty, "AT Lv.18"); }
     else { strcpy(Difficulty, "SP Lv.?"); }
-
+    
     // m_Timer will be initialized *later*
     m_RealTimer.Init(false);
     m_bUpdateTrackColor = true;
@@ -987,11 +987,13 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
         if (wParam == IDC_POSNDELAY) {
             KillTimer(g_hWnd, IDC_POSNDELAY);
             if (JumpTarget != ~0) {
-                UINT start = GetTickCount();
+                LARGE_INTEGER start, end, freq;
+                QueryPerformanceFrequency(&freq);
+                QueryPerformanceCounter(&start);
                 JumpTo(JumpTarget, false);
                 JumpTarget = ~0;
-                UINT end = GetTickCount();
-                nxtdelay = max(1, min(end - start, 1 << 9));
+                QueryPerformanceCounter(&end);
+                nxtdelay = max(1, min((end.QuadPart - start.QuadPart) * MS / freq.QuadPart, 1 << 9));
             }
         }
         return Success;
