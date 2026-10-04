@@ -154,10 +154,12 @@ D:\PIANO-FX-PRO\ROADMAP
 │   ├───Replay skipped events
 │   │   └───DONE
 │   ├───Resouce script
+│   │   ├───v2 Macro naming improvement and add 1.5x distance
+│   │   │   └───TODO
 │   │   ├───v2 Math formula auto generated RC
 │   │   │   └───DONE
 │   │   └───v3 Pointer navigated RC (Easier to add and remove components)
-│   │       └───TODO
+│   │       └───Gave up because RC doesn't support any form of variables! Not even #define Next Prev + 10, #Define Prev Next!
 │   ├───Reversed note rendering
 │   │   ├───Note drawing
 │   │   │   └───DONE
