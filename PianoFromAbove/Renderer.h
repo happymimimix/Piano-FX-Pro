@@ -133,9 +133,8 @@ private:
     HRESULT FlushText();
     bool UploadBackgroundBitmap();
 
-    static constexpr unsigned RectsPerPass = 1 << (1 << 4);
-    static constexpr unsigned NotesPerPass = 1 << (1 << 4) << 4;
-    static constexpr unsigned IndexBufferCount = max(RectsPerPass, NotesPerPass) * 6;
+    static constexpr unsigned RectsPerPass = 1<<(1<<4);
+    static constexpr unsigned IndexBufferCount = RectsPerPass*6;
 
     static ComPtr<IWICImagingFactory> s_pWICFactory;
 

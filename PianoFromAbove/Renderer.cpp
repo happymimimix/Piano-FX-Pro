@@ -192,7 +192,7 @@ tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
 
     // Create dynamic note structured buffer
     D3D11_BUFFER_DESC noteDesc = {};
-    noteDesc.ByteWidth = NotesPerPass * sizeof(NoteData);
+    noteDesc.ByteWidth = RectsPerPass * sizeof(NoteData);
     noteDesc.Usage = D3D11_USAGE_DYNAMIC;
     noteDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     noteDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
@@ -204,7 +204,7 @@ tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
     D3D11_SHADER_RESOURCE_VIEW_DESC noteSrvDesc = {};
     noteSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
     noteSrvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
-    noteSrvDesc.Buffer.NumElements = NotesPerPass;
+    noteSrvDesc.Buffer.NumElements = RectsPerPass;
     res = m_pDevice->CreateShaderResourceView(m_pNoteBuffer.Get(), &noteSrvDesc, &m_pNoteSRV);
     if (FAILED(res)) return make_tuple(res, "CreateSRV (note buffer)");
 
@@ -455,11 +455,11 @@ HRESULT Renderer11::EndScene(bool draw_bg) {
     if (FAILED(res)) return res;
 
     // Flush the intermediate note buffer
-    for (size_t i = 0; i < m_vNotesIntermediate.size(); i += (size_t)NotesPerPass) {
+    for (size_t i = 0; i < m_vNotesIntermediate.size(); i += (size_t)RectsPerPass) {
         if (i == 0) AutoSetNotePipeline();
 
         auto remaining = m_vNotesIntermediate.size() - i;
-        auto note_count = min(remaining, (size_t)NotesPerPass);
+        auto note_count = min(remaining, (size_t)RectsPerPass);
 
         // Unbind SRV before mapping (DX11 best practice)
         ID3D11ShaderResourceView* null_srv = nullptr;
