@@ -257,19 +257,28 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   ├───Implementation
 │   │   │   ├───Configure shader template
 │   │   │   └───Generate shader code from template
-│   │   └───Shader engine v2
-│   │       ├───Clean up flag
-│   │       │   └───DONE
-│   │       ├───Frame dump support
-│   │       │   └───DONE
-│   │       ├───Lazy bitmap allocation
-│   │       │   └───Validation needed (I forgot where I was)
-│   │       ├───Persistent state management
-│   │       │   └───DONE
-│   │       ├───SelectObject cleanup missing fix
+│   │   ├───Shader engine v2
+│   │   │   ├───Clean up flag
+│   │   │   │   └───DONE
+│   │   │   ├───Frame dump support
+│   │   │   │   └───DONE
+│   │   │   ├───Lazy bitmap allocation
+│   │   │   │   └───Validation needed (I forgot where I was)
+│   │   │   ├───Persistent state management
+│   │   │   │   └───DONE
+│   │   │   ├───SelectObject cleanup missing fix
+│   │   │   │   └───TODO
+│   │   │   └───Stacking shaders
+│   │   │       └───DONE
+│   │   └───Windowless shader engine v3
+│   │       ├───Ensure correct synchronization
 │   │       │   └───TODO
-│   │       └───Stacking shaders
-│   │           └───DONE
+│   │       ├───Expose DX11 GDI compatible backbuffer to CE
+│   │       │   └───TODO
+│   │       ├───Obtain image from backbuffer
+│   │       │   └───TODO
+│   │       └───Writeback modified image
+│   │           └───TODO
 │   └───Setup
 │       ├───Design
 │       │   └───DONE

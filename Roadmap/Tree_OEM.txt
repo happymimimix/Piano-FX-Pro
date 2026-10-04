@@ -257,19 +257,28 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „¥„Ÿ„Ÿ„ŸImplementation
 „    „    „    „¥„Ÿ„Ÿ„ŸConfigure shader template
 „    „    „    „¤„Ÿ„Ÿ„ŸGenerate shader code from template
-„    „    „¤„Ÿ„Ÿ„ŸShader engine v2
-„    „        „¥„Ÿ„Ÿ„ŸClean up flag
-„    „        „    „¤„Ÿ„Ÿ„ŸDONE
-„    „        „¥„Ÿ„Ÿ„ŸFrame dump support
-„    „        „    „¤„Ÿ„Ÿ„ŸDONE
-„    „        „¥„Ÿ„Ÿ„ŸLazy bitmap allocation
-„    „        „    „¤„Ÿ„Ÿ„ŸValidation needed (I forgot where I was)
-„    „        „¥„Ÿ„Ÿ„ŸPersistent state management
-„    „        „    „¤„Ÿ„Ÿ„ŸDONE
-„    „        „¥„Ÿ„Ÿ„ŸSelectObject cleanup missing fix
+„    „    „¥„Ÿ„Ÿ„ŸShader engine v2
+„    „    „    „¥„Ÿ„Ÿ„ŸClean up flag
+„    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
+„    „    „    „¥„Ÿ„Ÿ„ŸFrame dump support
+„    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
+„    „    „    „¥„Ÿ„Ÿ„ŸLazy bitmap allocation
+„    „    „    „    „¤„Ÿ„Ÿ„ŸValidation needed (I forgot where I was)
+„    „    „    „¥„Ÿ„Ÿ„ŸPersistent state management
+„    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
+„    „    „    „¥„Ÿ„Ÿ„ŸSelectObject cleanup missing fix
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¤„Ÿ„Ÿ„ŸStacking shaders
+„    „    „        „¤„Ÿ„Ÿ„ŸDONE
+„    „    „¤„Ÿ„Ÿ„ŸWindowless shader engine v3
+„    „        „¥„Ÿ„Ÿ„ŸEnsure correct synchronization
 „    „        „    „¤„Ÿ„Ÿ„ŸTODO
-„    „        „¤„Ÿ„Ÿ„ŸStacking shaders
-„    „            „¤„Ÿ„Ÿ„ŸDONE
+„    „        „¥„Ÿ„Ÿ„ŸExpose DX11 GDI compatible backbuffer to CE
+„    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „        „¥„Ÿ„Ÿ„ŸObtain image from backbuffer
+„    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „        „¤„Ÿ„Ÿ„ŸWriteback modified image
+„    „            „¤„Ÿ„Ÿ„ŸTODO
 „    „¤„Ÿ„Ÿ„ŸSetup
 „        „¥„Ÿ„Ÿ„ŸDesign
 „        „    „¤„Ÿ„Ÿ„ŸDONE
