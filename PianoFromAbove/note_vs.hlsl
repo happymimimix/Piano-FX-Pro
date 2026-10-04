@@ -88,7 +88,7 @@ NotePSInput main(uint id : SV_VertexID) {
     position.z = !sharp * 0.5;
 #endif
 
-    result.position = colors[track * 16 + chan].colors[2] == 0xFFFFFFFF ? float4(0, 0, 0, 0) : mul(root_proj, float4(position, 1));
+    result.position = mul(root_proj, float4(position, 1));
     result.color = float4(unpack_color(maincolor));
     result.border = float4(unpack_color(boardercolor));
     result.edges = float4(x, y, x + cx, y - cy);

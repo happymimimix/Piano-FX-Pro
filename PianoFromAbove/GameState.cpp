@@ -1405,7 +1405,7 @@ GameState::GameError MainScreen::Logic() {
                 auto& dst = track_colors[TnC_t(i) * TnC_t(16u) + TnC_t(j)];
                 dst.primary = src.iPrimaryRGB;
                 dst.dark = src.iDarkRGB;
-                dst.darker = src.bHidden ? 0xFFFFFFFF : src.iVeryDarkRGB; // Hack to signal hidden track without checking on CPU
+                dst.darker = src.iVeryDarkRGB;
             }
         }
     }
@@ -2223,38 +2223,41 @@ void MainScreen::RenderNotes() {
 }
 
 void MainScreen::RenderNote(const MIDIChannelEvent * pNote) {
-    key_t iNote = pNote->GetParam1();
-    chan_t iChannel = pNote->GetChannel();
-    track_t iTrack = pNote->GetTrack();
-    mms_t llNoteStart = pNote->GetAbsMicroSec();
-    mms_t llNoteEnd = pNote->GetSister(m_vEvents)->GetAbsMicroSec();
-    key_t iVel = m_bMapVel ? pNote->GetParam2() ^ 0x7F : 0x7F;
-    if (m_bTickMode) {
-        llNoteStart = pNote->GetAbsTick();
-        llNoteEnd = pNote->GetSister(m_vEvents)->GetAbsTick();
-    }
-    float fPos = static_cast<float>(
-        (m_dNSpeed < 0) != (m_fZoomX * m_fTempZoomX < 0)
-        ? -(llNoteStart - m_llRndStartTime) - (llNoteEnd - llNoteStart) + (m_fZoomX * m_fTempZoomX < 0 ? m_llTimeSpan : 0)
-        : llNoteStart - m_llRndStartTime + (m_fZoomX * m_fTempZoomX < 0 ? m_llTimeSpan : 0)
-        );
-    // Watch the magic happen! 
-    float fLength = static_cast<float>(llNoteEnd - llNoteStart);
-    iNote |= ((iVel & 0x01) << 7);
-    iChannel |= ((iVel & 0x1E) << 3);
-    *reinterpret_cast<unsigned int*>(&fLength) &= 0x7FFFFFFE;
-    *reinterpret_cast<unsigned int*>(&fLength) |= (iVel & 0x20) << 26;
-    *reinterpret_cast<unsigned int*>(&fLength) |= (iVel >> 6) & 0x01;
-    // Push it to the GPU. 
-    m_pRenderer->PushNoteData(
-        NoteData{
-            .key = iNote,
-            .channel = iChannel,
-            .track = iTrack,
-            .pos = fPos,
-            .length = fLength,
+    ChannelSettings CS = m_vTrackSettings[pNote->GetTrack() % MaxTrackColors].aChannels[pNote->GetChannel()];
+    if (!CS.bHidden) { // Don't even upload this thing to the GPU if it's not visible. 
+        key_t iNote = pNote->GetParam1();
+        chan_t iChannel = pNote->GetChannel();
+        track_t iTrack = pNote->GetTrack();
+        mms_t llNoteStart = pNote->GetAbsMicroSec();
+        mms_t llNoteEnd = pNote->GetSister(m_vEvents)->GetAbsMicroSec();
+        key_t iVel = m_bMapVel ? pNote->GetParam2() ^ 0x7F : 0x7F;
+        if (m_bTickMode) {
+            llNoteStart = pNote->GetAbsTick();
+            llNoteEnd = pNote->GetSister(m_vEvents)->GetAbsTick();
         }
-    );
+        float fPos = static_cast<float>(
+            (m_dNSpeed < 0) != (m_fZoomX * m_fTempZoomX < 0)
+            ? -(llNoteStart - m_llRndStartTime) - (llNoteEnd - llNoteStart) + (m_fZoomX * m_fTempZoomX < 0 ? m_llTimeSpan : 0)
+            : llNoteStart - m_llRndStartTime + (m_fZoomX * m_fTempZoomX < 0 ? m_llTimeSpan : 0)
+            );
+        // Watch the magic happen! 
+        float fLength = static_cast<float>(llNoteEnd - llNoteStart);
+        iNote |= ((iVel & 0x01) << 7);
+        iChannel |= ((iVel & 0x1E) << 3);
+        *reinterpret_cast<unsigned int*>(&fLength) &= 0x7FFFFFFE;
+        *reinterpret_cast<unsigned int*>(&fLength) |= (iVel & 0x20) << 26;
+        *reinterpret_cast<unsigned int*>(&fLength) |= (iVel >> 6) & 0x01;
+        // Push it to the GPU. 
+        m_pRenderer->PushNoteData(
+            NoteData{
+                .key = iNote,
+                .channel = iChannel,
+                .track = iTrack,
+                .pos = fPos,
+                .length = fLength,
+            }
+        );
+    }
 }
 
 void MainScreen::GenNoteXTable() {
