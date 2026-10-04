@@ -210,14 +210,33 @@ D:\PIANO-FX-PRO\ROADMAP
 │           └───DONE
 ├───Piano-FX Studio
 │   ├───Animate
-│   │   └───Animation engine v2
-│   │       ├───Debug window
-│   │       │   └───DONE
-│   │       ├───Pesudo multi-threading engine v2
-│   │       │   └───DONE
-│   │       └───Real multi-threadding
-│   │           └───Gave up because of the Lua heap corruption nightmare
+│   │   ├───Animation engine v2
+│   │   │   ├───Debug window
+│   │   │   │   └───DONE
+│   │   │   ├───Frame dump support
+│   │   │   │   └───DONE
+│   │   │   ├───Pesudo multi-threading engine v2
+│   │   │   │   └───DONE
+│   │   │   └───Real multi-threadding
+│   │   │       └───Gave up because of the Lua heap corruption nightmare
+│   │   ├───Design
+│   │   │   └───DONE
+│   │   └───Implementation
+│   │       ├───Generate animation code
+│   │       │   └───Almost!
+│   │       └───Write CE template to clipboard
+│   │           ├───Automatic memory address generation
+│   │           │   └───DONE
+│   │           └───Core
+│   │               └───DONE
 │   ├───Colorize
+│   │   ├───Design
+│   │   │   └───TODO
+│   │   ├───Implementation
+│   │   │   ├───Color to lyric
+│   │   │   ├───Generate colors from pfa config
+│   │   │   ├───Gradiant
+│   │   │   └───Lyric to color
 │   │   └───New C++ colorizer that supports SMF3
 │   │       └───TODO
 │   ├───Documentation
@@ -232,15 +251,35 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   └───SMF3 Format documentation
 │   │       └───TODO
 │   ├───GDI
+│   │   ├───Design
+│   │   ├───Implementation
+│   │   │   ├───Configure shader template
+│   │   │   └───Generate shader code from template
 │   │   └───Shader engine v2
 │   │       ├───Clean up flag
 │   │       │   └───DONE
+│   │       ├───Frame dump support
+│   │       │   └───DONE
+│   │       ├───Lazy bitmap allocation
+│   │       │   └───Validation needed (I forgot where I was)
 │   │       ├───Persistent state management
 │   │       │   └───DONE
+│   │       ├───SelectObject cleanup missing fix
+│   │       │   └───TODO
 │   │       └───Stacking shaders
 │   │           └───DONE
 │   └───Setup
-│       └───TODO
+│       ├───Design
+│       │   └───DONE
+│       └───Implementation
+│           ├───Convert to SMF1
+│           │   └───TODO
+│           ├───Convert to SMF3
+│           │   └───TODO
+│           ├───Install Cheat Engine
+│           │   └───TODO
+│           └───Install FL 12.3 Templates
+│               └───TODO
 └───Source code level modding system
     ├───Mod code injection pipeline
     │   ├───Post-build clean up

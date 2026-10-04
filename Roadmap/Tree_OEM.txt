@@ -210,14 +210,33 @@ D:\PIANO-FX-PRO\ROADMAP
 „            „¤„Ÿ„Ÿ„ŸDONE
 „¥„Ÿ„Ÿ„ŸPiano-FX Studio
 „    „¥„Ÿ„Ÿ„ŸAnimate
-„    „    „¤„Ÿ„Ÿ„ŸAnimation engine v2
-„    „        „¥„Ÿ„Ÿ„ŸDebug window
-„    „        „    „¤„Ÿ„Ÿ„ŸDONE
-„    „        „¥„Ÿ„Ÿ„ŸPesudo multi-threading engine v2
-„    „        „    „¤„Ÿ„Ÿ„ŸDONE
-„    „        „¤„Ÿ„Ÿ„ŸReal multi-threadding
-„    „            „¤„Ÿ„Ÿ„ŸGave up because of the Lua heap corruption nightmare
+„    „    „¥„Ÿ„Ÿ„ŸAnimation engine v2
+„    „    „    „¥„Ÿ„Ÿ„ŸDebug window
+„    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
+„    „    „    „¥„Ÿ„Ÿ„ŸFrame dump support
+„    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
+„    „    „    „¥„Ÿ„Ÿ„ŸPesudo multi-threading engine v2
+„    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
+„    „    „    „¤„Ÿ„Ÿ„ŸReal multi-threadding
+„    „    „        „¤„Ÿ„Ÿ„ŸGave up because of the Lua heap corruption nightmare
+„    „    „¥„Ÿ„Ÿ„ŸDesign
+„    „    „    „¤„Ÿ„Ÿ„ŸDONE
+„    „    „¤„Ÿ„Ÿ„ŸImplementation
+„    „        „¥„Ÿ„Ÿ„ŸGenerate animation code
+„    „        „    „¤„Ÿ„Ÿ„ŸAlmost!
+„    „        „¤„Ÿ„Ÿ„ŸWrite CE template to clipboard
+„    „            „¥„Ÿ„Ÿ„ŸAutomatic memory address generation
+„    „            „    „¤„Ÿ„Ÿ„ŸDONE
+„    „            „¤„Ÿ„Ÿ„ŸCore
+„    „                „¤„Ÿ„Ÿ„ŸDONE
 „    „¥„Ÿ„Ÿ„ŸColorize
+„    „    „¥„Ÿ„Ÿ„ŸDesign
+„    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „¥„Ÿ„Ÿ„ŸImplementation
+„    „    „    „¥„Ÿ„Ÿ„ŸColor to lyric
+„    „    „    „¥„Ÿ„Ÿ„ŸGenerate colors from pfa config
+„    „    „    „¥„Ÿ„Ÿ„ŸGradiant
+„    „    „    „¤„Ÿ„Ÿ„ŸLyric to color
 „    „    „¤„Ÿ„Ÿ„ŸNew C++ colorizer that supports SMF3
 „    „        „¤„Ÿ„Ÿ„ŸTODO
 „    „¥„Ÿ„Ÿ„ŸDocumentation
@@ -232,15 +251,35 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „¤„Ÿ„Ÿ„ŸSMF3 Format documentation
 „    „        „¤„Ÿ„Ÿ„ŸTODO
 „    „¥„Ÿ„Ÿ„ŸGDI
+„    „    „¥„Ÿ„Ÿ„ŸDesign
+„    „    „¥„Ÿ„Ÿ„ŸImplementation
+„    „    „    „¥„Ÿ„Ÿ„ŸConfigure shader template
+„    „    „    „¤„Ÿ„Ÿ„ŸGenerate shader code from template
 „    „    „¤„Ÿ„Ÿ„ŸShader engine v2
 „    „        „¥„Ÿ„Ÿ„ŸClean up flag
 „    „        „    „¤„Ÿ„Ÿ„ŸDONE
+„    „        „¥„Ÿ„Ÿ„ŸFrame dump support
+„    „        „    „¤„Ÿ„Ÿ„ŸDONE
+„    „        „¥„Ÿ„Ÿ„ŸLazy bitmap allocation
+„    „        „    „¤„Ÿ„Ÿ„ŸValidation needed (I forgot where I was)
 „    „        „¥„Ÿ„Ÿ„ŸPersistent state management
 „    „        „    „¤„Ÿ„Ÿ„ŸDONE
+„    „        „¥„Ÿ„Ÿ„ŸSelectObject cleanup missing fix
+„    „        „    „¤„Ÿ„Ÿ„ŸTODO
 „    „        „¤„Ÿ„Ÿ„ŸStacking shaders
 „    „            „¤„Ÿ„Ÿ„ŸDONE
 „    „¤„Ÿ„Ÿ„ŸSetup
-„        „¤„Ÿ„Ÿ„ŸTODO
+„        „¥„Ÿ„Ÿ„ŸDesign
+„        „    „¤„Ÿ„Ÿ„ŸDONE
+„        „¤„Ÿ„Ÿ„ŸImplementation
+„            „¥„Ÿ„Ÿ„ŸConvert to SMF1
+„            „    „¤„Ÿ„Ÿ„ŸTODO
+„            „¥„Ÿ„Ÿ„ŸConvert to SMF3
+„            „    „¤„Ÿ„Ÿ„ŸTODO
+„            „¥„Ÿ„Ÿ„ŸInstall Cheat Engine
+„            „    „¤„Ÿ„Ÿ„ŸTODO
+„            „¤„Ÿ„Ÿ„ŸInstall FL 12.3 Templates
+„                „¤„Ÿ„Ÿ„ŸTODO
 „¤„Ÿ„Ÿ„ŸSource code level modding system
     „¥„Ÿ„Ÿ„ŸMod code injection pipeline
     „    „¥„Ÿ„Ÿ„ŸPost-build clean up
