@@ -14,18 +14,19 @@ D:\PIANO-FX-PRO\ROADMAP
 │   └───Windows 7 support
 │       └───DONE
 ├───More architecture and operating system support
+│   ├───Linux (WineGCC ELF)
+│   │   ├───WineHQ amd64
+│   │   │   └───TODO
+│   │   ├───WineHQ arm
+│   │   │   └───TODO
+│   │   ├───WineHQ arm64
+│   │   │   └───TODO
+│   │   └───WineHQ i386
+│   │       └───TODO
 │   ├───Windows amd64
 │   │   └───Already supported since 2010
-│   ├───Windows i386
-│   │   └───DONE
-│   ├───WineHQ amd64
-│   │   └───TODO
-│   ├───WineHQ arm
-│   │   └───TODO
-│   ├───WineHQ arm64
-│   │   └───TODO
-│   └───WineHQ i386
-│       └───TODO
+│   └───Windows i386
+│       └───DONE
 ├───Piano-FX Pro
 │   ├───64bit array index
 │   │   ├───Allocate 64bit index on heap
