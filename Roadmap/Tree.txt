@@ -135,6 +135,21 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   └───Parse track port events correctly
 │   │       └───TODO
 │   ├───Reorganize preferences
+│   │   ├───Add 'Background adjustments' to visuals
+│   │   │   ├───Edit 'Brightness value'
+│   │   │   │   └───TODO
+│   │   │   ├───Edit 'Hue value'
+│   │   │   │   └───TODO
+│   │   │   ├───Edit 'Saturation value'
+│   │   │   │   └───TODO
+│   │   │   ├───Label 'Background color adjustment'
+│   │   │   │   └───TODO
+│   │   │   ├───Slider 'Brightness'
+│   │   │   │   └───TODO
+│   │   │   ├───Slider 'Hue'
+│   │   │   │   └───TODO
+│   │   │   └───Slider 'Saturation'
+│   │   │       └───TODO
 │   │   ├───Add '[ ] Dump audio output' to track selection
 │   │   │   └───TODO
 │   │   ├───Add '[ ] Full screen capture' to controls (Next to video output)
