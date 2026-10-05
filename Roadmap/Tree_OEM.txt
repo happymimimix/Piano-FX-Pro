@@ -173,7 +173,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „¥„Ÿ„Ÿ„ŸAdd '[x] Allow unknown SMF3 generators' to controls
 „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „¥„Ÿ„Ÿ„ŸAdd '[x] Auto Play (Not implemented and probably never will)' to controls
+„    „    „¥„Ÿ„Ÿ„ŸAdd '[x] Auto Play (Not implemented and probably never will)' to controls and make it checked and disabled forever
 „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „¤„Ÿ„Ÿ„ŸMove '[ ] Piano override' to controls
 „    „        „¤„Ÿ„Ÿ„ŸTODO
