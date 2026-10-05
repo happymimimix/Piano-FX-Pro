@@ -316,6 +316,10 @@ D:\PIANO-FX-PRO\ROADMAP
 „            „¤„Ÿ„Ÿ„ŸInstall FL 12.3 Templates
 „                „¤„Ÿ„Ÿ„ŸTODO
 „¤„Ÿ„Ÿ„ŸSource code level modding system
+    „¥„Ÿ„Ÿ„ŸC++ AST Analyzation
+    „    „¤„Ÿ„Ÿ„ŸTODO
+    „¥„Ÿ„Ÿ„ŸExample mods
+    „    „¤„Ÿ„Ÿ„ŸTODO
     „¥„Ÿ„Ÿ„ŸMod code injection pipeline
     „    „¥„Ÿ„Ÿ„ŸPost-build clean up
     „    „    „¤„Ÿ„Ÿ„ŸTODO
