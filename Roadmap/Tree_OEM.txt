@@ -14,6 +14,13 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „¤„Ÿ„Ÿ„ŸWindows 7 support
 „        „¤„Ÿ„Ÿ„ŸDONE
 „¥„Ÿ„Ÿ„ŸMore architecture and operating system support
+„    „¥„Ÿ„Ÿ„ŸAndroid (WineGCC ELF)
+„    „    „¥„Ÿ„Ÿ„Ÿlibwine.so android port
+„    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „¥„Ÿ„Ÿ„ŸWineHQ arm
+„    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „¤„Ÿ„Ÿ„ŸWineHQ arm64
+„    „        „¤„Ÿ„Ÿ„ŸTODO
 „    „¥„Ÿ„Ÿ„ŸLinux (WineGCC ELF)
 „    „    „¥„Ÿ„Ÿ„ŸWineHQ amd64
 „    „    „    „¤„Ÿ„Ÿ„ŸTODO
@@ -23,10 +30,11 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „¤„Ÿ„Ÿ„ŸWineHQ i386
 „    „        „¤„Ÿ„Ÿ„ŸTODO
-„    „¥„Ÿ„Ÿ„ŸWindows amd64
-„    „    „¤„Ÿ„Ÿ„ŸAlready supported since 2010
-„    „¤„Ÿ„Ÿ„ŸWindows i386
-„        „¤„Ÿ„Ÿ„ŸDONE
+„    „¤„Ÿ„Ÿ„ŸWindows
+„        „¥„Ÿ„Ÿ„ŸWin32 amd64
+„        „    „¤„Ÿ„Ÿ„ŸAlready supported since 2010
+„        „¤„Ÿ„Ÿ„ŸWin32 i386
+„            „¤„Ÿ„Ÿ„ŸDONE
 „¥„Ÿ„Ÿ„ŸPiano-FX Pro
 „    „¥„Ÿ„Ÿ„Ÿ64bit array index
 „    „    „¥„Ÿ„Ÿ„ŸAllocate 64bit index on heap
