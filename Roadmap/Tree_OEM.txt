@@ -253,9 +253,13 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „¥„Ÿ„Ÿ„ŸImplementation
 „    „    „    „¥„Ÿ„Ÿ„ŸColor to lyric
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¥„Ÿ„Ÿ„ŸGenerate colors from pfa config
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¥„Ÿ„Ÿ„ŸGradiant
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¤„Ÿ„Ÿ„ŸLyric to color
+„    „    „        „¤„Ÿ„Ÿ„ŸTODO
 „    „    „¤„Ÿ„Ÿ„ŸNew C++ colorizer that supports SMF3
 „    „        „¤„Ÿ„Ÿ„ŸTODO
 „    „¥„Ÿ„Ÿ„ŸDocumentation
@@ -271,9 +275,12 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „        „¤„Ÿ„Ÿ„ŸTODO
 „    „¥„Ÿ„Ÿ„ŸGDI
 „    „    „¥„Ÿ„Ÿ„ŸDesign
+„    „    „    „¤„Ÿ„Ÿ„ŸAlmost done, refine needed
 „    „    „¥„Ÿ„Ÿ„ŸImplementation
 „    „    „    „¥„Ÿ„Ÿ„ŸConfigure shader template
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¤„Ÿ„Ÿ„ŸGenerate shader code from template
+„    „    „        „¤„Ÿ„Ÿ„ŸTODO
 „    „    „¥„Ÿ„Ÿ„ŸShader engine v2
 „    „    „    „¥„Ÿ„Ÿ„ŸClean up flag
 „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
