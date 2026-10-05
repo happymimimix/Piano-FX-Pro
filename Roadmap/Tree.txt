@@ -290,6 +290,17 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   └───TODO
 │   │   │   └───Generate shader code from template
 │   │   │       └───TODO
+│   │   ├───New builtin shader
+│   │   │   ├───@ChatGPT  Feel free to add whatever shader ideas you can think of here!
+│   │   │   │   └───TODO
+│   │   │   ├───TCC-based HSL adjustment
+│   │   │   │   └───TODO
+│   │   │   ├───TCC-based obj icon drawing
+│   │   │   │   └───TODO
+│   │   │   ├───TCC-based rainbow shader
+│   │   │   │   └───TODO
+│   │   │   └───TCC-based ?片?争 shader (simulating video compression)
+│   │   │       └───TODO
 │   │   ├───Shader engine v2
 │   │   │   ├───Clean up flag
 │   │   │   │   └───DONE

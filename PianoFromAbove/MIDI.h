@@ -90,8 +90,6 @@ private:
     mms_t m_iCurrMicroSec;
 };
 
-typedef vector<pair<mms_t, idx_t>> eventvec_t;
-
 //Holds MIDI data
 class MIDI
 {
@@ -170,7 +168,7 @@ public:
     bool IsValid() const { return (m_vTracks.size() > 0 && m_Info.iNoteCount > 0 && m_Info.iDivision > 0 && (m_Info.iFormatType == 0 || m_Info.iFormatType == 1 || m_Info.iFormatType == 768)); }
     bool SkipUnknownSMF3Chunk(unsigned char* Buffer, size_t* Offset, uint32_t* FeatureFlags);
 
-    bool PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMetaEvent*>* vMetaEvents = nullptr, eventvec_t* vTempo = nullptr, eventvec_t* vSignature = nullptr, eventvec_t* vMarkers = nullptr, eventvec_t* vReplay = nullptr, eventvec_t* vColors = nullptr, vector<MIDISysExEvent*>* vSysExEvents = nullptr);
+    bool PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMetaEvent*>* vMetaEvents = nullptr, vector<idx_t>* vTempo = nullptr, vector<idx_t>* vSignature = nullptr, vector<idx_t>* vMarkers = nullptr, vector<idx_t>* vReplay = nullptr, vector<idx_t>* vColors = nullptr, vector<MIDISysExEvent*>* vSysExEvents = nullptr);
     void ConnectNotes();
     void clear(void);
 
@@ -215,11 +213,11 @@ private:
         vector<MIDIChannelEvent*> m_vEvents;
         vector<MIDIMetaEvent*> m_vMetaEvents;
         vector<MIDISysExEvent*> m_vSysExEvents;
-        eventvec_t m_vTempo;
-        eventvec_t m_vSignature;
-        eventvec_t m_vMarkers;
-        eventvec_t m_vColors;
-        eventvec_t m_vReplayTable;
+        vector<idx_t> m_vTempo;
+        vector<idx_t> m_vSignature;
+        vector<idx_t> m_vMarkers;
+        vector<idx_t> m_vColors;
+        vector<idx_t> m_vReplayTable;
     };
 
     struct __attribute__((packed)) PendingItem {
@@ -542,7 +540,7 @@ private:
 
 class MIDILoadingProgress {
 public:
-    enum Stage : uint8_t { CopyToMem, Decompress, ParseTracks, ConnectNotes, SortEvents, NCTable, Done };
+    enum Stage : uint8_t { CopyToMem, Decompress, ParseTracks, ConnectNotes, SortEvents, Done };
 
     Stage stage;
     wstring name;

@@ -1080,9 +1080,6 @@ INT_PTR CALLBACK LoadingProc(HWND hwnd, UINT msg, WPARAM, LPARAM) {
         case MIDILoadingProgress::Stage::SortEvents:
             desc = LoadingStage5;
             break;
-        case MIDILoadingProgress::Stage::NCTable:
-            desc = LoadingStage6;
-            break;
         case MIDILoadingProgress::Stage::Done:
             EndDialog(hwnd, 0);
             return true;

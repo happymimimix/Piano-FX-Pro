@@ -804,19 +804,19 @@ fileln_t MIDI::ParseEventsF3(const unsigned char* pcData, fileln_t iMaxSize, msg
                 switch (eEventType) {
                 case MIDIMetaEvent::SetTempo:
                     if (vTempo)
-                        vTempo->push_back(pair<mms_t, idx_t>(pEvent->GetAbsMicroSec(), vMetaEvents->size() - 1));
+                        vTempo->push_back(static_cast<idx_t>(vMetaEvents->size() - 1));
                     break;
                 case MIDIMetaEvent::TimeSignature:
                     if (vSignature)
-                        vSignature->push_back(pair<mms_t, idx_t>(pEvent->GetAbsMicroSec(), vMetaEvents->size() - 1));
+                        vSignature->push_back(static_cast<idx_t>(vMetaEvents->size() - 1));
                     break;
                 case MIDIMetaEvent::Marker:
                     if (vMarkers)
-                        vMarkers->push_back(pair<mms_t, idx_t>(pEvent->GetAbsMicroSec(), vMetaEvents->size() - 1));
+                        vMarkers->push_back(static_cast<idx_t>(vMetaEvents->size() - 1));
                     break;
                 case MIDIMetaEvent::GenericTextA:
                     if (vColors)
-                        vColors->push_back(pair<mms_t, idx_t>(pEvent->GetAbsMicroSec(), vMetaEvents->size() - 1));
+                        vColors->push_back(static_cast<idx_t>(vMetaEvents->size() - 1));
                     break;
                 default:
                     break;
@@ -893,7 +893,7 @@ void MIDI::MIDIInfo::AddTrackInfo(const MIDITrack& mTrack)
 
 // Sets absolute time variables. A lot of code for not much happening...
 // Has to be EXACT. Even a little drift and things start messing up a few minutes in (metronome, etc)
-bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMetaEvent*>* vMetaEvents, eventvec_t* vTempo, eventvec_t* vSignature, eventvec_t* vMarkers, eventvec_t* vReplay, eventvec_t* vColors, vector<MIDISysExEvent*>* vSysExEvents)
+bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMetaEvent*>* vMetaEvents, vector<idx_t>* vTempo, vector<idx_t>* vSignature, vector<idx_t>* vMarkers, vector<idx_t>* vReplay, vector<idx_t>* vColors, vector<MIDISysExEvent*>* vSysExEvents)
 {
     // Iterator like class
     MIDIPos midiPos(*this);
@@ -957,7 +957,7 @@ bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
                     return false;
                 }
                 else {
-                    if(vReplay) vReplay->push_back(pair<mms_t, idx_t>(pEvent->GetAbsMicroSec(), vChannelEvents.size()));
+                    if(vReplay) vReplay->push_back(static_cast<idx_t>(vChannelEvents.size()));
                 }
             }
             vChannelEvents.push_back(pChannelEvent);
@@ -978,16 +978,16 @@ bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
                 vMetaEvents->push_back(pMetaEvent);
                 switch (eEventType) {
                 case MIDIMetaEvent::SetTempo:
-                    if (vTempo) vTempo->push_back(pair<mms_t, idx_t>(pEvent->GetAbsMicroSec(), vMetaEvents->size() - 1));
+                    if (vTempo) vTempo->push_back(static_cast<idx_t>(vMetaEvents->size() - 1));
                     break;
                 case MIDIMetaEvent::TimeSignature:
-                    if (vSignature) vSignature->push_back(pair<mms_t, idx_t>(pEvent->GetAbsMicroSec(), vMetaEvents->size() - 1));
+                    if (vSignature) vSignature->push_back(static_cast<idx_t>(vMetaEvents->size() - 1));
                     break;
                 case MIDIMetaEvent::Marker:
-                    if (vMarkers) vMarkers->push_back(pair<mms_t, idx_t>(pEvent->GetAbsMicroSec(), vMetaEvents->size() - 1));
+                    if (vMarkers) vMarkers->push_back(static_cast<idx_t>(vMetaEvents->size() - 1));
                     break;
                 case MIDIMetaEvent::ArduanoKivaCompatibleColorEvent:
-                    if (vColors) vColors->push_back(pair<mms_t, idx_t>(pEvent->GetAbsMicroSec(), vMetaEvents->size() - 1));
+                    if (vColors) vColors->push_back(static_cast<idx_t>(vMetaEvents->size() - 1));
                     break;
                 default:
                     break;

@@ -323,3 +323,221 @@ __forceinline void BlendNoteColor(NoteColor* Dst, NoteColor* Src)
     Dst->iVeryDarkRGB = Div255_32(sRVBV * Alpha + dRVBV * InvertAlpha, PLUS04, MASK04) & MASK04;
     Dst->iVeryDarkRGB |= static_cast<uint32_t>((Tmp02 >> 16) & 0x0000FF00);
 }
+
+namespace std {// Why there's fucking no expoenential_upper_bound in std:: already? 
+    template <class _UFwdIt, class _Ty, class _Pr>
+    _NODISCARD _CONSTEXPR20 _UFwdIt upper_bound_unchecked(_UFwdIt _UFirst, _UFwdIt _ULast, const _Ty& _Val, _Pr _Pred) {
+        // find first element that _Val is before
+        _Iter_diff_t<_UFwdIt> _Count = _STD distance(_UFirst, _ULast);
+
+        while (0 < _Count) { // divide and conquer, find half that contains answer
+            _Iter_diff_t<_UFwdIt> _Count2 = _Count / 2;
+            const auto _UMid = _STD next(_UFirst, _Count2);
+            if (_Pred(_Val, *_UMid)) {
+                _Count = _Count2;
+            }
+            else { // try top half
+                _UFirst = _Next_iter(_UMid);
+                _Count -= _Count2 + 1;
+            }
+        }
+        return _UFirst;
+    }
+
+    template <class _FwdIt, class _Ty, class _Pr>
+    _NODISCARD _CONSTEXPR20 _FwdIt exponential_upper_bound_right(_FwdIt _First, _FwdIt _Last, const _Ty& _Val, const _FwdIt _Hint, _Pr _Pred) {
+        if (_First == _Last) return _Last;
+        // find first element not before _Val
+        _Adl_verify_range(_First, _Last);
+        // const auto _UFirst = _Get_unwrapped(_First);
+        const auto _ULast = _Get_unwrapped(_Last);
+        auto _UCurrent = _Get_unwrapped(_Hint);
+        if (_Pred(_Val, *_UCurrent)) {
+            _Seek_wrapped(_First, _UCurrent);
+            return _First;
+        }
+        _Iter_diff_t<_FwdIt> _Step = 1;
+
+        Next:
+        const auto _UNext = _STD next(_UCurrent, _Step);
+        if (_UNext >= _ULast) {
+            _UCurrent = upper_bound_unchecked(_UCurrent + 1, _ULast, _Val, _Pred);
+        }
+        else if (_Pred(_Val, *_UNext)) {
+            _UCurrent = upper_bound_unchecked(_UCurrent + 1, _UNext + 1, _Val, _Pred);
+        }
+        else {
+            _UCurrent = _UNext;
+            _Step++;
+            goto Next;
+        }
+
+        _Seek_wrapped(_First, _UCurrent);
+        return _First;
+    }
+
+    template <class _FwdIt, class _Ty>
+    _NODISCARD _CONSTEXPR20 _FwdIt exponential_upper_bound_right(_FwdIt _First, _FwdIt _Last, const _Ty& _Val, const _FwdIt _Hint) {
+        // find first element not before _Val
+        return _STD exponential_upper_bound_right(_First, _Last, _Val, _Hint, less<>{});
+    }
+
+    template <class _FwdIt, class _Ty, class _Pr>
+    _NODISCARD _CONSTEXPR20 _FwdIt exponential_upper_bound_left(_FwdIt _First, _FwdIt _Last, const _Ty& _Val, const _FwdIt _Hint, _Pr _Pred) {
+        if (_First == _Last) return _Last;
+        // find first element not before _Val
+        _Adl_verify_range(_First, _Last);
+        const auto _UFirst = _Get_unwrapped(_First);
+        // const auto _ULast = _Get_unwrapped(_Last);
+        auto _UCurrent = _Get_unwrapped(_Hint);
+        if (!_Pred(_Val,*_UCurrent)) {
+            _Seek_wrapped(_First, _UCurrent);
+            return _First;
+        }
+        _Iter_diff_t<_FwdIt> _Step = -1;
+
+        Next:
+        const auto _UNext = _STD next(_UCurrent, _Step);
+        if (_UNext < _UFirst) {
+            _UCurrent = upper_bound_unchecked(_UFirst, _UCurrent, _Val, _Pred);
+        }
+        else if (_Pred( _Val,*_UNext)) {
+            _UCurrent = _UNext;
+            _Step--;
+            goto Next;
+        }
+        else {
+            _UCurrent = upper_bound_unchecked(_UNext + 1, _UCurrent, _Val, _Pred);
+        }
+
+        _Seek_wrapped(_First, _UCurrent);
+        return _First;
+    }
+
+    template <class _FwdIt, class _Ty>
+    _NODISCARD _CONSTEXPR20 _FwdIt exponential_upper_bound_left(_FwdIt _First, _FwdIt _Last, const _Ty& _Val, const _FwdIt _Hint) {
+        // find first element not before _Val
+        return _STD exponential_upper_bound_left(_First, _Last, _Val, _Hint, less<>{});
+    }
+
+    template <class _FwdIt, class _Ty, class _Pr>
+    _NODISCARD _CONSTEXPR20 _FwdIt exponential_upper_bound(_FwdIt _First, _FwdIt _Last, const _Ty& _Val, const _FwdIt _Hint, _Pr _Pred) {
+        if (_First == _Last) return _Last;
+        // find first element not before _Val
+        return _Pred(_Val, *_Hint) ?_STD exponential_upper_bound_left(_First, _Last, _Val, _Hint, _Pred) : _STD exponential_upper_bound_right(_First, _Last, _Val, _Hint, _Pred);
+    }
+
+    template <class _FwdIt, class _Ty>
+    _NODISCARD _CONSTEXPR20 _FwdIt exponential_upper_bound(_FwdIt _First, _FwdIt _Last, const _Ty& _Val, const _FwdIt _Hint) {
+        // find first element not before _Val
+        return _STD exponential_upper_bound(_First, _Last, _Val, _Hint, less<>{});
+    }
+
+    template <class _UFwdIt, class _Ty, class _Pr>
+    _NODISCARD _CONSTEXPR20 _UFwdIt lower_bound_unchecked(_UFwdIt _UFirst, _UFwdIt _ULast, const _Ty& _Val, _Pr _Pred) {
+        // find first element not before _Val
+        _Iter_diff_t<_UFwdIt> _Count = _STD distance(_UFirst, _ULast);
+
+        while (0 < _Count) { // divide and conquer, find half that contains answer
+            const _Iter_diff_t<_UFwdIt> _Count2 = _Count / 2;
+            const auto _UMid = _STD next(_UFirst, _Count2);
+            if (_Pred(*_UMid, _Val)) { // try top half
+                _UFirst = _Next_iter(_UMid);
+                _Count -= _Count2 + 1;
+            }
+            else {
+                _Count = _Count2;
+            }
+        }
+        return _UFirst;
+    }
+
+    template <class _FwdIt, class _Ty, class _Pr>
+    _NODISCARD _CONSTEXPR20 _FwdIt exponential_lower_bound_right(_FwdIt _First, _FwdIt _Last, const _Ty& _Val, const _FwdIt _Hint, _Pr _Pred) {
+        if (_First == _Last) return _Last;
+        // find first element not before _Val
+        _Adl_verify_range(_First, _Last);
+        // const auto _UFirst = _Get_unwrapped(_First);
+        const auto _ULast = _Get_unwrapped(_Last);
+        auto _UCurrent = _Get_unwrapped(_Hint);
+        if (!_Pred(*_UCurrent, _Val)) {
+            _Seek_wrapped(_First, _UCurrent);
+            return _First;
+        }
+        _Iter_diff_t<_FwdIt> _Step = 1;
+
+        Next:
+        const auto _UNext = _STD next(_UCurrent, _Step);
+        if (_UNext >= _ULast) {
+            _UCurrent = lower_bound_unchecked(_UCurrent + 1, _ULast, _Val, _Pred);
+        }
+        else if(_Pred(*_UNext, _Val)) {
+            _UCurrent = _UNext;
+            _Step++;
+            goto Next;
+        }
+        else {
+            _UCurrent = lower_bound_unchecked(_UCurrent + 1, _UNext + 1, _Val, _Pred);
+        }
+
+        _Seek_wrapped(_First, _UCurrent);
+        return _First;
+    }
+
+    template <class _FwdIt, class _Ty>
+    _NODISCARD _CONSTEXPR20 _FwdIt exponential_lower_bound_right(_FwdIt _First, _FwdIt _Last, const _Ty& _Val, const _FwdIt _Hint) {
+        // find first element not before _Val
+        return _STD exponential_lower_bound_right(_First, _Last, _Val, _Hint, less<>{});
+    }
+
+    template <class _FwdIt, class _Ty, class _Pr>
+    _NODISCARD _CONSTEXPR20 _FwdIt exponential_lower_bound_left(_FwdIt _First, _FwdIt _Last, const _Ty& _Val, const _FwdIt _Hint, _Pr _Pred) {
+        if (_First == _Last) return _Last;
+        // find first element not before _Val
+        _Adl_verify_range(_First, _Last);
+        const auto _UFirst = _Get_unwrapped(_First);
+        // const auto _ULast = _Get_unwrapped(_Last);
+        auto _UCurrent = _Get_unwrapped(_Hint);
+        if (_Pred(*_UCurrent, _Val)) {
+            _Seek_wrapped(_First, _UCurrent);
+            return _First;
+        }
+        _Iter_diff_t<_FwdIt> _Step = -1;
+
+        Next:
+        const auto _UNext = _STD next(_UCurrent, _Step);
+        if (_UNext < _UFirst) {
+            _UCurrent = lower_bound_unchecked(_UFirst, _UCurrent, _Val, _Pred);
+        }
+        else if (_Pred(*_UNext, _Val)) {
+            _UCurrent = lower_bound_unchecked(_UNext + 1, _UCurrent, _Val, _Pred);
+        }
+        else {
+            _UCurrent = _UNext;
+            _Step--;
+            goto Next;
+        }
+
+        _Seek_wrapped(_First, _UCurrent);
+        return _First;
+    }
+
+    template <class _FwdIt, class _Ty>
+    _NODISCARD _CONSTEXPR20 _FwdIt exponential_lower_bound_left(_FwdIt _First, _FwdIt _Last, const _Ty& _Val, const _FwdIt _Hint) {
+        // find first element not before _Val
+        return _STD exponential_lower_bound_left(_First, _Last, _Val, _Hint, less<>{});
+    }
+
+    template <class _FwdIt, class _Ty, class _Pr>
+    _NODISCARD _CONSTEXPR20 _FwdIt exponential_lower_bound(_FwdIt _First, _FwdIt _Last, const _Ty& _Val, const _FwdIt _Hint, _Pr _Pred) {
+        if (_First == _Last) return _Last;
+        // find first element not before _Val
+        return _Pred(*_Hint, _Val) ? _STD exponential_lower_bound_right(_First, _Last, _Val, _Hint, _Pred) : _STD exponential_lower_bound_left(_First, _Last, _Val, _Hint, _Pred);
+    }
+
+    template <class _FwdIt, class _Ty>
+    _NODISCARD _CONSTEXPR20 _FwdIt exponential_lower_bound(_FwdIt _First, _FwdIt _Last, const _Ty& _Val, const _FwdIt _Hint) {
+        // find first element not before _Val
+        return _STD exponential_lower_bound(_First, _Last, _Val, _Hint, less<>{});
+    }
+}

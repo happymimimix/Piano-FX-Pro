@@ -326,7 +326,6 @@ public:
     MainScreen(wstring sMIDIFile, HWND hWnd, Renderer11* pRenderer);
     ~MainScreen() {
         PointersInitialized = false;
-        delete[] m_vNCTable;
         delete m_pState;
         delete m_pStateReversed;
         // Event payloads are released by the pool in m_MIDI's destructor; these vectors are views.
@@ -404,7 +403,8 @@ private:
     idx_t m_itNextColor;
     idx_t m_itNextSysEx;
     idx_t m_itReplayPosition;
-    idx_t* m_vNCTable;
+    idx_t m_iStartPosSub1Sec;
+    idx_t m_itReplayPositionSub1Sec;
     bpm_t m_iMicroSecsPerBeat; // Tempo
     mtk_t m_iLastTempoTick; // Tempo
     mms_t m_llLastTempoTime; // Tempo
