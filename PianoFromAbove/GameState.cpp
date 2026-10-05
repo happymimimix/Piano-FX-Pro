@@ -2141,7 +2141,6 @@ void MainScreen::RenderLines() {
 void MainScreen::RenderNotes() {
     // Even when there are no notes on screen we still gotta do this!
     InitKeyColor();
-    m_iPolyphony = 0;
     if (m_pStateReversed && !IsLastFrameReversed) m_iStartPos--;
     if (!m_pStateReversed && IsLastFrameReversed) m_iStartPos++;
     if (m_pStateReversed) m_iEndPos++;
@@ -2188,7 +2187,6 @@ void MainScreen::RenderNotes() {
                 if (!m_pStateReversed) RenderNote(pEvent);
                 if (!IsPressed(pEvent->GetParam1())) PressAndBlend(pEvent);
             }
-            m_iPolyphony++;
         });
     }
     else {
@@ -2198,7 +2196,6 @@ void MainScreen::RenderNotes() {
                 if (!m_pStateReversed) RenderNote(pEvent);
                 PressAndBlend(pEvent);
             }
-            m_iPolyphony++;
         });
         if (m_pStateReversed) {
             m_pStateReversed->ForEach([&](idx_t idx) {
@@ -2588,21 +2585,24 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
     if (m_llStartTime < 0)
         llStartTimeFormatted.insert(0, "-");
 
+    idx_t iPos = m_iStartPos + (IsLastFrameReversed ? 1 : 0);
+
+    m_iPolyphony = iPos < m_vEvents.size() ? m_vEvents[iPos]->GetSimultaneous() : 0;
     wstring polyFormatted = to_wstring(m_iPolyphony);
     for (signed short i = polyFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
         polyFormatted.insert(i, L",");
+
+    // Passed note count = current position in event stream minus all encountered non-note events plus all currently held notes divide by two.
+    // We must plus all currently held notes before dividing by two because the "off" part is not included between the start of the event stream and the current position in event stream!
+    m_iPassed = (iPos - m_itReplayPosition + m_iPolyphony) / 2;
+    wstring passedFormatted = to_wstring(m_iPassed);
+    for (signed short i = passedFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
+        passedFormatted.insert(i, L",");
 
     m_iNPS = m_vNCTable[min(max(m_llStartTime / MS, 0LL), iMaxMS)] - m_vNCTable[min(max((m_llStartTime - S) / MS, 0LL), iMaxMS)];
     wstring npsFormatted = to_wstring(m_iNPS);
     for (signed short i = npsFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
         npsFormatted.insert(i, L",");
-
-    // Passed note count = current position in event stream minus all encountered non-note events plus all currently held notes divide by two.
-    // We must plus all currently held notes before dividing by two because the "off" part is not included between the start of the event stream and the current position in event stream!
-    m_iPassed = (m_iStartPos + (IsLastFrameReversed ? 1 : 0) - (m_itReplayPosition - m_vReplayTable.begin()) + m_iPolyphony) / 2;
-    wstring passedFormatted = to_wstring(m_iPassed);
-    for (signed short i = passedFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
-        passedFormatted.insert(i, L",");
 
     RenderStatusLine(cur_line++, StatisticsText1, L"%s", L"v" VersionString);
     RenderStatusLine(cur_line++, StatisticsText2, L"");

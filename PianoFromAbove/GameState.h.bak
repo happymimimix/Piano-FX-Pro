@@ -364,7 +364,7 @@ private:
     void ApplyColor(MIDIMetaEvent* event);
     void AdvanceIterators(mms_t llTime, bool bIsJump);
     void SendSysEx(MIDISysExEvent* pSysEx);
-    MIDIMetaEvent* GetPrevious(idx_t& itCurrent, const vector<idx_t>& vEventMap, msgln_t iDataLen);
+    MIDIMetaEvent* GetPrevious(eventvec_t::const_iterator& itCurrent, const eventvec_t& vEventMap, msgln_t iDataLen);
 
     // MIDI helpers
     mtk_t GetCurrentTick(mms_t llStartTime);

@@ -37,6 +37,8 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │       └───DONE
 │   │   └───Retire signed index type completely
 │   │       └───DONE
+│   ├───Background image&background HSB adjustment
+│   │   └───TODO
 │   ├───Bitset based state tracking
 │   │   └───DONE
 │   ├───Dump played events

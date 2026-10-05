@@ -37,6 +37,8 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „¤„Ÿ„Ÿ„ŸRetire signed index type completely
 „    „        „¤„Ÿ„Ÿ„ŸDONE
+„    „¥„Ÿ„Ÿ„ŸBackground image&background HSB adjustment
+„    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „¥„Ÿ„Ÿ„ŸBitset based state tracking
 „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „¥„Ÿ„Ÿ„ŸDump played events
