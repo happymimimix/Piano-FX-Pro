@@ -368,7 +368,7 @@ namespace std {// Why there's fucking no expoenential_upper_bound in std:: alrea
         }
         else {
             _UCurrent = _UNext;
-            _Step++;
+            _Step*=2;
             goto Next;
         }
 
@@ -403,7 +403,7 @@ namespace std {// Why there's fucking no expoenential_upper_bound in std:: alrea
         }
         else if (_Pred( _Val,*_UNext)) {
             _UCurrent = _UNext;
-            _Step--;
+            _Step*=2;
             goto Next;
         }
         else {
@@ -473,7 +473,7 @@ namespace std {// Why there's fucking no expoenential_upper_bound in std:: alrea
         }
         else if(_Pred(*_UNext, _Val)) {
             _UCurrent = _UNext;
-            _Step++;
+            _Step*=2;
             goto Next;
         }
         else {
@@ -514,7 +514,7 @@ namespace std {// Why there's fucking no expoenential_upper_bound in std:: alrea
         }
         else {
             _UCurrent = _UNext;
-            _Step--;
+            _Step*=2;
             goto Next;
         }
 
