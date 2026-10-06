@@ -361,14 +361,14 @@ namespace std {// Why there's fucking no expoenential_upper_bound in std:: alrea
         Next:
         const auto _UNext = _STD next(_UCurrent, _Step);
         if (_UNext >= _ULast) {
-            _UCurrent = upper_bound_unchecked(_UCurrent + 1, _ULast, _Val, _Pred);
+            _UCurrent = upper_bound_unchecked(_STD next(_UCurrent), _ULast, _Val, _Pred);
         }
         else if (_Pred(_Val, *_UNext)) {
-            _UCurrent = upper_bound_unchecked(_UCurrent + 1, _UNext + 1, _Val, _Pred);
+            _UCurrent = upper_bound_unchecked(_STD next(_UCurrent), _UNext, _Val, _Pred);
         }
         else {
             _UCurrent = _UNext;
-            _Step*=2;
+            _Step += _Step;
             goto Next;
         }
 
@@ -403,11 +403,11 @@ namespace std {// Why there's fucking no expoenential_upper_bound in std:: alrea
         }
         else if (_Pred( _Val,*_UNext)) {
             _UCurrent = _UNext;
-            _Step*=2;
+            _Step += _Step;
             goto Next;
         }
         else {
-            _UCurrent = upper_bound_unchecked(_UNext + 1, _UCurrent, _Val, _Pred);
+            _UCurrent = upper_bound_unchecked(_STD next(_UNext), _UCurrent, _Val, _Pred);
         }
 
         _Seek_wrapped(_First, _UCurrent);
@@ -469,15 +469,15 @@ namespace std {// Why there's fucking no expoenential_upper_bound in std:: alrea
         Next:
         const auto _UNext = _STD next(_UCurrent, _Step);
         if (_UNext >= _ULast) {
-            _UCurrent = lower_bound_unchecked(_UCurrent + 1, _ULast, _Val, _Pred);
+            _UCurrent = lower_bound_unchecked(_STD next(_UCurrent), _ULast, _Val, _Pred);
         }
         else if(_Pred(*_UNext, _Val)) {
             _UCurrent = _UNext;
-            _Step*=2;
+            _Step += _Step;
             goto Next;
         }
         else {
-            _UCurrent = lower_bound_unchecked(_UCurrent + 1, _UNext + 1, _Val, _Pred);
+            _UCurrent = lower_bound_unchecked(_STD next(_UCurrent), _UNext, _Val, _Pred);
         }
 
         _Seek_wrapped(_First, _UCurrent);
@@ -510,11 +510,11 @@ namespace std {// Why there's fucking no expoenential_upper_bound in std:: alrea
             _UCurrent = lower_bound_unchecked(_UFirst, _UCurrent, _Val, _Pred);
         }
         else if (_Pred(*_UNext, _Val)) {
-            _UCurrent = lower_bound_unchecked(_UNext + 1, _UCurrent, _Val, _Pred);
+            _UCurrent = lower_bound_unchecked(_STD next(_UNext), _UCurrent, _Val, _Pred);
         }
         else {
             _UCurrent = _UNext;
-            _Step*=2;
+            _Step += _Step;
             goto Next;
         }
 
