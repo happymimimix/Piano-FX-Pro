@@ -396,9 +396,6 @@ GameState::GameError SplashScreen::Logic() {
     // Needs start time to be set. For creating textparticles.
     RenderGlobals();
 
-    // Advance end position
-    while (m_iEndPos + 1 < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() < llEndTime) m_iEndPos++;
-
     // Advance start position
     while (m_iStartPos < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iStartPos]->GetAbsMicroSec() <= m_llStartTime)
     {
@@ -420,7 +417,8 @@ GameState::GameError SplashScreen::Logic() {
         m_iStartPos++;
     }
 
-    PointersInitialized = false;
+    // Advance end position
+    while (m_iEndPos + 1 < static_cast<idx_t>(m_vEvents.size()) && m_vEvents[m_iEndPos + 1]->GetAbsMicroSec() < llEndTime) m_iEndPos++;
 
     return Success;
 }
@@ -1117,29 +1115,27 @@ GameState::GameError MainScreen::Logic() {
 
     RenderGlobals();
     bool Reverse = m_dSpeed < 0;
+    if (Reverse) {
+        if (!IsLastFrameReversed) {
+            m_iStartPos--;
+            const mms_t llSub1Sec = m_llStartTime + S;
+            m_iStartPosSub1Sec = static_cast<idx_t>(exponential_lower_bound(m_vEvents.begin(), m_vEvents.end(), llSub1Sec, m_vEvents.begin() + m_iStartPosSub1Sec, [](MIDIChannelEvent* event, mms_t target) { return event->GetAbsMicroSec() < target; }) - m_vEvents.begin());
+            m_itReplayPositionSub1Sec = static_cast<idx_t>(exponential_lower_bound(m_vReplayTable.begin(), m_vReplayTable.end(), llSub1Sec, m_vReplayTable.begin() + m_itReplayPositionSub1Sec, [&](idx_t index, mms_t target) { return m_vEvents[index]->GetAbsMicroSec() < target; }) - m_vReplayTable.begin());
+        }
+        IsLastFrameReversed = true;
+    }
+    else {
+        if (IsLastFrameReversed) {
+            m_iStartPos++;
+            const mms_t llSub1Sec = m_llStartTime - S;
+            m_iStartPosSub1Sec = static_cast<idx_t>(exponential_upper_bound(m_vEvents.begin(), m_vEvents.end(), llSub1Sec, m_vEvents.begin() + m_iStartPosSub1Sec, [](mms_t target, MIDIChannelEvent* event) { return target < event->GetAbsMicroSec(); }) - m_vEvents.begin());
+            m_itReplayPositionSub1Sec = static_cast<idx_t>(exponential_upper_bound(m_vReplayTable.begin(), m_vReplayTable.end(), llSub1Sec, m_vReplayTable.begin() + m_itReplayPositionSub1Sec, [&](mms_t target, idx_t index) { return target < m_vEvents[index]->GetAbsMicroSec(); }) - m_vReplayTable.begin());
+        }
+        IsLastFrameReversed = false;
+    }
 
     // Advance the start position! 
-    if (!m_bPaused)
-    {
-        if (Reverse) {
-            if (!IsLastFrameReversed) {
-                m_iStartPos--;
-                const mms_t llSub1Sec = m_llStartTime + S;
-                m_iStartPosSub1Sec = static_cast<idx_t>(exponential_lower_bound(m_vEvents.begin(), m_vEvents.end(), llSub1Sec, m_vEvents.begin() + m_iStartPosSub1Sec, [](MIDIChannelEvent* event, mms_t target) { return event->GetAbsMicroSec() < target; }) - m_vEvents.begin());
-                m_itReplayPositionSub1Sec = static_cast<idx_t>(exponential_lower_bound(m_vReplayTable.begin(), m_vReplayTable.end(), llSub1Sec, m_vReplayTable.begin() + m_itReplayPositionSub1Sec, [&](idx_t index, mms_t target) { return m_vEvents[index]->GetAbsMicroSec() < target; }) - m_vReplayTable.begin());
-            }
-            IsLastFrameReversed = true;
-        }
-        else {
-            if (IsLastFrameReversed) {
-                m_iStartPos++;
-                const mms_t llSub1Sec = m_llStartTime - S;
-                m_iStartPosSub1Sec = static_cast<idx_t>(exponential_upper_bound(m_vEvents.begin(), m_vEvents.end(), llSub1Sec, m_vEvents.begin() + m_iStartPosSub1Sec, [](mms_t target, MIDIChannelEvent* event) { return target < event->GetAbsMicroSec(); }) - m_vEvents.begin());
-                m_itReplayPositionSub1Sec = static_cast<idx_t>(exponential_upper_bound(m_vReplayTable.begin(), m_vReplayTable.end(), llSub1Sec, m_vReplayTable.begin() + m_itReplayPositionSub1Sec, [&](mms_t target, idx_t index) { return target < m_vEvents[index]->GetAbsMicroSec(); }) - m_vReplayTable.begin());
-            }
-            IsLastFrameReversed = false;
-        }
-
+    if (!m_bPaused) {
         // We want to use a different loop head in different scenario. 
         if (Reverse) goto ReversedLoopCondition; else goto NormalLoopCondition;
         ReversedLoopCondition:
@@ -1748,7 +1744,7 @@ void MainScreen::ApplyCurrentSignature() {
 }
 
 void MainScreen::ApplyCurrentMarker() {
-    if (m_itNextMarker != 0 && m_vMarkers[m_itNextMarker - 1] != IDX_MAX) {
+    if (m_itNextMarker != 0) {
         MIDIMetaEvent* const pEvent = m_vMetaEvents[m_vMarkers[m_itNextMarker - 1]];
         ApplyMarker(pEvent->GetData(), pEvent->GetDataLen());
     }
