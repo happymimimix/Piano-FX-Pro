@@ -124,6 +124,8 @@
 #define oColorBox pColorBox+ColorBox //Octuple
 #define nColorBox oColorBox+ColorBox //Nonuple
 #define cColorBox nColorBox+ColorBox //deCuple
+#define Border dMargin
+#define mBorder mdMargin
 #define KeySelectW 30+Margin
 #define SpinnerW 40+Margin
 #define MarkerEncodingW 80+Margin
