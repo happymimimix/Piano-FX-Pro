@@ -1081,20 +1081,9 @@ GameState::GameError MainScreen::Logic() {
     
     if (iOldStartTick != m_iPrevTick && JumpTarget == ~0) { // Handle tick jump from cheat engine
         // We need to find the tempo region that this jump lands in first, here we use upper_bound.
-        m_itNextTempo = static_cast<idx_t>(upper_bound(m_vTempo.begin(), m_vTempo.end(), iOldStartTick, [&](mtk_t target, idx_t index) {return target < m_vMetaEvents[index]->GetAbsTick(); }) - m_vTempo.begin());
-        MIDIMetaEvent* pPrevious = GetPrevious(m_itNextTempo, m_vTempo, 3);
-        if (pPrevious)
-        {
-            MIDI::Parse24Bit(pPrevious->GetData(), 3, (uint32_t*)&m_iMicroSecsPerBeat);
-            m_iMicroSecsPerBeat |= !m_iMicroSecsPerBeat;// Clamp to > 0
-            m_iLastTempoTick = pPrevious->GetAbsTick();
-            m_llLastTempoTime = pPrevious->GetAbsMicroSec();
-        }
-        else
-        {
-            m_iMicroSecsPerBeat = 500000;
-            m_llLastTempoTime = m_iLastTempoTick = 0;
-        }
+        m_itNextTempo = static_cast<idx_t>(upper_bound(m_vTempo.begin(), m_vTempo.end(), iOldStartTick, [&](mtk_t target, idx_t index) { return target < m_vMetaEvents[index]->GetAbsTick(); }) - m_vTempo.begin());
+        ExtendFirstMetaEventToFirstNote(m_itNextTempo, m_vTempo);
+        ApplyCurrentTempo();
         // Now use GetTickTime to figure out the corrisponding microsecond. 
         m_llStartTime = GetTickTime(iOldStartTick);
         AdvanceIterators(m_llStartTime, false);
@@ -1130,11 +1119,21 @@ GameState::GameError MainScreen::Logic() {
     if (!m_bPaused)
     {
         if (Reverse) {
-            if (!IsLastFrameReversed) m_iStartPos--;
+            if (!IsLastFrameReversed) {
+                m_iStartPos--;
+                const mms_t llSub1Sec = m_llStartTime + S;
+                m_iStartPosSub1Sec = static_cast<idx_t>(exponential_lower_bound(m_vEvents.begin(), m_vEvents.end(), llSub1Sec, m_vEvents.begin() + m_iStartPosSub1Sec, [](MIDIChannelEvent* event, mms_t target) { return event->GetAbsMicroSec() < target; }) - m_vEvents.begin());
+                m_itReplayPositionSub1Sec = static_cast<idx_t>(exponential_lower_bound(m_vReplayTable.begin(), m_vReplayTable.end(), llSub1Sec, m_vReplayTable.begin() + m_itReplayPositionSub1Sec, [&](idx_t index, mms_t target) { return m_vEvents[index]->GetAbsMicroSec() < target; }) - m_vReplayTable.begin());
+            }
             IsLastFrameReversed = true;
         }
         else {
-            if (IsLastFrameReversed) m_iStartPos++;
+            if (IsLastFrameReversed) {
+                m_iStartPos++;
+                const mms_t llSub1Sec = m_llStartTime - S;
+                m_iStartPosSub1Sec = static_cast<idx_t>(exponential_upper_bound(m_vEvents.begin(), m_vEvents.end(), llSub1Sec, m_vEvents.begin() + m_iStartPosSub1Sec, [](mms_t target, MIDIChannelEvent* event) { return target < event->GetAbsMicroSec(); }) - m_vEvents.begin());
+                m_itReplayPositionSub1Sec = static_cast<idx_t>(exponential_upper_bound(m_vReplayTable.begin(), m_vReplayTable.end(), llSub1Sec, m_vReplayTable.begin() + m_itReplayPositionSub1Sec, [&](mms_t target, idx_t index) { return target < m_vEvents[index]->GetAbsMicroSec(); }) - m_vReplayTable.begin());
+            }
             IsLastFrameReversed = false;
         }
 
@@ -1453,9 +1452,7 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
     // Find start position...
     auto itBegin = m_vEvents.begin();
     auto itEnd = m_vEvents.end();
-    auto itMiddle = lower_bound(itBegin, itEnd, m_llStartTime, [&](MIDIChannelEvent* lhs, const mms_t rhs) {
-        return lhs->GetAbsMicroSec() < rhs;
-        });
+    auto itMiddle = lower_bound(itBegin, itEnd, m_llStartTime, [](MIDIChannelEvent* lhs, const mms_t rhs) { return lhs->GetAbsMicroSec() < rhs; });
     m_iEndPos = m_iStartPos = itMiddle - m_vEvents.begin();
 
     // Find the notes that occur simultaneously with the previous note on...
@@ -1550,20 +1547,13 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
     // Play skipped control change and program change: 
     if (!loadingMode) {
         if (m_itNextColor < prev_itNextColor) prev_itNextColor = 0;
-        for (; prev_itNextColor < static_cast<idx_t>(m_vColors.size()) && prev_itNextColor != m_itNextColor; ++prev_itNextColor)
-        {
-            MIDIMetaEvent* pEvent = m_vMetaEvents[m_vColors[prev_itNextColor]];
-            ApplyColor(pEvent);
-        }
+        for (; prev_itNextColor < static_cast<idx_t>(m_vColors.size()) && prev_itNextColor != m_itNextColor; ++prev_itNextColor) ApplyColor(m_vMetaEvents[m_vColors[prev_itNextColor]]);
         if (m_itNextSysEx < prev_itNextSysEx) prev_itNextSysEx = 0;
-        for (; prev_itNextSysEx < static_cast<idx_t>(m_vSysExEvents.size()) && prev_itNextSysEx != m_itNextSysEx; ++prev_itNextSysEx)
-        {
-            SendSysEx(m_vSysExEvents[prev_itNextSysEx]);
-        }
+        for (; prev_itNextSysEx < static_cast<idx_t>(m_vSysExEvents.size()) && prev_itNextSysEx != m_itNextSysEx; ++prev_itNextSysEx) SendSysEx(m_vSysExEvents[prev_itNextSysEx]);
         // I know there are more efficient ways to implement this, but this should be fast enough to be acceptable in practice.
         if (m_itReplayPosition < prev_itReplayPosition) prev_itReplayPosition = 0;
         for (; prev_itReplayPosition < static_cast<idx_t>(m_vReplayTable.size()) && prev_itReplayPosition != m_itReplayPosition; ++prev_itReplayPosition) {
-            MIDIChannelEvent* pEvent = m_vEvents[m_vReplayTable[prev_itReplayPosition]];
+            MIDIChannelEvent* const pEvent = m_vEvents[m_vReplayTable[prev_itReplayPosition]];
             key_t key = pEvent->GetParam1();
             key_t vel = pEvent->GetParam2();
             if (IsNotNote(pEvent->GetChannelEventType())) {
@@ -1660,44 +1650,22 @@ void MainScreen::SendSysEx(MIDISysExEvent * pSysEx) {
 
 void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
     if (bIsJump) {
+        const idx_t itCurTempo = m_itNextTempo;
         m_itNextTempo = static_cast<idx_t>(upper_bound(m_vTempo.begin(), m_vTempo.end(), llTime, [&](mms_t target, idx_t index) { return target < m_vMetaEvents[index]->GetAbsMicroSec(); }) - m_vTempo.begin());
-        MIDIMetaEvent* pPrevious = GetPrevious(m_itNextTempo, m_vTempo, 3);
-        if (pPrevious)
-        {
-            MIDI::Parse24Bit(pPrevious->GetData(), 3, (uint32_t*)&m_iMicroSecsPerBeat);
-            m_iMicroSecsPerBeat |= !m_iMicroSecsPerBeat;// Clamp to > 0
-            m_iLastTempoTick = pPrevious->GetAbsTick();
-            m_llLastTempoTime = pPrevious->GetAbsMicroSec();
+        if (itCurTempo != m_itNextTempo) {
+            ExtendFirstMetaEventToFirstNote(m_itNextTempo, m_vTempo);
+            ApplyCurrentTempo();
         }
-        else {
-            m_iMicroSecsPerBeat = 500000;
-            m_llLastTempoTime = m_iLastTempoTick = 0;
-        }
+        const idx_t itCurSignature = m_itNextSignature;
         m_itNextSignature = static_cast<idx_t>(upper_bound(m_vSignature.begin(), m_vSignature.end(), llTime, [&](mms_t target, idx_t index) { return target < m_vMetaEvents[index]->GetAbsMicroSec(); }) - m_vSignature.begin());
-        pPrevious = GetPrevious(m_itNextSignature, m_vSignature, 4);
-        if (pPrevious)
-        {
-            m_iBeatsPerMeasure = pPrevious->GetData()[0];
-            m_iBeatType = 1 << pPrevious->GetData()[1];
-            m_iClocksPerMet = pPrevious->GetData()[2];
-            m_iLastSignatureTick = pPrevious->GetAbsTick();
+        if (itCurSignature != m_itNextSignature) {
+            ExtendFirstMetaEventToFirstNote(m_itNextSignature, m_vSignature);
+            ApplyCurrentSignature();
         }
-        else {
-            m_iBeatsPerMeasure = 4;
-            m_iBeatType = 4;
-            m_iClocksPerMet = 24;
-            m_iLastSignatureTick = 0;
-        }
-        auto itCurMarker = m_itNextMarker;
+        const idx_t itCurMarker = m_itNextMarker;
         m_itNextMarker = static_cast<idx_t>(upper_bound(m_vMarkers.begin(), m_vMarkers.end(), llTime, [&](mms_t target, idx_t index) { return target < m_vMetaEvents[index]->GetAbsMicroSec(); }) - m_vMarkers.begin());
         if (itCurMarker != m_itNextMarker) {
-            if (m_itNextMarker != 0 && m_vMarkers[m_itNextMarker - 1] != IDX_MAX) {
-                const auto eEvent = m_vMetaEvents[m_vMarkers[m_itNextMarker - 1]];
-                ApplyMarker(eEvent->GetData(), eEvent->GetDataLen());
-            }
-            else {
-                ApplyMarker(nullptr, 0);
-            }
+            ApplyCurrentMarker();
         }
         m_itNextColor = static_cast<idx_t>(lower_bound(m_vColors.begin(), m_vColors.end(), llTime, [&](idx_t index, mms_t target) { return m_vMetaEvents[index]->GetAbsMicroSec() < target; }) - m_vColors.begin());
         m_itNextSysEx = static_cast<idx_t>(lower_bound(m_vSysExEvents.begin(), m_vSysExEvents.end(), llTime, [](const MIDISysExEvent* message, mms_t target) { return message->GetAbsMicroSec() < target; }) - m_vSysExEvents.begin());
@@ -1708,132 +1676,50 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
     }
     else {
         if (m_dSpeed < 0) {
-            idx_t itCurTempo = m_itNextTempo;
+            const idx_t itCurTempo = m_itNextTempo;
             m_itNextTempo = static_cast<idx_t>(exponential_upper_bound_left(m_vTempo.begin(), m_vTempo.end(), llTime, m_vTempo.begin() + m_itNextTempo, [&](mms_t target, idx_t index) { return target < m_vMetaEvents[index]->GetAbsMicroSec(); }) - m_vTempo.begin());
             if (itCurTempo != m_itNextTempo) {
-            if (m_itNextTempo != 0)
-            {
-                MIDIMetaEvent* pEvent = m_vMetaEvents[m_vTempo[m_itNextTempo - 1]];
-                if (pEvent->GetDataLen() == 3)
-                {
-                    MIDI::Parse24Bit(pEvent->GetData(), 3, (uint32_t*)&m_iMicroSecsPerBeat);
-                    m_iMicroSecsPerBeat |= !m_iMicroSecsPerBeat;// Clamp to > 0
-                    m_iLastTempoTick = pEvent->GetAbsTick();
-                    m_llLastTempoTime = pEvent->GetAbsMicroSec();
-                }
+                ExtendFirstMetaEventToFirstNote(m_itNextTempo, m_vTempo);
+                ApplyCurrentTempo();
             }
-            else {
-                m_iMicroSecsPerBeat = 500000;
-                m_llLastTempoTime = m_iLastTempoTick = 0;
-            }
-            }
-            idx_t itCurSignature = m_itNextSignature;
+            const idx_t itCurSignature = m_itNextSignature;
             m_itNextSignature = static_cast<idx_t>(exponential_upper_bound_left(m_vSignature.begin(), m_vSignature.end(), llTime, m_vSignature.begin() + m_itNextSignature, [&](mms_t target, idx_t index) { return target < m_vMetaEvents[index]->GetAbsMicroSec(); }) - m_vSignature.begin());
             if (itCurSignature != m_itNextSignature) {
-            if (m_itNextSignature != 0)
-            {
-                MIDIMetaEvent* pEvent = m_vMetaEvents[m_vSignature[m_itNextSignature - 1]];
-                if (pEvent->GetDataLen() == 4)
-                {
-                    m_iBeatsPerMeasure = pEvent->GetData()[0];
-                    m_iBeatType = 1 << pEvent->GetData()[1];
-                    m_iClocksPerMet = pEvent->GetData()[2];
-                    m_iLastSignatureTick = pEvent->GetAbsTick();
-                }
+                ExtendFirstMetaEventToFirstNote(m_itNextSignature, m_vSignature);
+                ApplyCurrentSignature();
             }
-            else {
-                m_iBeatsPerMeasure = 4;
-                m_iBeatType = 4;
-                m_iClocksPerMet = 24;
-                m_iLastSignatureTick = 0;
-            }
-            }
-            idx_t itCurMarker = m_itNextMarker;
+            const idx_t itCurMarker = m_itNextMarker;
             m_itNextMarker = static_cast<idx_t>(exponential_upper_bound_left(m_vMarkers.begin(), m_vMarkers.end(), llTime, m_vMarkers.begin() + m_itNextMarker, [&](mms_t target, idx_t index) { return target < m_vMetaEvents[index]->GetAbsMicroSec(); }) - m_vMarkers.begin());
             if (itCurMarker != m_itNextMarker) {
-                if (m_itNextMarker != 0 && m_vMarkers[m_itNextMarker - 1] != IDX_MAX) {
-                    const auto eEvent = m_vMetaEvents[m_vMarkers[m_itNextMarker - 1]];
-                    ApplyMarker(eEvent->GetData(), eEvent->GetDataLen());
-                }
-                else {
-                    ApplyMarker(nullptr, 0);
-                }
+                ApplyCurrentMarker();
             }
-            for (; m_itNextColor != 0 && m_vMetaEvents[m_vColors[m_itNextColor - 1]]->GetAbsMicroSec() >= llTime; --m_itNextColor)
-            {
-                MIDIMetaEvent* pEvent = m_vMetaEvents[m_vColors[m_itNextColor - 1]];
-                ApplyColor(pEvent);
-            }
-            for (; m_itNextSysEx != 0 && m_vSysExEvents[m_itNextSysEx - 1]->GetAbsMicroSec() >= llTime; --m_itNextSysEx)
-            {
-                SendSysEx(m_vSysExEvents[m_itNextSysEx - 1]);
-            }
+            for (; m_itNextColor != 0 && m_vMetaEvents[m_vColors[m_itNextColor - 1]]->GetAbsMicroSec() >= llTime; --m_itNextColor) ApplyColor(m_vMetaEvents[m_vColors[m_itNextColor - 1]]);
+            for (; m_itNextSysEx != 0 && m_vSysExEvents[m_itNextSysEx - 1]->GetAbsMicroSec() >= llTime; --m_itNextSysEx) SendSysEx(m_vSysExEvents[m_itNextSysEx - 1]);
             m_itReplayPosition = static_cast<idx_t>(exponential_lower_bound_left(m_vReplayTable.begin(), m_vReplayTable.end(), llTime, m_vReplayTable.begin() + m_itReplayPosition, [&](idx_t index, mms_t target) { return m_vEvents[index]->GetAbsMicroSec() < target; }) - m_vReplayTable.begin());
-            const mms_t llSub1Sec = llTime - S;
+            const mms_t llSub1Sec = llTime + S;
             m_iStartPosSub1Sec = static_cast<idx_t>(exponential_lower_bound_left(m_vEvents.begin(), m_vEvents.end(), llSub1Sec, m_vEvents.begin() + m_iStartPosSub1Sec, [](MIDIChannelEvent* event, mms_t target) { return event->GetAbsMicroSec() < target; }) - m_vEvents.begin());
             m_itReplayPositionSub1Sec = static_cast<idx_t>(exponential_lower_bound_left(m_vReplayTable.begin(), m_vReplayTable.end(), llSub1Sec, m_vReplayTable.begin() + m_itReplayPositionSub1Sec, [&](idx_t index, mms_t target) { return m_vEvents[index]->GetAbsMicroSec() < target; }) - m_vReplayTable.begin());
         }
         else {
-            idx_t itCurTempo = m_itNextTempo;
+            const idx_t itCurTempo = m_itNextTempo;
             m_itNextTempo = static_cast<idx_t>(exponential_upper_bound_right(m_vTempo.begin(), m_vTempo.end(), llTime, m_vTempo.begin() + m_itNextTempo, [&](mms_t target, idx_t index) { return target < m_vMetaEvents[index]->GetAbsMicroSec(); }) - m_vTempo.begin());
             if (itCurTempo != m_itNextTempo) {
-            if (m_itNextTempo != 0)
-            {
-                MIDIMetaEvent* pEvent = m_vMetaEvents[m_vTempo[m_itNextTempo]];
-                if (pEvent->GetDataLen() == 3)
-                {
-                    MIDI::Parse24Bit(pEvent->GetData(), 3, (uint32_t*)&m_iMicroSecsPerBeat);
-                    m_iMicroSecsPerBeat |= !m_iMicroSecsPerBeat;// Clamp to > 0
-                    m_iLastTempoTick = pEvent->GetAbsTick();
-                    m_llLastTempoTime = pEvent->GetAbsMicroSec();
-                }
+                ExtendFirstMetaEventToFirstNote(m_itNextTempo, m_vTempo);
+                ApplyCurrentTempo();
             }
-            else {
-                m_iMicroSecsPerBeat = 500000;
-                m_llLastTempoTime = m_iLastTempoTick = 0;
-            }
-            }
-            idx_t itCurSignature = m_itNextSignature;
+            const idx_t itCurSignature = m_itNextSignature;
             m_itNextSignature = static_cast<idx_t>(exponential_upper_bound_right(m_vSignature.begin(), m_vSignature.end(), llTime, m_vSignature.begin() + m_itNextSignature, [&](mms_t target, idx_t index) { return target < m_vMetaEvents[index]->GetAbsMicroSec(); }) - m_vSignature.begin());
             if (itCurSignature != m_itNextSignature) {
-            if (m_itNextSignature != 0)
-            {
-                MIDIMetaEvent* pEvent = m_vMetaEvents[m_vSignature[m_itNextSignature]];
-                if (pEvent->GetDataLen() == 4)
-                {
-                    m_iBeatsPerMeasure = pEvent->GetData()[0];
-                    m_iBeatType = 1 << pEvent->GetData()[1];
-                    m_iClocksPerMet = pEvent->GetData()[2];
-                    m_iLastSignatureTick = pEvent->GetAbsTick();
-                }
+                ExtendFirstMetaEventToFirstNote(m_itNextSignature, m_vSignature);
+                ApplyCurrentSignature();
             }
-            else {
-                m_iBeatsPerMeasure = 4;
-                m_iBeatType = 4;
-                m_iClocksPerMet = 24;
-                m_iLastSignatureTick = 0;
-            }
-            }
-            auto itCurMarker = m_itNextMarker;
+            const idx_t itCurMarker = m_itNextMarker;
             m_itNextMarker = static_cast<idx_t>(exponential_upper_bound_right(m_vMarkers.begin(), m_vMarkers.end(), llTime, m_vMarkers.begin() + m_itNextMarker, [&](mms_t target, idx_t index) { return target < m_vMetaEvents[index]->GetAbsMicroSec(); }) - m_vMarkers.begin());
             if (itCurMarker != m_itNextMarker) {
-                if (m_itNextMarker != 0 && m_vMarkers[m_itNextMarker - 1] != IDX_MAX) {
-                    const auto eEvent = m_vMetaEvents[m_vMarkers[m_itNextMarker - 1]];
-                    ApplyMarker(eEvent->GetData(), eEvent->GetDataLen());
-                }
-                else {
-                    ApplyMarker(nullptr, 0);
-                }
+                ApplyCurrentMarker();
             }
-            for (; m_itNextColor < static_cast<idx_t>(m_vColors.size()) && m_vMetaEvents[m_vColors[m_itNextColor]]->GetAbsMicroSec() <= llTime; ++m_itNextColor)
-            {
-                MIDIMetaEvent* pEvent = m_vMetaEvents[m_vColors[m_itNextColor]];
-                ApplyColor(pEvent);
-            }
-            for (; m_itNextSysEx < static_cast<idx_t>(m_vSysExEvents.size()) && m_vSysExEvents[m_itNextSysEx]->GetAbsMicroSec() <= llTime; ++m_itNextSysEx)
-            {
-                SendSysEx(m_vSysExEvents[m_itNextSysEx]);
-            }
+            for (; m_itNextColor < static_cast<idx_t>(m_vColors.size()) && m_vMetaEvents[m_vColors[m_itNextColor]]->GetAbsMicroSec() <= llTime; ++m_itNextColor) ApplyColor(m_vMetaEvents[m_vColors[m_itNextColor]]);
+            for (; m_itNextSysEx < static_cast<idx_t>(m_vSysExEvents.size()) && m_vSysExEvents[m_itNextSysEx]->GetAbsMicroSec() <= llTime; ++m_itNextSysEx) SendSysEx(m_vSysExEvents[m_itNextSysEx]);
             m_itReplayPosition = static_cast<idx_t>(exponential_upper_bound_right(m_vReplayTable.begin(), m_vReplayTable.end(), llTime, m_vReplayTable.begin() + m_itReplayPosition, [&](mms_t target, idx_t index) { return target < m_vEvents[index]->GetAbsMicroSec(); }) - m_vReplayTable.begin());
             const mms_t llSub1Sec = llTime - S;
             m_iStartPosSub1Sec = static_cast<idx_t>(exponential_upper_bound_right(m_vEvents.begin(), m_vEvents.end(), llSub1Sec, m_vEvents.begin() + m_iStartPosSub1Sec, [](mms_t target, MIDIChannelEvent* event) { return target < event->GetAbsMicroSec(); }) - m_vEvents.begin());
@@ -1842,25 +1728,49 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
     }
 }
 
-// Might change the value of itCurrent
-MIDIMetaEvent* MainScreen::GetPrevious(idx_t& itCurrent, const vector<idx_t>& vEventMap, msgln_t iDataLen) {
-    const MIDI::MIDIInfo& mInfo = m_MIDI.GetInfo();
-    idx_t it = itCurrent;
-    if (itCurrent != 0)
-    {
-        while (it != 0) {
-            --it;
-            MIDIMetaEvent* pEvent = m_vMetaEvents[vEventMap[it]];
-            if (pEvent->GetDataLen() == iDataLen) return pEvent;
-        }
+// Apply state represented by one-past meta-event cursors.
+void MainScreen::ApplyCurrentTempo() {
+    if (m_itNextTempo != 0) {
+        MIDIMetaEvent* const pEvent = m_vMetaEvents[m_vTempo[m_itNextTempo - 1]];
+        MIDI::Parse24Bit(pEvent->GetData(), 3, reinterpret_cast<uint32_t*>(&m_iMicroSecsPerBeat));
+        m_iMicroSecsPerBeat |= !m_iMicroSecsPerBeat; //Clamp to > 0
+        m_iLastTempoTick = pEvent->GetAbsTick();
+        m_llLastTempoTime = pEvent->GetAbsMicroSec();
     }
-    else if (!vEventMap.empty()) {
-        MIDIMetaEvent* pEvent = m_vMetaEvents[vEventMap[it]];
-        if(pEvent->GetAbsMicroSec() <= mInfo.llFirstNote && pEvent->GetDataLen() == iDataLen) {
-        ++itCurrent;
-        return pEvent;
-    }}
-    return NULL;
+    else {
+        m_iMicroSecsPerBeat = 500000;
+        m_llLastTempoTime = m_iLastTempoTick = 0;
+    }
+}
+
+void MainScreen::ApplyCurrentSignature() {
+    if (m_itNextSignature != 0) {
+        MIDIMetaEvent* const pEvent = m_vMetaEvents[m_vSignature[m_itNextSignature - 1]];
+        m_iBeatsPerMeasure = pEvent->GetData()[0];
+        m_iBeatType = 1 << pEvent->GetData()[1];
+        m_iClocksPerMet = pEvent->GetData()[2];
+        m_iLastSignatureTick = pEvent->GetAbsTick();
+    }
+    else {
+        m_iBeatsPerMeasure = 4;
+        m_iBeatType = 4;
+        m_iClocksPerMet = 24;
+        m_iLastSignatureTick = 0;
+    }
+}
+
+void MainScreen::ApplyCurrentMarker() {
+    if (m_itNextMarker != 0 && m_vMarkers[m_itNextMarker - 1] != IDX_MAX) {
+        MIDIMetaEvent* const pEvent = m_vMetaEvents[m_vMarkers[m_itNextMarker - 1]];
+        ApplyMarker(pEvent->GetData(), pEvent->GetDataLen());
+    }
+    else {
+        ApplyMarker(nullptr, 0);
+    }
+}
+
+void MainScreen::ExtendFirstMetaEventToFirstNote(idx_t& itCurrent, const vector<idx_t>& vEventMap) {
+    if (itCurrent == 0 && !vEventMap.empty() && m_vMetaEvents[vEventMap.front()]->GetAbsMicroSec() <= m_MIDI.GetInfo().llFirstNote) itCurrent = 1;
 }
 
 // Gets the tick corresponding to llStartTime using current tempo
@@ -2105,20 +2015,18 @@ void MainScreen::RenderLines() {
             iNextBeatTick = GetBeatTick(iCurrTick + 1, iBeatType, iLastSignatureTick);
 
             // Next beat crosses the next tempo event. handle the event and recalculate next beat time
-            while (itNextTempo < static_cast<idx_t>(m_vTempo.size()) && m_vMetaEvents[m_vTempo[itNextTempo]]->GetDataLen() == 3 &&
-                iNextBeatTick > m_vMetaEvents[m_vTempo[itNextTempo]]->GetAbsTick())
+            while (itNextTempo < static_cast<idx_t>(m_vTempo.size()) && iNextBeatTick > m_vMetaEvents[m_vTempo[itNextTempo]]->GetAbsTick())
             {
-                MIDIMetaEvent* pEvent = m_vMetaEvents[m_vTempo[itNextTempo]];
+                MIDIMetaEvent* const pEvent = m_vMetaEvents[m_vTempo[itNextTempo]];
                 MIDI::Parse24Bit(pEvent->GetData(), 3, reinterpret_cast<uint32_t*>(&iMicroSecsPerBeat));
                 iMicroSecsPerBeat |= !iMicroSecsPerBeat;// Clamp to > 0
                 iLastTempoTick = pEvent->GetAbsTick();
                 llLastTempoTime = pEvent->GetAbsMicroSec();
                 ++itNextTempo;
             }
-            while (itNextSignature < static_cast<idx_t>(m_vSignature.size()) && m_vMetaEvents[m_vSignature[itNextSignature]]->GetDataLen() == 4 &&
-                iNextBeatTick > m_vMetaEvents[m_vSignature[itNextSignature]]->GetAbsTick())
+            while (itNextSignature < static_cast<idx_t>(m_vSignature.size()) && iNextBeatTick > m_vMetaEvents[m_vSignature[itNextSignature]]->GetAbsTick())
             {
-                MIDIMetaEvent* pEvent = m_vMetaEvents[m_vSignature[itNextSignature]];
+                MIDIMetaEvent* const pEvent = m_vMetaEvents[m_vSignature[itNextSignature]];
                 iBeatsPerMeasure = pEvent->GetData()[0];
                 iBeatType = 1 << pEvent->GetData()[1];
                 iLastSignatureTick = pEvent->GetAbsTick();
@@ -2603,7 +2511,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
 
     const idx_t iPolyphonySub1Sec = m_iStartPosSub1Sec < m_vEvents.size() ? m_vEvents[m_iStartPosSub1Sec]->GetSimultaneous() : 0;
     const idx_t iPassedSub1Sec = (m_iStartPosSub1Sec - m_itReplayPositionSub1Sec + iPolyphonySub1Sec) / 2;
-    m_iNPS = m_iPassed - iPassedSub1Sec;
+    m_iNPS = IsLastFrameReversed ? iPassedSub1Sec - m_iPassed : m_iPassed - iPassedSub1Sec;
     wstring npsFormatted = to_wstring(m_iNPS);
     for (signed short i = npsFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
         npsFormatted.insert(i, L",");

@@ -361,9 +361,12 @@ private:
     void JumpTo(mms_t llStartTime, bool loadingMode = false);
     void ApplyMarker(unsigned char* data, msgln_t size);
     void ApplyColor(MIDIMetaEvent* event);
+    void ApplyCurrentTempo();
+    void ApplyCurrentSignature();
+    void ApplyCurrentMarker();
+    void ExtendFirstMetaEventToFirstNote(idx_t& itCurrent, const vector<idx_t>& vEventMap);
     void AdvanceIterators(mms_t llTime, bool bIsJump);
     void SendSysEx(MIDISysExEvent* pSysEx);
-    MIDIMetaEvent* GetPrevious(idx_t& itCurrent, const vector<idx_t>& vEventMap, msgln_t iDataLen);
 
     // MIDI helpers
     mtk_t GetCurrentTick(mms_t llStartTime);

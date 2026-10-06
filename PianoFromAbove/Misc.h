@@ -349,10 +349,9 @@ namespace std {// Why there's fucking no expoenential_upper_bound in std:: alrea
         if (_First == _Last) return _Last;
         // find first element not before _Val
         _Adl_verify_range(_First, _Last);
-        // const auto _UFirst = _Get_unwrapped(_First);
         const auto _ULast = _Get_unwrapped(_Last);
         auto _UCurrent = _Get_unwrapped(_Hint);
-        if (_UCurrent != _ULast) return _Last;
+        if (_UCurrent == _ULast) return _Last;
         if (_Pred(_Val, *_UCurrent)) {
             _Seek_wrapped(_First, _UCurrent);
             return _First;
@@ -389,7 +388,7 @@ namespace std {// Why there's fucking no expoenential_upper_bound in std:: alrea
         // find first element not before _Val
         _Adl_verify_range(_First, _Last);
         const auto _UFirst = _Get_unwrapped(_First);
-        // const auto _ULast = _Get_unwrapped(_Last);
+        const auto _ULast = _Get_unwrapped(_Last);
         auto _UCurrent = _Get_unwrapped(_Hint);
         if (_UCurrent != _ULast && !_Pred(_Val,*_UCurrent)) {
             _Seek_wrapped(_First, _UCurrent);
@@ -459,10 +458,9 @@ namespace std {// Why there's fucking no expoenential_upper_bound in std:: alrea
         if (_First == _Last) return _Last;
         // find first element not before _Val
         _Adl_verify_range(_First, _Last);
-        // const auto _UFirst = _Get_unwrapped(_First);
         const auto _ULast = _Get_unwrapped(_Last);
         auto _UCurrent = _Get_unwrapped(_Hint);
-        if (_UCurrent != _ULast) return _Last;
+        if (_UCurrent == _ULast) return _Last;
         if (!_Pred(*_UCurrent, _Val)) {
             _Seek_wrapped(_First, _UCurrent);
             return _First;
@@ -499,7 +497,7 @@ namespace std {// Why there's fucking no expoenential_upper_bound in std:: alrea
         // find first element not before _Val
         _Adl_verify_range(_First, _Last);
         const auto _UFirst = _Get_unwrapped(_First);
-        // const auto _ULast = _Get_unwrapped(_Last);
+        const auto _ULast = _Get_unwrapped(_Last);
         auto _UCurrent = _Get_unwrapped(_Hint);
         if (_UCurrent != _ULast && _Pred(*_UCurrent, _Val)) {
             _Seek_wrapped(_First, _UCurrent);

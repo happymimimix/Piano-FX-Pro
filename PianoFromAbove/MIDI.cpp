@@ -978,10 +978,10 @@ bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
                 vMetaEvents->push_back(pMetaEvent);
                 switch (eEventType) {
                 case MIDIMetaEvent::SetTempo:
-                    if (vTempo) vTempo->push_back(static_cast<idx_t>(vMetaEvents->size() - 1));
+                    if (vTempo && pMetaEvent->GetDataLen() == 3) vTempo->push_back(static_cast<idx_t>(vMetaEvents->size() - 1));
                     break;
                 case MIDIMetaEvent::TimeSignature:
-                    if (vSignature) vSignature->push_back(static_cast<idx_t>(vMetaEvents->size() - 1));
+                    if (vSignature && pMetaEvent->GetDataLen() == 4) vSignature->push_back(static_cast<idx_t>(vMetaEvents->size() - 1));
                     break;
                 case MIDIMetaEvent::Marker:
                     if (vMarkers) vMarkers->push_back(static_cast<idx_t>(vMetaEvents->size() - 1));
