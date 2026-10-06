@@ -352,6 +352,7 @@ namespace std {// Why there's fucking no expoenential_upper_bound in std:: alrea
         // const auto _UFirst = _Get_unwrapped(_First);
         const auto _ULast = _Get_unwrapped(_Last);
         auto _UCurrent = _Get_unwrapped(_Hint);
+        if (_UCurrent != _ULast) return _Last;
         if (_Pred(_Val, *_UCurrent)) {
             _Seek_wrapped(_First, _UCurrent);
             return _First;
@@ -390,7 +391,7 @@ namespace std {// Why there's fucking no expoenential_upper_bound in std:: alrea
         const auto _UFirst = _Get_unwrapped(_First);
         // const auto _ULast = _Get_unwrapped(_Last);
         auto _UCurrent = _Get_unwrapped(_Hint);
-        if (!_Pred(_Val,*_UCurrent)) {
+        if (_UCurrent != _ULast && !_Pred(_Val,*_UCurrent)) {
             _Seek_wrapped(_First, _UCurrent);
             return _First;
         }
@@ -422,8 +423,9 @@ namespace std {// Why there's fucking no expoenential_upper_bound in std:: alrea
 
     template <class _FwdIt, class _Ty, class _Pr>
     _NODISCARD _CONSTEXPR20 _FwdIt exponential_upper_bound(_FwdIt _First, _FwdIt _Last, const _Ty& _Val, const _FwdIt _Hint, _Pr _Pred) {
-        if (_First == _Last) return _Last;
         // find first element not before _Val
+        if (_First == _Last) return _Last;
+        if (_Hint == _Last) return _STD exponential_upper_bound_left(_First, _Last, _Val, _Hint, _Pred);
         return _Pred(_Val, *_Hint) ?_STD exponential_upper_bound_left(_First, _Last, _Val, _Hint, _Pred) : _STD exponential_upper_bound_right(_First, _Last, _Val, _Hint, _Pred);
     }
 
@@ -460,6 +462,7 @@ namespace std {// Why there's fucking no expoenential_upper_bound in std:: alrea
         // const auto _UFirst = _Get_unwrapped(_First);
         const auto _ULast = _Get_unwrapped(_Last);
         auto _UCurrent = _Get_unwrapped(_Hint);
+        if (_UCurrent != _ULast) return _Last;
         if (!_Pred(*_UCurrent, _Val)) {
             _Seek_wrapped(_First, _UCurrent);
             return _First;
@@ -498,7 +501,7 @@ namespace std {// Why there's fucking no expoenential_upper_bound in std:: alrea
         const auto _UFirst = _Get_unwrapped(_First);
         // const auto _ULast = _Get_unwrapped(_Last);
         auto _UCurrent = _Get_unwrapped(_Hint);
-        if (_Pred(*_UCurrent, _Val)) {
+        if (_UCurrent != _ULast && _Pred(*_UCurrent, _Val)) {
             _Seek_wrapped(_First, _UCurrent);
             return _First;
         }
@@ -530,8 +533,9 @@ namespace std {// Why there's fucking no expoenential_upper_bound in std:: alrea
 
     template <class _FwdIt, class _Ty, class _Pr>
     _NODISCARD _CONSTEXPR20 _FwdIt exponential_lower_bound(_FwdIt _First, _FwdIt _Last, const _Ty& _Val, const _FwdIt _Hint, _Pr _Pred) {
-        if (_First == _Last) return _Last;
         // find first element not before _Val
+        if (_First == _Last) return _Last;
+        if (_Hint == _Last) return _STD exponential_lower_bound_left(_First, _Last, _Val, _Hint, _Pred);
         return _Pred(*_Hint, _Val) ? _STD exponential_lower_bound_right(_First, _Last, _Val, _Hint, _Pred) : _STD exponential_lower_bound_left(_First, _Last, _Val, _Hint, _Pred);
     }
 
