@@ -56,7 +56,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „¤„Ÿ„Ÿ„ŸLogic loop
 „    „        „¤„Ÿ„Ÿ„ŸTODO
 „    „¥„Ÿ„Ÿ„ŸExponential search optimization
-„    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „¥„Ÿ„Ÿ„ŸHighlight playing notes
 „    „    „¥„Ÿ„Ÿ„ŸMainScreen
 „    „    „    „¥„Ÿ„Ÿ„ŸPixelShaders
@@ -126,7 +126,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „¤„Ÿ„Ÿ„Ÿv3 zero memory iterator based NC
 „    „        „¥„Ÿ„Ÿ„ŸNPS
-„    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „        „    „¤„Ÿ„Ÿ„ŸDONE
 „    „        „¥„Ÿ„Ÿ„ŸPassed
 „    „        „    „¤„Ÿ„Ÿ„ŸDONE
 „    „        „¤„Ÿ„Ÿ„ŸPolyphony
@@ -170,6 +170,8 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Port dependent pitchbend visualization' to controls
 „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Show lyrics' to render
+„    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Topmost statistics' to render
 „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „¥„Ÿ„Ÿ„ŸAdd '[x] Allow unknown SMF3 generators' to controls
 „    „    „    „¤„Ÿ„Ÿ„ŸTODO
@@ -320,6 +322,8 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „        „¥„Ÿ„Ÿ„ŸExpose DX11 GDI compatible backbuffer to CE
 „    „        „    „¤„Ÿ„Ÿ„ŸTODO
 „    „        „¥„Ÿ„Ÿ„ŸObtain image from backbuffer
+„    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „        „¥„Ÿ„Ÿ„ŸTopmost statistics
 „    „        „    „¤„Ÿ„Ÿ„ŸTODO
 „    „        „¤„Ÿ„Ÿ„ŸWriteback modified image
 „    „            „¤„Ÿ„Ÿ„ŸTODO

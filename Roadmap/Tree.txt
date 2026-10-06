@@ -56,7 +56,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   └───Logic loop
 │   │       └───TODO
 │   ├───Exponential search optimization
-│   │   └───TODO
+│   │   └───DONE
 │   ├───Highlight playing notes
 │   │   ├───MainScreen
 │   │   │   ├───PixelShaders
@@ -126,7 +126,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   └───DONE
 │   │   └───v3 zero memory iterator based NC
 │   │       ├───NPS
-│   │       │   └───TODO
+│   │       │   └───DONE
 │   │       ├───Passed
 │   │       │   └───DONE
 │   │       └───Polyphony
@@ -170,6 +170,8 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   ├───Add '[ ] Port dependent pitchbend visualization' to controls
 │   │   │   └───TODO
 │   │   ├───Add '[ ] Show lyrics' to render
+│   │   │   └───TODO
+│   │   ├───Add '[ ] Topmost statistics' to render
 │   │   │   └───TODO
 │   │   ├───Add '[x] Allow unknown SMF3 generators' to controls
 │   │   │   └───TODO
@@ -320,6 +322,8 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │       ├───Expose DX11 GDI compatible backbuffer to CE
 │   │       │   └───TODO
 │   │       ├───Obtain image from backbuffer
+│   │       │   └───TODO
+│   │       ├───Topmost statistics
 │   │       │   └───TODO
 │   │       └───Writeback modified image
 │   │           └───TODO
