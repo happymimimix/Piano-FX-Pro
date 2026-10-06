@@ -1081,12 +1081,12 @@ GameState::GameError MainScreen::Logic() {
     
     if (iOldStartTick != m_iPrevTick && JumpTarget == ~0) { // Handle tick jump from cheat engine
         // We need to find the tempo region that this jump lands in first, here we use upper_bound.
+        const idx_t itCurTempo = m_itNextTempo;
         m_itNextTempo = static_cast<idx_t>(upper_bound(m_vTempo.begin(), m_vTempo.end(), iOldStartTick, [&](mtk_t target, idx_t index) { return target < m_vMetaEvents[index]->GetAbsTick(); }) - m_vTempo.begin());
         ExtendFirstMetaEventToFirstNote(m_itNextTempo, m_vTempo);
-        ApplyCurrentTempo();
+        if (itCurTempo != m_itNextTempo) ApplyCurrentTempo();
         // Now use GetTickTime to figure out the corrisponding microsecond. 
         m_llStartTime = GetTickTime(iOldStartTick);
-        AdvanceIterators(m_llStartTime, false);
         // We can finally make the jump now! 
         JumpTarget = m_llStartTime;
         JumpTo(m_llStartTime, true);
@@ -1652,21 +1652,16 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
     if (bIsJump) {
         const idx_t itCurTempo = m_itNextTempo;
         m_itNextTempo = static_cast<idx_t>(upper_bound(m_vTempo.begin(), m_vTempo.end(), llTime, [&](mms_t target, idx_t index) { return target < m_vMetaEvents[index]->GetAbsMicroSec(); }) - m_vTempo.begin());
-        if (itCurTempo != m_itNextTempo) {
-            ExtendFirstMetaEventToFirstNote(m_itNextTempo, m_vTempo);
-            ApplyCurrentTempo();
-        }
+        ExtendFirstMetaEventToFirstNote(m_itNextTempo, m_vTempo);
+        if (itCurTempo != m_itNextTempo) ApplyCurrentTempo();
         const idx_t itCurSignature = m_itNextSignature;
         m_itNextSignature = static_cast<idx_t>(upper_bound(m_vSignature.begin(), m_vSignature.end(), llTime, [&](mms_t target, idx_t index) { return target < m_vMetaEvents[index]->GetAbsMicroSec(); }) - m_vSignature.begin());
-        if (itCurSignature != m_itNextSignature) {
-            ExtendFirstMetaEventToFirstNote(m_itNextSignature, m_vSignature);
-            ApplyCurrentSignature();
-        }
+        ExtendFirstMetaEventToFirstNote(m_itNextSignature, m_vSignature);
+        if (itCurSignature != m_itNextSignature) ApplyCurrentSignature();
         const idx_t itCurMarker = m_itNextMarker;
         m_itNextMarker = static_cast<idx_t>(upper_bound(m_vMarkers.begin(), m_vMarkers.end(), llTime, [&](mms_t target, idx_t index) { return target < m_vMetaEvents[index]->GetAbsMicroSec(); }) - m_vMarkers.begin());
-        if (itCurMarker != m_itNextMarker) {
-            ApplyCurrentMarker();
-        }
+        ExtendFirstMetaEventToFirstNote(m_itNextMarker, m_vMarkers);
+        if (itCurMarker != m_itNextMarker) ApplyCurrentMarker();
         m_itNextColor = static_cast<idx_t>(lower_bound(m_vColors.begin(), m_vColors.end(), llTime, [&](idx_t index, mms_t target) { return m_vMetaEvents[index]->GetAbsMicroSec() < target; }) - m_vColors.begin());
         m_itNextSysEx = static_cast<idx_t>(lower_bound(m_vSysExEvents.begin(), m_vSysExEvents.end(), llTime, [](const MIDISysExEvent* message, mms_t target) { return message->GetAbsMicroSec() < target; }) - m_vSysExEvents.begin());
         m_itReplayPosition = static_cast<idx_t>(lower_bound(m_vReplayTable.begin(), m_vReplayTable.end(), llTime, [&](idx_t index, mms_t target) { return m_vEvents[index]->GetAbsMicroSec() < target; }) - m_vReplayTable.begin());
@@ -1678,21 +1673,16 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
         if (m_dSpeed < 0) {
             const idx_t itCurTempo = m_itNextTempo;
             m_itNextTempo = static_cast<idx_t>(exponential_upper_bound_left(m_vTempo.begin(), m_vTempo.end(), llTime, m_vTempo.begin() + m_itNextTempo, [&](mms_t target, idx_t index) { return target < m_vMetaEvents[index]->GetAbsMicroSec(); }) - m_vTempo.begin());
-            if (itCurTempo != m_itNextTempo) {
-                ExtendFirstMetaEventToFirstNote(m_itNextTempo, m_vTempo);
-                ApplyCurrentTempo();
-            }
+            ExtendFirstMetaEventToFirstNote(m_itNextTempo, m_vTempo);
+            if (itCurTempo != m_itNextTempo) ApplyCurrentTempo();
             const idx_t itCurSignature = m_itNextSignature;
             m_itNextSignature = static_cast<idx_t>(exponential_upper_bound_left(m_vSignature.begin(), m_vSignature.end(), llTime, m_vSignature.begin() + m_itNextSignature, [&](mms_t target, idx_t index) { return target < m_vMetaEvents[index]->GetAbsMicroSec(); }) - m_vSignature.begin());
-            if (itCurSignature != m_itNextSignature) {
-                ExtendFirstMetaEventToFirstNote(m_itNextSignature, m_vSignature);
-                ApplyCurrentSignature();
-            }
+            ExtendFirstMetaEventToFirstNote(m_itNextSignature, m_vSignature);
+            if (itCurSignature != m_itNextSignature) ApplyCurrentSignature();
             const idx_t itCurMarker = m_itNextMarker;
             m_itNextMarker = static_cast<idx_t>(exponential_upper_bound_left(m_vMarkers.begin(), m_vMarkers.end(), llTime, m_vMarkers.begin() + m_itNextMarker, [&](mms_t target, idx_t index) { return target < m_vMetaEvents[index]->GetAbsMicroSec(); }) - m_vMarkers.begin());
-            if (itCurMarker != m_itNextMarker) {
-                ApplyCurrentMarker();
-            }
+            ExtendFirstMetaEventToFirstNote(m_itNextMarker, m_vMarkers);
+            if (itCurMarker != m_itNextMarker) ApplyCurrentMarker();
             for (; m_itNextColor != 0 && m_vMetaEvents[m_vColors[m_itNextColor - 1]]->GetAbsMicroSec() >= llTime; --m_itNextColor) ApplyColor(m_vMetaEvents[m_vColors[m_itNextColor - 1]]);
             for (; m_itNextSysEx != 0 && m_vSysExEvents[m_itNextSysEx - 1]->GetAbsMicroSec() >= llTime; --m_itNextSysEx) SendSysEx(m_vSysExEvents[m_itNextSysEx - 1]);
             m_itReplayPosition = static_cast<idx_t>(exponential_lower_bound_left(m_vReplayTable.begin(), m_vReplayTable.end(), llTime, m_vReplayTable.begin() + m_itReplayPosition, [&](idx_t index, mms_t target) { return m_vEvents[index]->GetAbsMicroSec() < target; }) - m_vReplayTable.begin());
@@ -1703,21 +1693,16 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
         else {
             const idx_t itCurTempo = m_itNextTempo;
             m_itNextTempo = static_cast<idx_t>(exponential_upper_bound_right(m_vTempo.begin(), m_vTempo.end(), llTime, m_vTempo.begin() + m_itNextTempo, [&](mms_t target, idx_t index) { return target < m_vMetaEvents[index]->GetAbsMicroSec(); }) - m_vTempo.begin());
-            if (itCurTempo != m_itNextTempo) {
-                ExtendFirstMetaEventToFirstNote(m_itNextTempo, m_vTempo);
-                ApplyCurrentTempo();
-            }
+            ExtendFirstMetaEventToFirstNote(m_itNextTempo, m_vTempo);
+            if (itCurTempo != m_itNextTempo) ApplyCurrentTempo();
             const idx_t itCurSignature = m_itNextSignature;
             m_itNextSignature = static_cast<idx_t>(exponential_upper_bound_right(m_vSignature.begin(), m_vSignature.end(), llTime, m_vSignature.begin() + m_itNextSignature, [&](mms_t target, idx_t index) { return target < m_vMetaEvents[index]->GetAbsMicroSec(); }) - m_vSignature.begin());
-            if (itCurSignature != m_itNextSignature) {
-                ExtendFirstMetaEventToFirstNote(m_itNextSignature, m_vSignature);
-                ApplyCurrentSignature();
-            }
+            ExtendFirstMetaEventToFirstNote(m_itNextSignature, m_vSignature);
+            if (itCurSignature != m_itNextSignature) ApplyCurrentSignature();
             const idx_t itCurMarker = m_itNextMarker;
             m_itNextMarker = static_cast<idx_t>(exponential_upper_bound_right(m_vMarkers.begin(), m_vMarkers.end(), llTime, m_vMarkers.begin() + m_itNextMarker, [&](mms_t target, idx_t index) { return target < m_vMetaEvents[index]->GetAbsMicroSec(); }) - m_vMarkers.begin());
-            if (itCurMarker != m_itNextMarker) {
-                ApplyCurrentMarker();
-            }
+            ExtendFirstMetaEventToFirstNote(m_itNextMarker, m_vMarkers);
+            if (itCurMarker != m_itNextMarker) ApplyCurrentMarker();
             for (; m_itNextColor < static_cast<idx_t>(m_vColors.size()) && m_vMetaEvents[m_vColors[m_itNextColor]]->GetAbsMicroSec() <= llTime; ++m_itNextColor) ApplyColor(m_vMetaEvents[m_vColors[m_itNextColor]]);
             for (; m_itNextSysEx < static_cast<idx_t>(m_vSysExEvents.size()) && m_vSysExEvents[m_itNextSysEx]->GetAbsMicroSec() <= llTime; ++m_itNextSysEx) SendSysEx(m_vSysExEvents[m_itNextSysEx]);
             m_itReplayPosition = static_cast<idx_t>(exponential_upper_bound_right(m_vReplayTable.begin(), m_vReplayTable.end(), llTime, m_vReplayTable.begin() + m_itReplayPosition, [&](mms_t target, idx_t index) { return target < m_vEvents[index]->GetAbsMicroSec(); }) - m_vReplayTable.begin());
