@@ -601,6 +601,9 @@ MainScreen::MainScreen(wstring sMIDIFile, HWND hWnd, Renderer11* pRenderer) : Ga
     m_itReplayPosition = 0;
     m_iStartPosSub1Sec = 0;
     m_itReplayPositionSub1Sec = 0;
+    ApplyCurrentTempo();
+    ApplyCurrentSignature();
+    ApplyCurrentMarker();
 
     // Initialize
     InitColors();
