@@ -3879,36 +3879,24 @@ rename .\Widths.hh Widths.h</Command>
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SMF3Intro.h" />
     <ClInclude Include="Studio.h" />
-    <ClInclude Include="Tab1Btn2.h">
-      <FileType>CppHeader</FileType>
-    </ClInclude>
+    <ClInclude Include="Tab1Btn2.h" />
     <ClInclude Include="Tab1.h" />
-    <ClCompile Include="Tab1Main.h">
-      <FileType>CppHeader</FileType>
-    </ClCompile>
+    <ClCompile Include="Tab1Main.h" />
     <ClInclude Include="Tab1Btn4.h" />
     <ClInclude Include="Tab1Btn5.h" />
     <ClInclude Include="Tab1Graphics.h" />
     <ClInclude Include="Tab2.h" />
-    <ClCompile Include="Tab2Main.h">
-      <FileType>CppHeader</FileType>
-    </ClCompile>
+    <ClCompile Include="Tab2Main.h" />
     <ClInclude Include="Tab2Btn4.h" />
     <ClInclude Include="Tab2Graphics.h" />
     <ClInclude Include="Tab3.h" />
-    <ClCompile Include="Tab3Main.h">
-      <FileType>CppHeader</FileType>
-    </ClCompile>
+    <ClCompile Include="Tab3Main.h" />
     <ClInclude Include="Tab3Graphics.h" />
     <ClInclude Include="Tab4.h" />
-    <ClCompile Include="Tab4Main.h">
-      <FileType>CppHeader</FileType>
-    </ClCompile>
+    <ClCompile Include="Tab4Main.h" />
     <ClInclude Include="Tab4Graphics.h" />
     <ClInclude Include="TabSwitcher.h" />
-    <ClCompile Include="TabSwitcherMain.h">
-      <FileType>CppHeader</FileType>
-    </ClCompile>
+    <ClCompile Include="TabSwitcherMain.h" />
     <ClInclude Include="ConsoleTextbox.h" />
     <ClInclude Include="tinyxml\tinystr.h" />
     <ClInclude Include="tinyxml\tinyxml.h" />
@@ -3921,9 +3909,7 @@ rename .\Widths.hh Widths.h</Command>
     <ClInclude Include="WidthsWrapper.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="PianoFromAbove.RC.cpp">
-      <FileType>CppCode</FileType>
-    </ResourceCompile>
+    <ResourceCompile Include="PianoFromAbove.RC.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Config.cpp" />
