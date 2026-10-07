@@ -124,10 +124,28 @@
 #define oColorBox pColorBox+ColorBox //Octuple
 #define nColorBox oColorBox+ColorBox //Nonuple
 #define cColorBox nColorBox+ColorBox //deCuple
-#define Border dMargin
-#define mBorder mdMargin
 #define hBorder Margin
+#define Border dMargin
+#define dBorder Border+Border //Double
+#define tBorder dBorder+Border //Triple
+#define qBorder tBorder+Border //Quadruple
+#define iBorder qBorder+Border //quIntuple
+#define xBorder iBorder+Border //seXtuple
+#define pBorder xBorder+Border //sePtuple
+#define oBorder pBorder+Border //Octuple
+#define nBorder oBorder+Border //Nonuple
+#define cBorder nBorder+Border //deCuple
 #define mhBorder mMargin
+#define mBorder mdMargin //Minus
+#define mdBorder mBorder+mBorder //Double
+#define mtBorder mdBorder+mBorder //Triple
+#define mqBorder mtBorder+mBorder //Quadruple
+#define miBorder mqBorder+mBorder //quIntuple
+#define mxBorder miBorder+mBorder //seXtuple
+#define mpBorder mxBorder+mBorder //sePtuple
+#define moBorder mpBorder+mBorder //Octuple
+#define mnBorder moBorder+mBorder //Nonuple
+#define mcBorder mnBorder+mBorder //deCuple
 #define KeySelectW 30+Margin
 #define SpinnerW 40+Margin
 #define MarkerEncodingW 80+Margin
@@ -251,6 +269,26 @@
 #define ColorBox_8x oColorBox
 #define ColorBox_9x nColorBox
 #define ColorBox_0x cColorBox
+#define Border_1x Border
+#define Border_2x dBorder
+#define Border_3x tBorder
+#define Border_4x qBorder
+#define Border_5x iBorder
+#define Border_6x xBorder
+#define Border_7x pBorder
+#define Border_8x oBorder
+#define Border_9x nBorder
+#define Border_0x cBorder
+#define mBorder_1x mBorder
+#define mBorder_2x mdBorder
+#define mBorder_3x mtBorder
+#define mBorder_4x mqBorder
+#define mBorder_5x miBorder
+#define mBorder_6x mxBorder
+#define mBorder_7x mpBorder
+#define mBorder_8x moBorder
+#define mBorder_9x mnBorder
+#define mBorder_0x mcBorder
 #define BoxSpacing_m1x mBoxSpacing
 #define BoxSpacing_m2x mdBoxSpacing
 #define BoxSpacing_m3x mtBoxSpacing
@@ -321,6 +359,16 @@
 #define ContentHeight_m8x moContentHeight
 #define ContentHeight_m9x mnContentHeight
 #define ContentHeight_m0x mcContentHeight
+#define Border_m1x mBorder
+#define Border_m2x mdBorder
+#define Border_m3x mtBorder
+#define Border_m4x mqBorder
+#define Border_m5x miBorder
+#define Border_m6x mxBorder
+#define Border_m7x mpBorder
+#define Border_m8x moBorder
+#define Border_m9x mnBorder
+#define Border_m0x mcBorder
 #define BoxSpacing01 BoxSpacing
 #define BoxSpacing02 dBoxSpacing
 #define BoxSpacing03 tBoxSpacing
@@ -431,6 +479,26 @@
 #define ColorBox08 oColorBox
 #define ColorBox09 nColorBox
 #define ColorBox10 cColorBox
+#define Border01 Border
+#define Border02 dBorder
+#define Border03 tBorder
+#define Border04 qBorder
+#define Border05 iBorder
+#define Border06 xBorder
+#define Border07 pBorder
+#define Border08 oBorder
+#define Border09 nBorder
+#define Border10 cBorder
+#define mBorder01 mBorder
+#define mBorder02 mdBorder
+#define mBorder03 mtBorder
+#define mBorder04 mqBorder
+#define mBorder05 miBorder
+#define mBorder06 mxBorder
+#define mBorder07 mpBorder
+#define mBorder08 moBorder
+#define mBorder09 mnBorder
+#define mBorder10 mcBorder
 #define BoxSpacing_1 BoxSpacing
 #define BoxSpacing_2 dBoxSpacing
 #define BoxSpacing_3 tBoxSpacing
@@ -541,6 +609,26 @@
 #define ColorBox_8 oColorBox
 #define ColorBox_9 nColorBox
 #define ColorBox_0 cColorBox
+#define Border_1 Border
+#define Border_2 dBorder
+#define Border_3 tBorder
+#define Border_4 qBorder
+#define Border_5 iBorder
+#define Border_6 xBorder
+#define Border_7 pBorder
+#define Border_8 oBorder
+#define Border_9 nBorder
+#define Border_0 cBorder
+#define mBorder_1 mBorder
+#define mBorder_2 mdBorder
+#define mBorder_3 mtBorder
+#define mBorder_4 mqBorder
+#define mBorder_5 miBorder
+#define mBorder_6 mxBorder
+#define mBorder_7 mpBorder
+#define mBorder_8 moBorder
+#define mBorder_9 mnBorder
+#define mBorder_0 mcBorder
 #define BoxSpacing_m1 mBoxSpacing
 #define BoxSpacing_m2 mdBoxSpacing
 #define BoxSpacing_m3 mtBoxSpacing
@@ -611,6 +699,16 @@
 #define ContentHeight_m8 moContentHeight
 #define ContentHeight_m9 mnContentHeight
 #define ContentHeight_m0 mcContentHeight
+#define Border_m1 mBorder
+#define Border_m2 mdBorder
+#define Border_m3 mtBorder
+#define Border_m4 mqBorder
+#define Border_m5 miBorder
+#define Border_m6 mxBorder
+#define Border_m7 mpBorder
+#define Border_m8 moBorder
+#define Border_m9 mnBorder
+#define Border_m0 mcBorder
 #define bx01 BoxSpacing
 #define bx02 dBoxSpacing
 #define bx03 tBoxSpacing
@@ -711,6 +809,26 @@
 #define mct08 moContentHeight
 #define mct09 mnContentHeight
 #define mct10 mcContentHeight
+#define bd01 Border
+#define bd02 dBorder
+#define bd03 tBorder
+#define bd04 qBorder
+#define bd05 iBorder
+#define bd06 xBorder
+#define bd07 pBorder
+#define bd08 oBorder
+#define bd09 nBorder
+#define bd10 cBorder
+#define mbd01 mBorder
+#define mbd02 mdBorder
+#define mbd03 mtBorder
+#define mbd04 mqBorder
+#define mbd05 miBorder
+#define mbd06 mxBorder
+#define mbd07 mpBorder
+#define mbd08 moBorder
+#define mbd09 mnBorder
+#define mbd10 mcBorder
 #define lr01 ColorBox
 #define lr02 dColorBox
 #define lr03 tColorBox
@@ -829,3 +947,23 @@
 #define olr oColorBox
 #define nlr nColorBox
 #define clr cColorBox
+#define bd Border
+#define dbd dBorder
+#define tbd tBorder
+#define qbd qBorder
+#define ibd iBorder
+#define xbd xBorder
+#define pbd pBorder
+#define obd oBorder
+#define nbd nBorder
+#define cbd cBorder
+#define mbd mBorder
+#define mdbd mdBorder
+#define mtbd mtBorder
+#define mqbd mqBorder
+#define mibd miBorder
+#define mxbd mxBorder
+#define mpbd mpBorder
+#define mobd moBorder
+#define mnbd mnBorder
+#define mcbd mcBorder

@@ -1,4 +1,4 @@
-﻿// Microsoft Visual C++ generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by PianoFromAbove.rc
 //
 #include <winres.h>
