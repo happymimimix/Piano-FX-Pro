@@ -13,18 +13,19 @@
 #define IDD_PP2_AUDIO                   202
 #define IDD_PP3_VIDEO                   203
 #define IDD_PP4_CONTROLS                204
-#define IDD_PP5_CONTROLS                205
-#define IDD_TRACKSETTINGS               206
-#define IDD_ABOUT                       207
-#define IDD_LOADING                     208
-#define IDD_SETRESOLUTION               209
+#define IDD_TRACKSETTINGS               205
+#define IDD_ABOUT                       206
+#define IDD_LOADING                     207
+#define IDD_SETRESOLUTION               208
 
+#define IDS_SHOWKEYS					-1
 #define IDC_SHOWALLKEYS                 301
 #define IDC_SHOWSONGKEYS                302
 #define IDC_SHOWCUSTOMKEYS              303
 #define IDC_FIRSTKEY                    304
 #define IDC_THROUGH						305
 #define IDC_LASTKEY                     306
+#define IDS_TRACKCOLORS                 -1
 #define IDC_RANDOMIZE                   307
 #define IDC_COLOR1                      308
 #define IDC_COLOR2                      309
@@ -42,43 +43,61 @@
 #define IDC_COLOR14                     321
 #define IDC_COLOR15                     322
 #define IDC_COLOR16                     323
+#define IDS_BKGCOLOR                    -1
 #define IDC_BKGCOLOR                    324
+#define IDS_BARCOLOR                    -1
 #define IDC_BARCOLOR                    325
 #define IDC_RESTOREDEFAULTS             326
+#define IDS_BACKGROUND                  -1
 #define IDC_BACKGROUND                  327
 #define IDC_BACKGROUNDBROWSE            328
 #define IDC_BACKGROUNDRESET             329
+#define IDS_PP3_VIDEO					-1
 
+#define IDS_MIDIOUT                     -1
 #define IDC_MIDIOUT                     401
 #define IDC_KDMAPI                      402
 
+#define IDS_RENDER						-1
 #define IDC_TICKBASED                   501
 #define IDC_PITCHBENDS                  502
 #define IDC_SAMEWIDTH                   503
 #define IDC_MAPVEL						504
 #define IDC_MARKERS                     505
+#define IDS_MARKERENC                   -1
 #define IDC_MARKERENC                   506
 #define IDC_LIMITFPS                    507
 #define IDC_DEBUG						508
 #define IDC_DISABLEUI                   509
 #define IDC_OR		                    510
 
+#define IDC_CONTROLS                    -1
+#define IDS_LRARROWS                    -1
 #define IDC_LRARROWS                    601
 #define IDC_LRARROWSSPIN                602
+#define IDS_SECS					    -1
+#define IDS_UDARROWS                    -1
 #define IDC_UDARROWS                    603
 #define IDC_UDARROWSSPIN                604
+#define IDS_CENTS						-1
 #define IDC_SHOWCONTROLS                605
 #define IDC_PHIGROS                     606
+#define IDS_SPLASHMIDI                  -1
 #define IDC_SPLASHMIDI                  607
 #define IDC_SPLASHBROWSE                608
 #define IDC_SPLASHRESET                 609
+#define IDS_VELSTRSHLD                  -1
 #define IDC_VELSTRSHLD                  610
 #define IDC_VELSTRSHLDSPIN              611
 #define IDC_FFMPEG                      612
 
+#define IDS_FILE                        -1
 #define IDC_FILE                        801
+#define IDS_FOLDER                      -1
 #define IDC_FOLDER                      802
+#define IDS_NOTES                       -1
 #define IDC_NOTES                       803
+#define IDS_LENGTH                      -1
 #define IDC_LENGTH                      804
 #define IDC_TRACKS                      805
 #define IDC_NOLAG                       806
@@ -89,7 +108,9 @@
 #define IDC_LOADINGNUM                  903
 #define IDC_MEMUSAGE                    904
 
+#define IDS_WIDTH                       -1
 #define IDC_WIDTH                       1001
+#define IDS_HEIGHT                      -1
 #define IDC_HEIGHT                      1002
 
 #define ID_FILE_PRACTICE				1101
