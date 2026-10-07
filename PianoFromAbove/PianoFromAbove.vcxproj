@@ -3921,67 +3921,8 @@ rename .\Widths.hh Widths.h</Command>
     <ClInclude Include="WidthsWrapper.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="PianoFromAbove.RC.h">
-      <Culture Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">0x0411</Culture>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">0x0411</Culture>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</SuppressStartupBanner>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</SuppressStartupBanner>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">0x0411</Culture>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='Korean|Win32'">0x0411</Culture>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Korean|x64'">false</SuppressStartupBanner>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Korean|Win32'">false</SuppressStartupBanner>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">0x0411</Culture>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='Japanese|Win32'">0x0411</Culture>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Japanese|x64'">false</SuppressStartupBanner>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Japanese|Win32'">false</SuppressStartupBanner>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">0x0411</Culture>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='DPRK|Win32'">0x0411</Culture>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">false</SuppressStartupBanner>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='DPRK|Win32'">false</SuppressStartupBanner>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">0x0411</Culture>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='Chinese|Win32'">0x0411</Culture>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">false</SuppressStartupBanner>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Chinese|Win32'">false</SuppressStartupBanner>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">0x0411</Culture>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='Russian|Win32'">0x0411</Culture>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">false</SuppressStartupBanner>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Russian|Win32'">false</SuppressStartupBanner>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">0x0411</Culture>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='NoOptimization|Win32'">0x0411</Culture>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">false</SuppressStartupBanner>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='NoOptimization|Win32'">false</SuppressStartupBanner>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">0x0411</Culture>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='Arinoglish|Win32'">0x0411</Culture>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">false</SuppressStartupBanner>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Arinoglish|Win32'">false</SuppressStartupBanner>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">0x0411</Culture>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|Win32'">0x0411</Culture>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">0x0411</Culture>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='LimitedColor|Win32'">0x0411</Culture>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">0x0411</Culture>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='BIG|Win32'">0x0411</Culture>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">0x0411</Culture>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|Win32'">0x0411</Culture>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">false</SuppressStartupBanner>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|Win32'">false</SuppressStartupBanner>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">false</SuppressStartupBanner>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='LimitedColor|Win32'">false</SuppressStartupBanner>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='BIG|x64'">false</SuppressStartupBanner>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='BIG|Win32'">false</SuppressStartupBanner>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|x64'">false</SuppressStartupBanner>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='AlwaysBIG|Win32'">false</SuppressStartupBanner>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='Release|x64'">0x0411</Culture>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">0x0411</Culture>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</SuppressStartupBanner>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</SuppressStartupBanner>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">0x0411</Culture>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='Hiragana|Win32'">0x0411</Culture>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Hiragana|x64'">false</SuppressStartupBanner>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Hiragana|Win32'">false</SuppressStartupBanner>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">0x0411</Culture>
-      <Culture Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|Win32'">0x0411</Culture>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|x64'">false</SuppressStartupBanner>
-      <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='DoubleArinoglish|Win32'">false</SuppressStartupBanner>
+    <ResourceCompile Include="PianoFromAbove.RC.cpp">
+      <FileType>CppCode</FileType>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>

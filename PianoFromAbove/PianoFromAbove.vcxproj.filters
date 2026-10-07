@@ -476,7 +476,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="PianoFromAbove.RC.h">
+    <ResourceCompile Include="PianoFromAbove.RC.cpp">
       <Filter>Resource Files\GUI</Filter>
     </ResourceCompile>
   </ItemGroup>
