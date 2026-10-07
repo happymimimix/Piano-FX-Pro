@@ -3876,7 +3876,7 @@ rename .\Widths.hh Widths.h</Command>
     <ClInclude Include="RectPixelShader.h" />
     <ClInclude Include="RectVertexShader.h" />
     <ClInclude Include="Renderer.h" />
-    <ClInclude Include="resource.h" />
+    <ClInclude Include="Resource.h" />
     <ClInclude Include="SMF3Intro.h" />
     <ClInclude Include="Studio.h" />
     <ClInclude Include="Tab1Btn2.h">
@@ -3921,7 +3921,7 @@ rename .\Widths.hh Widths.h</Command>
     <ClInclude Include="WidthsWrapper.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="PianoFromAbove.rc">
+    <ResourceCompile Include="PianoFromAbove.RC.h">
       <Culture Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">0x0411</Culture>
       <Culture Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">0x0411</Culture>
       <SuppressStartupBanner Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</SuppressStartupBanner>

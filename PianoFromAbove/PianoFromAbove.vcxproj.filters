@@ -85,11 +85,20 @@
     <Filter Include="Resource Files\Embedded ffmpeg.exe">
       <UniqueIdentifier>{bfb735c4-31ac-4c24-b72e-f60975558e20}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\LanguagePacks">
-      <UniqueIdentifier>{59c079ee-d026-4177-a960-984f15feddf8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\monocypher">
       <UniqueIdentifier>{7ff0a4ed-b47e-4662-9711-d5faeae04094}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Directx11 HLSL Shaders">
+      <UniqueIdentifier>{c3b82545-17fd-43fc-ac56-e1cda7330f4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\GUI">
+      <UniqueIdentifier>{e2c26e13-071f-4185-861f-ec208fb265d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\GUI\LanguagePacks">
+      <UniqueIdentifier>{59c079ee-d026-4177-a960-984f15feddf8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Demo MIDI">
+      <UniqueIdentifier>{4a2389a4-7d54-49d4-be04-32d6a3fbcf07}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -279,17 +288,8 @@
     <ClInclude Include="ConsoleNumberSpinner.h">
       <Filter>Source Files\Piano-FX Studio\Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
     <ClInclude Include="ModdingAPI.h">
       <Filter>Source Files\ModdingRelated</Filter>
-    </ClInclude>
-    <ClInclude Include="imguiCompressedFont2GDI.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Fonts.h">
-      <Filter>Resource Files</Filter>
     </ClInclude>
     <ClInclude Include="LanguagePacks.hpp">
       <Filter>Generated Files %28DO NOT EDIT!%29</Filter>
@@ -337,28 +337,37 @@
       <Filter>Source Files\Piano-FX Studio\TouchEventListeners\Tab1\SubViews</Filter>
     </ClInclude>
     <ClInclude Include="LanguagePacks.h">
-      <Filter>Resource Files\LanguagePacks</Filter>
+      <Filter>Resource Files\GUI\LanguagePacks</Filter>
     </ClInclude>
     <ClInclude Include="Matrices.h">
-      <Filter>Resource Files\LanguagePacks</Filter>
+      <Filter>Resource Files\GUI\LanguagePacks</Filter>
     </ClInclude>
     <ClInclude Include="WidthsWrapper.h">
-      <Filter>Resource Files\LanguagePacks</Filter>
+      <Filter>Resource Files\GUI\LanguagePacks</Filter>
     </ClInclude>
     <ClInclude Include="FallbackStrings.h">
-      <Filter>Resource Files\LanguagePacks</Filter>
+      <Filter>Resource Files\GUI\LanguagePacks</Filter>
     </ClInclude>
     <ClInclude Include="DebugLanguageOverride.h">
-      <Filter>Resource Files\LanguagePacks</Filter>
+      <Filter>Resource Files\GUI\LanguagePacks</Filter>
     </ClInclude>
     <ClInclude Include="PackWrapper.h">
-      <Filter>Resource Files\LanguagePacks</Filter>
+      <Filter>Resource Files\GUI\LanguagePacks</Filter>
     </ClInclude>
     <ClInclude Include="FallbackStrings.hpp">
       <Filter>Generated Files %28DO NOT EDIT!%29</Filter>
     </ClInclude>
     <ClInclude Include="monocypher\monocypher.h">
       <Filter>Header Files\monocypher</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Resource Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Fonts.h">
+      <Filter>Resource Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imguiCompressedFont2GDI.h">
+      <Filter>Resource Files\GUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -423,52 +432,52 @@
       <Filter>Source Files\Piano-FX Studio\Tutorials</Filter>
     </ClCompile>
     <ClCompile Include="TextWidthCalculator.cpp">
-      <Filter>Resource Files\LanguagePacks</Filter>
+      <Filter>Resource Files\GUI\LanguagePacks</Filter>
     </ClCompile>
     <ClCompile Include="monocypher\monocypher.c">
       <Filter>Header Files\monocypher</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\mediaiconssmall.bmp">
-      <Filter>Resource Files</Filter>
+    <None Include="common.hlsl">
+      <Filter>Resource Files\Directx11 HLSL Shaders</Filter>
     </None>
     <None Include="Images\PFA Icon.ico">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\GUI</Filter>
     </None>
-    <None Include="common.hlsl">
-      <Filter>Resource Files</Filter>
+    <None Include="Images\mediaiconssmall.bmp">
+      <Filter>Resource Files\GUI</Filter>
     </None>
     <None Include="Images\chase.mid.xz">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Demo MIDI</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="rect_vs.hlsl">
-      <Filter>Resource Files</Filter>
-    </FxCompile>
-    <FxCompile Include="rect_ps.hlsl">
-      <Filter>Resource Files</Filter>
-    </FxCompile>
-    <FxCompile Include="note_vs.hlsl">
-      <Filter>Resource Files</Filter>
-    </FxCompile>
-    <FxCompile Include="note_ps.hlsl">
-      <Filter>Resource Files</Filter>
+    <FxCompile Include="background_ps.hlsl">
+      <Filter>Resource Files\Directx11 HLSL Shaders</Filter>
     </FxCompile>
     <FxCompile Include="background_vs.hlsl">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Directx11 HLSL Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="background_ps.hlsl">
-      <Filter>Resource Files</Filter>
+    <FxCompile Include="note_ps.hlsl">
+      <Filter>Resource Files\Directx11 HLSL Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="note_vs.hlsl">
+      <Filter>Resource Files\Directx11 HLSL Shaders</Filter>
     </FxCompile>
     <FxCompile Include="note_vs_samewidth.hlsl">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Directx11 HLSL Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="rect_ps.hlsl">
+      <Filter>Resource Files\Directx11 HLSL Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="rect_vs.hlsl">
+      <Filter>Resource Files\Directx11 HLSL Shaders</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="PianoFromAbove.rc">
-      <Filter>Resource Files</Filter>
+    <ResourceCompile Include="PianoFromAbove.RC.h">
+      <Filter>Resource Files\GUI</Filter>
     </ResourceCompile>
   </ItemGroup>
 </Project>
