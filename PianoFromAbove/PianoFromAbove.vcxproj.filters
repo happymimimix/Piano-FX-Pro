@@ -357,16 +357,16 @@
     <ClInclude Include="monocypher\monocypher.h">
       <Filter>Header Files\monocypher</Filter>
     </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>Resource Files\GUI</Filter>
-    </ClInclude>
     <ClInclude Include="Fonts.h">
       <Filter>Resource Files\GUI</Filter>
     </ClInclude>
     <ClInclude Include="imguiCompressedFont2GDI.h">
       <Filter>Resource Files\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="Matrices.h">
+    <ClInclude Include="matrices.h">
+      <Filter>Resource Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
       <Filter>Resource Files\GUI</Filter>
     </ClInclude>
   </ItemGroup>

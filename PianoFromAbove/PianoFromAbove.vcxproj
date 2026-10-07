@@ -3829,7 +3829,7 @@ rename .\Widths.hh Widths.h</Command>
     <ClInclude Include="lzma\version.h" />
     <ClInclude Include="lzma\vli.h" />
     <ClInclude Include="MainProcs.h" />
-    <ClInclude Include="Matrices.h" />
+    <ClInclude Include="matrices.h" />
     <ClInclude Include="MIDI.h" />
     <ClInclude Include="Misc.h" />
     <ClInclude Include="ModdingAPI.h">
@@ -3876,7 +3876,7 @@ rename .\Widths.hh Widths.h</Command>
     <ClInclude Include="RectPixelShader.h" />
     <ClInclude Include="RectVertexShader.h" />
     <ClInclude Include="Renderer.h" />
-    <ClInclude Include="Resource.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="SMF3Intro.h" />
     <ClInclude Include="Studio.h" />
     <ClInclude Include="Tab1Btn2.h" />
