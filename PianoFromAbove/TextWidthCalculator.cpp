@@ -97,10 +97,7 @@ int main() {
                 PatBlt(cmdDC, TextSize.cx, H - baseY, 1, baseY, PATCOPY);
                 wstring WidthText = L" <- " + to_wstring(MulDiv(TextSize.cx, 4, baseX));
                 TextOutW(cmdDC, TextSize.cx, H - baseY, WidthText.c_str(), WidthText.length());
-                HDC NULLDC = GetDC(NULL);
-                PatBlt(NULLDC, 0, 0, 1, 1, PATINVERT);
                 GdiFlush();
-                ReleaseDC(NULL, NULLDC);
             }
         }
     }

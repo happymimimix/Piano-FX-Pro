@@ -339,9 +339,6 @@
     <ClInclude Include="LanguagePacks.h">
       <Filter>Resource Files\GUI\LanguagePacks</Filter>
     </ClInclude>
-    <ClInclude Include="Matrices.h">
-      <Filter>Resource Files\GUI\LanguagePacks</Filter>
-    </ClInclude>
     <ClInclude Include="WidthsWrapper.h">
       <Filter>Resource Files\GUI\LanguagePacks</Filter>
     </ClInclude>
@@ -367,6 +364,9 @@
       <Filter>Resource Files\GUI</Filter>
     </ClInclude>
     <ClInclude Include="imguiCompressedFont2GDI.h">
+      <Filter>Resource Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Matrices.h">
       <Filter>Resource Files\GUI</Filter>
     </ClInclude>
   </ItemGroup>
@@ -431,11 +431,11 @@
     <ClCompile Include="Tutorials.cpp">
       <Filter>Source Files\Piano-FX Studio\Tutorials</Filter>
     </ClCompile>
-    <ClCompile Include="TextWidthCalculator.cpp">
-      <Filter>Resource Files\GUI\LanguagePacks</Filter>
-    </ClCompile>
     <ClCompile Include="monocypher\monocypher.c">
       <Filter>Header Files\monocypher</Filter>
+    </ClCompile>
+    <ClCompile Include="TextWidthCalculator.cpp">
+      <Filter>Resource Files\GUI\LanguagePacks</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
