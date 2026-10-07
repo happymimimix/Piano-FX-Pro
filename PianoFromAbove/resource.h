@@ -18,12 +18,12 @@
 #define IDD_LOADING                     207
 #define IDD_SETRESOLUTION               208
 
-#define IDS_SHOWKEYS					-1
+#define IDS_SHOWKEYS                    -1
 #define IDC_SHOWALLKEYS                 301
 #define IDC_SHOWSONGKEYS                302
 #define IDC_SHOWCUSTOMKEYS              303
 #define IDC_FIRSTKEY                    304
-#define IDC_THROUGH						305
+#define IDC_THROUGH                     305
 #define IDC_LASTKEY                     306
 #define IDS_TRACKCOLORS                 -1
 #define IDC_RANDOMIZE                   307
@@ -52,34 +52,34 @@
 #define IDC_BACKGROUND                  327
 #define IDC_BACKGROUNDBROWSE            328
 #define IDC_BACKGROUNDRESET             329
-#define IDS_PP3_VIDEO					-1
+#define IDS_PP3_VIDEO                   -1
 
 #define IDS_MIDIOUT                     -1
 #define IDC_MIDIOUT                     401
 #define IDC_KDMAPI                      402
 
-#define IDS_RENDER						-1
+#define IDS_RENDER                      -1
 #define IDC_TICKBASED                   501
 #define IDC_PITCHBENDS                  502
 #define IDC_SAMEWIDTH                   503
-#define IDC_MAPVEL						504
+#define IDC_MAPVEL                      504
 #define IDC_MARKERS                     505
 #define IDS_MARKERENC                   -1
 #define IDC_MARKERENC                   506
 #define IDC_LIMITFPS                    507
-#define IDC_DEBUG						508
+#define IDC_DEBUG                       508
 #define IDC_DISABLEUI                   509
-#define IDC_OR		                    510
+#define IDC_OR                          510
 
-#define IDC_CONTROLS                    -1
+#define IDS_CONTROLS                    -1
 #define IDS_LRARROWS                    -1
 #define IDC_LRARROWS                    601
 #define IDC_LRARROWSSPIN                602
-#define IDS_SECS					    -1
+#define IDS_SECS                        -1
 #define IDS_UDARROWS                    -1
 #define IDC_UDARROWS                    603
 #define IDC_UDARROWSSPIN                604
-#define IDS_CENTS						-1
+#define IDS_CENTS                       -1
 #define IDC_SHOWCONTROLS                605
 #define IDC_PHIGROS                     606
 #define IDS_SPLASHMIDI                  -1
@@ -113,7 +113,7 @@
 #define IDS_HEIGHT                      -1
 #define IDC_HEIGHT                      1002
 
-#define ID_FILE_PRACTICE				1101
+#define ID_FILE_PRACTICE                1101
 #define ID_FILE_CLOSEFILE               1102
 #define ID_PLAY_PLAYPAUSE               1103
 #define ID_PLAY_PLAY                    1104
@@ -147,12 +147,12 @@
 #define IDC_NSPEED                      1203
 #define IDC_TOPREBAR                    1204
 #define IDC_POSNCTRL                    1205
-#define IDC_POSNDELAY					1206
+#define IDC_POSNDELAY                   1206
 #define IDC_TOPTOOLBAR                  1207
 
 #define IDB_BITMAP1                     1301
 #define IDB_BITMAP2                     1302
 
 #ifdef DBG
-#include <DebugLanguageOverride.h>
+    #include <DebugLanguageOverride.h>
 #endif
