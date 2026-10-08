@@ -88,17 +88,17 @@
     <Filter Include="Header Files\monocypher">
       <UniqueIdentifier>{7ff0a4ed-b47e-4662-9711-d5faeae04094}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\Directx11 HLSL Shaders">
-      <UniqueIdentifier>{c3b82545-17fd-43fc-ac56-e1cda7330f4d}</UniqueIdentifier>
+    <Filter Include="Resource Files\DirectX11 HLSL Shaders">
+      <UniqueIdentifier>{f46dbd47-362d-42a9-83f5-f467d92a1168}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Demo MIDI">
+      <UniqueIdentifier>{f5a60afc-15da-4e42-89d3-6ada4c6b9600}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resource Files\GUI">
-      <UniqueIdentifier>{e2c26e13-071f-4185-861f-ec208fb265d1}</UniqueIdentifier>
+      <UniqueIdentifier>{0411824c-526b-47f3-9189-e8738d796ecd}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resource Files\GUI\LanguagePacks">
       <UniqueIdentifier>{59c079ee-d026-4177-a960-984f15feddf8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\Demo MIDI">
-      <UniqueIdentifier>{4a2389a4-7d54-49d4-be04-32d6a3fbcf07}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -357,16 +357,16 @@
     <ClInclude Include="monocypher\monocypher.h">
       <Filter>Header Files\monocypher</Filter>
     </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Resource Files\GUI</Filter>
+    </ClInclude>
     <ClInclude Include="Fonts.h">
       <Filter>Resource Files\GUI</Filter>
     </ClInclude>
     <ClInclude Include="imguiCompressedFont2GDI.h">
       <Filter>Resource Files\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="matrices.h">
-      <Filter>Resource Files\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="resource.h">
+    <ClInclude Include="Matrices.h">
       <Filter>Resource Files\GUI</Filter>
     </ClInclude>
   </ItemGroup>
@@ -431,48 +431,48 @@
     <ClCompile Include="Tutorials.cpp">
       <Filter>Source Files\Piano-FX Studio\Tutorials</Filter>
     </ClCompile>
-    <ClCompile Include="monocypher\monocypher.c">
-      <Filter>Header Files\monocypher</Filter>
-    </ClCompile>
     <ClCompile Include="TextWidthCalculator.cpp">
       <Filter>Resource Files\GUI\LanguagePacks</Filter>
+    </ClCompile>
+    <ClCompile Include="monocypher\monocypher.c">
+      <Filter>Header Files\monocypher</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="common.hlsl">
-      <Filter>Resource Files\Directx11 HLSL Shaders</Filter>
-    </None>
-    <None Include="Images\PFA Icon.ico">
-      <Filter>Resource Files\GUI</Filter>
-    </None>
-    <None Include="Images\mediaiconssmall.bmp">
-      <Filter>Resource Files\GUI</Filter>
+      <Filter>Resource Files\DirectX11 HLSL Shaders</Filter>
     </None>
     <None Include="Images\chase.mid.xz">
       <Filter>Resource Files\Demo MIDI</Filter>
     </None>
+    <None Include="Images\mediaiconssmall.bmp">
+      <Filter>Resource Files\GUI</Filter>
+    </None>
+    <None Include="Images\PFA Icon.ico">
+      <Filter>Resource Files\GUI</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="background_ps.hlsl">
-      <Filter>Resource Files\Directx11 HLSL Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="background_vs.hlsl">
-      <Filter>Resource Files\Directx11 HLSL Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="note_ps.hlsl">
-      <Filter>Resource Files\Directx11 HLSL Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="note_vs.hlsl">
-      <Filter>Resource Files\Directx11 HLSL Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="note_vs_samewidth.hlsl">
-      <Filter>Resource Files\Directx11 HLSL Shaders</Filter>
+    <FxCompile Include="rect_vs.hlsl">
+      <Filter>Resource Files\DirectX11 HLSL Shaders</Filter>
     </FxCompile>
     <FxCompile Include="rect_ps.hlsl">
-      <Filter>Resource Files\Directx11 HLSL Shaders</Filter>
+      <Filter>Resource Files\DirectX11 HLSL Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="rect_vs.hlsl">
-      <Filter>Resource Files\Directx11 HLSL Shaders</Filter>
+    <FxCompile Include="note_vs_samewidth.hlsl">
+      <Filter>Resource Files\DirectX11 HLSL Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="note_ps.hlsl">
+      <Filter>Resource Files\DirectX11 HLSL Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="note_vs.hlsl">
+      <Filter>Resource Files\DirectX11 HLSL Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="background_vs.hlsl">
+      <Filter>Resource Files\DirectX11 HLSL Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="background_ps.hlsl">
+      <Filter>Resource Files\DirectX11 HLSL Shaders</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
