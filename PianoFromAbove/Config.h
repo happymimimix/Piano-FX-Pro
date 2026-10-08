@@ -73,7 +73,7 @@ struct VideoSettings : public ISettings
     bool bSameWidth;
     bool bMapVel;
     bool bShowMarkers;
-    enum MarkerEncoding : uint8_t { CP1252, CP437, CP82, CP886, CP932, CP936, UTF8 } eMarkerEncoding;
+    WORD eMarkerEncoding;
     bool bLimitFPS;
     bool bDebug;
     bool bDisableUI;

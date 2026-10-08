@@ -156,7 +156,7 @@ void VideoSettings::LoadDefaultValues()
     bSameWidth = false;
     bMapVel = false;
     bShowMarkers = true;
-    eMarkerEncoding = MarkerEncoding::CP437;
+    eMarkerEncoding = 437;
     bLimitFPS = true;
     bDebug = false;
     bDisableUI = false;
@@ -233,11 +233,11 @@ void VisualSettings::LoadConfigValues(TiXmlElement* txRoot)
     // Attributes
     int iAttrVal;
     if (txVisual->QueryIntAttribute("KeysShown", &iAttrVal) == TIXML_SUCCESS)
-        eKeysShown = static_cast<KeysShown>(max(KeysShown::All, min(iAttrVal, KeysShown::Custom)));
+        eKeysShown = static_cast<KeysShown>(max(KeysShown::All, min(*reinterpret_cast<key_t*>(&iAttrVal), KeysShown::Custom)));
     if (txVisual->QueryIntAttribute("FirstKey", &iAttrVal) == TIXML_SUCCESS)
-        iFirstKey = static_cast<key_t>(max(0, min(iAttrVal, 127)));
+        iFirstKey = *reinterpret_cast<key_t*>(&iAttrVal);
     if (txVisual->QueryIntAttribute("LastKey", &iAttrVal) == TIXML_SUCCESS)
-        iLastKey = static_cast<key_t>(max(0, min(iAttrVal, 127)));
+        iLastKey = *reinterpret_cast<key_t*>(&iAttrVal);
 
     //Colors
     int r, g, b, a = 0;
@@ -266,11 +266,11 @@ void VisualSettings::LoadConfigValues(TiXmlElement* txRoot)
             txBarColor->QueryIntAttribute("B", &b) == TIXML_SUCCESS &&
             txBarColor->QueryIntAttribute("A", &a) == TIXML_SUCCESS)
             iBarColor = static_cast<color_t>(((r & 0xFF) << 0) | ((g & 0xFF) << 8) | ((b & 0xFF) << 16) | ((a & 0xFF) << 24));
-    if (txVisual->QueryIntAttribute("RandomizeColor", &iAttrVal) == TIXML_SUCCESS)
-        bRandomizeColor = (iAttrVal != 0);
+    if (txVisual->QueryBoolAttribute("RandomizeColor", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
+        bRandomizeColor = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
     string sTempStr;
-    txVisual->QueryStringAttribute("Background", &sTempStr);
-    sBackground = Util::StringToWstring(sTempStr);
+    if (txVisual->QueryStringAttribute("Background", &sTempStr)) == TIXML_SUCCESS)
+        sBackground = Util::StringToWstring(sTempStr);
 }
 
 void AudioSettings::LoadConfigValues(TiXmlElement* txRoot)
@@ -288,8 +288,8 @@ void AudioSettings::LoadConfigValues(TiXmlElement* txRoot)
     }
 
     int iAttrVal;
-    if (txAudio->QueryIntAttribute("KDMAPI", &iAttrVal) == TIXML_SUCCESS)
-        bKDMAPI = (iAttrVal != 0);
+    if (txAudio->QueryBoolAttribute("KDMAPI", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
+        bKDMAPI = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
 }
 
 void VideoSettings::LoadConfigValues(TiXmlElement* txRoot)
@@ -298,26 +298,26 @@ void VideoSettings::LoadConfigValues(TiXmlElement* txRoot)
     if (!txVideo) return;
 
     int iAttrVal;
-    if (txVideo->QueryIntAttribute("TickBased", &iAttrVal) == TIXML_SUCCESS)
-        bTickBased = (iAttrVal != 0);
-    if (txVideo->QueryIntAttribute("VisualizePitchBends", &iAttrVal) == TIXML_SUCCESS)
-        bVisualizePitchBends = (iAttrVal != 0);
-    if (txVideo->QueryIntAttribute("SameWidthNotes", &iAttrVal) == TIXML_SUCCESS)
-        bSameWidth = (iAttrVal != 0);
-    if (txVideo->QueryIntAttribute("MapVelocity", &iAttrVal) == TIXML_SUCCESS)
-        bMapVel = (iAttrVal != 0);
-    if (txVideo->QueryIntAttribute("ShowMarkers", &iAttrVal) == TIXML_SUCCESS)
-        bShowMarkers = (iAttrVal != 0);
-    txVideo->QueryIntAttribute("MarkerEncoding", &iAttrVal);
-    eMarkerEncoding = static_cast<MarkerEncoding>(max(MarkerEncoding::CP1252, min(iAttrVal, MarkerEncoding::UTF8)));
-    if (txVideo->QueryIntAttribute("LimitFPS", &iAttrVal) == TIXML_SUCCESS)
-        bLimitFPS = (iAttrVal != 0);
-    if (txVideo->QueryIntAttribute("Debug", &iAttrVal) == TIXML_SUCCESS)
-        bDebug = (iAttrVal != 0);
-    if (txVideo->QueryIntAttribute("DisableUI", &iAttrVal) == TIXML_SUCCESS)
-        bDisableUI = (iAttrVal != 0);
-    if (txVideo->QueryIntAttribute("RemoveOverlaps", &iAttrVal) == TIXML_SUCCESS)
-        bOR = (iAttrVal != 0);
+    if (txVideo->QueryBoolAttribute("TickBased", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
+        bTickBased = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
+    if (txVideo->QueryBoolAttribute("VisualizePitchBends", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
+        bVisualizePitchBends = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
+    if (txVideo->QueryBoolAttribute("SameWidthNotes", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
+        bSameWidth = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
+    if (txVideo->QueryBoolAttribute("MapVelocity", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
+        bMapVel = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
+    if (txVideo->QueryBoolAttribute("ShowMarkers", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
+        bShowMarkers = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
+    if (txVideo->QueryIntAttribute("CodePage", &iAttrVal) == TIXML_SUCCESS)
+        eMarkerEncoding = *reinterpret_cast<WORD*>(&iAttrVal);
+    if (txVideo->QueryBoolAttribute("LimitFPS", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
+        bLimitFPS = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
+    if (txVideo->QueryBoolAttribute("Debug", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
+        bDebug = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
+    if (txVideo->QueryBoolAttribute("DisableUI", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
+        bDisableUI = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
+    if (txVideo->QueryBoolAttribute("RemoveOverlaps", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
+        bOR = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
 }
 
 void ControlsSettings::LoadConfigValues(TiXmlElement* txRoot)
@@ -325,20 +325,26 @@ void ControlsSettings::LoadConfigValues(TiXmlElement* txRoot)
     TiXmlElement* txControls = txRoot->FirstChildElement("Controls");
     if (!txControls) return;
 
-    txControls->QueryDoubleAttribute("FwdBackSecs", &dFwdBackSecs);
-    txControls->QueryDoubleAttribute("SpeedUpPct", &dSpeedUpPct);
     int iAttrVal;
-    if (txControls->QueryIntAttribute("PhigrosMode", &iAttrVal) == TIXML_SUCCESS)
-        bPhigros = (iAttrVal != 0);
-    if (txControls->QueryIntAttribute("AlwaysShowControls", &iAttrVal) == TIXML_SUCCESS)
-        bAlwaysShowControls = (iAttrVal != 0);
+    if (txControls->QueryIntAttribute("FwdBackSecs", &iAttrVal) == TIXML_SUCCESS)
+        *reinterpret_cast<int*>(&dFwdBackSecs) = iAttrVal;
+    if (txControls->QueryIntAttribute("FwdBackSecsL", &iAttrVal) == TIXML_SUCCESS)
+        *(reinterpret_cast<int*>(&dFwdBackSecs) + 1) = iAttrVal;
+    if (txControls->QueryIntAttribute("SpeedUpPct", &iAttrVal) == TIXML_SUCCESS)
+        *reinterpret_cast<int*>(&dSpeedUpPct) = iAttrVal;
+    if (txControls->QueryIntAttribute("SpeedUpPctL", &iAttrVal) == TIXML_SUCCESS)
+        *(reinterpret_cast<int*>(&dSpeedUpPct) + 1) = iAttrVal;
+    if (txControls->QueryBoolAttribute("PhigrosMode", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
+        bPhigros = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
+    if (txControls->QueryBoolAttribute("AlwaysShowControls", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
+        bAlwaysShowControls = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
     string sTempStr;
-    txControls->QueryStringAttribute("SplashMIDI", &sTempStr);
-    sSplashMIDI = Util::StringToWstring(sTempStr);
+    if (txControls->QueryStringAttribute("SplashMIDI", &sTempStr) == TIXML_SUCCESS)
+        sSplashMIDI = Util::StringToWstring(sTempStr);
     if (txControls->QueryIntAttribute("VelocityThreshold", &iAttrVal) == TIXML_SUCCESS)
-        iVelocityThreshold = static_cast<uint8_t>(max(0, min(iAttrVal, 127)));
-    if (txControls->QueryIntAttribute("DumpFrames", &iAttrVal) == TIXML_SUCCESS)
-        bDumpFrames = (iAttrVal != 0);
+        iVelocityThreshold = *reinterpret_cast<key_t*>(&iAttrVal);
+    if (txControls->QueryBoolAttribute("DumpFrames", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
+        bDumpFrames = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
 }
 
 void PlaybackSettings::LoadConfigValues(TiXmlElement* txRoot)
@@ -347,11 +353,20 @@ void PlaybackSettings::LoadConfigValues(TiXmlElement* txRoot)
     if (!txPlayback) return;
 
     int iAttrVal;
-    if (txPlayback->QueryIntAttribute("Mute", &iAttrVal) == TIXML_SUCCESS)
-        m_bMute = (iAttrVal != 0);
-    txPlayback->QueryDoubleAttribute("PlaybackSpeed", &m_dSpeed);
-    txPlayback->QueryDoubleAttribute("NoteSpeed", &m_dNSpeed);
-    txPlayback->QueryDoubleAttribute("Volume", &m_dVolume);
+    if (txPlayback->QueryBoolAttribute("Mute", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
+        m_bMute = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
+    if (txPlayback->QueryIntAttribute("PlaybackSpeed", &iAttrVal) == TIXML_SUCCESS)
+        *reinterpret_cast<uint32_t*>(&m_dSpeed) = iAttrVal;
+    if (txPlayback->QueryIntAttribute("PlaybackSpeedL", &iAttrVal) == TIXML_SUCCESS)
+        *(reinterpret_cast<uint32_t*>(&m_dSpeed) + 1) = iAttrVal;
+    if (txPlayback->QueryIntAttribute("NoteSpeed", &iAttrVal) == TIXML_SUCCESS)
+        *reinterpret_cast<uint32_t*>(&m_dNSpeed) = iAttrVal;
+    if (txPlayback->QueryIntAttribute("NoteSpeedL", &iAttrVal) == TIXML_SUCCESS)
+        *(reinterpret_cast<uint32_t*>(&m_dNSpeed) + 1) = iAttrVal;
+    if (txPlayback->QueryIntAttribute("Volume", &iAttrVal) == TIXML_SUCCESS)
+        *reinterpret_cast<uint32_t*>(&m_dVolume) = iAttrVal;
+    if (txPlayback->QueryIntAttribute("VolumeL", &iAttrVal) == TIXML_SUCCESS)
+        *(reinterpret_cast<uint32_t*>(&m_dVolume) + 1) = iAttrVal;
 }
 
 void ViewSettings::LoadConfigValues(TiXmlElement* txRoot)
@@ -360,15 +375,18 @@ void ViewSettings::LoadConfigValues(TiXmlElement* txRoot)
     if (!txView) return;
 
     int iAttrVal;
-    if (txView->QueryIntAttribute("Controls", &iAttrVal) == TIXML_SUCCESS)
-        m_bControls = (iAttrVal != 0);
-    if (txView->QueryIntAttribute("Keyboard", &iAttrVal) == TIXML_SUCCESS)
-        m_bKeyboard = (iAttrVal != 0);
-    if (txView->QueryIntAttribute("OnTop", &iAttrVal) == TIXML_SUCCESS)
-        m_bOnTop = (iAttrVal != 0);
-    txView->QueryFloatAttribute("OffsetX", &m_fOffsetX);
-    txView->QueryFloatAttribute("OffsetY", &m_fOffsetY);
-    txView->QueryFloatAttribute("ZoomX", &m_fZoomX);
+    if (txView->QueryBoolAttribute("Controls", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
+        m_bControls = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
+    if (txView->QueryBoolAttribute("Keyboard", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
+        m_bKeyboard = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
+    if (txView->QueryBoolAttribute("OnTop", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
+        m_bOnTop = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
+    if (txView->QueryIntAttribute("OffsetX", &iAttrVal) == TIXML_SUCCESS)
+        *reinterpret_cast<uint32_t*>(&m_fOffsetX) = iAttrVal;
+    if (txView->QueryIntAttribute("OffsetY", &iAttrVal) == TIXML_SUCCESS)
+        *reinterpret_cast<uint32_t*>(&m_fOffsetY) = iAttrVal;
+    if (txView->QueryIntAttribute("ZoomX", &iAttrVal) == TIXML_SUCCESS)
+        *reinterpret_cast<uint32_t*>(&m_fZoomX) = iAttrVal;
     if (txView->QueryIntAttribute("MainLeft", &iAttrVal) == TIXML_SUCCESS)
         m_iMainLeft = iAttrVal;
     if (txView->QueryIntAttribute("MainTop", &iAttrVal) == TIXML_SUCCESS)
@@ -387,9 +405,9 @@ bool VisualSettings::SaveConfigValues(TiXmlElement* txRoot)
 {
     TiXmlElement* txVisual = new TiXmlElement("Visual");
     txRoot->LinkEndChild(txVisual);
-    txVisual->SetAttribute("KeysShown", eKeysShown);
-    txVisual->SetAttribute("FirstKey", iFirstKey);
-    txVisual->SetAttribute("LastKey", iLastKey);
+    txVisual->SetAttribute("KeysShown", static_cast<int>(key_t(eKeysShown)));
+    txVisual->SetAttribute("FirstKey", static_cast<int>(key_t(iFirstKey)));
+    txVisual->SetAttribute("LastKey", static_cast<int>(key_t(iLastKey)));
 
     TiXmlElement* txColors = new TiXmlElement("Colors");
     txVisual->LinkEndChild(txColors);
@@ -417,7 +435,7 @@ bool VisualSettings::SaveConfigValues(TiXmlElement* txRoot)
     txBarColor->SetAttribute("B", (iBarColor >> 16) & 0xFF);
     txBarColor->SetAttribute("A", (iBarColor >> 24) & 0xFF);
 
-    txVisual->SetAttribute("RandomizeColor", bRandomizeColor);
+    txVisual->SetAttribute("RandomizeColor", bRandomizeColor ? "yes" : "no");
     txVisual->SetAttribute("Background", Util::WstringToString(sBackground));
 
     return true;
@@ -431,7 +449,7 @@ bool AudioSettings::SaveConfigValues(TiXmlElement* txRoot)
     if (this->sDesiredOut.length() > 0)
         txAudio->SetAttribute("MIDIOutDevice", Util::WstringToString(this->sDesiredOut));
 
-    txAudio->SetAttribute("KDMAPI", bKDMAPI);
+    txAudio->SetAttribute("KDMAPI", bKDMAPI ? "yes" : "no");
     return true;
 }
 
@@ -439,16 +457,16 @@ bool VideoSettings::SaveConfigValues(TiXmlElement* txRoot)
 {
     TiXmlElement* txVideo = new TiXmlElement("Video");
     txRoot->LinkEndChild(txVideo);
-    txVideo->SetAttribute("TickBased", bTickBased);
-    txVideo->SetAttribute("VisualizePitchBends", bVisualizePitchBends);
-    txVideo->SetAttribute("SameWidthNotes", bSameWidth);
-    txVideo->SetAttribute("MapVelocity", bMapVel);
-    txVideo->SetAttribute("ShowMarkers", bShowMarkers);
-    txVideo->SetAttribute("MarkerEncoding", eMarkerEncoding);
-    txVideo->SetAttribute("LimitFPS", bLimitFPS);
-    txVideo->SetAttribute("Debug", bDebug);
-    txVideo->SetAttribute("DisableUI", bDisableUI);
-    txVideo->SetAttribute("RemoveOverlaps", bOR);
+    txVideo->SetAttribute("TickBased", bTickBased ? "yes" : "no");
+    txVideo->SetAttribute("VisualizePitchBends", bVisualizePitchBends ? "yes" : "no");
+    txVideo->SetAttribute("SameWidthNotes", bSameWidth ? "yes" : "no");
+    txVideo->SetAttribute("MapVelocity", bMapVel ? "yes" : "no");
+    txVideo->SetAttribute("ShowMarkers", bShowMarkers ? "yes" : "no");
+    txVideo->SetAttribute("MarkerEncoding", static_cast<int>(WORD(eMarkerEncoding)));
+    txVideo->SetAttribute("LimitFPS", bLimitFPS ? "yes" : "no");
+    txVideo->SetAttribute("Debug", bDebug ? "yes" : "no");
+    txVideo->SetAttribute("DisableUI", bDisableUI ? "yes" : "no");
+    txVideo->SetAttribute("RemoveOverlaps", bOR ? "yes" : "no");
     return true;
 }
 
@@ -456,13 +474,15 @@ bool ControlsSettings::SaveConfigValues(TiXmlElement* txRoot)
 {
     TiXmlElement* txControls = new TiXmlElement("Controls");
     txRoot->LinkEndChild(txControls);
-    txControls->SetDoubleAttribute("FwdBackSecs", dFwdBackSecs);
-    txControls->SetDoubleAttribute("SpeedUpPct", dSpeedUpPct);
-    txControls->SetAttribute("AlwaysShowControls", bAlwaysShowControls);
-    txControls->SetAttribute("PhigrosMode", bPhigros);
+    txControls->SetAttribute("FwdBackSecs", *reinterpret_cast<int*>(&dFwdBackSecs));
+    txControls->SetAttribute("FwdBackSecsL", *(reinterpret_cast<int*>(&dFwdBackSecs) + 1));
+    txControls->SetAttribute("SpeedUpPct", *reinterpret_cast<int*>(&dSpeedUpPct));
+    txControls->SetAttribute("SpeedUpPctL", *(reinterpret_cast<int*>(&dSpeedUpPct) + 1));
+    txControls->SetAttribute("AlwaysShowControls", bAlwaysShowControls ? "yes" : "no");
+    txControls->SetAttribute("PhigrosMode", bPhigros ? "yes" : "no");
     txControls->SetAttribute("SplashMIDI", Util::WstringToString(sSplashMIDI));
-    txControls->SetAttribute("VelocityThreshold", iVelocityThreshold);
-    txControls->SetAttribute("DumpFrames", bDumpFrames);
+    txControls->SetAttribute("VelocityThreshold", iVelocityThreshold ? "yes" : "no");
+    txControls->SetAttribute("DumpFrames", bDumpFrames ? "yes" : "no");
     return true;
 }
 
@@ -470,10 +490,13 @@ bool PlaybackSettings::SaveConfigValues(TiXmlElement* txRoot)
 {
     TiXmlElement* txPlayback = new TiXmlElement("Playback");
     txRoot->LinkEndChild(txPlayback);
-    txPlayback->SetAttribute("Mute", m_bMute);
-    txPlayback->SetDoubleAttribute("PlaybackSpeed", m_dSpeed);
-    txPlayback->SetDoubleAttribute("NoteSpeed", m_dNSpeed);
-    txPlayback->SetDoubleAttribute("Volume", m_dVolume);
+    txPlayback->SetAttribute("Mute", m_bMute ? "yes" : "no");
+    txPlayback->SetAttribute("PlaybackSpeed", *reinterpret_cast<int*>(&m_dSpeed));
+    txPlayback->SetAttribute("PlaybackSpeedL", *(reinterpret_cast<int*>(&m_dSpeed) + 1));
+    txPlayback->SetAttribute("NoteSpeed", *reinterpret_cast<int*>(&m_dNSpeed));
+    txPlayback->SetAttribute("NoteSpeedL", *(reinterpret_cast<int*>(&m_dNSpeed) + 1));
+    txPlayback->SetAttribute("Volume", *reinterpret_cast<int*>(&m_dVolume));
+    txPlayback->SetAttribute("VolumeL", *(reinterpret_cast<int*>(&m_dVolume) + 1));
     return true;
 }
 
@@ -481,12 +504,12 @@ bool ViewSettings::SaveConfigValues(TiXmlElement* txRoot)
 {
     TiXmlElement* txView = new TiXmlElement("View");
     txRoot->LinkEndChild(txView);
-    txView->SetAttribute("Controls", m_bControls);
-    txView->SetAttribute("Keyboard", m_bKeyboard);
-    txView->SetAttribute("OnTop", m_bOnTop);
-    txView->SetDoubleAttribute("OffsetX", m_fOffsetX);
-    txView->SetDoubleAttribute("OffsetY", m_fOffsetY);
-    txView->SetDoubleAttribute("ZoomX", m_fZoomX);
+    txView->SetAttribute("Controls", m_bControls ? "yes" : "no");
+    txView->SetAttribute("Keyboard", m_bKeyboard ? "yes" : "no");
+    txView->SetAttribute("OnTop", m_bOnTop ? "yes" : "no");
+    txView->SetAttribute("OffsetX", *reinterpret_cast<int*>(&m_fOffsetX));
+    txView->SetAttribute("OffsetY", *reinterpret_cast<int*>(&m_fOffsetY));
+    txView->SetAttribute("ZoomX", *reinterpret_cast<int*>(&m_fZoomX));
     txView->SetAttribute("MainLeft", m_iMainLeft);
     txView->SetAttribute("MainTop", m_iMainTop);
     txView->SetAttribute("MainWidth", m_iMainWidth);
