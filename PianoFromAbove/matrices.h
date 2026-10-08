@@ -14,12 +14,12 @@
 #define LoadingWindowH 50
 #define ResolutionWindowW 100
 #define ResolutionWindowH 60
-#define DialogStyle DS_LOCALEDIT | DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_CHILD | WS_CAPTION
-#define AltDialogStyle DS_LOCALEDIT | DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_CAPTION
+#define DialogStyle DS_LOCALEDIT | DS_SETFONT | DS_NOFAILCREATE | WS_CHILD | WS_CAPTION
+#define AltDialogStyle DS_LOCALEDIT | DS_SETFONT | DS_MODALFRAME | DS_NOFAILCREATE | WS_POPUP | WS_CAPTION
 #ifdef USE_RTL_LAYOUT
-#define DialogStyleExtra WS_EX_DLGMODALFRAME | WS_EX_LAYOUTRTL | WS_EX_RTLREADING
+#define DialogStyleExtra WS_EX_WINDOWEDGE | WS_EX_LAYOUTRTL | WS_EX_RTLREADING
 #else
-#define DialogStyleExtra WS_EX_DLGMODALFRAME
+#define DialogStyleExtra WS_EX_WINDOWEDGE
 #endif
 #define BoxSpacing 14
 #define dBoxSpacing BoxSpacing+BoxSpacing //Double

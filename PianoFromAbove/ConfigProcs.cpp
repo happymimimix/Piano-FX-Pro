@@ -42,7 +42,11 @@ VOID DoPreferences(HWND hWndOwner)
         psp[i].pfnCallback = NULL;
     }
     psh.dwSize = sizeof(PROPSHEETHEADER);
+#ifdef USE_RTL_LAYOUT
+    psh.dwFlags = PSH_PROPSHEETPAGE | PSH_NOCONTEXTHELP | PSH_RTLREADING;
+#else
     psh.dwFlags = PSH_PROPSHEETPAGE | PSH_NOCONTEXTHELP;
+#endif
     psh.hwndParent = hWndOwner;
     psh.hInstance = g_hInstance;
     psh.pszIcon = NULL;

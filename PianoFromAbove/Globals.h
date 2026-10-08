@@ -45,3 +45,9 @@ inline bool* PtrToIsWrapRenderer = nullptr;
 #define TitleRender wstring(EmptyWstr+TitleVersionInfo+MainWindowTitle4+L"%ws"+TitlePostFix).c_str()
 #define TitleSplash wstring(EmptyWstr+TitleVersionInfo+MainWindowTitle3+MainWindowTitle6+TitlePostFix).c_str()
 #define TitleIdle wstring(EmptyWstr+TitleVersionInfo+MainWindowTitle3+MainWindowTitle5+TitlePostFix).c_str()
+
+#ifdef USE_RTL_LAYOUT
+#define RTL_STYLE WS_EX_LAYOUTRTL | WS_EX_RTLREADING
+#else
+#define RTL_STYLE
+#endif

@@ -522,7 +522,7 @@ LRESULT WINAPI BarProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 HWND CreateRebar(HWND hWndOwner)
 {
     // Create the Rebar. Just houses the toolbar.
-    HWND hWndRebar = CreateWindowEx(WS_EX_CONTROLPARENT, REBARCLASSNAME, NULL, WS_CHILD | WS_DLGFRAME | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CCS_NODIVIDER | RBS_VARHEIGHT, NULL, NULL, NULL, NULL, hWndOwner, (HMENU)IDC_TOPREBAR, g_hInstance, NULL);
+    HWND hWndRebar = CreateWindowEx(WS_EX_CONTROLPARENT | RTL_STYLE, REBARCLASSNAME, NULL, WS_CHILD | WS_DLGFRAME | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CCS_NODIVIDER | RBS_VARHEIGHT, NULL, NULL, NULL, NULL, hWndOwner, (HMENU)IDC_TOPREBAR, g_hInstance, NULL);
     if (!hWndRebar) return NULL;
 
     // Create the system font
@@ -533,7 +533,7 @@ HWND CreateRebar(HWND hWndOwner)
     HIMAGELIST hIml = ImageList_LoadImage(g_hInstance, MAKEINTRESOURCE(IDB_MEDIAICONSSMALL), 1 << 4, (1 << 4) + (1 << 2), RGB(255, 255, 0), IMAGE_BITMAP, LR_CREATEDIBSECTION);
 
     // Create the toolbar. Houses custom controls too. Don't want multiple rebar brands because you lose too much control
-    HWND hWndToolbar = CreateWindowEx(WS_EX_CONTROLPARENT, TOOLBARCLASSNAME, NULL, WS_CHILD | WS_TABSTOP | CCS_NODIVIDER | CCS_NOPARENTALIGN | CCS_NORESIZE | TBSTYLE_FLAT | TBSTYLE_LIST | TBSTYLE_TOOLTIPS, NULL, NULL, NULL, NULL, hWndRebar, (HMENU)IDC_TOPTOOLBAR, g_hInstance, NULL);
+    HWND hWndToolbar = CreateWindowEx(WS_EX_CONTROLPARENT | RTL_STYLE, TOOLBARCLASSNAME, NULL, WS_CHILD | WS_TABSTOP | CCS_NODIVIDER | CCS_NOPARENTALIGN | CCS_NORESIZE | TBSTYLE_LIST | TBSTYLE_TOOLTIPS, NULL, NULL, NULL, NULL, hWndRebar, (HMENU)IDC_TOPTOOLBAR, g_hInstance, NULL);
     if (hWndToolbar == NULL)
         return NULL;
 
@@ -578,21 +578,21 @@ HWND CreateRebar(HWND hWndOwner)
     RECT SliderPos;
     // Now add the other controls
     SendMessage(hWndToolbar, TB_GETITEMRECT, 8, (LPARAM)&SliderPos);
-    HWND hWndVolume = CreateWindowEx(0, TRACKBAR_CLASS, NULL, WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_BOTH | TBS_NOTICKS, SliderPos.left, SliderPos.top + 4, SliderPos.right - SliderPos.left, SliderPos.bottom - SliderPos.top - 4, hWndToolbar, (HMENU)IDC_VOLUME, g_hInstance, NULL);
+    HWND hWndVolume = CreateWindowEx(RTL_STYLE, TRACKBAR_CLASS, NULL, WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_BOTH | TBS_NOTICKS, SliderPos.left, SliderPos.top + 4, SliderPos.right - SliderPos.left, SliderPos.bottom - SliderPos.top - 4, hWndToolbar, (HMENU)IDC_VOLUME, g_hInstance, NULL);
     SendMessage(hWndVolume, TBM_SETRANGE, FALSE, MAKELONG(0, 100));
     SendMessage(hWndVolume, TBM_SETLINESIZE, 0, 5);
 
     SendMessage(hWndToolbar, TB_GETITEMRECT, 11, (LPARAM)&SliderPos);
-    HWND hWndSpeed = CreateWindowEx(0, TRACKBAR_CLASS, NULL, WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_BOTH | TBS_NOTICKS, SliderPos.left, SliderPos.top + 4, SliderPos.right - SliderPos.left, SliderPos.bottom - SliderPos.top - 4, hWndToolbar, (HMENU)IDC_SPEED, g_hInstance, NULL);
+    HWND hWndSpeed = CreateWindowEx(RTL_STYLE, TRACKBAR_CLASS, NULL, WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_BOTH | TBS_NOTICKS, SliderPos.left, SliderPos.top + 4, SliderPos.right - SliderPos.left, SliderPos.bottom - SliderPos.top - 4, hWndToolbar, (HMENU)IDC_SPEED, g_hInstance, NULL);
     SendMessage(hWndSpeed, TBM_SETRANGE, FALSE, MAKELONG(5, 195));
     SendMessage(hWndSpeed, TBM_SETLINESIZE, 0, 10);
 
     SendMessage(hWndToolbar, TB_GETITEMRECT, 14, (LPARAM)&SliderPos);
-    HWND hWndNSpeed = CreateWindowEx(0, TRACKBAR_CLASS, NULL, WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_BOTH | TBS_NOTICKS, SliderPos.left, SliderPos.top + 4, SliderPos.right - SliderPos.left, SliderPos.bottom - SliderPos.top - 4, hWndToolbar, (HMENU)IDC_NSPEED, g_hInstance, NULL);
+    HWND hWndNSpeed = CreateWindowEx(RTL_STYLE, TRACKBAR_CLASS, NULL, WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_BOTH | TBS_NOTICKS, SliderPos.left, SliderPos.top + 4, SliderPos.right - SliderPos.left, SliderPos.bottom - SliderPos.top - 4, hWndToolbar, (HMENU)IDC_NSPEED, g_hInstance, NULL);
     SendMessage(hWndNSpeed, TBM_SETRANGE, FALSE, MAKELONG(5, 195));
     SendMessage(hWndNSpeed, TBM_SETLINESIZE, 0, 10);
 
-    HWND hWndPosn = CreateWindowEx(0, POSNCLASSNAME, NULL, WS_CHILD | WS_VISIBLE, 0, 0, 0, 0, hWndRebar, (HMENU)IDC_POSNCTRL, g_hInstance, NULL);
+    HWND hWndPosn = CreateWindowEx(RTL_STYLE, POSNCLASSNAME, NULL, WS_CHILD | WS_VISIBLE, 0, 0, 0, 0, hWndRebar, (HMENU)IDC_POSNCTRL, g_hInstance, NULL);
 
     REBARBANDINFO rbbi;
     rbbi.cbSize = sizeof(REBARBANDINFO);
