@@ -522,7 +522,7 @@ LRESULT WINAPI BarProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 HWND CreateRebar(HWND hWndOwner)
 {
     // Create the Rebar. Just houses the toolbar.
-    HWND hWndRebar = CreateWindowEx(WS_EX_CONTROLPARENT | RTL_STYLE, REBARCLASSNAME, NULL, WS_CHILD | WS_DLGFRAME | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CCS_NODIVIDER | RBS_VARHEIGHT, NULL, NULL, NULL, NULL, hWndOwner, (HMENU)IDC_TOPREBAR, g_hInstance, NULL);
+    HWND hWndRebar = CreateWindowEx(WS_EX_CONTROLPARENT | RTL_STYLE, REBARCLASSNAME, NULL, WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CCS_NODIVIDER | RBS_VARHEIGHT, NULL, NULL, NULL, NULL, hWndOwner, (HMENU)IDC_TOPREBAR, g_hInstance, NULL);
     if (!hWndRebar) return NULL;
 
     // Create the system font
@@ -533,7 +533,7 @@ HWND CreateRebar(HWND hWndOwner)
     HIMAGELIST hIml = ImageList_LoadImage(g_hInstance, MAKEINTRESOURCE(IDB_MEDIAICONSSMALL), 1 << 4, (1 << 4) + (1 << 2), RGB(255, 255, 0), IMAGE_BITMAP, LR_CREATEDIBSECTION);
 
     // Create the toolbar. Houses custom controls too. Don't want multiple rebar brands because you lose too much control
-    HWND hWndToolbar = CreateWindowEx(WS_EX_CONTROLPARENT | RTL_STYLE, TOOLBARCLASSNAME, NULL, WS_CHILD | WS_TABSTOP | CCS_NODIVIDER | CCS_NOPARENTALIGN | CCS_NORESIZE | TBSTYLE_LIST | TBSTYLE_TOOLTIPS, NULL, NULL, NULL, NULL, hWndRebar, (HMENU)IDC_TOPTOOLBAR, g_hInstance, NULL);
+    HWND hWndToolbar = CreateWindowEx(WS_EX_CONTROLPARENT | RTL_STYLE, TOOLBARCLASSNAME, NULL, WS_CHILD | WS_TABSTOP | CCS_NODIVIDER | CCS_NOPARENTALIGN | CCS_NORESIZE | TBSTYLE_FLAT | TBSTYLE_TOOLTIPS, NULL, NULL, NULL, NULL, hWndRebar, (HMENU)IDC_TOPTOOLBAR, g_hInstance, NULL);
     if (hWndToolbar == NULL)
         return NULL;
 
