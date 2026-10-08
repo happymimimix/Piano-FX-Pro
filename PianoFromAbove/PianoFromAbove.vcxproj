@@ -53,6 +53,14 @@
       <Configuration>BIG</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Hebrew|Win32">
+      <Configuration>Hebrew</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Hebrew|x64">
+      <Configuration>Hebrew</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Hiragana|Win32">
       <Configuration>Hiragana</Configuration>
       <Platform>Win32</Platform>
@@ -217,7 +225,23 @@
     <PreferredToolArchitecture>x86</PreferredToolArchitecture>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Hebrew|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>ClangCL</PlatformToolset>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
+    <EnableASAN>false</EnableASAN>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Russian|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>ClangCL</PlatformToolset>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
+    <EnableASAN>false</EnableASAN>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Hebrew|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
@@ -407,7 +431,13 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Russian|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Hebrew|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Russian|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Hebrew|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'" Label="PropertySheets">
@@ -553,7 +583,23 @@
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Hebrew|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)\Release\</OutDir>
+    <IntDir>Release\</IntDir>
+    <TargetName>Piano-FX-Pro-RUS</TargetName>
+    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Russian|Win32'">
+    <TargetName>Piano-FX-Pro-RUS-i386</TargetName>
+    <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)\Release\</OutDir>
+    <IntDir>Release\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Hebrew|Win32'">
     <TargetName>Piano-FX-Pro-RUS-i386</TargetName>
     <LibraryPath>$(ProjectDir)lzma\lib\$(LibrariesArchitecture);$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)monocypher;$(ProjectDir);$(IncludePath)</IncludePath>
@@ -1857,6 +1903,112 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
       <PreprocessorDefinitions>RUS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Hebrew|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;LZMA_API_STATIC;INCLUDE_FFMPEG;HRB;USE_RTL_LAYOUT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <GuardSignedReturns>false</GuardSignedReturns>
+      <OpenMPSupport>false</OpenMPSupport>
+      <WarningLevel>Level4</WarningLevel>
+      <CallingConvention>Cdecl</CallingConvention>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>
+      </PrecompiledHeaderOutputFile>
+      <DiagnosticsFormat>Caret</DiagnosticsFormat>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <ShowIncludes>true</ShowIncludes>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <StringPooling>true</StringPooling>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <GuardEHContMetadata>false</GuardEHContMetadata>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StructMemberAlignment>4Bytes</StructMemberAlignment>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>liblzma.lib;dxgi.lib;d3d11.lib;Psapi.lib;Shlwapi.lib;Dwmapi.lib;Comctl32.lib;WinMM.lib;UxTheme.lib;Advapi32.lib;Msimg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <Version>
+      </Version>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>false</DataExecutionPrevention>
+      <AdditionalManifestDependencies>"type='Win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'";%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
+      <AllowIsolation>true</AllowIsolation>
+      <AdditionalOptions>/MAP</AdditionalOptions>
+      <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+    <PreBuildEvent>
+      <Command>cd /d "$(ProjectDir)"
+del ..\Release /f /s /q
+rmdir ..\Release /s /q
+msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
+msbuild ..\Colorizer\Colorizer.sln -t:Clean -p:Configuration=Release /p:Platform=x64
+msbuild ..\PFXGDI\PFXGDI.sln -t:Clean -p:Configuration=Release /p:Platform=x86
+del .\Colorizer.exe /f /q
+del .\Colorizer.exe.h /f /q
+del .\PFXGDI.exe /f /q
+del .\PFXGDI.exe.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
+del .\Widths.h /f /q
+msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
+msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
+xxd -i Colorizer.exe &gt; Colorizer.exe.h
+xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content LanguagePacks.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 LanguagePacks.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content FallbackStrings.h -Encoding Unicode; (@(''), $lines) | Set-Content -Encoding UTF8 FallbackStrings.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.hpp ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\FallbackStrings.hpp ^|.\tmp.exe ^&gt;^&gt;.\Widths.h
+del .\tmp.exe /f /q
+del .\tmp.obj /f /q
+Powershell -ExecutionPolicy Bypass -Command "Get-Content Widths.h -Encoding UTF8 | Select-Object -skip 1 | Set-Content -Encoding Unicode Widths.hh"
+del .\Widths.h /f /q
+rename .\Widths.hh Widths.h</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>cd /d "$(ProjectDir)"
+copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
+msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
+del .\Widths.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
+del ..\.vs /f /s /q
+rmdir ..\.vs /s /q
+del .\Release /f /s /q
+rmdir .\Release /s /q
+del ..\Release /f /s /q
+rmdir ..\Release /s /q
+mkdir ..\Release
+move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
+    </PostBuildEvent>
+    <ResourceCompile>
+      <ShowProgress>true</ShowProgress>
+      <PreprocessorDefinitions>HRB;USE_RTL_LAYOUT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Russian|Win32'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -1959,6 +2111,112 @@ move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
     <ResourceCompile>
       <ShowProgress>true</ShowProgress>
       <PreprocessorDefinitions>RUS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Hebrew|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;TIXML_USE_STL;LZMA_API_STATIC;INCLUDE_FFMPEG;HRB;USE_RTL_LAYOUT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <GuardSignedReturns>false</GuardSignedReturns>
+      <OpenMPSupport>false</OpenMPSupport>
+      <WarningLevel>Level4</WarningLevel>
+      <CallingConvention>Cdecl</CallingConvention>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>
+      </PrecompiledHeaderOutputFile>
+      <DiagnosticsFormat>Caret</DiagnosticsFormat>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <ShowIncludes>true</ShowIncludes>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <OmitFramePointers>true</OmitFramePointers>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <StringPooling>true</StringPooling>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <GuardEHContMetadata>false</GuardEHContMetadata>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StructMemberAlignment>4Bytes</StructMemberAlignment>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>liblzma.lib;dxgi.lib;d3d11.lib;Psapi.lib;Shlwapi.lib;Dwmapi.lib;Comctl32.lib;WinMM.lib;UxTheme.lib;Advapi32.lib;Msimg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <Version>
+      </Version>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>false</DataExecutionPrevention>
+      <AdditionalManifestDependencies>"type='Win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'";%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
+      <AllowIsolation>true</AllowIsolation>
+      <AdditionalOptions>/MAP</AdditionalOptions>
+      <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <IgnoreSpecificDefaultLibraries>MSVCRT.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LargeAddressAware>true</LargeAddressAware>
+      <TerminalServerAware>false</TerminalServerAware>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PreBuildEvent>
+      <Command>cd /d "$(ProjectDir)"
+del ..\Release /f /s /q
+rmdir ..\Release /s /q
+msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x86
+msbuild ..\Colorizer\Colorizer.sln -t:Clean -p:Configuration=Release /p:Platform=x64
+msbuild ..\PFXGDI\PFXGDI.sln -t:Clean -p:Configuration=Release /p:Platform=x86
+del .\Colorizer.exe /f /q
+del .\Colorizer.exe.h /f /q
+del .\PFXGDI.exe /f /q
+del .\PFXGDI.exe.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
+del .\Widths.h /f /q
+msbuild ..\Colorizer\Colorizer.sln -t:Rebuild -p:Configuration=Release /p:Platform=x64
+msbuild ..\PFXGDI\PFXGDI.sln -t:Rebuild -p:Configuration=Release /p:Platform=x86
+xxd -i Colorizer.exe &gt; Colorizer.exe.h
+xxd -i PFXGDI.exe &gt; PFXGDI.exe.h
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content LanguagePacks.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 LanguagePacks.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content FallbackStrings.h -Encoding Unicode; (@(''), $lines) | Set-Content -Encoding UTF8 FallbackStrings.hpp"
+Powershell -ExecutionPolicy Bypass -Command "$lines = Get-Content PackWrapper.h -Encoding Unicode; $header = $lines[0] -replace '\.h&gt;', '.hpp&gt;'; $rest = $lines | Select-Object -Skip 1; ($header, $rest) | Set-Content -Encoding UTF8 PackWrapper.hpp"
+clang-cl /fallback /EHsc /D "UNICODE" /Fe.\tmp.exe /Fo.\tmp.obj .\TextWidthCalculator.cpp /link gdi32.lib user32.lib
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\LanguagePacks.hpp ^|.\tmp.exe ^&gt;.\Widths.h
+start /wait cmd /c chcp 65001 ^&amp;title Calculating text widths... ^&amp;type .\FallbackStrings.hpp ^|.\tmp.exe ^&gt;^&gt;.\Widths.h
+del .\tmp.exe /f /q
+del .\tmp.obj /f /q
+Powershell -ExecutionPolicy Bypass -Command "Get-Content Widths.h -Encoding UTF8 | Select-Object -skip 1 | Set-Content -Encoding Unicode Widths.hh"
+del .\Widths.h /f /q
+rename .\Widths.hh Widths.h</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>cd /d "$(ProjectDir)"
+copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
+msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x86
+del .\Widths.h /f /q
+del .\LanguagePacks.hpp /f /q
+del .\PackWrapper.hpp /f /q
+del ..\.vs /f /s /q
+rmdir ..\.vs /s /q
+del .\Release /f /s /q
+rmdir .\Release /s /q
+del ..\Release /f /s /q
+rmdir ..\Release /s /q
+mkdir ..\Release
+move /y ..\$(TargetName).exe ..\Release\$(TargetName).exe</Command>
+    </PostBuildEvent>
+    <ResourceCompile>
+      <ShowProgress>true</ShowProgress>
+      <PreprocessorDefinitions>HRB;USE_RTL_LAYOUT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">
@@ -3737,7 +3995,9 @@ rename .\Widths.hh Widths.h</Command>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DPRK|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Hebrew|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Russian|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Hebrew|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">true</ExcludedFromBuild>
@@ -3781,7 +4041,9 @@ rename .\Widths.hh Widths.h</Command>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DPRK|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DPRK|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Hebrew|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Russian|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Hebrew|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='SoftwareRender|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='LimitedColor|x64'">true</ExcludedFromBuild>
@@ -3846,7 +4108,9 @@ rename .\Widths.hh Widths.h</Command>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Chinese|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Chinese|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Russian|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Hebrew|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Russian|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Hebrew|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='NoOptimization|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='NoOptimization|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Arinoglish|x64'">true</ExcludedFromBuild>
@@ -3879,24 +4143,24 @@ rename .\Widths.hh Widths.h</Command>
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SMF3Intro.h" />
     <ClInclude Include="Studio.h" />
-    <ClInclude Include="Tab1Btn2.h"/>
+    <ClInclude Include="Tab1Btn2.h" />
     <ClInclude Include="Tab1.h" />
-    <ClCompile Include="Tab1Main.h"/>
+    <ClCompile Include="Tab1Main.h" />
     <ClInclude Include="Tab1Btn4.h" />
     <ClInclude Include="Tab1Btn5.h" />
     <ClInclude Include="Tab1Graphics.h" />
     <ClInclude Include="Tab2.h" />
-    <ClCompile Include="Tab2Main.h"/>
+    <ClCompile Include="Tab2Main.h" />
     <ClInclude Include="Tab2Btn4.h" />
     <ClInclude Include="Tab2Graphics.h" />
     <ClInclude Include="Tab3.h" />
-    <ClCompile Include="Tab3Main.h"/>
+    <ClCompile Include="Tab3Main.h" />
     <ClInclude Include="Tab3Graphics.h" />
     <ClInclude Include="Tab4.h" />
-    <ClCompile Include="Tab4Main.h"/>
+    <ClCompile Include="Tab4Main.h" />
     <ClInclude Include="Tab4Graphics.h" />
     <ClInclude Include="TabSwitcher.h" />
-    <ClCompile Include="TabSwitcherMain.h"/>
+    <ClCompile Include="TabSwitcherMain.h" />
     <ClInclude Include="ConsoleTextbox.h" />
     <ClInclude Include="tinyxml\tinystr.h" />
     <ClInclude Include="tinyxml\tinyxml.h" />
@@ -3909,7 +4173,7 @@ rename .\Widths.hh Widths.h</Command>
     <ClInclude Include="WidthsWrapper.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="PianoFromAbove.RC.cpp"/>
+    <ResourceCompile Include="PianoFromAbove.RC.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Config.cpp" />
@@ -3930,55 +4194,55 @@ rename .\Widths.hh Widths.h</Command>
     <None Include="Images\chase.mid.xz" />
     <None Include="Images\PFA Icon.ico" />
     <None Include="Images\mediaiconssmall.bmp" />
-    <None Include="common.hlsl"/>
+    <None Include="common.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="background_ps.hlsl">
       <ShaderType>Pixel</ShaderType>
       <ShaderModel>5.0</ShaderModel>
-      <HeaderFileOutput >$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
+      <HeaderFileOutput>$(ProjectDir)BackgroundPixelShader.h</HeaderFileOutput>
       <ObjectFileOutput />
       <VariableName>g_pBackgroundPixelShader</VariableName>
     </FxCompile>
     <FxCompile Include="background_vs.hlsl">
       <ShaderType>Vertex</ShaderType>
       <ShaderModel>5.0</ShaderModel>
-      <HeaderFileOutput >$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
+      <HeaderFileOutput>$(ProjectDir)BackgroundVertexShader.h</HeaderFileOutput>
       <ObjectFileOutput />
       <VariableName>g_pBackgroundVertexShader</VariableName>
     </FxCompile>
     <FxCompile Include="note_ps.hlsl">
       <ShaderType>Pixel</ShaderType>
       <ShaderModel>5.0</ShaderModel>
-      <HeaderFileOutput >$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
+      <HeaderFileOutput>$(ProjectDir)NotePixelShader.h</HeaderFileOutput>
       <ObjectFileOutput />
       <VariableName>g_pNotePixelShader</VariableName>
     </FxCompile>
     <FxCompile Include="note_vs.hlsl">
       <ShaderType>Vertex</ShaderType>
       <ShaderModel>5.0</ShaderModel>
-      <HeaderFileOutput >$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
+      <HeaderFileOutput>$(ProjectDir)NoteVertexShader.h</HeaderFileOutput>
       <ObjectFileOutput />
       <VariableName>g_pNoteVertexShader</VariableName>
     </FxCompile>
     <FxCompile Include="note_vs_samewidth.hlsl">
       <ShaderType>Vertex</ShaderType>
       <ShaderModel>5.0</ShaderModel>
-      <HeaderFileOutput >$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
+      <HeaderFileOutput>$(ProjectDir)NoteVertexShaderSameWidth.h</HeaderFileOutput>
       <ObjectFileOutput />
       <VariableName>g_pNoteVertexShaderSameWidth</VariableName>
     </FxCompile>
     <FxCompile Include="rect_ps.hlsl">
       <ShaderType>Pixel</ShaderType>
       <ShaderModel>5.0</ShaderModel>
-      <HeaderFileOutput >$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
+      <HeaderFileOutput>$(ProjectDir)RectPixelShader.h</HeaderFileOutput>
       <ObjectFileOutput />
       <VariableName>g_pRectPixelShader</VariableName>
     </FxCompile>
     <FxCompile Include="rect_vs.hlsl">
       <ShaderType>Vertex</ShaderType>
       <ShaderModel>5.0</ShaderModel>
-      <HeaderFileOutput >$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
+      <HeaderFileOutput>$(ProjectDir)RectVertexShader.h</HeaderFileOutput>
       <ObjectFileOutput />
       <VariableName>g_pRectVertexShader</VariableName>
     </FxCompile>

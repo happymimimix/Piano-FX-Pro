@@ -21,6 +21,8 @@ Global
 		DoubleArinoglish|x86 = DoubleArinoglish|x86
 		DPRK|x64 = DPRK|x64
 		DPRK|x86 = DPRK|x86
+		Hebrew|x64 = Hebrew|x64
+		Hebrew|x86 = Hebrew|x86
 		Hiragana|x64 = Hiragana|x64
 		Hiragana|x86 = Hiragana|x86
 		Japanese|x64 = Japanese|x64
@@ -81,6 +83,12 @@ Global
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.DPRK|x86.ActiveCfg = DPRK|Win32
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.DPRK|x86.Build.0 = DPRK|Win32
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.DPRK|x86.Deploy.0 = DPRK|Win32
+		{DD4C822F-844F-40BF-8113-129B04EDE199}.Hebrew|x64.ActiveCfg = Hebrew|x64
+		{DD4C822F-844F-40BF-8113-129B04EDE199}.Hebrew|x64.Build.0 = Hebrew|x64
+		{DD4C822F-844F-40BF-8113-129B04EDE199}.Hebrew|x64.Deploy.0 = Hebrew|x64
+		{DD4C822F-844F-40BF-8113-129B04EDE199}.Hebrew|x86.ActiveCfg = Hebrew|Win32
+		{DD4C822F-844F-40BF-8113-129B04EDE199}.Hebrew|x86.Build.0 = Hebrew|Win32
+		{DD4C822F-844F-40BF-8113-129B04EDE199}.Hebrew|x86.Deploy.0 = Hebrew|Win32
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Hiragana|x64.ActiveCfg = Hiragana|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Hiragana|x64.Build.0 = Hiragana|x64
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.Hiragana|x64.Deploy.0 = Hiragana|x64
