@@ -14,8 +14,13 @@
 #define LoadingWindowH 50
 #define ResolutionWindowW 100
 #define ResolutionWindowH 60
-#define DialogStyle DS_SETFONT | WS_CHILD | WS_CAPTION
-#define AltDialogStyle DS_SETFONT | WS_POPUP | WS_CAPTION
+#define DialogStyle DS_LOCALEDIT | DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_CHILD | WS_CAPTION
+#define AltDialogStyle DS_LOCALEDIT | DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_NOFAILCREATE | WS_POPUP | WS_CAPTION
+#ifdef USE_RTL_LAYOUT
+#define DialogStyleExtra WS_EX_DLGMODALFRAME | WS_EX_LAYOUTRTL | WS_EX_RTLREADING
+#else
+#define DialogStyleExtra WS_EX_DLGMODALFRAME
+#endif
 #define BoxSpacing 14
 #define dBoxSpacing BoxSpacing+BoxSpacing //Double
 #define tBoxSpacing dBoxSpacing+BoxSpacing //Triple
@@ -158,6 +163,8 @@
 #elif TrackText4W >= TrackText1W && TrackText4W >= TrackText2W && TrackText4W >= TrackText3W
 #define TrackAlign TrackText4W
 #endif
+#define LoadingSkew 16
+#define mLoadingSkew 0 - LoadingSkew
 //Alternative Macro Naming Conventions
 #define BoxSpacing_1x BoxSpacing
 #define BoxSpacing_2x dBoxSpacing

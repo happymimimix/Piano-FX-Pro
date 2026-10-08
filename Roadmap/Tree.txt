@@ -1,5 +1,5 @@
 ﻿Folder PATH listing for volume Data
-Volume serial number is 9DB5-5629
+Volume serial number is 0000012A 9DB5:5629
 D:\PIANO-FX-PRO\ROADMAP
 ├───DirectX 11 backport
 │   ├───Core
@@ -188,11 +188,13 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   └───DONE
 │   ├───Resouce script
 │   │   ├───v2 Macro naming improvement and add 1.5x distance
-│   │   │   └───TODO
+│   │   │   └───DONE
 │   │   ├───v2 Math formula auto generated RC
 │   │   │   └───DONE
-│   │   └───v3 Pointer navigated RC (Easier to add and remove components)
-│   │       └───Gave up because RC doesn't support any form of variables! Not even #define Next Prev + 10, #Define Prev Next!
+│   │   ├───v3 Pointer navigated RC (Easier to add and remove components)
+│   │   │   └───Gave up because RC doesn't support any form of variables! Not even #define Next Prev + 10, #Define Prev Next!
+│   │   └───v3 ResourceID based pesudo pointer navigated RC (Attempt 2)
+│   │       └───DONE
 │   ├───Reversed note rendering
 │   │   ├───Note drawing
 │   │   │   └───DONE
