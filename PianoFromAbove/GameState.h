@@ -123,8 +123,8 @@ struct dynamic_bitset {
 
     template<typename Func>
     __forceinline void ForEach(Func&& FuncPtr) {
-		if (minWord > maxWord) return;
-		minWord = min(minWord, wordCount - 1);
+        if (minWord > maxWord) return;
+        minWord = min(minWord, wordCount - 1);
         maxWord = min(maxWord, wordCount - 1);
         idx_t newMin = wordCount - 1;
         idx_t newMax = 0;

@@ -1266,7 +1266,7 @@ GameState::GameError MainScreen::Logic() {
             SkipSearch:;
         }
     } else {
-    	if (m_pStateReversed) {
+        if (m_pStateReversed) {
             // Leaving reversed drawing state
             delete m_pStateReversed;
             m_pStateReversed = nullptr;
