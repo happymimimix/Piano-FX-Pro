@@ -96,8 +96,13 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „¤„Ÿ„Ÿ„ŸUpdates required
 „    „    „¥„Ÿ„Ÿ„ŸNorthKorean
 „    „    „    „¤„Ÿ„Ÿ„ŸUpdates required
-„    „    „¤„Ÿ„Ÿ„ŸRussian
-„    „        „¤„Ÿ„Ÿ„ŸUpdates required
+„    „    „¥„Ÿ„Ÿ„ŸRussian
+„    „    „    „¤„Ÿ„Ÿ„ŸUpdates required
+„    „    „¤„Ÿ„Ÿ„Ÿ[NEW] Hebrew
+„    „        „¥„Ÿ„Ÿ„ŸRight to left layout support
+„    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „        „¤„Ÿ„Ÿ„ŸTranslation
+„    „            „¤„Ÿ„Ÿ„ŸTODO
 „    „¥„Ÿ„Ÿ„ŸNew git-based about screen
 „    „    „¥„Ÿ„Ÿ„ŸParse commit
 „    „    „    „¤„Ÿ„Ÿ„ŸTODO
@@ -159,7 +164,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¤„Ÿ„Ÿ„ŸSlider 'Saturation'
 „    „    „        „¤„Ÿ„Ÿ„ŸTODO
-„    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Dump audio output' to track selection
+„    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Dump midi output' to track selection
 „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Full screen capture' to controls (Next to video output)
 „    „    „    „¤„Ÿ„Ÿ„ŸTODO
