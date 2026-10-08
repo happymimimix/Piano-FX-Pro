@@ -126,8 +126,8 @@ GameState::GameError IntroScreen::Render() {
     color_t G = (iColor >> 8) & 0xFF;
     color_t B = (iColor >> 16) & 0xFF;
     if (FAILED(m_pRenderer->ClearAndBeginScene(D3DCOLOR_XRGB(R, G, B)))) return DirectXError;
-    m_pRenderer->AddText(StatisticsText1 L" v" VersionString, 1 << 5, 16, 6, 0xFF404040);
-    m_pRenderer->AddText(StatisticsText1 L" v" VersionString, 1 << 5, 14, 4, 0xFFFFFFFF);
+    m_pRenderer->AddText(StatisticsText1 L" v" VersionString, 1 << 5, 16, 6, 0xFF404040, ALIGN_AUTOSWAP RTL_ALIGN);
+    m_pRenderer->AddText(StatisticsText1 L" v" VersionString, 1 << 5, 14, 4, 0xFFFFFFFF, ALIGN_AUTOSWAP RTL_ALIGN);
 
     // Present the backbuffer contents to the display
     if (FAILED(m_pRenderer->EndScene())) return DirectXError;
@@ -446,8 +446,8 @@ GameState::GameError SplashScreen::Render() {
     int B = (iColor >> 16) & 0xFF;
     if (FAILED(m_pRenderer->ClearAndBeginScene(D3DCOLOR_XRGB(R, G, B)))) return DirectXError;
     RenderNotes();
-    m_pRenderer->AddText(StatisticsText1 L" v" VersionString, 1 << 5, 16, 6, 0xFF404040);
-    m_pRenderer->AddText(StatisticsText1 L" v" VersionString, 1 << 5, 14, 4, 0xFFFFFFFF);
+    m_pRenderer->AddText(StatisticsText1 L" v" VersionString, 1 << 5, 16, 6, 0xFF404040, ALIGN_AUTOSWAP RTL_ALIGN);
+    m_pRenderer->AddText(StatisticsText1 L" v" VersionString, 1 << 5, 14, 4, 0xFFFFFFFF, ALIGN_AUTOSWAP RTL_ALIGN);
 
     // Present the backbuffer contents to the display
     if (FAILED(m_pRenderer->EndScene())) return DirectXError;
@@ -2400,6 +2400,13 @@ void MainScreen::RenderText() {
     RECT rcScr = { 0, 0, m_pRenderer->GetBufferWidth(), m_pRenderer->GetBufferHeight() };
 
     // Draw the text
+#ifdef USE_RTL_LAYOUT
+    rcStatus.left = m_pRenderer->GetBufferWidth() - rcStatus.left;
+    rcStatus.right = m_pRenderer->GetBufferWidth() - rcStatus.right;
+    rcStatus.left ^= rcStatus.right;
+    rcStatus.right ^= rcStatus.left;
+    rcStatus.left ^= rcStatus.right;
+#endif
     RenderStatus(&rcStatus);
     if (!m_sMarker.empty() && cVideo.bShowMarkers) {
         RenderMarker(m_sMarker.c_str());
@@ -2421,21 +2428,19 @@ void MainScreen::RenderText() {
 }
 
 void MainScreen::RenderStatusLine(unsigned char line, const wchar_t* left, const wchar_t* format, ...) {
-    if (Config::GetConfig().GetVideoSettings().bDisableUI) return;
-
     wchar_t buf[LONG_MAX_PATH] = {};
     va_list varargs;
     va_start(varargs, format);
-    vswprintf_s(buf, _countof(buf), format, varargs);
+    vswprintf_s(buf, LONG_MAX_PATH, format, varargs);
     va_end(varargs);
 
     win32_t TextY = 2 + line * 16;
     win32_t LeftTextX = m_pRenderer->GetBufferWidth() - (StatisticsWidth - 6);
     win32_t RightTextX = m_pRenderer->GetBufferWidth() - 6;
-    m_pRenderer->AddText(left, 1 << 4, LeftTextX + 2, TextY, 0x404040, ALIGN_LEFT | ALIGN_TOP);
-    m_pRenderer->AddText(left, 1 << 4, LeftTextX, TextY - 2, 0xFFFFFF, ALIGN_LEFT | ALIGN_TOP);
-    m_pRenderer->AddText(buf, 1 << 4, RightTextX + 2, TextY, 0x404040, ALIGN_RIGHT | ALIGN_TOP);
-    m_pRenderer->AddText(buf, 1 << 4, RightTextX, TextY - 2, 0xFFFFFF, ALIGN_RIGHT | ALIGN_TOP);
+    m_pRenderer->AddText(left, 1 << 4, LeftTextX + 2, TextY, 0x404040, ALIGN_AUTOSWAP | ALIGN_LEFT | ALIGN_TOP RTL_ALIGN);
+    m_pRenderer->AddText(left, 1 << 4, LeftTextX, TextY - 2, 0xFFFFFF, ALIGN_AUTOSWAP | ALIGN_LEFT | ALIGN_TOP RTL_ALIGN);
+    m_pRenderer->AddText(buf, 1 << 4, RightTextX + 2, TextY, 0x404040, ALIGN_AUTOSWAP | ALIGN_RIGHT | ALIGN_TOP RTL_ALIGN);
+    m_pRenderer->AddText(buf, 1 << 4, RightTextX, TextY - 2, 0xFFFFFF, ALIGN_AUTOSWAP | ALIGN_RIGHT | ALIGN_TOP RTL_ALIGN);
 }
 
 void MainScreen::RenderStatus(LPRECT prcStatus) {
@@ -2500,6 +2505,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
     for (signed short i = npsFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
         npsFormatted.insert(i, L",");
 
+    if (Config::GetConfig().GetVideoSettings().bDisableUI) goto NoStats;
     RenderStatusLine(cur_line++, StatisticsText1, L"%s", L"v" VersionString);
     RenderStatusLine(cur_line++, StatisticsText2, L"");
     RenderStatusLine(cur_line++, L"", L"");
@@ -2592,7 +2598,10 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
             RenderStatusLine(cur_line++, StatisticsText32, L"");
         }
     }
-    if (IsWindowVisible(GetConsoleWindow()) && !IsIconic(GetConsoleWindow()) && (FrameCount & 0x0F) == 0) {
+    NoStats:
+
+    HWND CMD = GetConsoleWindow();
+    if (IsWindowVisible(CMD) && !IsIconic(CMD) && (FrameCount & 0x0F) == 0) {
         HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
         COORD pos;
         CONSOLE_SCREEN_BUFFER_INFO csbi;
@@ -2837,8 +2846,8 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
 }
 
 void MainScreen::RenderMarker(const wstring & str) {
-    m_pRenderer->AddText(str, (1 << 4) + (1 << 2), 5, 1, 0xFF404040, ALIGN_LEFT | ALIGN_TOP, -1, -1, 4, 0, 0x80000000);
-    m_pRenderer->AddText(str, (1 << 4) + (1 << 2), 3, -1, 0xFFFFFFFF, ALIGN_LEFT | ALIGN_TOP);
+    m_pRenderer->AddText(str, (1 << 4) + (1 << 2), 5, 1, 0xFF404040, ALIGN_AUTOSWAP | ALIGN_LEFT | ALIGN_TOP RTL_ALIGN, -1, -1, 4, 0, 0x80000000);
+    m_pRenderer->AddText(str, (1 << 4) + (1 << 2), 3, -1, 0xFFFFFFFF, ALIGN_AUTOSWAP | ALIGN_LEFT | ALIGN_TOP RTL_ALIGN);
 }
 
 void MainScreen::RenderMessage(LPRECT prcMsg, LPRECT prcScr, const wstring & sMsg, char lnAlign) {
@@ -2891,8 +2900,8 @@ void MainScreen::RenderMessage(LPRECT prcMsg, LPRECT prcScr, const wstring & sMs
     for (auto& Line : Lines) {
         SIZE LineSize = m_pRenderer->CalcTextSize(Line.empty() ? L" " : Line, fontsize);
         if (!Line.empty()) {
-            m_pRenderer->AddText(Line, fontsize, CurX + 2, CurY + 1, 0xFF404040, Alignment);
-            m_pRenderer->AddText(Line, fontsize, CurX, CurY, 0xFFFFFFFF, Alignment);
+            m_pRenderer->AddText(Line, fontsize, CurX + 2, CurY + 1, 0xFF404040, ALIGN_AUTOSWAP RTL_ALIGN | Alignment);
+            m_pRenderer->AddText(Line, fontsize, CurX, CurY, 0xFFFFFFFF, ALIGN_AUTOSWAP RTL_ALIGN | Alignment);
         }
         CurY += LineSize.cy;
     }

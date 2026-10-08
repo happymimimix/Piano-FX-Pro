@@ -29,6 +29,8 @@ constexpr DWORD ALIGN_RIGHT  = 0x0300;
 constexpr DWORD ALIGN_TOP    = 0x0001;
 constexpr DWORD ALIGN_MIDDLE = 0x0002;
 constexpr DWORD ALIGN_BOTTOM = 0x0003;
+constexpr DWORD ALIGN_RTL = 0x00010000;
+constexpr DWORD ALIGN_AUTOSWAP = 0x01000000;
 
 enum class Pipeline : uint8_t {
     Rect,

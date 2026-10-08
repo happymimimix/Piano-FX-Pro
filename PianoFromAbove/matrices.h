@@ -18,8 +18,10 @@
 #define AltDialogStyle DS_LOCALEDIT | DS_SETFONT | DS_MODALFRAME | DS_NOFAILCREATE | WS_POPUP | WS_CAPTION
 #ifdef USE_RTL_LAYOUT
 #define DialogStyleExtra WS_EX_WINDOWEDGE | WS_EX_LAYOUTRTL | WS_EX_RTLREADING
+#define LTR_STYLE WS_EX_RTLREADING
 #else
 #define DialogStyleExtra WS_EX_WINDOWEDGE
+#define LTR_STYLE NULL
 #endif
 #define BoxSpacing 14
 #define dBoxSpacing BoxSpacing+BoxSpacing //Double

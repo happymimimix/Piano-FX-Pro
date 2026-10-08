@@ -43,7 +43,7 @@ VOID DoPreferences(HWND hWndOwner)
     }
     psh.dwSize = sizeof(PROPSHEETHEADER);
 #ifdef USE_RTL_LAYOUT
-    psh.dwFlags = PSH_PROPSHEETPAGE | PSH_NOCONTEXTHELP | PSH_RTLREADING;
+    psh.dwFlags = PSH_PROPSHEETPAGE | PSH_NOCONTEXTHELP | PSH_USECALLBACK | PSH_RTLREADING;
 #else
     psh.dwFlags = PSH_PROPSHEETPAGE | PSH_NOCONTEXTHELP;
 #endif
@@ -54,7 +54,19 @@ VOID DoPreferences(HWND hWndOwner)
     psh.nPages = sizeof(psp) / sizeof(PROPSHEETPAGE);
     psh.nStartPage = 0;
     psh.ppsp = (LPCPROPSHEETPAGE)&psp;
+#ifdef USE_RTL_LAYOUT
+    psh.pfnCallback = [](HWND hPSH, UINT uMsg, LPARAM lParam) -> int {
+        if (uMsg == PSCB_PRECREATE)
+        {
+            struct DLGTEMPLATEEX { WORD dlgVer, signature; DWORD helpID, exStyle, style; WORD  cDlgItems; short x, y, cx, cy; };
+            if (((DLGTEMPLATEEX*)lParam)->signature == 0xFFFF) ((DLGTEMPLATEEX*)lParam)->exStyle |= RTL_STYLE;
+            else ((DLGTEMPLATE*)lParam)->dwExtendedStyle |= RTL_STYLE;
+        }
+        return 0;
+    };
+#else
     psh.pfnCallback = NULL;
+#endif
 
     PropertySheet(&psh);
 }

@@ -672,11 +672,23 @@ HRESULT Renderer11::FlushText() {
 
     SetBkMode(DXDC, TRANSPARENT);
 
-    for (const TextCommand& CMD : m_vTextCommands) {
+    for (TextCommand& CMD : m_vTextCommands) {
         HFONT imguiFont = (CMD.Text.empty() || CMD.Size<=0) ? NULL : imguiFont2GDI(PHIFON_compressed_data, PHIFON_compressed_size, CMD.Size);
         HFONT OldFont = CMD.Text.empty() ? NULL : (HFONT)SelectObject(DXDC, imguiFont);
         SetTextColor(DXDC, CMD.Color & 0x00FFFFFF);
-
+        SetTextAlign(DXDC, (CMD.Alignment & 0x00FF0000) == ALIGN_RTL ? TA_RTLREADING : NULL);
+#ifdef USE_RTL_LAYOUT
+        if ((CMD.Alignment & 0xFF000000) == ALIGN_AUTOSWAP) {
+            switch (CMD.Alignment & 0xFF00) {
+            default:
+            case ALIGN_LEFT: CMD.Alignment &= ~0xFF00; CMD.Alignment |= ALIGN_RIGHT; break;
+            case ALIGN_CENTER: break;
+            case ALIGN_RIGHT: CMD.Alignment &= ~0xFF00; CMD.Alignment |= ALIGN_LEFT; break;
+            }
+            CMD.X = m_iBufferWidth - CMD.X;
+            CMD.OffsetX *= -1;
+        }
+#endif
         // Measure text for alignment
         SIZE TextSize = {0,0};
         if (!CMD.Text.empty()) {
