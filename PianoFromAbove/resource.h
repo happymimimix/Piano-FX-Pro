@@ -1,8 +1,6 @@
 // Microsoft Visual C++ generated include file.
 // Used by PianoFromAbove.rc
 //
-#include <winres.h>
-
 #define IDM_MAINMENU                    101
 #define IDA_MAINMENU                    102
 #define IDI_PFAICON                     103
