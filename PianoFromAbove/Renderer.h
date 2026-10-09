@@ -87,11 +87,13 @@ constexpr unsigned long MaxChannelColors = 1<<4; //Theoretic maximum number of c
 class Renderer11 {
 public:
     Renderer11() {
-        PtrToIsWrapRenderer = &m_bSoftware;
+        PtrToIsWarpRenderer = &m_bSoftware;
+        PtrToRendererName = reinterpret_cast<wchar_t*>(&m_wcDeviceName);
     }
     ~Renderer11() {
         imguiClearFontCache();
-        PtrToIsWrapRenderer = nullptr;
+        PtrToIsWarpRenderer = nullptr;
+        PtrToRendererName = nullptr;
     }
 
     tuple<HRESULT, const char*> Init(HWND hWnd, bool bLimitFPS);
@@ -144,6 +146,7 @@ private:
     win32_t m_iBufferHeight = 0;
     bool m_bLimitFPS = false;
     bool m_bSoftware = false;
+    wchar_t m_wcDeviceName[_countof(DXGI_ADAPTER_DESC1::Description)+3];
 
     HWND m_hWnd = NULL;
     ComPtr<IDXGIFactory1> m_pFactory;

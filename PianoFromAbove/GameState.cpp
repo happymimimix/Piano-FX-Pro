@@ -2410,7 +2410,13 @@ void MainScreen::RenderText() {
         RenderMarker(m_sMarker.c_str());
     }
     if (m_bZoomMove) {
-        RenderMessage(&rcMsg, &rcScr, ZoomMoveMsg, 'L');
+        RenderMessage(&rcMsg, &rcScr, ZoomMoveMsg,
+#ifdef USE_RTL_LAYOUT
+            'R'
+#else
+            'L'
+#endif
+        );
     }
     if (CheatEngineCaption[0] != 'C' && CheatEngineCaption[0] != 'L' && CheatEngineCaption[0] != 'R') {
         CheatEngineCaption[0] = 'C';
@@ -2420,7 +2426,13 @@ void MainScreen::RenderText() {
             RenderMessage(&rcMsg, &rcScr, Utf8ToWString(Ptr_to_CaptionContent), CheatEngineCaption[0]);
         }
         else {
-            RenderMessage(&rcMsg, &rcScr, Utf8ToWString("The caption has exceeded the maximum acceptable length of " + to_string(sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]) - 2) + " characters. \nAs a result, this caption has been blocked from showing in order to prevent crashing. \nPlease consider writing something slightly shorter. "), 'L');
+            RenderMessage(&rcMsg, &rcScr, LengthExceededPartA + to_wstring(sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]) - 2) + LengthExceededPartB,
+#ifdef USE_RTL_LAYOUT
+                'R'
+#else
+                'L'
+#endif
+            );
         }
     }
 }
@@ -2898,8 +2910,8 @@ void MainScreen::RenderMessage(LPRECT prcMsg, LPRECT prcScr, const wstring & sMs
     for (auto& Line : Lines) {
         SIZE LineSize = m_pRenderer->CalcTextSize(Line.empty() ? L" " : Line, fontsize);
         if (!Line.empty()) {
-            m_pRenderer->AddText(Line, fontsize, CurX + 2, CurY + 1, 0xFF404040, ALIGN_AUTOSWAP RTL_ALIGN | Alignment);
-            m_pRenderer->AddText(Line, fontsize, CurX, CurY, 0xFFFFFFFF, ALIGN_AUTOSWAP RTL_ALIGN | Alignment);
+            m_pRenderer->AddText(Line, fontsize, CurX + 2, CurY + 1, 0xFF404040, Alignment RTL_ALIGN);
+            m_pRenderer->AddText(Line, fontsize, CurX, CurY, 0xFFFFFFFF, Alignment RTL_ALIGN);
         }
         CurY += LineSize.cy;
     }

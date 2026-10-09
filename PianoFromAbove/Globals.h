@@ -20,7 +20,8 @@ extern HWND g_hWndGfx;
 extern bool g_bGfxDestroyed;
 extern TSQueue<MSG> g_MsgQueue;
 
-inline bool* PtrToIsWrapRenderer = nullptr;
+inline bool* PtrToIsWarpRenderer = nullptr;
+inline wchar_t* PtrToRendererName = nullptr;
 #define TitleGapLine wstring(L" | ")
 #define TitleGapEmpty wstring(L"  ")
 #define EmptyWstr wstring(L"")
@@ -28,7 +29,7 @@ inline bool* PtrToIsWrapRenderer = nullptr;
 #ifdef SOFTWARE_RENDER_ONLY
 #define PF_SWR TitleGapEmpty+MainWindowTitle8
 #else
-#define PF_SWR wstring(PtrToIsWrapRenderer != nullptr && (*PtrToIsWrapRenderer) ? wstring(TitleGapEmpty+MainWindowTitle7) : EmptyWstr)
+#define PF_SWR wstring(PtrToIsWarpRenderer != nullptr && (*PtrToIsWarpRenderer) ? TitleGapEmpty+wstring(MainWindowTitle7) : (PtrToRendererName != nullptr ? TitleGapEmpty+wstring(PtrToRendererName) : EmptyWstr))
 #endif
 #ifdef LIMIT_COLORS
 #define PF_COL TitleGapEmpty+MainWindowTitle9

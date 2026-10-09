@@ -44,7 +44,7 @@ tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
         res = adapter->GetDesc1(&desc);
         if (FAILED(res)) return make_tuple(res, "GetDesc1");
 
-        if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) continue;
+        if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE || (desc.VendorId == 0x1414 && desc.DeviceId == 0x008C)) continue;
 
         D3D_FEATURE_LEVEL featureLevel;
         static const D3D_FEATURE_LEVEL wanted[] = { D3D_FEATURE_LEVEL_11_0 };
@@ -53,6 +53,18 @@ tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
             D3D11_SDK_VERSION, &m_pDevice, &featureLevel, &m_pContext);
         if (FAILED(res)) continue;
         m_bSoftware = false;
+        m_wcDeviceName[0] = L'\0';
+        wcsncpy_s(reinterpret_cast<wchar_t*>(&m_wcDeviceName)+1, _countof(desc.Description)+1, reinterpret_cast<wchar_t*>(&desc.Description), _TRUNCATE);
+        for (wchar_t& ch : m_wcDeviceName) {
+            if (&ch > reinterpret_cast<wchar_t*>(&m_wcDeviceName) &&
+                ch == L'\0' && m_wcDeviceName[0] == L'\0' &&
+                &ch < reinterpret_cast<wchar_t*>(&m_wcDeviceName)+(_countof(desc.Description)+2)) {
+                m_wcDeviceName[0] = L'(';
+                ch = L')';
+                *(&ch + 1) = L'\0';
+                break;
+            }
+        }
         break;
     }
     if (m_bSoftware) //Oh we love software rendering!
