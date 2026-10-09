@@ -648,7 +648,11 @@ VOID DrawSliderChannel(LPNMCUSTOMDRAW lpnmcd, HWND hWndOwner)
     }
 
     BitBlt(lpnmcd->hdc, 0, 0, rcCtrl.right - rcCtrl.left, rcCtrl.bottom - rcCtrl.top,
+#ifdef USE_RTL_LAYOUT
+        hdcMem, rcOwner.right - rcCtrl.right, rcCtrl.top - rcOwner.top, SRCCOPY);
+#else
         hdcMem, rcCtrl.left - rcOwner.left, rcCtrl.top - rcOwner.top, SRCCOPY);
+#endif
     if (GetFocus() == lpnmcd->hdr.hwndFrom)
         DrawFocusRect(lpnmcd->hdc, &rcCtrlClient);
 }
@@ -724,13 +728,24 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         // Copy background and draw
         BitBlt(hDCMem, ps.rcPaint.left, ps.rcPaint.top, ps.rcPaint.right - ps.rcPaint.left, ps.rcPaint.bottom - ps.rcPaint.top,
             hDCBkg, rcCtrl.left - rcOwner.left + ps.rcPaint.left, rcCtrl.top - rcOwner.top + ps.rcPaint.top, SRCCOPY);
-        if (bEnabled)
-        {
-            SetDCBrushColor(hDCMem, RGB(255, 255, 255));
+        if (bEnabled) {
+            SetDCBrushColor(hDCMem, RGB(0, 0, 191));
             HBRUSH hBrush = (HBRUSH)GetStockObject(DC_BRUSH);
             FillRect(hDCMem, &rcChannel, hBrush);
+            SetDCBrushColor(hDCMem, RGB(255, 255, 0));
+            hBrush = (HBRUSH)GetStockObject(DC_BRUSH);
+            win32_t iProgress = (2 * iPosition * (rcChannel.right - rcChannel.left - 1) + INT16_MAX) / (2 * INT16_MAX);
+            RECT rcProgress = { rcChannel.left, rcChannel.top, rcChannel.left + iProgress, rcChannel.bottom };
+            FillRect(hDCMem, &rcProgress, hBrush);
         }
-        DrawEdge(hDCMem, &rcChannel, BDR_SUNKENOUTER, BF_RECT);
+        else {
+            SetDCBrushColor(hDCMem, RGB(127, 127, 127));
+            HBRUSH hBrush = (HBRUSH)GetStockObject(DC_BRUSH);
+            FillRect(hDCMem, &rcChannel, hBrush);
+
+
+        }
+        DrawEdge(hDCMem, &rcChannel, EDGE_SUNKEN, BF_RECT);
         ImageList_DrawEx(hIml, 9 + bEnabled, hDCMem, rcThumb.left, rcThumb.top, rcThumb.right - rcThumb.left, rcThumb.bottom - rcThumb.top,
             CLR_DEFAULT, CLR_DEFAULT, ILD_NORMAL);
         BitBlt(hDC, ps.rcPaint.left, ps.rcPaint.top, ps.rcPaint.right - ps.rcPaint.left, ps.rcPaint.bottom - ps.rcPaint.top,
