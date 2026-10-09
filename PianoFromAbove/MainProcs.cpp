@@ -353,6 +353,11 @@ LRESULT WINAPI GfxProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
     switch (msg)
     {
+#ifdef USE_RTL_LAYOUT
+    case WM_NCCREATE:
+        SetWindowLongPtrW(hWnd, GWL_EXSTYLE, GetWindowLongPtrW(hWnd, GWL_EXSTYLE) & ~static_cast<LONG_PTR>(WS_EX_LAYOUTRTL));
+        break;
+#endif
     case WM_CREATE:
         ShowKeyboard(cView.GetKeyboard());
         return 0;
@@ -450,8 +455,11 @@ LRESULT WINAPI BarProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     switch (msg)
     {
     case WM_THEMECHANGED:
+    case WM_SYSCOLORCHANGE:
         CallWindowProc(g_pPrevBarProc, hWnd, msg, wParam, lParam);
         SendMessage(hWnd, TB_SETBUTTONSIZE, 0, MAKELONG(1 << 5, 1 << 5));
+        DrawSliderChannel(NULL, hWnd);
+        RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN);
         return 0;
     case WM_HSCROLL:
     {
@@ -629,6 +637,14 @@ VOID DrawSliderChannel(LPNMCUSTOMDRAW lpnmcd, HWND hWndOwner)
     static HDC hdcMem = NULL;
     static HBITMAP hBitmap = NULL;
 
+    if (!lpnmcd) {
+        if (hdcMem != NULL) DeleteObject((HGDIOBJ)hBitmap);
+        if (hBitmap != NULL) DeleteObject((HGDIOBJ)hBitmap);
+        hBitmap = NULL;
+        hBitmap = NULL;
+        return;
+    }
+
     RECT rcCtrl, rcOwner;
     GetWindowRect(lpnmcd->hdr.hwndFrom, &rcCtrl);
     GetWindowRect(hWndOwner, &rcOwner);
@@ -668,6 +684,14 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
     switch (msg)
     {
+    case WM_THEMECHANGED:
+    case WM_SYSCOLORCHANGE:
+        if (hBackbuffer != NULL) DeleteObject((HGDIOBJ)hBackbuffer);
+        if (hBackground != NULL) DeleteObject((HGDIOBJ)hBackground);
+        hBackbuffer = NULL;
+        hBackground = NULL;
+        InvalidateRect(hWnd, NULL, TRUE);
+        return 0;
     case WM_CREATE:
         hIml = ImageList_LoadImage(g_hInstance, MAKEINTRESOURCE(IDB_MEDIAICONSSMALL), 1 << 4, (1 << 4) + (1 << 2), CLR_DEFAULT, IMAGE_BITMAP, LR_CREATEDIBSECTION);
         bEnabled = ((GetWindowLongPtr(hWnd, GWL_STYLE) & WS_DISABLED) == 0);
@@ -729,21 +753,19 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         BitBlt(hDCMem, ps.rcPaint.left, ps.rcPaint.top, ps.rcPaint.right - ps.rcPaint.left, ps.rcPaint.bottom - ps.rcPaint.top,
             hDCBkg, rcCtrl.left - rcOwner.left + ps.rcPaint.left, rcCtrl.top - rcOwner.top + ps.rcPaint.top, SRCCOPY);
         if (bEnabled) {
-            SetDCBrushColor(hDCMem, RGB(0, 0, 191));
+            SetDCBrushColor(hDCMem, GetSysColor(COLOR_WINDOW));
             HBRUSH hBrush = (HBRUSH)GetStockObject(DC_BRUSH);
             FillRect(hDCMem, &rcChannel, hBrush);
-            SetDCBrushColor(hDCMem, RGB(255, 255, 0));
+            SetDCBrushColor(hDCMem, GetSysColor(COLOR_HIGHLIGHT));
             hBrush = (HBRUSH)GetStockObject(DC_BRUSH);
             win32_t iProgress = (2 * iPosition * (rcChannel.right - rcChannel.left - 1) + INT16_MAX) / (2 * INT16_MAX);
             RECT rcProgress = { rcChannel.left, rcChannel.top, rcChannel.left + iProgress, rcChannel.bottom };
             FillRect(hDCMem, &rcProgress, hBrush);
         }
         else {
-            SetDCBrushColor(hDCMem, RGB(127, 127, 127));
+            SetDCBrushColor(hDCMem, GetSysColor(COLOR_GRAYTEXT));
             HBRUSH hBrush = (HBRUSH)GetStockObject(DC_BRUSH);
             FillRect(hDCMem, &rcChannel, hBrush);
-
-
         }
         DrawEdge(hDCMem, &rcChannel, EDGE_SUNKEN, BF_RECT);
         ImageList_DrawEx(hIml, 9 + bEnabled, hDCMem, rcThumb.left, rcThumb.top, rcThumb.right - rcThumb.left, rcThumb.bottom - rcThumb.top,
@@ -763,7 +785,9 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         if (hBackground != NULL) DeleteObject((HGDIOBJ)hBackground);
         hBackbuffer = NULL;
         hBackground = NULL;
+        InvalidateRect(hWnd, NULL, FALSE);
         return 0;
+
     case WM_LBUTTONDOWN:
     {
         if (!bEnabled) return 0;

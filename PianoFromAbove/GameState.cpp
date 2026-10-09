@@ -547,7 +547,7 @@ void SplashScreen::RenderNote(MIDIChannelEvent* pNote, bool Highlight) {
     fMaxY -= fDeflate;
     if (y > fMaxY) { cy -= (y - fMaxY); y = fMaxY; }
     if (y - cy < fMinY) { cy -= (fMinY - (y - cy)); y = fMinY + cy; }
-    if (Highlight) m_pRenderer->DrawRect(x, y - cy, cx, cy, 0xFF000000, 0xFF000000, 0x7FFFFFFF, 0x7FFFFFFF);
+    if (Highlight) m_pRenderer->DrawRect(x, y - cy, cx, cy, 0xFF7F7F7F, 0xFF7F7F7F, 0x7FFFFFFF, 0x7FFFFFFF);
 }
 
 void SplashScreen::GenNoteXTable() {

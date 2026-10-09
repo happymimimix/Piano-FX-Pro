@@ -128,7 +128,8 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_COMMAND:
     {
         winword_t iId = LOWORD(wParam);
-        Changed(hWnd);
+        winword_t iCode = HIWORD(wParam);
+        if (iCode == LBN_SELCHANGE || iCode == EN_CHANGE || iCode == BN_CLICKED) Changed(hWnd);
         switch (iId)
         {
         case IDC_SHOWCUSTOMKEYS:
@@ -204,7 +205,6 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         }
         case IDC_BACKGROUNDRESET:
         {
-            Changed(hWnd);
             SetDlgItemTextW(hWnd, IDC_BACKGROUND, L"");
             return TRUE;
         }
@@ -277,10 +277,8 @@ INT_PTR WINAPI AudioProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     }
     case WM_COMMAND:
     {
-        winword_t iId = LOWORD(wParam);
         winword_t iCode = HIWORD(wParam);
-        if (iCode == LBN_SELCHANGE || (iId == IDC_KDMAPI && iCode == BN_CLICKED))
-            Changed(hWnd);
+        if (iCode == LBN_SELCHANGE || iCode == EN_CHANGE || iCode == BN_CLICKED) Changed(hWnd);
         break;
     }
     case WM_NOTIFY:
@@ -372,8 +370,11 @@ INT_PTR WINAPI VideoProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         return TRUE;
     }
     case WM_COMMAND:
-        Changed(hWnd);
+    {
+        winword_t iCode = HIWORD(wParam);
+        if (iCode == LBN_SELCHANGE || iCode == EN_CHANGE || iCode == BN_CLICKED) Changed(hWnd);
         break;
+    }
     case WM_NOTIFY:
     {
         LPNMHDR lpnmhdr = (LPNMHDR)lParam;
@@ -424,29 +425,25 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         // Config to fill out the form
         const ControlsSettings& cControls = Config::GetConfig().GetControlsSettings();
 
-        HWND hWndFwdBack = GetDlgItem(hWnd, IDC_LRARROWS);
-        HWND hWndSpeedPct = GetDlgItem(hWnd, IDC_UDARROWS);
-        HWND hWndVelStrshld = GetDlgItem(hWnd, IDC_VELSTRSHLD);
-        HWND hWndVelStrshldSpin = GetDlgItem(hWnd, IDC_VELSTRSHLDSPIN);
         // Edit boxes
         TCHAR buf[LONG_MAX_PATH];
         _stprintf_s(buf, TEXT("%g"), cControls.dFwdBackSecs);
-        SetWindowText(hWndFwdBack, buf);
+        SetDlgItemTextW(hWnd, IDC_LRARROWS, buf);
         _stprintf_s(buf, TEXT("%g"), cControls.dSpeedUpPct);
-        SetWindowText(hWndSpeedPct, buf);
-        SendMessage(hWndVelStrshldSpin, UDM_SETRANGE32, 0, 127);
+        SetDlgItemTextW(hWnd, IDC_UDARROWS, buf);
         CheckDlgButton(hWnd, IDC_SHOWCONTROLS, cControls.bAlwaysShowControls);
         CheckDlgButton(hWnd, IDC_PHIGROS, cControls.bPhigros);
         SetDlgItemTextW(hWnd, IDC_SPLASHMIDI, cControls.sSplashMIDI.c_str());
         _stprintf_s(buf, TEXT("%hhu"), cControls.iVelocityThreshold);
-        SetWindowText(hWndVelStrshld, buf);
+        SetDlgItemTextW(hWnd, IDC_VELSTRSHLD, buf);
         CheckDlgButton(hWnd, IDC_FFMPEG, cControls.bDumpFrames);
 
         return TRUE;
     }
     case WM_COMMAND: {
         winword_t iId = LOWORD(wParam);
-        Changed(hWnd);
+        winword_t iCode = HIWORD(wParam);
+        if (iCode == LBN_SELCHANGE || iCode == EN_CHANGE || iCode == BN_CLICKED) Changed(hWnd);
         switch (iId)
         {
         case IDC_SPLASHBROWSE: {
@@ -464,7 +461,6 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             return TRUE;
         }
         case IDC_SPLASHRESET: {
-            Changed(hWnd);
             SetDlgItemTextW(hWnd, IDC_SPLASHMIDI, L"");
             return TRUE;
         }
@@ -487,7 +483,7 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 HWND hWndFwdBack = GetDlgItem(hWnd, IDC_LRARROWS);
                 double dOldVal = 0;
                 win32_t len = GetWindowText(hWndFwdBack, buf, LONG_MAX_PATH);
-                if (len > 0 && _stscanf_s(buf, TEXT("%lf"), &dOldVal) == 1)
+                if (len > 0 && _stscanf_s(buf, TEXT("%lf"), &dOldVal))
                 {
                     double dNewVal = dOldVal - lpnmud->iDelta * .1;
                     _stprintf_s(buf, TEXT("%g"), dNewVal);
@@ -502,11 +498,26 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 HWND hWndSpeedPct = GetDlgItem(hWnd, IDC_UDARROWS);
                 double dOldVal = 0;
                 win32_t len = GetWindowText(hWndSpeedPct, buf, LONG_MAX_PATH);
-                if (len > 0 && _stscanf_s(buf, TEXT("%lf"), &dOldVal) == 1)
+                if (len > 0 && _stscanf_s(buf, TEXT("%lf"), &dOldVal))
                 {
                     double dNewVal = dOldVal - lpnmud->iDelta;
                     _stprintf_s(buf, TEXT("%g"), dNewVal);
                     SetWindowText(hWndSpeedPct, buf);
+                }
+                return TRUE;
+            }
+            case IDC_VELSTRSHLDSPIN:
+            {
+                TCHAR buf[LONG_MAX_PATH];
+                LPNMUPDOWN lpnmud = (LPNMUPDOWN)lParam;
+                HWND hWndVelTh = GetDlgItem(hWnd, IDC_VELSTRSHLD);
+                uint8_t iOldVal = 0;
+                win32_t len = GetWindowText(hWndVelTh, buf, LONG_MAX_PATH);
+                if (len > 0 && _stscanf_s(buf, TEXT("%hhu"), &iOldVal))
+                {
+                    uint8_t iNewVal = (iOldVal - lpnmud->iDelta) & 0x7F;
+                    _stprintf_s(buf, TEXT("%hhu"), iNewVal);
+                    SetWindowText(hWndVelTh, buf);
                 }
                 return TRUE;
             }
@@ -522,11 +533,10 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             // Edit boxes
             TCHAR buf[LONG_MAX_PATH];
             double dEditVal = 0;
-            win32_t iEditVal = 0;
 
             HWND hWndFwdBack = GetDlgItem(hWnd, IDC_LRARROWS);
             win32_t len = GetWindowText(hWndFwdBack, buf, LONG_MAX_PATH);
-            if (len > 0 && _stscanf_s(buf, TEXT("%lf"), &dEditVal) == 1)
+            if (len > 0 && _stscanf_s(buf, TEXT("%lf"), &dEditVal))
                 cControls.dFwdBackSecs = dEditVal;
             else
             {
@@ -538,7 +548,7 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
             HWND hWndSpeedPct = GetDlgItem(hWnd, IDC_UDARROWS);
             len = GetWindowText(hWndSpeedPct, buf, LONG_MAX_PATH);
-            if (len > 0 && _stscanf_s(buf, TEXT("%lf"), &dEditVal) == 1)
+            if (len > 0 && _stscanf_s(buf, TEXT("%lf"), &dEditVal))
                 cControls.dSpeedUpPct = dEditVal;
             else
             {
@@ -556,8 +566,8 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
             HWND hWndVelStrshld = GetDlgItem(hWnd, IDC_VELSTRSHLD);
             len = GetWindowText(hWndVelStrshld, buf, LONG_MAX_PATH);
-            if (len > 0 && _stscanf_s(buf, TEXT("%d"), &iEditVal) == 1)
-                cControls.iVelocityThreshold = static_cast<uint8_t>(max(0, min(iEditVal, 127)));
+            if (len > 0 && _stscanf_s(buf, TEXT("%hhu"), reinterpret_cast<uint8_t*>(&dEditVal)))
+                cControls.iVelocityThreshold = *reinterpret_cast<uint8_t*>(&dEditVal) & 0x7F;
             else
             {
                 MessageBox(hWnd, TEXT("Please specify a numeric value! "), TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
