@@ -44,8 +44,8 @@ void Tab1::SubViewBtn2::Open() {
     Close->Y = 7;
     Close->W = 0;
     Close->H = 0;
-    Close->OnTouch = []() {
-        Close->OnLeave = []() {};
+    Close->OnTouch = [&]() {
+        Close->OnLeave = [&]() {};
         TouchEventManager::Delete(Close);
         Path.Delete();
         TouchEventManager::Delete(Browse);
@@ -57,10 +57,10 @@ void Tab1::SubViewBtn2::Open() {
         Tab1::EnableAll();
         FillConsole(3, 17, 50, 9, ' ', 0x0F);
     };
-    Close->OnHover = []() {
+    Close->OnHover = [&]() {
         cout << "[8;66H[44m[93mx";
     };
-    Close->OnLeave = []() {
+    Close->OnLeave = [&]() {
         cout << "[8;66H[44m[91mx";
     };
     Path.Create(6, 10, 51, 2);
@@ -70,7 +70,7 @@ void Tab1::SubViewBtn2::Open() {
     Browse->Y = 10;
     Browse->W = 7;
     Browse->H = 0;
-    Browse->OnTouch = []() {
+    Browse->OnTouch = [&]() {
         Tab1Graphics::Btn2Graphics::Browse(58, 10, Touched);
         OPENFILENAME ofn = {};
         TCHAR sFilename[LONG_MAX_PATH] = TEXT("Folder");
@@ -88,10 +88,10 @@ void Tab1::SubViewBtn2::Open() {
             Path.SetText(sFilename);
         }
     };
-    Browse->OnHover = []() {
+    Browse->OnHover = [&]() {
         Tab1Graphics::Btn2Graphics::Browse(58, 10, Hovered);
     };
-    Browse->OnLeave = []() {
+    Browse->OnLeave = [&]() {
         Tab1Graphics::Btn2Graphics::Browse(58, 10, Normal);
     };
     Install = TouchEventManager::Create();
@@ -99,7 +99,7 @@ void Tab1::SubViewBtn2::Open() {
     Install->Y = 13;
     Install->W = 8;
     Install->H = 0;
-    Install->OnTouch = []() {
+    Install->OnTouch = [&]() {
         Tab1Graphics::Btn2Graphics::Install(57, 13, Touched);
         wstring DIR = Path.GetText();
         DIR += L"\\Data\\Projects\\Templates\\BlackMIDI";
@@ -135,10 +135,10 @@ void Tab1::SubViewBtn2::Open() {
         NoticeText += DIR;
         MessageBox(GetConsoleWindow(), NoticeText.c_str(), L"Success", MB_OK | MB_ICONEXCLAMATION);
     };
-    Install->OnHover = []() {
+    Install->OnHover = [&]() {
         Tab1Graphics::Btn2Graphics::Install(57, 13, Hovered);
     };
-    Install->OnLeave = []() {
+    Install->OnLeave = [&]() {
         Tab1Graphics::Btn2Graphics::Install(57, 13, Normal);
     };
 }

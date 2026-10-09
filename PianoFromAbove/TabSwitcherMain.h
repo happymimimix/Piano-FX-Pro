@@ -26,19 +26,19 @@ void TabSwitcher::EnableAll() {
         Tab1->Y = 33;
         Tab1->W = 6;
         Tab1->H = 0;
-        Tab1->OnTouch = []() {
+        Tab1->OnTouch = [&]() {
             if (TabSwitcher::CurrentTab != 1) {
                 DisableTab(TabSwitcher::CurrentTab);
                 TabSwitcher::CurrentTab = 1;
                 EnableTab(TabSwitcher::CurrentTab);
             }
         };
-        Tab1->OnHover = []() {
+        Tab1->OnHover = [&]() {
             if (TabSwitcher::CurrentTab != 1) {
                 cout << "[34;4H[93mSetup";
             }
         };
-        Tab1->OnLeave = []() {
+        Tab1->OnLeave = [&]() {
             if (TabSwitcher::CurrentTab != 1) {
                 cout << "[34;4H[91mSetup";
             }
@@ -48,19 +48,19 @@ void TabSwitcher::EnableAll() {
         Tab2->Y = 33;
         Tab2->W = 8;
         Tab2->H = 0;
-        Tab2->OnTouch = []() {
+        Tab2->OnTouch = [&]() {
             if (TabSwitcher::CurrentTab != 2) {
                 DisableTab(TabSwitcher::CurrentTab);
                 TabSwitcher::CurrentTab = 2;
                 EnableTab(TabSwitcher::CurrentTab);
             }
         };
-        Tab2->OnHover = []() {
+        Tab2->OnHover = [&]() {
             if (TabSwitcher::CurrentTab != 2) {
                 cout << "[34;13H[93mAnimate";
             }
         };
-        Tab2->OnLeave = []() {
+        Tab2->OnLeave = [&]() {
             if (TabSwitcher::CurrentTab != 2) {
                 cout << "[34;13H[91mAnimate";
             }
@@ -70,19 +70,19 @@ void TabSwitcher::EnableAll() {
         Tab3->Y = 33;
         Tab3->W = 9;
         Tab3->H = 0;
-        Tab3->OnTouch = []() {
+        Tab3->OnTouch = [&]() {
             if (TabSwitcher::CurrentTab != 3) {
                 DisableTab(TabSwitcher::CurrentTab);
                 TabSwitcher::CurrentTab = 3;
                 EnableTab(TabSwitcher::CurrentTab);
             }
         };
-        Tab3->OnHover = []() {
+        Tab3->OnHover = [&]() {
             if (TabSwitcher::CurrentTab != 3) {
                 cout << "[34;24H[93mColorize";
             }
         };
-        Tab3->OnLeave = []() {
+        Tab3->OnLeave = [&]() {
             if (TabSwitcher::CurrentTab != 3) {
                 cout << "[34;24H[91mColorize";
             }
@@ -92,19 +92,19 @@ void TabSwitcher::EnableAll() {
         Tab4->Y = 33;
         Tab4->W = 4;
         Tab4->H = 0;
-        Tab4->OnTouch = []() {
+        Tab4->OnTouch = [&]() {
             if (TabSwitcher::CurrentTab != 4) {
                 DisableTab(TabSwitcher::CurrentTab);
                 TabSwitcher::CurrentTab = 4;
                 EnableTab(TabSwitcher::CurrentTab);
             }
         };
-        Tab4->OnHover = []() {
+        Tab4->OnHover = [&]() {
             if (TabSwitcher::CurrentTab != 4) {
                 cout << "[34;36H[93mGDI";
             }
         };
-        Tab4->OnLeave = []() {
+        Tab4->OnLeave = [&]() {
             if (TabSwitcher::CurrentTab != 4) {
                 cout << "[34;36H[91mGDI";
             }

@@ -30,8 +30,8 @@ void Tab2::SubViewBtn4::Open() {
     Close->Y = 13;
     Close->W = 0;
     Close->H = 0;
-    Close->OnTouch = []() {
-        Close->OnLeave = []() {};
+    Close->OnTouch = [&]() {
+        Close->OnLeave = [&]() {};
         TouchEventManager::Delete(Close);
         AnimationType1.Delete();
         AnimationType2.Delete();
@@ -49,12 +49,12 @@ void Tab2::SubViewBtn4::Open() {
         Tab2Graphics::Btn4(3, 11, Normal);
         TabSwitcher::EnableAll();
         Tab2::EnableAll();
-        LoopingTask = []() {};
+        LoopingTask = [&]() {};
     };
-    Close->OnHover = []() {
+    Close->OnHover = [&]() {
         cout << "[14;76H[44m[93mx";
     };
-    Close->OnLeave = []() {
+    Close->OnLeave = [&]() {
         cout << "[14;76H[44m[91mx";
     };
     AnimationType1.Create(22, 15, 21, 2);
@@ -124,15 +124,15 @@ void Tab2::SubViewBtn4::Open() {
     UseThreads->Y = 27;
     UseThreads->W = 0;
     UseThreads->H = 0;
-    UseThreads->OnTouch = []() {
+    UseThreads->OnTouch = [&]() {
         Thread = !Thread;
         UseThreads->OnLeave();
         while (GetAsyncKeyState(VK_LBUTTON) & 0x8000) {}
     };
-    UseThreads->OnHover = []() {
+    UseThreads->OnHover = [&]() {
         Tab2Graphics::Btn4Graphics::UseThreads(49, 27, Hovered);
     };
-    UseThreads->OnLeave = []() {
+    UseThreads->OnLeave = [&]() {
         if (Thread) {
             Tab2Graphics::Btn4Graphics::UseThreads(49, 27, Touched);
         }
@@ -145,7 +145,7 @@ void Tab2::SubViewBtn4::Open() {
     Generate->Y = 27;
     Generate->W = 9;
     Generate->H = 0;
-    Generate->OnTouch = []() {
+    Generate->OnTouch = [&]() {
         Tab2Graphics::Btn4Graphics::Generate(66, 27, Touched);
         wstring Code = L"";
         if (AnimationType2.GetSelectionText() == L"Sliced") {
@@ -171,13 +171,13 @@ void Tab2::SubViewBtn4::Open() {
             Code += StartValue.GetText();
         }
     };
-    Generate->OnHover = []() {
+    Generate->OnHover = [&]() {
         Tab2Graphics::Btn4Graphics::Generate(66, 27, Hovered);
     };
-    Generate->OnLeave = []() {
+    Generate->OnLeave = [&]() {
         Tab2Graphics::Btn4Graphics::Generate(66, 27, Normal);
     };
-    LoopingTask = []() {
+    LoopingTask = [&]() {
         if (AnimationType1.GetSelection() == 0) {
             AnimationTarget1.Show();
             AnimationTarget2.Hide();

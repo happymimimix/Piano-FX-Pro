@@ -24,15 +24,15 @@ void Tab1::EnableAll() {
         Btn1->Y = 2;
         Btn1->W = 27;
         Btn1->H = 2;
-        Btn1->OnTouch = []() {
+        Btn1->OnTouch = [&]() {
             Tab1Graphics::Btn1(3, 2, Touched);
             Sleep(500);
             Btn1->OnLeave();
         };
-        Btn1->OnHover = []() {
+        Btn1->OnHover = [&]() {
             Tab1Graphics::Btn1(3, 2, Hovered);
         };
-        Btn1->OnLeave = []() {
+        Btn1->OnLeave = [&]() {
             Tab1Graphics::Btn1(3, 2, Normal);
         };
         Btn2 = TouchEventManager::Create();
@@ -40,15 +40,15 @@ void Tab1::EnableAll() {
         Btn2->Y = 5;
         Btn2->W = 48;
         Btn2->H = 2;
-        Btn2->OnTouch = []() {
+        Btn2->OnTouch = [&]() {
             Tab1Graphics::Btn2(3, 5, Touched);
-            Tab1::Btn2->OnLeave = []() {};
+            Tab1::Btn2->OnLeave = [&]() {};
             Tab1::SubViewBtn2::Open();
         };
-        Btn2->OnHover = []() {
+        Btn2->OnHover = [&]() {
             Tab1Graphics::Btn2(3, 5, Hovered);
         };
-        Btn2->OnLeave = []() {
+        Btn2->OnLeave = [&]() {
             Tab1Graphics::Btn2(3, 5, Normal);
         };
         Btn3 = TouchEventManager::Create();
@@ -56,7 +56,7 @@ void Tab1::EnableAll() {
         Btn3->Y = 8;
         Btn3->W = 41;
         Btn3->H = 2;
-        Btn3->OnTouch = []() {
+        Btn3->OnTouch = [&]() {
             Tab1Graphics::Btn3(3, 8, Touched);
             Sleep(500);
             char ProgramPath[LONG_MAX_PATH] = {};
@@ -68,10 +68,10 @@ void Tab1::EnableAll() {
             system(Command.c_str());
             Btn3->OnLeave();
         };
-        Btn3->OnHover = []() {
+        Btn3->OnHover = [&]() {
             Tab1Graphics::Btn3(3, 8, Hovered);
         };
-        Btn3->OnLeave = []() {
+        Btn3->OnLeave = [&]() {
             Tab1Graphics::Btn3(3, 8, Normal);
         };
         Btn4 = TouchEventManager::Create();
@@ -79,15 +79,15 @@ void Tab1::EnableAll() {
         Btn4->Y = 11;
         Btn4->W = 42;
         Btn4->H = 2;
-        Btn4->OnTouch = []() {
+        Btn4->OnTouch = [&]() {
             Tab1Graphics::Btn4(3, 11, Touched);
-            Tab1::Btn4->OnLeave = []() {};
+            Tab1::Btn4->OnLeave = [&]() {};
             Tab1::SubViewBtn4::Open();
         };
-        Btn4->OnHover = []() {
+        Btn4->OnHover = [&]() {
             Tab1Graphics::Btn4(3, 11, Hovered);
         };
-        Btn4->OnLeave = []() {
+        Btn4->OnLeave = [&]() {
             Tab1Graphics::Btn4(3, 11, Normal);
         };
         Btn5 = TouchEventManager::Create();
@@ -95,15 +95,15 @@ void Tab1::EnableAll() {
         Btn5->Y = 14;
         Btn5->W = 48;
         Btn5->H = 2;
-        Btn5->OnTouch = []() {
+        Btn5->OnTouch = [&]() {
             Tab1Graphics::Btn5(3, 14, Touched);
-            Tab1::Btn5->OnLeave = []() {};
+            Tab1::Btn5->OnLeave = [&]() {};
             Tab1::SubViewBtn5::Open();
         };
-        Btn5->OnHover = []() {
+        Btn5->OnHover = [&]() {
             Tab1Graphics::Btn5(3, 14, Hovered);
         };
-        Btn5->OnLeave = []() {
+        Btn5->OnLeave = [&]() {
             Tab1Graphics::Btn5(3, 14, Normal);
         };
         Tab1::Draw();

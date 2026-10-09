@@ -50,6 +50,6 @@ inline bool* PtrToIsWrapRenderer = nullptr;
 #define RTL_STYLE WS_EX_LAYOUTRTL | WS_EX_RTLREADING
 #define RTL_ALIGN | ALIGN_RTL
 #else
-#define RTL_STYLE
+#define RTL_STYLE NULL
 #define RTL_ALIGN
 #endif

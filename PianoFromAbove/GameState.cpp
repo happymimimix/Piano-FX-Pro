@@ -1119,7 +1119,7 @@ GameState::GameError MainScreen::Logic() {
         if (!IsLastFrameReversed) {
             m_iStartPos--;
             const mms_t llSub1Sec = m_llStartTime + S;
-            m_iStartPosSub1Sec = static_cast<idx_t>(exponential_lower_bound(m_vEvents.begin(), m_vEvents.end(), llSub1Sec, m_vEvents.begin() + m_iStartPosSub1Sec, [](MIDIChannelEvent* event, mms_t target) { return event->GetAbsMicroSec() < target; }) - m_vEvents.begin());
+            m_iStartPosSub1Sec = static_cast<idx_t>(exponential_lower_bound(m_vEvents.begin(), m_vEvents.end(), llSub1Sec, m_vEvents.begin() + m_iStartPosSub1Sec, [&](MIDIChannelEvent* event, mms_t target) { return event->GetAbsMicroSec() < target; }) - m_vEvents.begin());
             m_itReplayPositionSub1Sec = static_cast<idx_t>(exponential_lower_bound(m_vReplayTable.begin(), m_vReplayTable.end(), llSub1Sec, m_vReplayTable.begin() + m_itReplayPositionSub1Sec, [&](idx_t index, mms_t target) { return m_vEvents[index]->GetAbsMicroSec() < target; }) - m_vReplayTable.begin());
         }
         IsLastFrameReversed = true;
@@ -1128,7 +1128,7 @@ GameState::GameError MainScreen::Logic() {
         if (IsLastFrameReversed) {
             m_iStartPos++;
             const mms_t llSub1Sec = m_llStartTime - S;
-            m_iStartPosSub1Sec = static_cast<idx_t>(exponential_upper_bound(m_vEvents.begin(), m_vEvents.end(), llSub1Sec, m_vEvents.begin() + m_iStartPosSub1Sec, [](mms_t target, MIDIChannelEvent* event) { return target < event->GetAbsMicroSec(); }) - m_vEvents.begin());
+            m_iStartPosSub1Sec = static_cast<idx_t>(exponential_upper_bound(m_vEvents.begin(), m_vEvents.end(), llSub1Sec, m_vEvents.begin() + m_iStartPosSub1Sec, [&](mms_t target, MIDIChannelEvent* event) { return target < event->GetAbsMicroSec(); }) - m_vEvents.begin());
             m_itReplayPositionSub1Sec = static_cast<idx_t>(exponential_upper_bound(m_vReplayTable.begin(), m_vReplayTable.end(), llSub1Sec, m_vReplayTable.begin() + m_itReplayPositionSub1Sec, [&](mms_t target, idx_t index) { return target < m_vEvents[index]->GetAbsMicroSec(); }) - m_vReplayTable.begin());
         }
         IsLastFrameReversed = false;
@@ -1451,7 +1451,7 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
     // Find start position...
     auto itBegin = m_vEvents.begin();
     auto itEnd = m_vEvents.end();
-    auto itMiddle = lower_bound(itBegin, itEnd, m_llStartTime, [](MIDIChannelEvent* lhs, const mms_t rhs) { return lhs->GetAbsMicroSec() < rhs; });
+    auto itMiddle = lower_bound(itBegin, itEnd, m_llStartTime, [&](MIDIChannelEvent* lhs, const mms_t rhs) { return lhs->GetAbsMicroSec() < rhs; });
     m_iEndPos = m_iStartPos = itMiddle - m_vEvents.begin();
 
     // Find the notes that occur simultaneously with the previous note on...
@@ -1509,10 +1509,10 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
     // SearchProcedure walks itMiddle backwards, so restore it to the start position first.
     itMiddle = itBegin + m_iStartPos;
     if (m_bTickMode) {
-        itMiddle = exponential_lower_bound(itBegin, itEnd, llEndTime, itMiddle, [](MIDIChannelEvent* event, mms_t target) { return event->GetAbsTick() < target; });
+        itMiddle = exponential_lower_bound(itBegin, itEnd, llEndTime, itMiddle, [&](MIDIChannelEvent* event, mms_t target) { return event->GetAbsTick() < target; });
     }
     else {
-        itMiddle = exponential_lower_bound(itBegin, itEnd, llEndTime, itMiddle, [](MIDIChannelEvent* event, mms_t target) { return event->GetAbsMicroSec() < target; });
+        itMiddle = exponential_lower_bound(itBegin, itEnd, llEndTime, itMiddle, [&](MIDIChannelEvent* event, mms_t target) { return event->GetAbsMicroSec() < target; });
     }
     m_iEndPos = itMiddle == itBegin ? IDX_MAX : static_cast<idx_t>(itMiddle - itBegin - 1);
 
@@ -1617,15 +1617,13 @@ void MainScreen::ApplyMarker(unsigned char* data, msgln_t size) {
         static Config& config = Config::GetConfig();
         static const VideoSettings& cVideo = config.GetVideoSettings();
 
-        constexpr uint16_t codepages[] = { 1252, 437, 82, 886, 932, 936, CP_UTF8 };
-
         auto temp_str = new char[size + 1];
         memcpy(temp_str, data, size);
         temp_str[size] = '\0';
 
-        auto wide_len = MultiByteToWideChar(codepages[cVideo.eMarkerEncoding], 0, temp_str, size + 1, NULL, 0);
+        auto wide_len = MultiByteToWideChar(cVideo.eMarkerEncoding, 0, temp_str, size + 1, NULL, 0);
         auto wide_temp_str = new WCHAR[wide_len];
-        MultiByteToWideChar(codepages[cVideo.eMarkerEncoding], 0, temp_str, size + 1, wide_temp_str, wide_len);
+        MultiByteToWideChar(cVideo.eMarkerEncoding, 0, temp_str, size + 1, wide_temp_str, wide_len);
 
         m_sMarker = wstring(wide_temp_str);
 
@@ -1662,10 +1660,10 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
         ExtendFirstMetaEventToFirstNote(m_itNextMarker, m_vMarkers);
         if (itCurMarker != m_itNextMarker) ApplyCurrentMarker();
         m_itNextColor = static_cast<idx_t>(lower_bound(m_vColors.begin(), m_vColors.end(), llTime, [&](idx_t index, mms_t target) { return m_vMetaEvents[index]->GetAbsMicroSec() < target; }) - m_vColors.begin());
-        m_itNextSysEx = static_cast<idx_t>(lower_bound(m_vSysExEvents.begin(), m_vSysExEvents.end(), llTime, [](const MIDISysExEvent* message, mms_t target) { return message->GetAbsMicroSec() < target; }) - m_vSysExEvents.begin());
+        m_itNextSysEx = static_cast<idx_t>(lower_bound(m_vSysExEvents.begin(), m_vSysExEvents.end(), llTime, [&](const MIDISysExEvent* message, mms_t target) { return message->GetAbsMicroSec() < target; }) - m_vSysExEvents.begin());
         m_itReplayPosition = static_cast<idx_t>(lower_bound(m_vReplayTable.begin(), m_vReplayTable.end(), llTime, [&](idx_t index, mms_t target) { return m_vEvents[index]->GetAbsMicroSec() < target; }) - m_vReplayTable.begin());
         const mms_t llSub1Sec = llTime - S;
-        m_iStartPosSub1Sec = static_cast<idx_t>(lower_bound(m_vEvents.begin(), m_vEvents.end(), llSub1Sec, [](MIDIChannelEvent* event, mms_t target) { return event->GetAbsMicroSec() < target; }) - m_vEvents.begin());
+        m_iStartPosSub1Sec = static_cast<idx_t>(lower_bound(m_vEvents.begin(), m_vEvents.end(), llSub1Sec, [&](MIDIChannelEvent* event, mms_t target) { return event->GetAbsMicroSec() < target; }) - m_vEvents.begin());
         m_itReplayPositionSub1Sec = static_cast<idx_t>(lower_bound(m_vReplayTable.begin(), m_vReplayTable.end(), llSub1Sec, [&](idx_t index, mms_t target) { return m_vEvents[index]->GetAbsMicroSec() < target; }) - m_vReplayTable.begin());
     }
     else {
@@ -1686,7 +1684,7 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
             for (; m_itNextSysEx != 0 && m_vSysExEvents[m_itNextSysEx - 1]->GetAbsMicroSec() >= llTime; --m_itNextSysEx) SendSysEx(m_vSysExEvents[m_itNextSysEx - 1]);
             m_itReplayPosition = static_cast<idx_t>(exponential_lower_bound_left(m_vReplayTable.begin(), m_vReplayTable.end(), llTime, m_vReplayTable.begin() + m_itReplayPosition, [&](idx_t index, mms_t target) { return m_vEvents[index]->GetAbsMicroSec() < target; }) - m_vReplayTable.begin());
             const mms_t llSub1Sec = llTime + S;
-            m_iStartPosSub1Sec = static_cast<idx_t>(exponential_lower_bound_left(m_vEvents.begin(), m_vEvents.end(), llSub1Sec, m_vEvents.begin() + m_iStartPosSub1Sec, [](MIDIChannelEvent* event, mms_t target) { return event->GetAbsMicroSec() < target; }) - m_vEvents.begin());
+            m_iStartPosSub1Sec = static_cast<idx_t>(exponential_lower_bound_left(m_vEvents.begin(), m_vEvents.end(), llSub1Sec, m_vEvents.begin() + m_iStartPosSub1Sec, [&](MIDIChannelEvent* event, mms_t target) { return event->GetAbsMicroSec() < target; }) - m_vEvents.begin());
             m_itReplayPositionSub1Sec = static_cast<idx_t>(exponential_lower_bound_left(m_vReplayTable.begin(), m_vReplayTable.end(), llSub1Sec, m_vReplayTable.begin() + m_itReplayPositionSub1Sec, [&](idx_t index, mms_t target) { return m_vEvents[index]->GetAbsMicroSec() < target; }) - m_vReplayTable.begin());
         }
         else {
@@ -1706,7 +1704,7 @@ void MainScreen::AdvanceIterators(mms_t llTime, bool bIsJump) {
             for (; m_itNextSysEx < static_cast<idx_t>(m_vSysExEvents.size()) && m_vSysExEvents[m_itNextSysEx]->GetAbsMicroSec() <= llTime; ++m_itNextSysEx) SendSysEx(m_vSysExEvents[m_itNextSysEx]);
             m_itReplayPosition = static_cast<idx_t>(exponential_upper_bound_right(m_vReplayTable.begin(), m_vReplayTable.end(), llTime, m_vReplayTable.begin() + m_itReplayPosition, [&](mms_t target, idx_t index) { return target < m_vEvents[index]->GetAbsMicroSec(); }) - m_vReplayTable.begin());
             const mms_t llSub1Sec = llTime - S;
-            m_iStartPosSub1Sec = static_cast<idx_t>(exponential_upper_bound_right(m_vEvents.begin(), m_vEvents.end(), llSub1Sec, m_vEvents.begin() + m_iStartPosSub1Sec, [](mms_t target, MIDIChannelEvent* event) { return target < event->GetAbsMicroSec(); }) - m_vEvents.begin());
+            m_iStartPosSub1Sec = static_cast<idx_t>(exponential_upper_bound_right(m_vEvents.begin(), m_vEvents.end(), llSub1Sec, m_vEvents.begin() + m_iStartPosSub1Sec, [&](mms_t target, MIDIChannelEvent* event) { return target < event->GetAbsMicroSec(); }) - m_vEvents.begin());
             m_itReplayPositionSub1Sec = static_cast<idx_t>(exponential_upper_bound_right(m_vReplayTable.begin(), m_vReplayTable.end(), llSub1Sec, m_vReplayTable.begin() + m_itReplayPositionSub1Sec, [&](mms_t target, idx_t index) { return target < m_vEvents[index]->GetAbsMicroSec(); }) - m_vReplayTable.begin());
         }
     }

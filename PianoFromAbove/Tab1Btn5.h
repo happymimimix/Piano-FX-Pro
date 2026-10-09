@@ -19,8 +19,8 @@ void Tab1::SubViewBtn5::Open() {
     Close->Y = 16;
     Close->W = 0;
     Close->H = 0;
-    Close->OnTouch = []() {
-        Close->OnLeave = []() {};
+    Close->OnTouch = [&]() {
+        Close->OnLeave = [&]() {};
         TouchEventManager::Delete(Close);
         Path.Delete();
         TouchEventManager::Delete(Browse);
@@ -30,10 +30,10 @@ void Tab1::SubViewBtn5::Open() {
         TabSwitcher::EnableAll();
         Tab1::EnableAll();
     };
-    Close->OnHover = []() {
+    Close->OnHover = [&]() {
         cout << "[17;66H[44m[93mx";
     };
-    Close->OnLeave = []() {
+    Close->OnLeave = [&]() {
         cout << "[17;66H[44m[91mx";
     };
     Path.Create(6, 19, 51, 2);
@@ -42,7 +42,7 @@ void Tab1::SubViewBtn5::Open() {
     Browse->Y = 19;
     Browse->W = 7;
     Browse->H = 0;
-    Browse->OnTouch = []() {
+    Browse->OnTouch = [&]() {
         Tab1Graphics::Btn4Graphics::Browse(58, 19, Touched);
         OPENFILENAME ofn = {};
         TCHAR sFilename[LONG_MAX_PATH] = {};
@@ -58,10 +58,10 @@ void Tab1::SubViewBtn5::Open() {
             Path.SetText(sFilename);
         }
     };
-    Browse->OnHover = []() {
+    Browse->OnHover = [&]() {
         Tab1Graphics::Btn4Graphics::Browse(58, 19, Hovered);
     };
-    Browse->OnLeave = []() {
+    Browse->OnLeave = [&]() {
         Tab1Graphics::Btn4Graphics::Browse(58, 19, Normal);
     };
     Convert = TouchEventManager::Create();
@@ -69,7 +69,7 @@ void Tab1::SubViewBtn5::Open() {
     Convert->Y = 22;
     Convert->W = 8;
     Convert->H = 0;
-    Convert->OnTouch = []() {
+    Convert->OnTouch = [&]() {
         Tab1Graphics::Btn4Graphics::Convert(57, 22, Touched);
         wstring DIR = Path.GetText();
         wstring NoticeText = L"";
@@ -77,10 +77,10 @@ void Tab1::SubViewBtn5::Open() {
         NoticeText += DIR;
         MessageBox(GetConsoleWindow(), NoticeText.c_str(), L"Success", MB_OK | MB_ICONEXCLAMATION);
     };
-    Convert->OnHover = []() {
+    Convert->OnHover = [&]() {
         Tab1Graphics::Btn4Graphics::Convert(57, 22, Hovered);
     };
-    Convert->OnLeave = []() {
+    Convert->OnLeave = [&]() {
         Tab1Graphics::Btn4Graphics::Convert(57, 22, Normal);
     };
 }

@@ -155,7 +155,7 @@
 #define mcBorder mnBorder+mBorder //deCuple
 #define KeySelectW 30+Margin
 #define SpinnerW 40+Margin
-#define MarkerEncodingW 80+Margin
+#define MarkerEncodingW 140+Margin
 #if TrackText1W >= TrackText2W && TrackText1W >= TrackText3W && TrackText1W >= TrackText4W
 #define TrackAlign TrackText1W
 #elif TrackText2W >= TrackText3W && TrackText2W >= TrackText4W && TrackText2W >= TrackText1W

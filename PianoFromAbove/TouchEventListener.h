@@ -8,9 +8,9 @@ struct TouchEventListener {
     uint8_t Y = 0;
     uint8_t W = 0;
     uint8_t H = 0;
-    function<void()> OnHover = []() {};
-    function<void()> OnLeave = []() {};
-    function<void()> OnTouch = []() {};
+    function<void()> OnHover = [&]() {};
+    function<void()> OnLeave = [&]() {};
+    function<void()> OnTouch = [&]() {};
 
     bool IsTouching(POINT MousePos) {
         if (X <= MousePos.x && MousePos.x <= (X + W) && Y <= MousePos.y && MousePos.y <= (Y + H)) {
