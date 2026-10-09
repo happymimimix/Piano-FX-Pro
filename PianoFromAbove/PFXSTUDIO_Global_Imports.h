@@ -29,10 +29,7 @@ void inline 💬() {
 void inline 🖥() {
     //Graphics update
     HWND hComponents = NULL;
-    while ((hComponents = FindWindowEx(GetConsoleWindow(), hComponents, NULL, NULL)) != NULL)
-    {
-        InvalidateRect(hComponents, NULL, true);
-    }
+    while ((hComponents = FindWindowEx(GetConsoleWindow(), hComponents, NULL, NULL)) != NULL) InvalidateRect(hComponents, NULL, TRUE);
 
     //Handle console font change
     CONSOLE_FONT_INFOEX cfi;

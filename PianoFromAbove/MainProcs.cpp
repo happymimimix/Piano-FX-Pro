@@ -96,6 +96,15 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         if (wParam == IDC_POSNDELAY) HandOffMsg(msg, wParam, lParam);
         return 0;
     }
+    case WM_SYSCOLORCHANGE:
+        // Notify every descendant, including nested common controls.
+        EnumChildWindows(hWnd, [](HWND ChildhWnd, LPARAM ChildlParam) -> BOOL {
+            SendMessage(ChildhWnd, WM_SYSCOLORCHANGE, NULL, NULL);
+            return TRUE;
+        }, NULL);
+        // Repaint after the controls have updated their colors and caches.
+        RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_ERASENOW | RDW_UPDATENOW);
+        break;
     case WM_WINDOWPOSCHANGING:
         // Allow the window to be larger than the screen. 
         return 0;
@@ -458,8 +467,9 @@ LRESULT WINAPI BarProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_SYSCOLORCHANGE:
         CallWindowProc(g_pPrevBarProc, hWnd, msg, wParam, lParam);
         SendMessage(hWnd, TB_SETBUTTONSIZE, 0, MAKELONG(1 << 5, 1 << 5));
+    case WM_SIZE:
         DrawSliderChannel(NULL, hWnd);
-        RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN);
+        RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_ERASENOW | RDW_UPDATENOW);
         return 0;
     case WM_HSCROLL:
     {
@@ -530,7 +540,7 @@ LRESULT WINAPI BarProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 HWND CreateRebar(HWND hWndOwner)
 {
     // Create the Rebar. Just houses the toolbar.
-    HWND hWndRebar = CreateWindowEx(WS_EX_CONTROLPARENT | RTL_STYLE, REBARCLASSNAME, NULL, WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CCS_NODIVIDER | RBS_VARHEIGHT, NULL, NULL, NULL, NULL, hWndOwner, (HMENU)IDC_TOPREBAR, g_hInstance, NULL);
+    HWND hWndRebar = CreateWindowEx(WS_EX_CONTROLPARENT | RTL_STYLE, REBARCLASSNAME, NULL, WS_CHILD | CCS_NODIVIDER | RBS_VARHEIGHT, NULL, NULL, NULL, NULL, hWndOwner, (HMENU)IDC_TOPREBAR, g_hInstance, NULL);
     if (!hWndRebar) return NULL;
 
     // Create the system font
@@ -600,7 +610,7 @@ HWND CreateRebar(HWND hWndOwner)
     SendMessage(hWndNSpeed, TBM_SETRANGE, FALSE, MAKELONG(5, 195));
     SendMessage(hWndNSpeed, TBM_SETLINESIZE, 0, 10);
 
-    HWND hWndPosn = CreateWindowEx(RTL_STYLE, POSNCLASSNAME, NULL, WS_CHILD | WS_VISIBLE, 0, 0, 0, 0, hWndRebar, (HMENU)IDC_POSNCTRL, g_hInstance, NULL);
+    HWND hWndPosn = CreateWindowEx(RTL_STYLE, POSNCLASSNAME, NULL, WS_CHILD | WS_VISIBLE | WS_TABSTOP, 0, 0, 0, 0, hWndRebar, (HMENU)IDC_POSNCTRL, g_hInstance, NULL);
 
     REBARBANDINFO rbbi;
     rbbi.cbSize = sizeof(REBARBANDINFO);
@@ -638,9 +648,9 @@ VOID DrawSliderChannel(LPNMCUSTOMDRAW lpnmcd, HWND hWndOwner)
     static HBITMAP hBitmap = NULL;
 
     if (!lpnmcd) {
-        if (hdcMem != NULL) DeleteObject((HGDIOBJ)hBitmap);
+        if (hdcMem != NULL) DeleteObject((HGDIOBJ)hdcMem);
         if (hBitmap != NULL) DeleteObject((HGDIOBJ)hBitmap);
-        hBitmap = NULL;
+        hdcMem = NULL;
         hBitmap = NULL;
         return;
     }
@@ -654,7 +664,7 @@ VOID DrawSliderChannel(LPNMCUSTOMDRAW lpnmcd, HWND hWndOwner)
 
     // Only make the copy of the parent once
     // ASSUMES THE SAME PARENT! Function will need to change if it ever gets called by more than one Proc
-    if (!hdcMem && !hBitmap)
+    if (!hdcMem || !hBitmap)
     {
         hdcMem = CreateCompatibleDC(lpnmcd->hdc);
         hBitmap = CreateCompatibleBitmap(lpnmcd->hdc, rcOwner.right - rcOwner.left, rcOwner.bottom - rcOwner.top);
@@ -686,11 +696,12 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
     case WM_THEMECHANGED:
     case WM_SYSCOLORCHANGE:
+    case WM_SIZE:
         if (hBackbuffer != NULL) DeleteObject((HGDIOBJ)hBackbuffer);
         if (hBackground != NULL) DeleteObject((HGDIOBJ)hBackground);
         hBackbuffer = NULL;
         hBackground = NULL;
-        InvalidateRect(hWnd, NULL, TRUE);
+        RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_ERASENOW | RDW_UPDATENOW);
         return 0;
     case WM_CREATE:
         hIml = ImageList_LoadImage(g_hInstance, MAKEINTRESOURCE(IDB_MEDIAICONSSMALL), 1 << 4, (1 << 4) + (1 << 2), CLR_DEFAULT, IMAGE_BITMAP, LR_CREATEDIBSECTION);
@@ -780,15 +791,16 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         EndPaint(hWnd, &ps);
         return 0;
     }
-    case WM_SIZE:
-        if (hBackbuffer != NULL) DeleteObject((HGDIOBJ)hBackbuffer);
-        if (hBackground != NULL) DeleteObject((HGDIOBJ)hBackground);
-        hBackbuffer = NULL;
-        hBackground = NULL;
-        InvalidateRect(hWnd, NULL, FALSE);
-        return 0;
-
+    case WM_MOUSEWHEEL:
+    {
+        RECT rcChannel, rcThumbOld;
+        GetChannelRect(hWnd, &rcChannel);
+        GetThumbRect(hWnd, iPosition, &rcChannel, &rcThumbOld);
+        winword_t iPositionNew = iPosition + (GET_WHEEL_DELTA_WPARAM(wParam) / (WHEEL_DELTA / 6));
+        MoveThumbPosition(iPositionNew, iPosition, hWnd, &rcChannel, &rcThumbOld);
+    }
     case WM_LBUTTONDOWN:
+    case WM_RBUTTONDOWN:
     {
         if (!bEnabled) return 0;
         POINT pt = {(winword_t)LOWORD(lParam), (winword_t)HIWORD(lParam)};
@@ -804,6 +816,7 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             MoveThumbPosition(iPositionNew, iPosition, hWnd, &rcChannel, &rcThumb);
             bTracking = TRUE;
             SetCapture(hWnd);
+            SetFocus(hWnd);
         }
         return 0;
     }
@@ -811,6 +824,7 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         bTracking = false;
         return 0;
     case WM_LBUTTONUP:
+    case WM_RBUTTONUP:
         if (bTracking) ReleaseCapture();
         bTracking = FALSE;
         return 0;
