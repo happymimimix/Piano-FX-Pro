@@ -9,6 +9,7 @@
 *
 *************************************************************************************************/
 #include <Windows.h>
+#include <uxtheme.h>
 #include <lzma.h>
 #ifdef INCLUDE_FFMPEG
 // Do not include these files in Debug configuration as these files are too large and would cause significant lag in intellisense! 
@@ -1536,6 +1537,8 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
     }
     cout << "\n\n";
     cout << WStringToUtf8(StartupStage1Text) << "\n";
+    InitCommonControls();
+    SetThemeAppProperties(STAP_ALLOW_CONTROLS | STAP_ALLOW_NONCLIENT);
 
     if (__argc == 3) {
         string ARG1 = __argv[1];

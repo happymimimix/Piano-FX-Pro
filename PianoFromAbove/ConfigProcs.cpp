@@ -667,8 +667,6 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             lvc.pszText = (TCHAR*)aText[i];
             SendMessage(hWndTracks, LVM_INSERTCOLUMN, i, (LPARAM)&lvc);
         }
-        HWND hHeader = ListView_GetHeader(hWndTracks);
-        SetWindowLongPtr(hHeader, GWL_STYLE, GetWindowLongPtr(hHeader, GWL_STYLE) | HDS_NOSIZING);
 
         // Set rows of the list view
 #ifdef LIMIT_COLORS
@@ -752,12 +750,14 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         HWND hWndTracks = GetDlgItem(hWnd, IDC_TRACKS);
         if (lpnmhdr->hwndFrom == ListView_GetHeader(hWndTracks)) {
             switch (lpnmhdr->code) {
+            case HDN_ENDTRACKA:
             case HDN_ENDTRACKW:
+            case HDN_DIVIDERDBLCLICKA:
             case HDN_DIVIDERDBLCLICKW:
                 RECT rcTracks;
                 GetClientRect(hWndTracks, &rcTracks);
                 win32_t aCx[7] = { 45, (rcTracks.right - 50 * 5) / 2, (rcTracks.right - 50 * 5) / 2, 70, 45, 45, 45 };
-                SendMessage(hWndTracks, LVM_SETCOLUMNWIDTH, ((NMHEADER*)lParam)->iItem, MAKELPARAM(aCx[((NMHEADER*)lParam)->iItem], NULL));
+                PostMessage(hWndTracks, LVM_SETCOLUMNWIDTH, ((NMHEADER*)lParam)->iItem, MAKELPARAM(aCx[((NMHEADER*)lParam)->iItem], NULL));
                 return TRUE;
             }
         }
