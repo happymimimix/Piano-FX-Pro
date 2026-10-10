@@ -842,7 +842,9 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 GetClientRect(hWndTracks, &rcTracks);
                 win32_t aCx[7] = { 45, (rcTracks.right - 50 * 5) / 2, (rcTracks.right - 50 * 5) / 2, 70, 45, 45, 45 };
                 for (win32_t i = 0; i < static_cast<win32_t>(sizeof(aCx) / sizeof(win32_t)); i++) {
-                    SendMessage(hWndTracks, LVM_SETCOLUMNWIDTH, i, aCx[i]); //Please don't resize this, it makes the interface look very ridiculous! 
+                    if (SendMessage(hWndTracks, LVM_GETCOLUMNWIDTH, i, NULL) != aCx[i])
+                        //Please don't resize this, it makes the interface look very ridiculous! 
+                        SendMessage(hWndTracks, LVM_SETCOLUMNWIDTH, i, aCx[i]);
                 }
                 switch (lpnmcd->dwDrawStage)
                 {
