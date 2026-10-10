@@ -255,7 +255,37 @@
     <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
     <RemoteDebuggerConnection>RemoteWithAuthentication</RemoteDebuggerConnection>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='W2K|x64'">
+    <RemoteDebuggerDeployDebugCppRuntime>true</RemoteDebuggerDeployDebugCppRuntime>
+    <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
+    <RemoteDebuggerCommand>$(SystemDrive)\Piano-FX-Pro_Debug\$(TargetFileName)</RemoteDebuggerCommand>
+    <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
+    <DeploymentDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</DeploymentDirectory>
+    <AdditionalFiles>$(ProjectDir)winmm.dll</AdditionalFiles>
+    <RemoteDebuggerAmpDefaultAccelerator />
+    <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
+    <RemoteDebuggerWorkingDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</RemoteDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(OutputPath)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerAmpDefaultAccelerator />
+    <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
+    <RemoteDebuggerConnection>RemoteWithAuthentication</RemoteDebuggerConnection>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='LimitedColor|Win32'">
+    <RemoteDebuggerDeployDebugCppRuntime>true</RemoteDebuggerDeployDebugCppRuntime>
+    <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
+    <RemoteDebuggerCommand>$(SystemDrive)\Piano-FX-Pro_Debug\$(TargetFileName)</RemoteDebuggerCommand>
+    <RemoteDebuggerServerName>127.0.0.1:4024</RemoteDebuggerServerName>
+    <DeploymentDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</DeploymentDirectory>
+    <AdditionalFiles>$(ProjectDir)WOW6432Node\winmm.dll</AdditionalFiles>
+    <RemoteDebuggerAmpDefaultAccelerator />
+    <RemoteDebuggerSQLDebugging>true</RemoteDebuggerSQLDebugging>
+    <RemoteDebuggerWorkingDirectory>$(SystemDrive)\Piano-FX-Pro_Debug</RemoteDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(OutputPath)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerAmpDefaultAccelerator />
+    <LocalDebuggerSQLDebugging>true</LocalDebuggerSQLDebugging>
+    <RemoteDebuggerConnection>RemoteWithAuthentication</RemoteDebuggerConnection>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='W2K|Win32'">
     <RemoteDebuggerDeployDebugCppRuntime>true</RemoteDebuggerDeployDebugCppRuntime>
     <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
     <RemoteDebuggerCommand>$(SystemDrive)\Piano-FX-Pro_Debug\$(TargetFileName)</RemoteDebuggerCommand>

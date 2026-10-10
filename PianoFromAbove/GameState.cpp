@@ -2610,6 +2610,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
     }
     NoStats:
 
+#ifndef W2K
     HWND CMD = GetConsoleWindow();
     if (IsWindowVisible(CMD) && !IsIconic(CMD) && (FrameCount & 0x0F) == 0) {
         HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -2853,6 +2854,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), bufferSize);
     }
     FrameCount++;
+#endif
 }
 
 void MainScreen::RenderMarker(const wstring & str) {

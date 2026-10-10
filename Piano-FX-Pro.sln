@@ -39,6 +39,8 @@ Global
 		Russian|x86 = Russian|x86
 		SoftwareRender|x64 = SoftwareRender|x64
 		SoftwareRender|x86 = SoftwareRender|x86
+		W2K|x64 = W2K|x64
+		W2K|x86 = W2K|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.AlwaysBIG|x64.ActiveCfg = AlwaysBIG|x64
@@ -137,6 +139,10 @@ Global
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.SoftwareRender|x86.ActiveCfg = SoftwareRender|Win32
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.SoftwareRender|x86.Build.0 = SoftwareRender|Win32
 		{DD4C822F-844F-40BF-8113-129B04EDE199}.SoftwareRender|x86.Deploy.0 = SoftwareRender|Win32
+		{DD4C822F-844F-40BF-8113-129B04EDE199}.W2K|x64.ActiveCfg = W2K|Win32
+		{DD4C822F-844F-40BF-8113-129B04EDE199}.W2K|x86.ActiveCfg = W2K|Win32
+		{DD4C822F-844F-40BF-8113-129B04EDE199}.W2K|x86.Build.0 = W2K|Win32
+		{DD4C822F-844F-40BF-8113-129B04EDE199}.W2K|x86.Deploy.0 = W2K|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

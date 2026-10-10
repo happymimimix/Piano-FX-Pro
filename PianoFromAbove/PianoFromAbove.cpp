@@ -25,7 +25,9 @@
 #include <GameState.h>
 #include <Renderer.h>
 #include <Misc.h>
+#ifndef W2K
 #include <Studio.h>
+#endif
 #include <Tutorials.h>
 #include <LuaCode.h>
 
@@ -56,7 +58,7 @@ string ProgramPath() {
     (strrchr(szFilePath, '\\'))[0] = 0;
     return szFilePath;
 }
-
+#ifndef W2K
 string MultiInstanceGuardInit() {
     string Code = "";
     Code += "if _G.Working then\n";
@@ -1505,6 +1507,7 @@ string BuiltinShaders() {
     Code += MatrixShader();
     return Code;
 }
+#endif
 
 //-----------------------------------------------------------------------------
 // Name: wWinMain()
@@ -1518,6 +1521,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
     extern int __argc;
     extern char** __argv;
 
+#ifndef W2K
     //Debug console
     AllocConsole();
     freopen("CONIN$", "r", stdin);
@@ -1743,6 +1747,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
             }
         }
     }
+#endif
 
 #ifdef INCLUDE_FFMPEG
     unsigned char* pData = new unsigned char[ffmpeg_len];
