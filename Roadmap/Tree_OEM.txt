@@ -33,21 +33,56 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „¤„Ÿ„Ÿ„ŸWindows
 „        „¥„Ÿ„Ÿ„ŸWin32 amd64
 „        „    „¥„Ÿ„Ÿ„Ÿ10.0.17763
-„        „    „    „¤„Ÿ„Ÿ„ŸWorks the best!!!
+„        „    „    „¥„Ÿ„Ÿ„ŸDialogs
+„        „    „    „    „¤„Ÿ„Ÿ„ŸOK
+„        „    „    „¥„Ÿ„Ÿ„ŸDirectX 11 rendering
+„        „    „    „    „¤„Ÿ„Ÿ„ŸOK
+„        „    „    „¥„Ÿ„Ÿ„ŸPiano-FX Studio
+„        „    „    „    „¤„Ÿ„Ÿ„ŸOK
+„        „    „    „¤„Ÿ„Ÿ„ŸToolbars and menus
+„        „    „        „¤„Ÿ„Ÿ„ŸOK
 „        „    „¥„Ÿ„Ÿ„Ÿ10.0.19041
-„        „    „    „¤„Ÿ„Ÿ„ŸWorking fine
+„        „    „    „¥„Ÿ„Ÿ„ŸDialogs
+„        „    „    „    „¤„Ÿ„Ÿ„ŸOK
+„        „    „    „¥„Ÿ„Ÿ„ŸDirectX 11 rendering
+„        „    „    „    „¤„Ÿ„Ÿ„ŸOK
+„        „    „    „¥„Ÿ„Ÿ„ŸPiano-FX Studio
+„        „    „    „    „¤„Ÿ„Ÿ„ŸOK
+„        „    „    „¤„Ÿ„Ÿ„ŸToolbars and menus
+„        „    „        „¤„Ÿ„Ÿ„ŸOK
 „        „    „¥„Ÿ„Ÿ„Ÿ10.0.20348
-„        „    „    „¤„Ÿ„Ÿ„ŸWorking fine
+„        „    „    „¥„Ÿ„Ÿ„ŸDialogs
+„        „    „    „    „¤„Ÿ„Ÿ„ŸOK
+„        „    „    „¥„Ÿ„Ÿ„ŸDirectX 11 rendering
+„        „    „    „    „¤„Ÿ„Ÿ„ŸOK
+„        „    „    „¥„Ÿ„Ÿ„ŸPiano-FX Studio
+„        „    „    „    „¤„Ÿ„Ÿ„ŸOK
+„        „    „    „¤„Ÿ„Ÿ„ŸToolbars and menus
+„        „    „        „¤„Ÿ„Ÿ„ŸOK
 „        „    „¥„Ÿ„Ÿ„Ÿ10.0.22000
-„        „    „    „¤„Ÿ„Ÿ„ŸWorking fine
+„        „    „    „¥„Ÿ„Ÿ„ŸDialogs
+„        „    „    „    „¤„Ÿ„Ÿ„ŸOK
+„        „    „    „¥„Ÿ„Ÿ„ŸDirectX 11 rendering
+„        „    „    „    „¤„Ÿ„Ÿ„ŸOK
+„        „    „    „¥„Ÿ„Ÿ„ŸPiano-FX Studio
+„        „    „    „    „¤„Ÿ„Ÿ„ŸOK
+„        „    „    „¤„Ÿ„Ÿ„ŸToolbars and menus
+„        „    „        „¤„Ÿ„Ÿ„ŸOK
 „        „    „¥„Ÿ„Ÿ„Ÿ10.0.26100
 „        „    „    „¤„Ÿ„Ÿ„ŸProbably never will
 „        „    „¥„Ÿ„Ÿ„Ÿ5.2
-„        „    „    „¤„Ÿ„Ÿ„ŸTODO
+„        „    „    „¤„Ÿ„Ÿ„ŸTesting needed
 „        „    „¥„Ÿ„Ÿ„Ÿ6.0
-„        „    „    „¤„Ÿ„Ÿ„ŸTODO
+„        „    „    „¤„Ÿ„Ÿ„ŸTesting needed
 „        „    „¥„Ÿ„Ÿ„Ÿ6.1
-„        „    „    „¤„Ÿ„Ÿ„ŸMostly works
+„        „    „    „¥„Ÿ„Ÿ„ŸDialogs
+„        „    „    „    „¤„Ÿ„Ÿ„ŸOK
+„        „    „    „¥„Ÿ„Ÿ„ŸDirectX 11 rendering
+„        „    „    „    „¤„Ÿ„Ÿ„ŸOK
+„        „    „    „¥„Ÿ„Ÿ„ŸPiano-FX Studio
+„        „    „    „    „¤„Ÿ„Ÿ„ŸFAIL
+„        „    „    „¤„Ÿ„Ÿ„ŸToolbars and menus
+„        „    „        „¤„Ÿ„Ÿ„ŸOK
 „        „    „¥„Ÿ„Ÿ„Ÿ6.2
 „        „    „    „¤„Ÿ„Ÿ„ŸTesting needed
 „        „    „¤„Ÿ„Ÿ„Ÿ6.4
@@ -57,10 +92,19 @@ D:\PIANO-FX-PRO\ROADMAP
 „        „    „    „¤„Ÿ„Ÿ„ŸTesting needed
 „        „    „¥„Ÿ„Ÿ„Ÿ10.0.19041
 „        „    „    „¤„Ÿ„Ÿ„ŸTesting needed
+„        „    „¥„Ÿ„Ÿ„Ÿ5.0
+„        „    „    „¤„Ÿ„Ÿ„ŸTODO
 „        „    „¥„Ÿ„Ÿ„Ÿ5.2
-„        „    „    „¤„Ÿ„Ÿ„ŸTODO
+„        „    „    „¥„Ÿ„Ÿ„ŸDialogs
+„        „    „    „    „¤„Ÿ„Ÿ„ŸOK
+„        „    „    „¥„Ÿ„Ÿ„ŸDirectX 11 rendering
+„        „    „    „    „¤„Ÿ„Ÿ„ŸOK
+„        „    „    „¥„Ÿ„Ÿ„ŸPiano-FX Studio
+„        „    „    „    „¤„Ÿ„Ÿ„ŸFAIL
+„        „    „    „¤„Ÿ„Ÿ„ŸToolbars and menus
+„        „    „        „¤„Ÿ„Ÿ„ŸOK
 „        „    „¥„Ÿ„Ÿ„Ÿ6.0
-„        „    „    „¤„Ÿ„Ÿ„ŸTODO
+„        „    „    „¤„Ÿ„Ÿ„ŸTesting needed
 „        „    „¥„Ÿ„Ÿ„Ÿ6.1
 „        „    „    „¤„Ÿ„Ÿ„ŸTesting needed
 „        „    „¥„Ÿ„Ÿ„Ÿ6.2

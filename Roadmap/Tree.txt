@@ -33,21 +33,56 @@ D:\PIANO-FX-PRO\ROADMAP
 │   └───Windows
 │       ├───Win32 amd64
 │       │   ├───10.0.17763
-│       │   │   └───Works the best!!!
+│       │   │   ├───Dialogs
+│       │   │   │   └───OK
+│       │   │   ├───DirectX 11 rendering
+│       │   │   │   └───OK
+│       │   │   ├───Piano-FX Studio
+│       │   │   │   └───OK
+│       │   │   └───Toolbars and menus
+│       │   │       └───OK
 │       │   ├───10.0.19041
-│       │   │   └───Working fine
+│       │   │   ├───Dialogs
+│       │   │   │   └───OK
+│       │   │   ├───DirectX 11 rendering
+│       │   │   │   └───OK
+│       │   │   ├───Piano-FX Studio
+│       │   │   │   └───OK
+│       │   │   └───Toolbars and menus
+│       │   │       └───OK
 │       │   ├───10.0.20348
-│       │   │   └───Working fine
+│       │   │   ├───Dialogs
+│       │   │   │   └───OK
+│       │   │   ├───DirectX 11 rendering
+│       │   │   │   └───OK
+│       │   │   ├───Piano-FX Studio
+│       │   │   │   └───OK
+│       │   │   └───Toolbars and menus
+│       │   │       └───OK
 │       │   ├───10.0.22000
-│       │   │   └───Working fine
+│       │   │   ├───Dialogs
+│       │   │   │   └───OK
+│       │   │   ├───DirectX 11 rendering
+│       │   │   │   └───OK
+│       │   │   ├───Piano-FX Studio
+│       │   │   │   └───OK
+│       │   │   └───Toolbars and menus
+│       │   │       └───OK
 │       │   ├───10.0.26100
 │       │   │   └───Probably never will
 │       │   ├───5.2
-│       │   │   └───TODO
+│       │   │   └───Testing needed
 │       │   ├───6.0
-│       │   │   └───TODO
+│       │   │   └───Testing needed
 │       │   ├───6.1
-│       │   │   └───Mostly works
+│       │   │   ├───Dialogs
+│       │   │   │   └───OK
+│       │   │   ├───DirectX 11 rendering
+│       │   │   │   └───OK
+│       │   │   ├───Piano-FX Studio
+│       │   │   │   └───FAIL
+│       │   │   └───Toolbars and menus
+│       │   │       └───OK
 │       │   ├───6.2
 │       │   │   └───Testing needed
 │       │   └───6.4
@@ -57,10 +92,19 @@ D:\PIANO-FX-PRO\ROADMAP
 │       │   │   └───Testing needed
 │       │   ├───10.0.19041
 │       │   │   └───Testing needed
+│       │   ├───5.0
+│       │   │   └───TODO
 │       │   ├───5.2
-│       │   │   └───TODO
+│       │   │   ├───Dialogs
+│       │   │   │   └───OK
+│       │   │   ├───DirectX 11 rendering
+│       │   │   │   └───OK
+│       │   │   ├───Piano-FX Studio
+│       │   │   │   └───FAIL
+│       │   │   └───Toolbars and menus
+│       │   │       └───OK
 │       │   ├───6.0
-│       │   │   └───TODO
+│       │   │   └───Testing needed
 │       │   ├───6.1
 │       │   │   └───Testing needed
 │       │   ├───6.2
