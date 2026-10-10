@@ -94,7 +94,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „        „    „    „¤„Ÿ„Ÿ„ŸTesting needed
 „        „    „¥„Ÿ„Ÿ„Ÿ5.0
 „        „    „    „¤„Ÿ„Ÿ„ŸTODO
-„        „    „¥„Ÿ„Ÿ„Ÿ5.2
+„        „    „¥„Ÿ„Ÿ„Ÿ5.1
 „        „    „    „¥„Ÿ„Ÿ„ŸDialogs
 „        „    „    „    „¤„Ÿ„Ÿ„ŸOK
 „        „    „    „¥„Ÿ„Ÿ„ŸDirectX 11 rendering
