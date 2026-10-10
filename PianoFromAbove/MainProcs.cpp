@@ -542,7 +542,8 @@ HWND CreateRebar(HWND hWndOwner)
 {
     // Create the Rebar. Just houses the toolbar.
     HWND hWndRebar = CreateWindowEx(WS_EX_CONTROLPARENT | RTL_STYLE, REBARCLASSNAME, NULL, WS_CHILD | WS_TABSTOP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CCS_NODIVIDER | RBS_VARHEIGHT, NULL, NULL, NULL, NULL, hWndOwner, (HMENU)IDC_TOPREBAR, g_hInstance, NULL);
-    if (!hWndRebar) return NULL;
+    if (hWndRebar == NULL)
+        return NULL;
 
     // Create the system font
     HDC hDC = GetDC(hWndOwner);
@@ -966,7 +967,7 @@ VOID ShowControls(BOOL bShow)
         ShowWindow(g_hWndBar, bShow ? SW_SHOWNA : SW_HIDE);
     else if (cView.GetFullScreen())
         ShowWindow(g_hWndBar, SW_HIDE);
-    HandOffMsg(WM_COMMAND, ID_VIEW_RESETDEVICE, 0);
+    HandOffMsg(WM_COMMAND, ID_VIEW_RESETDEVICE, NULL);
 
     HMENU hMenu = GetMainMenu();
     CheckMenuItem(hMenu, ID_VIEW_CONTROLS, MF_BYCOMMAND | (bShow ? MF_CHECKED : MF_UNCHECKED));
@@ -980,13 +981,9 @@ VOID ShowKeyboard(BOOL bShow)
 
 VOID SetOnTop(BOOL bOnTop)
 {
-    static const ViewSettings& cView = Config::GetConfig().GetViewSettings();
-    if (!cView.GetFullScreen())
-        SetWindowPos(g_hWnd, bOnTop ? HWND_TOPMOST : HWND_NOTOPMOST, 0, 0, 0, 0,
-            SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
-
-    HMENU hMenu = GetMainMenu();
-    CheckMenuItem(hMenu, ID_VIEW_ALWAYSONTOP, MF_BYCOMMAND | (bOnTop ? MF_CHECKED : MF_UNCHECKED));
+    SetWindowPos(g_hWnd, bOnTop ? HWND_TOPMOST : HWND_NOTOPMOST, NULL, NULL, NULL, NULL, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+    HandOffMsg(WM_COMMAND, ID_VIEW_RESETDEVICE, NULL);
+    CheckMenuItem(GetMainMenu(), ID_VIEW_ALWAYSONTOP, MF_BYCOMMAND | (bOnTop ? MF_CHECKED : MF_UNCHECKED));
 }
 
 VOID SetFullScreen(BOOL bFullScreen)
@@ -1003,23 +1000,27 @@ VOID SetFullScreen(BOOL bFullScreen)
         GetWindowRect(GetDesktopWindow(), &rcDesktop);
 
         SetMenu(g_hWnd, NULL);
-        if (!cControls.bAlwaysShowControls) ShowWindow(g_hWndBar, SW_HIDE);
-        SetWindowLongPtr(g_hWnd, GWL_STYLE, GetWindowLongPtr(g_hWnd, GWL_STYLE) & ~WS_CAPTION & ~WS_THICKFRAME);
-        SetWindowPos(g_hWnd, HWND_TOPMOST, rcDesktop.left, rcDesktop.top,
-            rcDesktop.right - rcDesktop.left, rcDesktop.bottom - rcDesktop.top,
-            SWP_NOACTIVATE | SWP_FRAMECHANGED);
-        HandOffMsg(WM_COMMAND, ID_VIEW_RESETDEVICE, 0);
+        ShowControls(cView.GetControls());
+        SetWindowLongPtr(g_hWndGfx, GWL_EXSTYLE, GetWindowLongPtr(g_hWnd, GWL_EXSTYLE) & ~WS_EX_CLIENTEDGE);
+        SetWindowLongPtr(g_hWnd, GWL_STYLE, GetWindowLongPtr(g_hWnd, GWL_STYLE) & ~WS_SYSMENU & ~WS_CAPTION & ~WS_THICKFRAME);
+        SetWindowLongPtr(g_hWndBar, GWL_EXSTYLE, GetWindowLongPtr(g_hWnd, GWL_EXSTYLE) | WS_EX_DLGMODALFRAME);
+        SetWindowPos(g_hWndGfx, NULL, NULL, NULL, NULL, NULL, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+        SetWindowPos(g_hWnd, NULL, rcDesktop.left, rcDesktop.top, rcDesktop.right - rcDesktop.left, rcDesktop.bottom - rcDesktop.top, SWP_NOZORDER | SWP_FRAMECHANGED);
+        SetWindowPos(g_hWndBar, NULL, NULL, NULL, NULL, NULL, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+        HandOffMsg(WM_COMMAND, ID_VIEW_RESETDEVICE, NULL);
         CheckMenuItem(hMenu, ID_VIEW_FULLSCREEN, MF_BYCOMMAND | MF_CHECKED);
     }
     else
     {
         SetMenu(g_hWnd, hMenu);
-        if (cView.GetControls()) ShowWindow(g_hWndBar, SW_SHOWNA);
-        SetWindowLongPtr(g_hWnd, GWL_STYLE, GetWindowLongPtr(g_hWnd, GWL_STYLE) | WS_CAPTION | WS_THICKFRAME);
-        SetWindowPos(g_hWnd, cView.GetOnTop() ? HWND_TOPMOST : HWND_NOTOPMOST, rcOld.left, rcOld.top,
-            rcOld.right - rcOld.left, rcOld.bottom - rcOld.top,
-            SWP_NOACTIVATE | SWP_FRAMECHANGED);
-        HandOffMsg(WM_COMMAND, ID_VIEW_RESETDEVICE, 0);
+        ShowControls(cView.GetControls());
+        SetWindowLongPtr(g_hWndGfx, GWL_EXSTYLE, GetWindowLongPtr(g_hWnd, GWL_EXSTYLE) | WS_EX_CLIENTEDGE);
+        SetWindowLongPtr(g_hWndBar, GWL_EXSTYLE, GetWindowLongPtr(g_hWnd, GWL_EXSTYLE) & ~WS_EX_DLGMODALFRAME);
+        SetWindowLongPtr(g_hWnd, GWL_STYLE, GetWindowLongPtr(g_hWnd, GWL_STYLE) | WS_SYSMENU | WS_CAPTION | WS_THICKFRAME);
+        SetWindowPos(g_hWndGfx, NULL, NULL, NULL, NULL, NULL, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+        SetWindowPos(g_hWndBar, NULL, NULL, NULL, NULL, NULL, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+        SetWindowPos(g_hWnd, NULL, rcOld.left, rcOld.top, rcOld.right - rcOld.left, rcOld.bottom - rcOld.top, SWP_NOZORDER | SWP_FRAMECHANGED);
+        HandOffMsg(WM_COMMAND, ID_VIEW_RESETDEVICE, NULL);
         CheckMenuItem(hMenu, ID_VIEW_FULLSCREEN, MF_BYCOMMAND | MF_UNCHECKED);
     }
 }

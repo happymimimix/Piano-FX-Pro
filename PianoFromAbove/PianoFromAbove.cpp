@@ -1538,7 +1538,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
     cout << "\n\n";
     cout << WStringToUtf8(StartupStage1Text) << "\n";
     InitCommonControls();
-    SetThemeAppProperties(STAP_ALLOW_CONTROLS | STAP_ALLOW_NONCLIENT);
+    SetThemeAppProperties(STAP_ALLOW_NONCLIENT | STAP_ALLOW_CONTROLS | STAP_ALLOW_WEBCONTENT);
 
     if (__argc == 3) {
         string ARG1 = __argv[1];
@@ -1892,7 +1892,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
     ViewSettings& cView = config.GetViewSettings();
 
     // Create the application window
-    g_hWnd = CreateWindowEx(WS_EX_APPWINDOW | WS_EX_DLGMODALFRAME | RTL_STYLE, CLASSNAME, TitleIdle, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, cView.GetMainLeft(), cView.GetMainTop(), cView.GetMainWidth(), cView.GetMainHeight(), NULL, NULL, wc.hInstance, NULL);
+    g_hWnd = CreateWindowEx(WS_EX_APPWINDOW | RTL_STYLE, CLASSNAME, TitleIdle, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, cView.GetMainLeft(), cView.GetMainTop(), cView.GetMainWidth(), cView.GetMainHeight(), NULL, NULL, wc.hInstance, NULL);
 
     if (!g_hWnd) return 1;
 

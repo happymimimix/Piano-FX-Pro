@@ -844,6 +844,11 @@ rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1
+del "..\Release\$(TargetName)_Manifest.xml" /f /q
+del "..\Release\$(TargetName)_ManifestFixed.xml" /f /q
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
 del .\Widths.h /f /q
@@ -948,6 +953,11 @@ rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1
+del "..\Release\$(TargetName)_Manifest.xml" /f /q
+del "..\Release\$(TargetName)_ManifestFixed.xml" /f /q
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x86
 del .\Widths.h /f /q
@@ -1052,6 +1062,11 @@ rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1
+del "..\Release\$(TargetName)_Manifest.xml" /f /q
+del "..\Release\$(TargetName)_ManifestFixed.xml" /f /q
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
 del .\Widths.h /f /q
@@ -1156,6 +1171,11 @@ rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1
+del "..\Release\$(TargetName)_Manifest.xml" /f /q
+del "..\Release\$(TargetName)_ManifestFixed.xml" /f /q
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x86
 del .\Widths.h /f /q
@@ -1260,6 +1280,11 @@ rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1
+del "..\Release\$(TargetName)_Manifest.xml" /f /q
+del "..\Release\$(TargetName)_ManifestFixed.xml" /f /q
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
 del .\Widths.h /f /q
@@ -1364,6 +1389,11 @@ rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1
+del "..\Release\$(TargetName)_Manifest.xml" /f /q
+del "..\Release\$(TargetName)_ManifestFixed.xml" /f /q
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x86
 del .\Widths.h /f /q
@@ -1468,6 +1498,11 @@ rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1
+del "..\Release\$(TargetName)_Manifest.xml" /f /q
+del "..\Release\$(TargetName)_ManifestFixed.xml" /f /q
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
 del .\Widths.h /f /q
@@ -1572,6 +1607,11 @@ rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1
+del "..\Release\$(TargetName)_Manifest.xml" /f /q
+del "..\Release\$(TargetName)_ManifestFixed.xml" /f /q
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x86
 del .\Widths.h /f /q
@@ -1676,6 +1716,11 @@ rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1
+del "..\Release\$(TargetName)_Manifest.xml" /f /q
+del "..\Release\$(TargetName)_ManifestFixed.xml" /f /q
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
 del .\Widths.h /f /q
@@ -1780,6 +1825,11 @@ rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1
+del "..\Release\$(TargetName)_Manifest.xml" /f /q
+del "..\Release\$(TargetName)_ManifestFixed.xml" /f /q
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x86
 del .\Widths.h /f /q
@@ -1884,6 +1934,11 @@ rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1
+del "..\Release\$(TargetName)_Manifest.xml" /f /q
+del "..\Release\$(TargetName)_ManifestFixed.xml" /f /q
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
 del .\Widths.h /f /q
@@ -1990,6 +2045,11 @@ rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1
+del "..\Release\$(TargetName)_Manifest.xml" /f /q
+del "..\Release\$(TargetName)_ManifestFixed.xml" /f /q
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
 del .\Widths.h /f /q
@@ -2094,6 +2154,11 @@ rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1
+del "..\Release\$(TargetName)_Manifest.xml" /f /q
+del "..\Release\$(TargetName)_ManifestFixed.xml" /f /q
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x86
 del .\Widths.h /f /q
@@ -2200,6 +2265,11 @@ rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1
+del "..\Release\$(TargetName)_Manifest.xml" /f /q
+del "..\Release\$(TargetName)_ManifestFixed.xml" /f /q
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x86
 del .\Widths.h /f /q
@@ -2304,6 +2374,11 @@ rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1
+del "..\Release\$(TargetName)_Manifest.xml" /f /q
+del "..\Release\$(TargetName)_ManifestFixed.xml" /f /q
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
 del .\Widths.h /f /q
@@ -2408,6 +2483,11 @@ rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1
+del "..\Release\$(TargetName)_Manifest.xml" /f /q
+del "..\Release\$(TargetName)_ManifestFixed.xml" /f /q
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x86
 del .\Widths.h /f /q
@@ -2512,6 +2592,11 @@ rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1
+del "..\Release\$(TargetName)_Manifest.xml" /f /q
+del "..\Release\$(TargetName)_ManifestFixed.xml" /f /q
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
 del .\Widths.h /f /q
@@ -2616,6 +2701,11 @@ rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1
+del "..\Release\$(TargetName)_Manifest.xml" /f /q
+del "..\Release\$(TargetName)_ManifestFixed.xml" /f /q
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x86
 del .\Widths.h /f /q
@@ -2720,6 +2810,11 @@ rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1
+del "..\Release\$(TargetName)_Manifest.xml" /f /q
+del "..\Release\$(TargetName)_ManifestFixed.xml" /f /q
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
 del .\Widths.h /f /q
@@ -2824,6 +2919,11 @@ rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1
+del "..\Release\$(TargetName)_Manifest.xml" /f /q
+del "..\Release\$(TargetName)_ManifestFixed.xml" /f /q
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x86
 del .\Widths.h /f /q
@@ -2928,6 +3028,11 @@ rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1
+del "..\Release\$(TargetName)_Manifest.xml" /f /q
+del "..\Release\$(TargetName)_ManifestFixed.xml" /f /q
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
 del .\Widths.h /f /q
@@ -3032,6 +3137,11 @@ rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1
+del "..\Release\$(TargetName)_Manifest.xml" /f /q
+del "..\Release\$(TargetName)_ManifestFixed.xml" /f /q
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x86
 del .\Widths.h /f /q
@@ -3136,6 +3246,11 @@ rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1
+del "..\Release\$(TargetName)_Manifest.xml" /f /q
+del "..\Release\$(TargetName)_ManifestFixed.xml" /f /q
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
 del .\Widths.h /f /q
@@ -3240,6 +3355,11 @@ rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1
+del "..\Release\$(TargetName)_Manifest.xml" /f /q
+del "..\Release\$(TargetName)_ManifestFixed.xml" /f /q
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x86
 del .\Widths.h /f /q
@@ -3344,6 +3464,11 @@ rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1
+del "..\Release\$(TargetName)_Manifest.xml" /f /q
+del "..\Release\$(TargetName)_ManifestFixed.xml" /f /q
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
 del .\Widths.h /f /q
@@ -3448,6 +3573,11 @@ rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1
+del "..\Release\$(TargetName)_Manifest.xml" /f /q
+del "..\Release\$(TargetName)_ManifestFixed.xml" /f /q
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x86
 del .\Widths.h /f /q
@@ -3552,6 +3682,11 @@ rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1
+del "..\Release\$(TargetName)_Manifest.xml" /f /q
+del "..\Release\$(TargetName)_ManifestFixed.xml" /f /q
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x64
 del .\Widths.h /f /q
@@ -3656,6 +3791,11 @@ rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1
+del "..\Release\$(TargetName)_Manifest.xml" /f /q
+del "..\Release\$(TargetName)_ManifestFixed.xml" /f /q
 copy ..\Release\$(TargetName).exe ..\$(TargetName).exe /v /y
 msbuild ..\Piano-FX-Pro.sln -t:Clean -p:Configuration=$(ConfigurationName) /p:Platform=x86
 del .\Widths.h /f /q
@@ -3741,8 +3881,10 @@ del .\Widths.h /f /q
 rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <ShowProgress>true</ShowProgress>
@@ -3815,8 +3957,10 @@ del .\Widths.h /f /q
 rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <ShowProgress>true</ShowProgress>
@@ -3890,8 +4034,10 @@ del .\Widths.h /f /q
 rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <ShowProgress>true</ShowProgress>
@@ -3965,8 +4111,10 @@ del .\Widths.h /f /q
 rename .\Widths.hh Widths.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>cd /d "$(ProjectDir)"
+mt.exe -inputresource:"..\Release\$(TargetName).exe";#1 -out:"..\Release\$(TargetName)_Manifest.xml"
+powershell -Command "(gc '..\Release\$(TargetName)_Manifest.xml' -raw) -replace '&lt;trustInfo&gt;','&lt;trustInfo xmlns="^""urn:schemas-microsoft-com:asm.v3"^""&gt;' |sc '..\Release\$(TargetName)_ManifestFixed.xml'"
+mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:"..\Release\$(TargetName).exe";#1</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <ShowProgress>true</ShowProgress>
