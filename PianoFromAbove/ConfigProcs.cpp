@@ -655,7 +655,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         RECT rcTracks;
         GetClientRect(hWndTracks, &rcTracks);
         win32_t aFmt[7] = { LVCFMT_RIGHT, LVCFMT_LEFT, LVCFMT_LEFT, LVCFMT_RIGHT, LVCFMT_CENTER, LVCFMT_CENTER, LVCFMT_CENTER };
-        win32_t aCx[7] = { 40, (rcTracks.right - 50 * 5) / 2, (rcTracks.right - 50 * 5) / 2, 60, 50, 50, 50 };
+        win32_t aCx[7] = { 45, (rcTracks.right - 50 * 5) / 2, (rcTracks.right - 50 * 5) / 2, 70, 45, 45, 45 };
         CONST TCHAR* aText[7] = { TEXT("Track"), TEXT("Title"), TEXT("Instrument"), TEXT("Notes"), TEXT("Muted"), TEXT("Hidden"), TEXT("Color") };
 
         LVCOLUMN lvc = {};
@@ -795,7 +795,6 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             }
             // Toggle checkboxes or select color
             case NM_CLICK:
-            case NM_DBLCLK:
             {
                 // Have to manually figure out the corresponding item. Silly.
                 LPNMITEMACTIVATE lpnmia = (LPNMITEMACTIVATE)lpnmhdr;
@@ -841,7 +840,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 HWND hWndTracks = GetDlgItem(hWnd, IDC_TRACKS);
                 RECT rcTracks;
                 GetClientRect(hWndTracks, &rcTracks);
-                win32_t aCx[7] = { 40, (rcTracks.right - 50 * 5) / 2, (rcTracks.right - 50 * 5) / 2, 60, 50, 50, 50 };
+                win32_t aCx[7] = { 45, (rcTracks.right - 50 * 5) / 2, (rcTracks.right - 50 * 5) / 2, 70, 45, 45, 45 };
                 for (win32_t i = 0; i < static_cast<win32_t>(sizeof(aCx) / sizeof(win32_t)); i++) {
                     SendMessage(hWndTracks, LVM_SETCOLUMNWIDTH, i, aCx[i]); //Please don't resize this, it makes the interface look very ridiculous! 
                 }
