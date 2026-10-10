@@ -605,8 +605,9 @@ BOOL GetCustomSettings(MainScreen* pGameState)
 INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     static const VisualSettings& cVisual = Config::GetConfig().GetVisualSettings();
-    static vector< bool > vMuted, vHidden; // Would rather be part of control, but no subitem lparam available
-    static vector< unsigned > vColors;
+    static vector<bool> vMuted, vHidden; // Would rather be part of control, but no subitem lparam available
+    static vector<unsigned> vColors;
+    static win32_t widths[7];
 
     switch (msg)
     {
@@ -666,6 +667,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             lvc.cx = aCx[i];
             lvc.pszText = (TCHAR*)aText[i];
             SendMessage(hWndTracks, LVM_INSERTCOLUMN, i, (LPARAM)&lvc);
+            widths[i] = aCx[i];
         }
 
         // Set rows of the list view
@@ -696,7 +698,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 if (mTrackInfo.aNoteCount[j] > 0) {
 #endif
                     lvi.iSubItem = 0;
-                    _stprintf_s(buf, TEXT("%u"), iPos + 1);
+                    _stprintf_s(buf, TEXT("%hu"), iPos + 1);
                     lvi.iItem = (win32_t)SendMessage(hWndTracks, LVM_INSERTITEM, 0, (LPARAM)&lvi);
 
                     lvi.iSubItem++;
@@ -722,8 +724,8 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                     lvi.iItem++;
                     iPos++;
                 }
+                }
             }
-        }
 
         if (GetWindowLongPtr(hWndTracks, GWL_STYLE) & WS_VSCROLL)
             SendMessage(hWndTracks, LVM_SETCOLUMNWIDTH, 1, aCx[1] - 17);
@@ -743,12 +745,20 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         EnableWindow(GetDlgItem(hWnd, IDC_PIANO), TRUE);
 
         return TRUE;
-    }
+        }
     case WM_NOTIFY:
     {
         LPNMHDR lpnmhdr = (LPNMHDR)lParam;
-        if (lpnmhdr->idFrom == IDC_TRACKS)
-        {
+        HWND hWndTracks = GetDlgItem(hWnd, IDC_TRACKS);
+        if (lpnmhdr->hwndFrom == ListView_GetHeader(hWndTracks)) {
+            switch (lpnmhdr->code) {
+            case HDN_ENDTRACKW:
+            case HDN_DIVIDERDBLCLICKW:
+                PostMessageW(hWndTracks, LVM_SETCOLUMNWIDTH, ((NMHEADER*)lParam)->iItem, MAKELPARAM(widths[((NMHEADER*)lParam)->iItem], NULL));
+                return TRUE;
+            }
+        }
+        else if (lpnmhdr->idFrom == IDC_TRACKS) {
             switch (lpnmhdr->code)
             {
                 // Prevent's item selection
@@ -800,7 +810,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 LPNMITEMACTIVATE lpnmia = (LPNMITEMACTIVATE)lpnmhdr;
                 LVHITTESTINFO lvhti = { lpnmia->ptAction,NULL,NULL,NULL,NULL };
                 SendMessage(lpnmia->hdr.hwndFrom, LVM_SUBITEMHITTEST, 0, (LPARAM)&lvhti);
-                if (lvhti.iItem < 0 || (win32_t)lvhti.iItem >= (win32_t)vMuted.size()) return FALSE;
+                if (lvhti.iItem < 0 || (win32_t)lvhti.iItem >= static_cast<win32_t>(vMuted.size())) return FALSE;
 
                 RECT rcItem = { LVIR_BOUNDS,LVIR_BOUNDS,LVIR_BOUNDS,LVIR_BOUNDS };
                 SendMessage(lpnmia->hdr.hwndFrom, LVM_GETITEMRECT, lvhti.iItem, (LPARAM)&rcItem);
@@ -837,15 +847,6 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             {
                 LPNMCUSTOMDRAW lpnmcd = (LPNMCUSTOMDRAW)lParam;
                 LPNMLVCUSTOMDRAW lpnmlvcd = (LPNMLVCUSTOMDRAW)lParam;
-                HWND hWndTracks = GetDlgItem(hWnd, IDC_TRACKS);
-                RECT rcTracks;
-                GetClientRect(hWndTracks, &rcTracks);
-                win32_t aCx[7] = { 45, (rcTracks.right - 50 * 5) / 2, (rcTracks.right - 50 * 5) / 2, 70, 45, 45, 45 };
-                for (win32_t i = 0; i < static_cast<win32_t>(sizeof(aCx) / sizeof(win32_t)); i++) {
-                    if (SendMessage(hWndTracks, LVM_GETCOLUMNWIDTH, i, NULL) != aCx[i])
-                        //Please don't resize this, it makes the interface look very ridiculous! 
-                        SendMessage(hWndTracks, LVM_SETCOLUMNWIDTH, i, aCx[i]);
-                }
                 switch (lpnmcd->dwDrawStage)
                 {
                 case CDDS_PREPAINT: case CDDS_ITEMPREPAINT:
@@ -917,4 +918,4 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     }
 
     return FALSE;
-}
+    }
