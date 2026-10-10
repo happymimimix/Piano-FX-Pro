@@ -2853,8 +2853,8 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         SetConsoleWindowInfo(GetStdHandle(STD_OUTPUT_HANDLE), TRUE, &windowSize);
         SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), bufferSize);
     }
-    FrameCount++;
 #endif
+    FrameCount++;
 }
 
 void MainScreen::RenderMarker(const wstring & str) {

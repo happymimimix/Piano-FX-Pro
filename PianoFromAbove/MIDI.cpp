@@ -9,7 +9,9 @@
 *************************************************************************************************/
 #include <fstream>
 #include <queue>
+#ifndef W2K
 #include <ppl.h>
+#endif
 #include <lzma.h>
 #include <Globals.h>
 #include <MIDI.h>
@@ -1037,8 +1039,11 @@ void MIDI::ConnectNotes()
     g_LoadingProgress.stage = MIDILoadingProgress::Stage::ConnectNotes;
     g_LoadingProgress.progress = 0;
     g_LoadingProgress.max = m_vTracks.size();
-
+#ifdef W2K
+    for (track_t track = 0; track < m_vTracks.size(); ++track) {
+#else
     concurrency::parallel_for(track_t(0), static_cast<track_t>(m_vTracks.size()), [&](track_t track) {
+#endif
         vector<MIDIEvent*>& vEvents = m_vTracks[track]->m_vEvents;
         for (idx_t i = 0; i < vEvents.size(); i++) {
             if (vEvents[i]->GetEventType() == MIDIEvent::ChannelEvent)
@@ -1062,7 +1067,11 @@ void MIDI::ConnectNotes()
             }
         }
         g_LoadingProgress.progress++;
-        });
+#ifdef W2K
+    }
+#else
+    });
+#endif
 }
 
 

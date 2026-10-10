@@ -4564,10 +4564,7 @@ mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:".
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SMF3Intro.h" />
-    <ClInclude Include="Studio.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='W2K|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='W2K|x64'">true</ExcludedFromBuild>
-    </ClInclude>
+    <ClInclude Include="Studio.h" />
     <ClInclude Include="Tab1Btn2.h" />
     <ClInclude Include="Tab1.h" />
     <ClCompile Include="Tab1Main.h" />
@@ -4609,10 +4606,7 @@ mt.exe -manifest "..\Release\$(TargetName)_ManifestFixed.xml" -outputresource:".
     <ClCompile Include="Misc.cpp" />
     <ClCompile Include="PianoFromAbove.cpp" />
     <ClCompile Include="Renderer.cpp" />
-    <ClCompile Include="Studio.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='W2K|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='W2K|x64'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="Studio.cpp" />
     <ClCompile Include="tinyxml\tinystr.cpp" />
     <ClCompile Include="tinyxml\tinyxml.cpp" />
     <ClCompile Include="tinyxml\tinyxmlerror.cpp" />
