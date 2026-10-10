@@ -96,6 +96,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         if (wParam == IDC_POSNDELAY) HandOffMsg(msg, wParam, lParam);
         return 0;
     }
+    case WM_THEMECHANGED:
     case WM_SYSCOLORCHANGE:
         // Notify every descendant, including nested common controls.
         EnumChildWindows(hWnd, [](HWND ChildhWnd, LPARAM ChildlParam) -> BOOL {
@@ -103,7 +104,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             return TRUE;
         }, NULL);
         // Repaint after the controls have updated their colors and caches.
-        RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_ERASENOW | RDW_UPDATENOW);
+        RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN);
         break;
     case WM_WINDOWPOSCHANGING:
         // Allow the window to be larger than the screen. 
@@ -464,12 +465,12 @@ LRESULT WINAPI BarProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     switch (msg)
     {
     case WM_THEMECHANGED:
-    case WM_SYSCOLORCHANGE:
         CallWindowProc(g_pPrevBarProc, hWnd, msg, wParam, lParam);
         SendMessage(hWnd, TB_SETBUTTONSIZE, 0, MAKELONG(1 << 5, 1 << 5));
+    case WM_SYSCOLORCHANGE:
     case WM_SIZE:
         DrawSliderChannel(NULL, hWnd);
-        RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_ERASENOW | RDW_UPDATENOW);
+        RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN);
         return 0;
     case WM_HSCROLL:
     {
@@ -540,7 +541,7 @@ LRESULT WINAPI BarProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 HWND CreateRebar(HWND hWndOwner)
 {
     // Create the Rebar. Just houses the toolbar.
-    HWND hWndRebar = CreateWindowEx(WS_EX_CONTROLPARENT | RTL_STYLE, REBARCLASSNAME, NULL, WS_CHILD | CCS_NODIVIDER | RBS_VARHEIGHT, NULL, NULL, NULL, NULL, hWndOwner, (HMENU)IDC_TOPREBAR, g_hInstance, NULL);
+    HWND hWndRebar = CreateWindowEx(WS_EX_CONTROLPARENT | RTL_STYLE, REBARCLASSNAME, NULL, WS_CHILD | WS_TABSTOP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CCS_NODIVIDER | RBS_VARHEIGHT, NULL, NULL, NULL, NULL, hWndOwner, (HMENU)IDC_TOPREBAR, g_hInstance, NULL);
     if (!hWndRebar) return NULL;
 
     // Create the system font
@@ -551,7 +552,7 @@ HWND CreateRebar(HWND hWndOwner)
     HIMAGELIST hIml = ImageList_LoadImage(g_hInstance, MAKEINTRESOURCE(IDB_MEDIAICONSSMALL), 1 << 4, (1 << 4) + (1 << 2), RGB(255, 255, 0), IMAGE_BITMAP, LR_CREATEDIBSECTION);
 
     // Create the toolbar. Houses custom controls too. Don't want multiple rebar brands because you lose too much control
-    HWND hWndToolbar = CreateWindowEx(WS_EX_CONTROLPARENT | RTL_STYLE, TOOLBARCLASSNAME, NULL, WS_CHILD | WS_TABSTOP | CCS_NODIVIDER | CCS_NOPARENTALIGN | CCS_NORESIZE | TBSTYLE_FLAT | TBSTYLE_TOOLTIPS, NULL, NULL, NULL, NULL, hWndRebar, (HMENU)IDC_TOPTOOLBAR, g_hInstance, NULL);
+    HWND hWndToolbar = CreateWindowEx(WS_EX_CONTROLPARENT | RTL_STYLE, TOOLBARCLASSNAME, NULL, WS_CHILD | WS_TABSTOP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CCS_NODIVIDER | CCS_NOPARENTALIGN | CCS_NORESIZE | TBSTYLE_FLAT | TBSTYLE_TOOLTIPS, NULL, NULL, NULL, NULL, hWndRebar, (HMENU)IDC_TOPTOOLBAR, g_hInstance, NULL);
     if (hWndToolbar == NULL)
         return NULL;
 
@@ -610,7 +611,7 @@ HWND CreateRebar(HWND hWndOwner)
     SendMessage(hWndNSpeed, TBM_SETRANGE, FALSE, MAKELONG(5, 195));
     SendMessage(hWndNSpeed, TBM_SETLINESIZE, 0, 10);
 
-    HWND hWndPosn = CreateWindowEx(RTL_STYLE, POSNCLASSNAME, NULL, WS_CHILD | WS_VISIBLE | WS_TABSTOP, 0, 0, 0, 0, hWndRebar, (HMENU)IDC_POSNCTRL, g_hInstance, NULL);
+    HWND hWndPosn = CreateWindowEx(RTL_STYLE, POSNCLASSNAME, NULL, WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | WS_CLIPSIBLINGS, 0, 0, 0, 0, hWndRebar, (HMENU)IDC_POSNCTRL, g_hInstance, NULL);
 
     REBARBANDINFO rbbi;
     rbbi.cbSize = sizeof(REBARBANDINFO);
@@ -648,8 +649,8 @@ VOID DrawSliderChannel(LPNMCUSTOMDRAW lpnmcd, HWND hWndOwner)
     static HBITMAP hBitmap = NULL;
 
     if (!lpnmcd) {
-        if (hdcMem != NULL) DeleteObject((HGDIOBJ)hdcMem);
-        if (hBitmap != NULL) DeleteObject((HGDIOBJ)hBitmap);
+        if (hdcMem != NULL) DeleteDC(hdcMem);
+        if (hBitmap != NULL) DeleteObject(hBitmap);
         hdcMem = NULL;
         hBitmap = NULL;
         return;
@@ -697,11 +698,11 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_THEMECHANGED:
     case WM_SYSCOLORCHANGE:
     case WM_SIZE:
-        if (hBackbuffer != NULL) DeleteObject((HGDIOBJ)hBackbuffer);
-        if (hBackground != NULL) DeleteObject((HGDIOBJ)hBackground);
+        if (hBackbuffer != NULL) DeleteObject(hBackbuffer);
+        if (hBackground != NULL) DeleteObject(hBackground);
         hBackbuffer = NULL;
         hBackground = NULL;
-        RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_ERASENOW | RDW_UPDATENOW);
+        RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN);
         return 0;
     case WM_CREATE:
         hIml = ImageList_LoadImage(g_hInstance, MAKEINTRESOURCE(IDB_MEDIAICONSSMALL), 1 << 4, (1 << 4) + (1 << 2), CLR_DEFAULT, IMAGE_BITMAP, LR_CREATEDIBSECTION);
@@ -762,7 +763,11 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
         // Copy background and draw
         BitBlt(hDCMem, ps.rcPaint.left, ps.rcPaint.top, ps.rcPaint.right - ps.rcPaint.left, ps.rcPaint.bottom - ps.rcPaint.top,
+#ifdef USE_RTL_LAYOUT
+            hDCBkg, rcOwner.right - rcCtrl.right + ps.rcPaint.left, rcCtrl.top - rcOwner.top + ps.rcPaint.top, SRCCOPY);
+#else
             hDCBkg, rcCtrl.left - rcOwner.left + ps.rcPaint.left, rcCtrl.top - rcOwner.top + ps.rcPaint.top, SRCCOPY);
+#endif
         if (bEnabled) {
             SetDCBrushColor(hDCMem, GetSysColor(COLOR_WINDOW));
             HBRUSH hBrush = (HBRUSH)GetStockObject(DC_BRUSH);
@@ -850,8 +855,8 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         return 0;
     }
     case WM_DESTROY:
-        if (hBackbuffer != NULL) DeleteObject((HGDIOBJ)hBackbuffer);
-        if (hBackground != NULL) DeleteObject((HGDIOBJ)hBackground);
+        if (hBackbuffer != NULL) DeleteObject(hBackbuffer);
+        if (hBackground != NULL) DeleteObject(hBackground);
         ImageList_Destroy(hIml);
         return 0;
     }
