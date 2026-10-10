@@ -271,6 +271,8 @@ INT_PTR WINAPI AudioProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         for (vector<wstring>::const_iterator it = cAudio.vMIDIOutDevices.begin(); it != cAudio.vMIDIOutDevices.end(); ++it)
             SendMessage(hWndOutDevs, LB_ADDSTRING, 0, (LPARAM)(it->c_str()));
         SendMessage(hWndOutDevs, LB_SETCURSEL, cAudio.iOutDevice, 0);
+        ShowScrollBar(hWndOutDevs, SB_VERT, TRUE);
+        ShowScrollBar(hWndOutDevs, SB_HORZ, FALSE);
 
         CheckDlgButton(hWnd, IDC_KDMAPI, cAudio.bKDMAPI);
         return TRUE;
@@ -658,6 +660,8 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         win32_t aFmt[7] = { LVCFMT_RIGHT, LVCFMT_LEFT, LVCFMT_LEFT, LVCFMT_RIGHT, LVCFMT_CENTER, LVCFMT_CENTER, LVCFMT_CENTER };
         win32_t aCx[7] = { 46, (rcTracks.right - 50 * 5) / 2, (rcTracks.right - 50 * 5) / 2, 68, 46, 46, 46 };
         CONST TCHAR* aText[7] = { TrackHeader };
+        ShowScrollBar(hWndTracks, SB_VERT, TRUE);
+        ShowScrollBar(hWndTracks, SB_HORZ, FALSE);
 
         LVCOLUMN lvc = {};
         lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT;
@@ -757,6 +761,8 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             case HDN_ENDTRACKW:
             case HDN_DIVIDERDBLCLICKA:
             case HDN_DIVIDERDBLCLICKW:
+                ShowScrollBar(hWndTracks, SB_VERT, TRUE);
+                ShowScrollBar(hWndTracks, SB_HORZ, FALSE);
                 PostMessage(hWndTracks, LVM_SETCOLUMNWIDTH, ((NMHEADER*)lParam)->iItem, clwth[((NMHEADER*)lParam)->iItem]);
                 return TRUE;
             }
