@@ -1,5 +1,5 @@
 Folder PATH listing for volume Data
-Volume serial number is 0000012A 9DB5:5629
+Volume serial number is 9DB5-5629
 D:\PIANO-FX-PRO\ROADMAP
 „¥„Ÿ„Ÿ„ŸDirectX 11 backport
 „    „¥„Ÿ„Ÿ„ŸCore
@@ -32,9 +32,44 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „        „¤„Ÿ„Ÿ„ŸTODO
 „    „¤„Ÿ„Ÿ„ŸWindows
 „        „¥„Ÿ„Ÿ„ŸWin32 amd64
-„        „    „¤„Ÿ„Ÿ„ŸAlready supported since 2010
-„        „¤„Ÿ„Ÿ„ŸWin32 i386
-„            „¤„Ÿ„Ÿ„ŸDONE
+„        „    „¥„Ÿ„Ÿ„Ÿ10.0.17763
+„        „    „    „¤„Ÿ„Ÿ„ŸWorks the best!!!
+„        „    „¥„Ÿ„Ÿ„Ÿ10.0.19041
+„        „    „    „¤„Ÿ„Ÿ„ŸWorking fine
+„        „    „¥„Ÿ„Ÿ„Ÿ10.0.20348
+„        „    „    „¤„Ÿ„Ÿ„ŸWorking fine
+„        „    „¥„Ÿ„Ÿ„Ÿ10.0.22000
+„        „    „    „¤„Ÿ„Ÿ„ŸWorking fine
+„        „    „¥„Ÿ„Ÿ„Ÿ10.0.26100
+„        „    „    „¤„Ÿ„Ÿ„ŸProbably never will
+„        „    „¥„Ÿ„Ÿ„Ÿ5.2
+„        „    „    „¤„Ÿ„Ÿ„ŸTODO
+„        „    „¥„Ÿ„Ÿ„Ÿ6.0
+„        „    „    „¤„Ÿ„Ÿ„ŸTODO
+„        „    „¥„Ÿ„Ÿ„Ÿ6.1
+„        „    „    „¤„Ÿ„Ÿ„ŸMostly works
+„        „    „¥„Ÿ„Ÿ„Ÿ6.2
+„        „    „    „¤„Ÿ„Ÿ„ŸTesting needed
+„        „    „¤„Ÿ„Ÿ„Ÿ6.4
+„        „        „¤„Ÿ„Ÿ„ŸTesting needed
+„        „¥„Ÿ„Ÿ„ŸWin32 i386
+„        „    „¥„Ÿ„Ÿ„Ÿ10.0.17763
+„        „    „    „¤„Ÿ„Ÿ„ŸTesting needed
+„        „    „¥„Ÿ„Ÿ„Ÿ10.0.19041
+„        „    „    „¤„Ÿ„Ÿ„ŸTesting needed
+„        „    „¥„Ÿ„Ÿ„Ÿ5.2
+„        „    „    „¤„Ÿ„Ÿ„ŸTODO
+„        „    „¥„Ÿ„Ÿ„Ÿ6.0
+„        „    „    „¤„Ÿ„Ÿ„ŸTODO
+„        „    „¥„Ÿ„Ÿ„Ÿ6.1
+„        „    „    „¤„Ÿ„Ÿ„ŸTesting needed
+„        „    „¥„Ÿ„Ÿ„Ÿ6.2
+„        „    „    „¤„Ÿ„Ÿ„ŸTesting needed
+„        „    „¤„Ÿ„Ÿ„Ÿ6.4
+„        „        „¤„Ÿ„Ÿ„ŸTesting needed
+„        „¤„Ÿ„Ÿ„ŸWOA
+„            „¤„Ÿ„Ÿ„Ÿ10.0.22000
+„                „¤„Ÿ„Ÿ„ŸTODO
 „¥„Ÿ„Ÿ„ŸPiano-FX Pro
 „    „¥„Ÿ„Ÿ„Ÿ64bit array index
 „    „    „¥„Ÿ„Ÿ„ŸAllocate 64bit index on heap
