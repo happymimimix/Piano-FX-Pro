@@ -170,7 +170,7 @@ void ControlsSettings::LoadDefaultValues()
     bAlwaysShowControls = false;
     bPhigros = false;
     sSplashMIDI = L"";
-    iVelocityThreshold = 0;
+    iVelocityThreshold = 1;
     bDumpFrames = false;
 }
 
