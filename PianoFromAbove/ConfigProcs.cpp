@@ -607,6 +607,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     static const VisualSettings& cVisual = Config::GetConfig().GetVisualSettings();
     static vector<bool> vMuted, vHidden; // Would rather be part of control, but no subitem lparam available
     static vector<unsigned> vColors;
+    static win32_t clwth[7];
 
     switch (msg)
     {
@@ -655,8 +656,8 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         RECT rcTracks;
         GetClientRect(hWndTracks, &rcTracks);
         win32_t aFmt[7] = { LVCFMT_RIGHT, LVCFMT_LEFT, LVCFMT_LEFT, LVCFMT_RIGHT, LVCFMT_CENTER, LVCFMT_CENTER, LVCFMT_CENTER };
-        win32_t aCx[7] = { 45, (rcTracks.right - 50 * 5) / 2, (rcTracks.right - 50 * 5) / 2, 70, 45, 45, 45 };
-        CONST TCHAR* aText[7] = { TEXT("Track"), TEXT("Title"), TEXT("Instrument"), TEXT("Notes"), TEXT("Muted"), TEXT("Hidden"), TEXT("Color") };
+        win32_t aCx[7] = { 46, (rcTracks.right - 50 * 5) / 2, (rcTracks.right - 50 * 5) / 2, 68, 46, 46, 46 };
+        CONST TCHAR* aText[7] = { TrackHeader };
 
         LVCOLUMN lvc = {};
         lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT;
@@ -666,6 +667,8 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             lvc.cx = aCx[i];
             lvc.pszText = (TCHAR*)aText[i];
             SendMessage(hWndTracks, LVM_INSERTCOLUMN, i, (LPARAM)&lvc);
+            clwth[i] = aCx[i];
+            PostMessage(hWndTracks, LVM_SETCOLUMNWIDTH, i, clwth[i]);
         }
 
         // Set rows of the list view
@@ -754,10 +757,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             case HDN_ENDTRACKW:
             case HDN_DIVIDERDBLCLICKA:
             case HDN_DIVIDERDBLCLICKW:
-                RECT rcTracks;
-                GetClientRect(hWndTracks, &rcTracks);
-                win32_t aCx[7] = { 45, (rcTracks.right - 50 * 5) / 2, (rcTracks.right - 50 * 5) / 2, 70, 45, 45, 45 };
-                PostMessage(hWndTracks, LVM_SETCOLUMNWIDTH, ((NMHEADER*)lParam)->iItem, MAKELPARAM(aCx[((NMHEADER*)lParam)->iItem], NULL));
+                PostMessage(hWndTracks, LVM_SETCOLUMNWIDTH, ((NMHEADER*)lParam)->iItem, clwth[((NMHEADER*)lParam)->iItem]);
                 return TRUE;
             }
         }
@@ -808,6 +808,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             }
             // Toggle checkboxes or select color
             case NM_CLICK:
+            case NM_DBLCLK:
             {
                 // Have to manually figure out the corresponding item. Silly.
                 LPNMITEMACTIVATE lpnmia = (LPNMITEMACTIVATE)lpnmhdr;
@@ -858,11 +859,14 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 case CDDS_SUBITEM | CDDS_ITEMPREPAINT:
                     if (lpnmlvcd->iSubItem >= 4 && lpnmlvcd->iSubItem <= 6)
                     {
+                        RECT rcCell = {};
+                        ListView_GetSubItemRect(hWndTracks, lpnmcd->dwItemSpec, lpnmlvcd->iSubItem, LVIR_BOUNDS, &rcCell);
+
                         // Figure out size. Too big a rect is fine: will be clipped
                         RECT rcOut;
-                        win32_t iBmpSize = lpnmcd->rc.bottom - lpnmcd->rc.top - 2;
-                        rcOut.left = lpnmcd->rc.left + (lpnmcd->rc.right - lpnmcd->rc.left - iBmpSize) / 2;
-                        rcOut.top = lpnmcd->rc.top + (lpnmcd->rc.bottom - lpnmcd->rc.top - iBmpSize) / 2;
+                        win32_t iBmpSize = rcCell.bottom - rcCell.top - 2;
+                        rcOut.left = rcCell.left + (rcCell.right - rcCell.left - iBmpSize) / 2;
+                        rcOut.top = rcCell.top + (rcCell.bottom - rcCell.top - iBmpSize) / 2;
                         rcOut.right = rcOut.left + iBmpSize;
                         rcOut.bottom = rcOut.top + iBmpSize;
 
@@ -876,12 +880,9 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                             DrawFrameControl(lpnmcd->hdc, &rcOut, DFC_BUTTON, DFCS_BUTTONCHECK | (vHidden[lpnmcd->dwItemSpec] ? DFCS_CHECKED : 0));
                             break;
                         case 6:
-                            SetDCBrushColor(lpnmcd->hdc, lpnmlvcd->clrFace);
-                            FillRect(lpnmcd->hdc, &lpnmcd->rc, (HBRUSH)GetStockObject(DC_BRUSH));
-                            InflateRect(&lpnmcd->rc, -1, -1);
                             SetDCBrushColor(lpnmcd->hdc, vColors[lpnmcd->dwItemSpec] & 0x00FFFFFF);
-                            FillRect(lpnmcd->hdc, &lpnmcd->rc, (HBRUSH)GetStockObject(DC_BRUSH));
-                            DrawEdge(lpnmcd->hdc, &lpnmcd->rc, BDR_SUNKENINNER, BF_RECT);
+                            FillRect(lpnmcd->hdc, &rcCell, (HBRUSH)GetStockObject(DC_BRUSH));
+                            DrawEdge(lpnmcd->hdc, &rcCell, EDGE_SUNKEN, BF_RECT);
                             break;
                         }
                         SetWindowLongPtr(hWnd, DWLP_MSGRESULT, CDRF_SKIPDEFAULT);

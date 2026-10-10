@@ -1512,6 +1512,9 @@ string BuiltinShaders() {
 //-----------------------------------------------------------------------------
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
 {
+    InitCommonControls();
+    SetThemeAppProperties(STAP_ALLOW_CONTROLS | STAP_ALLOW_NONCLIENT);
+
     extern int __argc;
     extern char** __argv;
 
@@ -1537,8 +1540,6 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
     }
     cout << "\n\n";
     cout << WStringToUtf8(StartupStage1Text) << "\n";
-    InitCommonControls();
-    SetThemeAppProperties(STAP_ALLOW_NONCLIENT | STAP_ALLOW_CONTROLS | STAP_ALLOW_WEBCONTENT);
 
     if (__argc == 3) {
         string ARG1 = __argv[1];
