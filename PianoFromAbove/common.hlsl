@@ -1,3 +1,5 @@
+#include <DebugLanguageOverride.h>
+
 cbuffer RootConstants : register(b0) {
     float4x4 root_proj;
     float root_deflate;

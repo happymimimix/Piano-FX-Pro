@@ -617,7 +617,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
         HWND hWndTracks = GetDlgItem(hWnd, IDC_TRACKS);
         TCHAR buf[LONG_MAX_PATH];
-        SendMessage(hWndTracks, LVM_SETEXTENDEDLISTVIEWSTYLE, 0, LVS_EX_DOUBLEBUFFER);
+        SendMessage(hWndTracks, LVM_SETEXTENDEDLISTVIEWSTYLE, NULL, LVS_EX_GRIDLINES);
 
         // Get data
         MainScreen* pGameState = (MainScreen*)lParam;

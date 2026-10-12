@@ -9,7 +9,6 @@
 *************************************************************************************************/
 #include <fstream>
 #include <queue>
-#include <ppl.h>
 #include <lzma.h>
 #include <Globals.h>
 #include <MIDI.h>
@@ -495,7 +494,7 @@ void MIDI::clear(void)
 {
     for (vector<MIDITrack*>::iterator it = m_vTracks.begin(); it != m_vTracks.end(); ++it)
         delete *it;
-    m_vTracks.clear();
+    vector<MIDITrack*>().swap(m_vTracks);
     m_Info.clear();
     for (auto& pool : event_pools) {
         for (sidx_t i = 0; i < pool.count; i++) {
@@ -511,7 +510,7 @@ void MIDI::clear(void)
         }
         _aligned_free(pool.events);
     }
-    event_pools.clear();
+    vector<EventPool>().swap(event_pools);
 }
 
 fileln_t MIDI::ParseMIDI(const unsigned char* pcData, fileln_t iMaxSize)
@@ -1021,7 +1020,7 @@ bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
     }
 
     // We don't need the track vectors anymore (saves 8 bytes per event!)
-    for (auto track : m_vTracks) track->ClearEvents();
+    for (MIDITrack* track : m_vTracks) track->ClearEvents();
 
     m_Info.llTotalMicroSecs = llTime;
     m_Info.llFirstNote = max(0LL, llFirstNote);
@@ -1031,40 +1030,35 @@ bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
 
 void MIDI::ConnectNotes()
 {
-    vector<array<queue<idx_t>, 128>> vStacks;
-    vStacks.resize(m_vTracks.size() * 16);
-
+    queue<idx_t> NoteQueues[1 << 7][1 << 4];
     g_LoadingProgress.stage = MIDILoadingProgress::Stage::ConnectNotes;
     g_LoadingProgress.progress = 0;
     g_LoadingProgress.max = m_vTracks.size();
-
-    concurrency::parallel_for(track_t(0), static_cast<track_t>(m_vTracks.size()), [&](track_t track) {
+    for (track_t track = 0; track < m_vTracks.size(); ++track) {
         vector<MIDIEvent*>& vEvents = m_vTracks[track]->m_vEvents;
-        for (idx_t i = 0; i < vEvents.size(); i++) {
-            if (vEvents[i]->GetEventType() == MIDIEvent::ChannelEvent)
-            {
-                MIDIChannelEvent* pEvent = reinterpret_cast<MIDIChannelEvent*>(vEvents[i]);
-                auto& sStack = vStacks[TnC_t(track) * TnC_t(16u) + TnC_t(pEvent->GetChannel())][pEvent->GetParam1()];
-
+        for (idx_t eventindex = 0; eventindex < vEvents.size(); eventindex++) {
+            if (vEvents[eventindex]->GetEventType() == MIDIEvent::ChannelEvent) {
+                MIDIChannelEvent* pEvent = reinterpret_cast<MIDIChannelEvent*>(vEvents[eventindex]);
                 if (IsNote(pEvent->GetChannelEventType())) {
+                    queue<idx_t>& NoteQueue = NoteQueues[pEvent->GetParam1()][pEvent->GetChannel()];
                     if (IsOn(pEvent->GetChannelEventType(), pEvent->GetParam2())) {
-                        sStack.push(i);
+                        NoteQueue.push(eventindex);
                     }
                     else {
-                        if (!sStack.empty()) {
-                            auto pTop = sStack.front();
-                            sStack.pop();
+                        if (!NoteQueue.empty()) {
+                            idx_t pTop = NoteQueue.front();
+                            NoteQueue.pop();
                             pEvent->SetSisterIdx(pTop);
-                            reinterpret_cast<MIDIChannelEvent*>(vEvents[pTop])->SetSisterIdx(i);
+                            reinterpret_cast<MIDIChannelEvent*>(vEvents[pTop])->SetSisterIdx(eventindex);
                         }
                     }
                 }
             }
         }
+        for (key_t Key = 0; Key < (1 << 7); ++Key) for (chan_t Ch = 0; Ch < (1 << 4); ++Ch) queue<idx_t>().swap(NoteQueues[Key][Ch]);
         g_LoadingProgress.progress++;
-        });
+    }
 }
-
 
 //-----------------------------------------------------------------------------
 // MIDITrack functions
@@ -1079,7 +1073,7 @@ MIDITrack::~MIDITrack(void)
 
 void MIDITrack::clear(void)
 {
-    m_vEvents.clear();
+    vector<MIDIEvent*>().swap(m_vEvents);
     m_TrackInfo.clear();
 }
 

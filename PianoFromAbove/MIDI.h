@@ -278,7 +278,7 @@ public:
         msg_t aProgram[16];
     };
     const MIDITrackInfo& GetInfo() const { return m_TrackInfo; }
-    void ClearEvents() { m_vEvents.clear(); m_vEvents.shrink_to_fit(); }
+    void ClearEvents() { vector<MIDIEvent*>().swap(m_vEvents); }
 
 private:
     MIDITrackInfo m_TrackInfo;
