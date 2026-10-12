@@ -890,6 +890,13 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
         }
         break;
     }
+    case WM_MOUSEWHEEL:
+    {
+        bool StartTimer = (JumpTarget == ~0);
+        JumpTarget = static_cast<mms_t>(m_llStartTime + cControls.dFwdBackSecs * S * (static_cast<double>(GET_WHEEL_DELTA_WPARAM(wParam)) / static_cast<double>(WHEEL_DELTA)));
+        if (StartTimer) SetTimer(g_hWnd, IDC_POSNDELAY, nxtdelay, NULL); //Async JumpTo process
+        return Success;
+    }
     // These are doubled from MainProcs.cpp. Allows to get rid of the Ctrl requirement for accellerators
     case WM_DEVICECHANGE:
         if (cAudio.bKDMAPI) {
@@ -2391,6 +2398,9 @@ void MainScreen::RenderText() {
     if (cControls.bDumpFrames) {
         Lines -= 1; //Don't show FPS when exporting videos
     }
+    if (cVideo.bDisableUI) {
+        Lines = 2; //Still gotta keep the version number
+    }
 
     // Screen info
     RECT rcStatus = { m_pRenderer->GetBufferWidth() - StatisticsWidth, 0, m_pRenderer->GetBufferWidth(), 16 * Lines + 8 };
@@ -2469,10 +2479,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
     mms_t tcs = (abs(m_llMaxTime) % 1000000) / 100000;
     double tempo = 60000000.0 / m_iMicroSecsPerBeat;
     uint8_t cur_line = 0;
-
-    if (!cVideo.bDisableUI) {
-        m_pRenderer->AddGDIRect(prcStatus->left, prcStatus->top, prcStatus->right - prcStatus->left, prcStatus->bottom - prcStatus->top, 0x80000000);
-    }
+    m_pRenderer->AddGDIRect(prcStatus->left, prcStatus->top, prcStatus->right - prcStatus->left, prcStatus->bottom - prcStatus->top, 0x80000000);
 
     string TotalTimeFormatted = to_string(abs(m_llMaxTime));
     uint8_t Splits = 0;
@@ -2515,9 +2522,9 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
     for (signed short i = npsFormatted.length() - DigitSeparate; i > 0; i -= DigitSeparate)
         npsFormatted.insert(i, L",");
 
-    if (Config::GetConfig().GetVideoSettings().bDisableUI) goto NoStats;
     RenderStatusLine(cur_line++, StatisticsText1, L"%s", L"v" VersionString);
     RenderStatusLine(cur_line++, StatisticsText2, L"");
+    if (Config::GetConfig().GetVideoSettings().bDisableUI) goto NoStats;
     RenderStatusLine(cur_line++, L"", L"");
     RenderStatusLine(cur_line++, StatisticsText3, L"%s%lld:%02lld.%lld / %s%lld:%02lld.%lld",
         m_llStartTime < 0 ? L"-" : L"",

@@ -393,6 +393,8 @@ LRESULT WINAPI GfxProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         if (lParam && wParam != VK_TAB) lr |= DLGC_WANTMESSAGE;
         return lr;
     }
+    case WM_MOUSEWHEEL:
+        HandOffMsg(WM_MOUSEWHEEL, wParam, lParam);
     // Pop up the library/controls if mouse is close enough
     case WM_MOUSEMOVE:
     {
@@ -798,13 +800,7 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         return 0;
     }
     case WM_MOUSEWHEEL:
-    {
-        RECT rcChannel, rcThumbOld;
-        GetChannelRect(hWnd, &rcChannel);
-        GetThumbRect(hWnd, iPosition, &rcChannel, &rcThumbOld);
-        winword_t iPositionNew = iPosition + (GET_WHEEL_DELTA_WPARAM(wParam) / (WHEEL_DELTA / 6));
-        MoveThumbPosition(iPositionNew, iPosition, hWnd, &rcChannel, &rcThumbOld);
-    }
+        HandOffMsg(WM_MOUSEWHEEL, wParam, lParam);
     case WM_LBUTTONDOWN:
     case WM_RBUTTONDOWN:
     {
@@ -822,7 +818,6 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             MoveThumbPosition(iPositionNew, iPosition, hWnd, &rcChannel, &rcThumb);
             bTracking = TRUE;
             SetCapture(hWnd);
-            SetFocus(hWnd);
         }
         return 0;
     }
