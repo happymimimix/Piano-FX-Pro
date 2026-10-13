@@ -101,52 +101,20 @@ inline wstring GetExePath(void) {
     return szFilePath;
 }
 
-//The timer
-class Timer
-{
+//-----------------------------------------------------------------------------
+// The Timer class
+//-----------------------------------------------------------------------------
+
+class DeltaPerformanceCounter {
+    mms_t LastQuery = 0;
+    mms_t ConstantDelta = 0;
+    mms_t TimerResolution = 0;
 public:
-    // Initializes variables
-    ~Timer();
-    void Init(bool manual);
-
-    // The various clock actions
-    void Start();
-    void Pause();
-    void Unpause();
-
-    // Gets the timer's time
-    double GetSecs();
-    mms_t GetMicroSecs();
-    mms_t GetTicks();
-    mms_t GetTicksPerSec() { return m_llTicksPerSec; }
-
-    // Status accessors
-    bool IsStarted() { return m_bStarted; }
-    bool IsPaused() { return m_bPaused; }
-
-    // Manual timer stuff
-    void AddManualTime(mms_t time);
-    void SetFrameRate(mms_t rate);
-    void IncrementFrame();
-    bool m_bManualTimer;
-    double m_dFramerate;
-
-private:
-    // Timer stuff
-    mms_t GetRawTicks();
-    mms_t m_llStartTicks;
-    mms_t m_llTicksPerSec;
-
-    // More manual timer stuff
-    mms_t m_llManualTicks;
-    mms_t m_llManualTicksPerFrame;
-
-    // Ticks stored when the timer was paused
-    mms_t m_llPausedTicks;
-
-    // Timer status
-    bool m_bStarted;
-    bool m_bPaused;
+    DeltaPerformanceCounter();
+    mms_t QueryDeltaPerformanceCounter();
+    mms_t QueryDeltaPerformanceFrequency() { return TimerResolution; }
+    mms_t QueryRealDeltaPerformanceCounter();
+    void SetConstantDelta(mms_t Delta) { ConstantDelta = Delta; }
 };
 
 //-----------------------------------------------------------------------------

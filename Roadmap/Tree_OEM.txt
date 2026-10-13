@@ -129,6 +129,8 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „¥„Ÿ„Ÿ„ŸBitset based state tracking
 „    „    „¤„Ÿ„Ÿ„ŸDONE
+„    „¥„Ÿ„Ÿ„ŸDeltaQPC based timer with support for toggling manual timer toggle anywhere
+„    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „¥„Ÿ„Ÿ„ŸDump played events
 „    „    „¥„Ÿ„Ÿ„ŸBasic SMF0 writer
 „    „    „    „¤„Ÿ„Ÿ„ŸTODO
@@ -243,6 +245,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¤„Ÿ„Ÿ„ŸSlider 'Saturation'
 „    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „¥„Ÿ„Ÿ„ŸAdd 'Mouse wheel scroll skips [____]x more than arrow keys.' to controls
 „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Dump midi output' to track selection
 „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Full screen capture' to controls (Next to video output)

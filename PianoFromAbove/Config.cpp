@@ -172,6 +172,8 @@ void ControlsSettings::LoadDefaultValues()
     sSplashMIDI = L"";
     iVelocityThreshold = 1;
     bDumpFrames = false;
+    bManualTimer = false;
+    bPianoOverride = false;
 }
 
 void PlaybackSettings::LoadDefaultValues()
@@ -360,9 +362,14 @@ void ControlsSettings::LoadConfigValues(TiXmlElement* txRoot)
     if (txControls->QueryStringAttribute("SplashMIDI", &sTempStr) == TIXML_SUCCESS)
         sSplashMIDI = Util::StringToWstring(sTempStr);
     if (txControls->QueryIntAttribute("VelocityThreshold", &iAttrVal) == TIXML_SUCCESS)
-        iVelocityThreshold = *reinterpret_cast<key_t*>(&iAttrVal);
+        iVelocityThreshold = *reinterpret_cast<key_t*>(&iAttrVal) & 0x7F;
     if (txControls->QueryBoolAttribute("DumpFrames", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
         bDumpFrames = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
+    if (txControls->QueryBoolAttribute("ManualTimer", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
+        bManualTimer = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
+    if (txControls->QueryIntAttribute("InstrumentOverride", &iAttrVal) == TIXML_SUCCESS)
+        eInstrumentOverride = *reinterpret_cast<key_t*>(&iAttrVal);
+    if (eInstrumentOverride != 0x80) eInstrumentOverride &= 0x7F;
 }
 
 void PlaybackSettings::LoadConfigValues(TiXmlElement* txRoot)
@@ -537,6 +544,8 @@ bool ControlsSettings::SaveConfigValues(TiXmlElement* txRoot)
     txControls->SetAttribute("SplashMIDI", Util::WstringToString(sSplashMIDI));
     txControls->SetAttribute("VelocityThreshold", static_cast<int>(key_t(iVelocityThreshold)));
     txControls->SetAttribute("DumpFrames", bDumpFrames ? "yes" : "no");
+    txControls->SetAttribute("ManualTimer", bManualTimer ? "yes" : "no");
+    txControls->SetAttribute("InstrumentOverride", static_cast<int>(key_t(eInstrumentOverride)));
     return true;
 }
 

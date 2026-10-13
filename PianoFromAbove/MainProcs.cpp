@@ -818,6 +818,7 @@ LRESULT WINAPI PosnProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             MoveThumbPosition(iPositionNew, iPosition, hWnd, &rcChannel, &rcThumb);
             bTracking = TRUE;
             SetCapture(hWnd);
+            SetFocus(hWnd);
         }
         return 0;
     }

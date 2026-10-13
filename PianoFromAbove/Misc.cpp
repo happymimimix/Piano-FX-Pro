@@ -17,111 +17,25 @@
 // The Timer class
 //-----------------------------------------------------------------------------
 
-Timer::~Timer()
-{
-    if (!m_bManualTimer)
-        timeEndPeriod(1);
+DeltaPerformanceCounter::DeltaPerformanceCounter() {
+    LARGE_INTEGER Temp = {};
+    QueryPerformanceFrequency(&Temp);
+    TimerResolution = Temp.QuadPart;
+    QueryRealDeltaPerformanceCounter();
 }
 
-void Timer::Init(bool manual) {
-    // Get the frequency. This should be done in a static constructor. Oh well.
-    m_bManualTimer = manual;
-    m_llManualTicks = 0;
-    if (!m_bManualTimer) {
-        timeBeginPeriod(1);
-        m_llTicksPerSec = 1000;
-    }
-    else {
-        m_llManualTicksPerFrame = 100;
-        m_llTicksPerSec = 10000;
-    }
+mms_t DeltaPerformanceCounter::QueryDeltaPerformanceCounter() {
+    if (ConstantDelta) return ConstantDelta;
+    else return QueryRealDeltaPerformanceCounter();
+};
 
-    // Initialize status
-    m_bStarted = m_bPaused = false;
-    m_llStartTicks = m_llPausedTicks = 0;
-}
-
-// Start/reset the timer
-void Timer::Start()
-{
-    m_bStarted = true;
-    m_bPaused = false;
-    m_llStartTicks = GetRawTicks();
-}
-
-// Pause
-void Timer::Pause()
-{
-    if (m_bStarted && !m_bPaused)
-    {
-        m_bPaused = true;
-        m_llPausedTicks = GetRawTicks() - m_llStartTicks;
-    }
-}
-
-// Unpause or start
-void Timer::Unpause()
-{
-    if (!m_bStarted)
-        Start();
-
-    if (!m_bPaused)
-    {
-        m_bPaused = false;
-        m_llStartTicks = GetRawTicks() - m_llPausedTicks;
-    }
-}
-
-// Elapsed ticks since start
-mms_t Timer::GetTicks()
-{
-    if (m_bStarted)
-    {
-        if (m_bPaused)
-            return m_llPausedTicks;
-        else
-            return GetRawTicks() - m_llStartTicks;
-    }
-
-    return 0;
-}
-
-// Elapsed micro seconds since start
-// Assuming 3,000,000 ticks/sec this will overflow in 35 days
-mms_t Timer::GetMicroSecs()
-{
-    return (GetTicks() * 1000000LL) / m_llTicksPerSec;
-}
-
-double Timer::GetSecs()
-{
-    return static_cast<double>(GetTicks()) / m_llTicksPerSec;
-}
-
-// Private. Hits the API for the tick count.
-mms_t Timer::GetRawTicks()
-{
-    if (m_bManualTimer)
-        return m_llManualTicks;
-    else
-        return timeGetTime();
-}
-
-void Timer::AddManualTime(mms_t time)
-{
-    m_llManualTicks += time;
-}
-
-void Timer::SetFrameRate(mms_t rate)
-{
-    m_llTicksPerSec = rate * 100;
-    m_dFramerate = rate;
-}
-
-void Timer::IncrementFrame()
-{
-    m_llManualTicks += m_llManualTicksPerFrame;
-}
+mms_t DeltaPerformanceCounter::QueryRealDeltaPerformanceCounter() {
+    LARGE_INTEGER Temp = {};
+    QueryPerformanceCounter(&Temp);
+    mms_t Delta = Temp.QuadPart - LastQuery;
+    LastQuery = Temp.QuadPart;
+    return Delta;
+};
 
 //-----------------------------------------------------------------------------
 // Small utility functions

@@ -86,12 +86,14 @@ struct ControlsSettings : public ISettings
     void LoadConfigValues(TiXmlElement* txRoot);
     bool SaveConfigValues(TiXmlElement* txRoot);
 
-    double dFwdBackSecs, dSpeedUpPct;
+    double dFwdBackSecs, dSpeedUpPct, dWheelMul;
     bool bAlwaysShowControls;
     bool bPhigros;
     key_t iVelocityThreshold;
     wstring sSplashMIDI;
     bool bDumpFrames;
+    bool bManualTimer;
+    bool eInstrumentOverride;
 };
 
 class PlaybackSettings : public ISettings
@@ -218,9 +220,6 @@ public:
     void SetAudioSettings(const AudioSettings& audioSettings) { m_AudioSettings = audioSettings; }
     void SetVideoSettings(const VideoSettings& videoSettings) { m_VideoSettings = videoSettings; }
     void SetControlsSettings(const ControlsSettings& ControlsSettings) { m_ControlsSettings = ControlsSettings; }
-
-    bool m_bManualTimer = false;
-    bool m_bPianoOverride = false;
 
 private:
     // Singleton
