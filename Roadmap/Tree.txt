@@ -368,6 +368,8 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │       │   └───DONE
 │   │   │       └───Core
 │   │   │           └───DONE
+│   │   ├───[NEW] Edit DX11 projection matrix (360 Piano Rotation!!!)
+│   │   │   └───TODO
 │   │   └───[NEW] Inject any midi event
 │   │       ├───Reading from buffer and process events in Logic()
 │   │       │   ├───Clean up and free memory
