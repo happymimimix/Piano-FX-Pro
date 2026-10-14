@@ -80,16 +80,32 @@
 #define IDC_UDARROWS                    603
 #define IDC_UDARROWSSPIN                604
 #define IDS_CENTS                       IDC_STATIC
-#define IDC_SHOWCONTROLS                605
-#define IDC_PHIGROS                     606
+#define IDS_WHEELMUL                    IDC_STATIC
+#define IDC_WHEELMUL                    605
+#define IDC_WHEELMULSPIN                606
+#define IDS_TIMESMORE                   IDC_STATIC
+#define IDC_SHOWCONTROLS                607
+#define IDC_PHIGROS                     608
 #define IDS_SPLASHMIDI                  IDC_STATIC
-#define IDC_SPLASHMIDI                  607
-#define IDC_SPLASHBROWSE                608
-#define IDC_SPLASHRESET                 609
+#define IDC_SPLASHMIDI                  609
+#define IDC_SPLASHBROWSE                610
+#define IDC_SPLASHRESET                 611
 #define IDS_VELSTRSHLD                  IDC_STATIC
-#define IDC_VELSTRSHLD                  610
-#define IDC_VELSTRSHLDSPIN              611
-#define IDC_FFMPEG                      612
+#define IDC_VELSTRSHLD                  612
+#define IDC_VELSTRSHLDSPIN              613
+#define IDS_INSTRUMENT                  IDC_STATIC
+#define IDC_INSTRUMENT                  614
+#define IDC_NOLAG                       615
+
+#define IDS_EXPORT                      IDC_STATIC
+#define IDC_FFMPEG                      701
+#define IDC_FULLSCREENGRAB              702
+#define IDS_VIDEOFPS                    IDC_STATIC
+#define IDC_VIDEOFPS                    703
+#define IDC_VIDEOFPSSPIN                704
+#define IDS_FPS                         IDC_STATIC
+#define IDC_MIDIDUMP                    705
+#define IDC_PRECISEDUMP                 706
 
 #define IDS_FILE                        IDC_STATIC
 #define IDC_FILE                        801
@@ -100,8 +116,6 @@
 #define IDS_LENGTH                      IDC_STATIC
 #define IDC_LENGTH                      804
 #define IDC_TRACKS                      805
-#define IDC_NOLAG                       806
-#define IDC_PIANO                       807
 #define IDC_TRACK_PLAY                  IDOK
 #define IDC_TRACK_ABORT                 IDCANCEL
 

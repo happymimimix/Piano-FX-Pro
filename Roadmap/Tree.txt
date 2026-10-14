@@ -188,6 +188,9 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │       │   └───TODO
 │   │       └───Translation
 │   │           └───TODO
+│   ├───Menu
+│   │   └───New 'Replay skipped midi events' item in Play
+│   │       └───TODO
 │   ├───New git-based about screen
 │   │   ├───Parse commit
 │   │   │   └───TODO
@@ -250,7 +253,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   └───Slider 'Saturation'
 │   │   │       └───TODO
 │   │   ├───Add 'Mouse wheel scroll skips [____]x more than arrow keys.' to controls
-│   │   ├───Add '[ ] Audio output' to track selection
+│   │   ├───Add '[ ] Dump midi output' to track selection
 │   │   │   └───TODO
 │   │   ├───Add '[ ] Full screen capture' to controls (Next to video output)
 │   │   │   └───TODO
@@ -271,13 +274,11 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   ├───Add new preference page 'Export'
 │   │   │   ├───Add 'Video frame rate [____]' to this new page
 │   │   │   │   └───TODO
-│   │   │   ├───Add '[ ] Precise audio timing' to this new page
+│   │   │   ├───Add '[ ] Precise event timestamp' to this new page
 │   │   │   │   └───TODO
-│   │   │   ├───Move '[ ] Audio output' to this new page
+│   │   │   ├───Move '[ ] Dump midi output' to this new page
 │   │   │   │   └───TODO
 │   │   │   ├───Move '[ ] Full screen capture' to this new page
-│   │   │   │   └───TODO
-│   │   │   ├───Move '[ ] Slow down instead of lag' to this new page
 │   │   │   │   └───TODO
 │   │   │   └───Move '[ ] Video output' to this new page
 │   │   │       └───TODO
