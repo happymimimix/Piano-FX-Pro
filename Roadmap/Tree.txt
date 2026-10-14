@@ -373,7 +373,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │       │   │   └───TODO
 │   │       │   ├───Play events
 │   │       │   │   └───TODO
-│   │       │   └───Process pith bend, color, tempo, port change events
+│   │       │   └───Process pitch bend, color, tempo, port change events
 │   │       │       ├───Color events
 │   │       │       │   └───TODO
 │   │       │       ├───Pitch bend events
