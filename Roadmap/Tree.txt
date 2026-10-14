@@ -134,7 +134,9 @@ D:\PIANO-FX-PRO\ROADMAP
 │   ├───Dump played events
 │   │   ├───Basic SMF0 writer
 │   │   │   └───TODO
-│   │   └───Logic loop
+│   │   ├───Logic loop
+│   │   │   └───TODO
+│   │   └───Precise timing support (not rounded to frames)
 │   │       └───TODO
 │   ├───Exponential search optimization
 │   │   └───DONE
@@ -156,6 +158,8 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   └───Vertical flip
 │   │       └───DONE
 │   ├───Language pack upgrade
+│   │   ├───Add localized instrument names
+│   │   │   └───TODO
 │   │   ├───Arinoglish
 │   │   │   └───Updates required
 │   │   ├───Chinese
@@ -246,7 +250,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   └───Slider 'Saturation'
 │   │   │       └───TODO
 │   │   ├───Add 'Mouse wheel scroll skips [____]x more than arrow keys.' to controls
-│   │   ├───Add '[ ] Dump midi output' to track selection
+│   │   ├───Add '[ ] Audio output' to track selection
 │   │   │   └───TODO
 │   │   ├───Add '[ ] Full screen capture' to controls (Next to video output)
 │   │   │   └───TODO
@@ -264,7 +268,22 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   └───TODO
 │   │   ├───Add '[x] Auto Play (Not implemented and probably never will)' to controls and make it checked and disabled forever
 │   │   │   └───TODO
-│   │   └───Move '[ ] Piano override' to controls
+│   │   ├───Add new preference page 'Export'
+│   │   │   ├───Add 'Video frame rate [____]' to this new page
+│   │   │   │   └───TODO
+│   │   │   ├───Add '[ ] Precise audio timing' to this new page
+│   │   │   │   └───TODO
+│   │   │   ├───Move '[ ] Audio output' to this new page
+│   │   │   │   └───TODO
+│   │   │   ├───Move '[ ] Full screen capture' to this new page
+│   │   │   │   └───TODO
+│   │   │   ├───Move '[ ] Slow down instead of lag' to this new page
+│   │   │   │   └───TODO
+│   │   │   └───Move '[ ] Video output' to this new page
+│   │   │       └───TODO
+│   │   ├───Move '[ ] Piano override' to controls
+│   │   │   └───TODO
+│   │   └───Replace '[ ] Piano override' with a new 'Instrument override [____]' drop down (Format '[000] Acoustic Grand Piano' or 'Disabled')
 │   │       └───TODO
 │   ├───Replay skipped events
 │   │   └───DONE
@@ -340,14 +359,33 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │       └───Gave up because of the Lua heap corruption nightmare
 │   │   ├───Design
 │   │   │   └───DONE
-│   │   └───Implementation
-│   │       ├───Generate animation code
-│   │       │   └───Almost!
-│   │       └───Write CE template to clipboard
-│   │           ├───Automatic memory address generation
-│   │           │   └───DONE
-│   │           └───Core
-│   │               └───DONE
+│   │   ├───Implementation
+│   │   │   ├───Generate animation code
+│   │   │   │   └───Almost!
+│   │   │   └───Write CE template to clipboard
+│   │   │       ├───Automatic memory address generation
+│   │   │       │   └───DONE
+│   │   │       └───Core
+│   │   │           └───DONE
+│   │   └───[NEW] Inject any midi event
+│   │       ├───Reading from buffer and process events in Logic()
+│   │       │   ├───Clean up and free memory
+│   │       │   │   └───TODO
+│   │       │   ├───Play events
+│   │       │   │   └───TODO
+│   │       │   └───Process pith bend, color, tempo, port change events
+│   │       │       ├───Color events
+│   │       │       │   └───TODO
+│   │       │       ├───Pitch bend events
+│   │       │       │   └───TODO
+│   │       │       ├───Port chabge events
+│   │       │       │   └───TODO
+│   │       │       └───Tempo events (set playback speed multiplier)
+│   │       │           └───TODO
+│   │       ├───Resizable buffer
+│   │       │   └───TODO
+│   │       └───Writing to buffer
+│   │           └───TODO
 │   ├───Colorize
 │   │   ├───Design
 │   │   │   └───TODO

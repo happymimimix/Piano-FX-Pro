@@ -134,7 +134,9 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „¥„Ÿ„Ÿ„ŸDump played events
 „    „    „¥„Ÿ„Ÿ„ŸBasic SMF0 writer
 „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „¤„Ÿ„Ÿ„ŸLogic loop
+„    „    „¥„Ÿ„Ÿ„ŸLogic loop
+„    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „¤„Ÿ„Ÿ„ŸPrecise timing support (not rounded to frames)
 „    „        „¤„Ÿ„Ÿ„ŸTODO
 „    „¥„Ÿ„Ÿ„ŸExponential search optimization
 „    „    „¤„Ÿ„Ÿ„ŸDONE
@@ -156,6 +158,8 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „¤„Ÿ„Ÿ„ŸVertical flip
 „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „¥„Ÿ„Ÿ„ŸLanguage pack upgrade
+„    „    „¥„Ÿ„Ÿ„ŸAdd localized instrument names
+„    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „¥„Ÿ„Ÿ„ŸArinoglish
 „    „    „    „¤„Ÿ„Ÿ„ŸUpdates required
 „    „    „¥„Ÿ„Ÿ„ŸChinese
@@ -246,7 +250,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „¤„Ÿ„Ÿ„ŸSlider 'Saturation'
 „    „    „        „¤„Ÿ„Ÿ„ŸTODO
 „    „    „¥„Ÿ„Ÿ„ŸAdd 'Mouse wheel scroll skips [____]x more than arrow keys.' to controls
-„    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Dump midi output' to track selection
+„    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Audio output' to track selection
 „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Full screen capture' to controls (Next to video output)
 „    „    „    „¤„Ÿ„Ÿ„ŸTODO
@@ -264,7 +268,22 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „¥„Ÿ„Ÿ„ŸAdd '[x] Auto Play (Not implemented and probably never will)' to controls and make it checked and disabled forever
 „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „¤„Ÿ„Ÿ„ŸMove '[ ] Piano override' to controls
+„    „    „¥„Ÿ„Ÿ„ŸAdd new preference page 'Export'
+„    „    „    „¥„Ÿ„Ÿ„ŸAdd 'Video frame rate [____]' to this new page
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Precise audio timing' to this new page
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸMove '[ ] Audio output' to this new page
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸMove '[ ] Full screen capture' to this new page
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸMove '[ ] Slow down instead of lag' to this new page
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¤„Ÿ„Ÿ„ŸMove '[ ] Video output' to this new page
+„    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „¥„Ÿ„Ÿ„ŸMove '[ ] Piano override' to controls
+„    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „¤„Ÿ„Ÿ„ŸReplace '[ ] Piano override' with a new 'Instrument override [____]' drop down (Format '[000] Acoustic Grand Piano' or 'Disabled')
 „    „        „¤„Ÿ„Ÿ„ŸTODO
 „    „¥„Ÿ„Ÿ„ŸReplay skipped events
 „    „    „¤„Ÿ„Ÿ„ŸDONE
@@ -340,14 +359,33 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „        „¤„Ÿ„Ÿ„ŸGave up because of the Lua heap corruption nightmare
 „    „    „¥„Ÿ„Ÿ„ŸDesign
 „    „    „    „¤„Ÿ„Ÿ„ŸDONE
-„    „    „¤„Ÿ„Ÿ„ŸImplementation
-„    „        „¥„Ÿ„Ÿ„ŸGenerate animation code
-„    „        „    „¤„Ÿ„Ÿ„ŸAlmost!
-„    „        „¤„Ÿ„Ÿ„ŸWrite CE template to clipboard
-„    „            „¥„Ÿ„Ÿ„ŸAutomatic memory address generation
-„    „            „    „¤„Ÿ„Ÿ„ŸDONE
-„    „            „¤„Ÿ„Ÿ„ŸCore
-„    „                „¤„Ÿ„Ÿ„ŸDONE
+„    „    „¥„Ÿ„Ÿ„ŸImplementation
+„    „    „    „¥„Ÿ„Ÿ„ŸGenerate animation code
+„    „    „    „    „¤„Ÿ„Ÿ„ŸAlmost!
+„    „    „    „¤„Ÿ„Ÿ„ŸWrite CE template to clipboard
+„    „    „        „¥„Ÿ„Ÿ„ŸAutomatic memory address generation
+„    „    „        „    „¤„Ÿ„Ÿ„ŸDONE
+„    „    „        „¤„Ÿ„Ÿ„ŸCore
+„    „    „            „¤„Ÿ„Ÿ„ŸDONE
+„    „    „¤„Ÿ„Ÿ„Ÿ[NEW] Inject any midi event
+„    „        „¥„Ÿ„Ÿ„ŸReading from buffer and process events in Logic()
+„    „        „    „¥„Ÿ„Ÿ„ŸClean up and free memory
+„    „        „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „        „    „¥„Ÿ„Ÿ„ŸPlay events
+„    „        „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „        „    „¤„Ÿ„Ÿ„ŸProcess pith bend, color, tempo, port change events
+„    „        „        „¥„Ÿ„Ÿ„ŸColor events
+„    „        „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „        „        „¥„Ÿ„Ÿ„ŸPitch bend events
+„    „        „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „        „        „¥„Ÿ„Ÿ„ŸPort chabge events
+„    „        „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „        „        „¤„Ÿ„Ÿ„ŸTempo events (set playback speed multiplier)
+„    „        „            „¤„Ÿ„Ÿ„ŸTODO
+„    „        „¥„Ÿ„Ÿ„ŸResizable buffer
+„    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „        „¤„Ÿ„Ÿ„ŸWriting to buffer
+„    „            „¤„Ÿ„Ÿ„ŸTODO
 „    „¥„Ÿ„Ÿ„ŸColorize
 „    „    „¥„Ÿ„Ÿ„ŸDesign
 „    „    „    „¤„Ÿ„Ÿ„ŸTODO
