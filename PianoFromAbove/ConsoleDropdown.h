@@ -6,8 +6,8 @@ struct ConsoleDropdown {
 
     void Create(uint8_t x, uint8_t y, uint8_t w, uint8_t h) {
         if (this->hDropdown != NULL) {
-            cout << "[1;1H[40m[91mERROR: Trying to create a dropdown menu that already exist! \n";
-            cout << "\nThe program will now stop. \n";
+            wcout << L"[1;1H[40m[91mERROR: Trying to create a dropdown menu that already exist! \n";
+            wcout << L"\nThe program will now stop. \n";
             for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
@@ -35,8 +35,8 @@ struct ConsoleDropdown {
             💬();
         }
         else {
-            cout << "[1;1H[40m[91mERROR: Trying to add items to a dropdown menu that doesn't exist! \n";
-            cout << "\nThe program will now stop. \n";
+            wcout << L"[1;1H[40m[91mERROR: Trying to add items to a dropdown menu that doesn't exist! \n";
+            wcout << L"\nThe program will now stop. \n";
             for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
@@ -51,8 +51,8 @@ struct ConsoleDropdown {
             return Choice;
         }
         else {
-            cout << "[1;1H[40m[91mERROR: Trying to grab selection from a dropdown menu that doesn't exist! \n";
-            cout << "\nThe program will now stop. \n";
+            wcout << L"[1;1H[40m[91mERROR: Trying to grab selection from a dropdown menu that doesn't exist! \n";
+            wcout << L"\nThe program will now stop. \n";
             for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
@@ -69,8 +69,8 @@ struct ConsoleDropdown {
             return Content;
         }
         else {
-            cout << "[1;1H[40m[91mERROR: Trying to grab selection from a dropdown menu that doesn't exist! \n";
-            cout << "\nThe program will now stop. \n";
+            wcout << L"[1;1H[40m[91mERROR: Trying to grab selection from a dropdown menu that doesn't exist! \n";
+            wcout << L"\nThe program will now stop. \n";
             for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
@@ -85,12 +85,12 @@ struct ConsoleDropdown {
                 💬();
             }
             else {
-                cout << "[1;1H[40m[91mERROR: Cannot set selection index ";
-                cout << IDX;
-                cout << " to a dropdown menu that has only ";
-                cout << SendMessageW(this->hDropdown, CB_GETCOUNT, 0, 0);
-                cout << " items! \n";
-                cout << "\nThe program will now stop. \n";
+                wcout << L"[1;1H[40m[91mERROR: Cannot set selection index ";
+                wcout << IDX;
+                wcout << L" to a dropdown menu that has only ";
+                wcout << SendMessageW(this->hDropdown, CB_GETCOUNT, 0, 0);
+                wcout << L" items! \n";
+                wcout << L"\nThe program will now stop. \n";
                 for (;;) {
                     // Make the program hang instead of closing! 
                     // This way the user can clearly see the error message. 
@@ -98,8 +98,8 @@ struct ConsoleDropdown {
             }
         }
         else {
-            cout << "[1;1H[40m[91mERROR: Trying to set selection to a dropdown menu that doesn't exist! \n";
-            cout << "\nThe program will now stop. \n";
+            wcout << L"[1;1H[40m[91mERROR: Trying to set selection to a dropdown menu that doesn't exist! \n";
+            wcout << L"\nThe program will now stop. \n";
             for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
@@ -114,8 +114,8 @@ struct ConsoleDropdown {
             💬();
         }
         else {
-            cout << "[1;1H[40m[91mERROR: Trying to delete a dropdown menu that doesn't exist! \n";
-            cout << "\nThe program will now stop. \n";
+            wcout << L"[1;1H[40m[91mERROR: Trying to delete a dropdown menu that doesn't exist! \n";
+            wcout << L"\nThe program will now stop. \n";
             for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
@@ -129,8 +129,8 @@ struct ConsoleDropdown {
             💬();
         }
         else {
-            cout << "[1;1H[40m[91mERROR: Trying to hide a dropdown menu that doesn't exist! \n";
-            cout << "\nThe program will now stop. \n";
+            wcout << L"[1;1H[40m[91mERROR: Trying to hide a dropdown menu that doesn't exist! \n";
+            wcout << L"\nThe program will now stop. \n";
             for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
@@ -144,8 +144,8 @@ struct ConsoleDropdown {
             💬();
         }
         else {
-            cout << "[1;1H[40m[91mERROR: Trying to show a dropdown menu that doesn't exist! \n";
-            cout << "\nThe program will now stop. \n";
+            wcout << L"[1;1H[40m[91mERROR: Trying to show a dropdown menu that doesn't exist! \n";
+            wcout << L"\nThe program will now stop. \n";
             for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
@@ -159,8 +159,8 @@ struct ConsoleDropdown {
             💬();
         }
         else {
-            cout << "[1;1H[40m[91mERROR: Trying to disable a dropdown menu that doesn't exist! \n";
-            cout << "\nThe program will now stop. \n";
+            wcout << L"[1;1H[40m[91mERROR: Trying to disable a dropdown menu that doesn't exist! \n";
+            wcout << L"\nThe program will now stop. \n";
             for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
@@ -174,8 +174,8 @@ struct ConsoleDropdown {
             💬();
         }
         else {
-            cout << "[1;1H[40m[91mERROR: Trying to enable a dropdown menu that doesn't exist! \n";
-            cout << "\nThe program will now stop. \n";
+            wcout << L"[1;1H[40m[91mERROR: Trying to enable a dropdown menu that doesn't exist! \n";
+            wcout << L"\nThe program will now stop. \n";
             for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 

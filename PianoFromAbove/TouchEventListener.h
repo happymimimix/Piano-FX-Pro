@@ -41,8 +41,8 @@ struct TouchEventManager {
     }
     static void Delete(TouchEventListener* &ListenerPointer) {
         if (ListenerPointer == nullptr) {
-            cout << "[1;1H[40m[91mERROR: Trying to remove a touch event listener that doesn't exist! \n";
-            cout << "\nThe program will now stop. \n";
+            wcout << "[1;1H[40m[91mERROR: Trying to remove a touch event listener that doesn't exist! \n";
+            wcout << "\nThe program will now stop. \n";
             for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
@@ -71,25 +71,25 @@ struct TouchEventManager {
                 }
                 else {
                     // Oh no! We're triggering more than one TouchEventListeners at the same time! 
-                    cout << "[1;1H[40m[91mERROR: Touch event listeners cannot overlap! \n\n";
-                    cout << "The TouchEventListener at (";
-                    cout << (int)Touched->X;
-                    cout << ", ";
-                    cout << (int)Touched->Y;
-                    cout << ") with size ";
-                    cout << (int)Touched->W;
-                    cout << " * ";
-                    cout << (int)Touched->H;
-                    cout << " is overlapping with another TouchEventListener at (";
-                    cout << (int)CurrentListener->X;
-                    cout << ", ";
-                    cout << (int)CurrentListener->Y;
-                    cout << ") with size ";
-                    cout << (int)CurrentListener->W;
-                    cout << " * ";
-                    cout << (int)CurrentListener->H;
-                    cout << "! \n";
-                    cout << "\nThe program will now stop. \n";
+                    wcout << "[1;1H[40m[91mERROR: Touch event listeners cannot overlap! \n\n";
+                    wcout << "The TouchEventListener at (";
+                    wcout << (int)Touched->X;
+                    wcout << ", ";
+                    wcout << (int)Touched->Y;
+                    wcout << ") with size ";
+                    wcout << (int)Touched->W;
+                    wcout << " * ";
+                    wcout << (int)Touched->H;
+                    wcout << " is overlapping with another TouchEventListener at (";
+                    wcout << (int)CurrentListener->X;
+                    wcout << ", ";
+                    wcout << (int)CurrentListener->Y;
+                    wcout << ") with size ";
+                    wcout << (int)CurrentListener->W;
+                    wcout << " * ";
+                    wcout << (int)CurrentListener->H;
+                    wcout << "! \n";
+                    wcout << "\nThe program will now stop. \n";
                     for (;;) {
                         // Make the program hang instead of closing! 
                         // This way the user can clearly see the error message. 

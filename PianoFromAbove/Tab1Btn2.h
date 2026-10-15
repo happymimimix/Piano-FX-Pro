@@ -58,10 +58,10 @@ void Tab1::SubViewBtn2::Open() {
         FillConsole(3, 17, 50, 9, ' ', 0x0F);
     };
     Close->OnHover = [&]() {
-        cout << "[8;66H[44m[93mx";
+        wcout << "[8;66H[44m[93mx";
     };
     Close->OnLeave = [&]() {
-        cout << "[8;66H[44m[91mx";
+        wcout << "[8;66H[44m[91mx";
     };
     Path.Create(6, 10, 51, 2);
     Path.SetText(L"C:\\Program Files (x86)\\Image-Line\\FL Studio 12");

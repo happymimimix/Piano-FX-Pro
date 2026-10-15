@@ -35,9 +35,9 @@ void inline 🖥() {
     CONSOLE_FONT_INFOEX cfi;
     cfi.cbSize = sizeof(CONSOLE_FONT_INFOEX);
     if (!GetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), FALSE, &cfi)) {
-        cout << "[1;1H[40m[91mERROR: Unable to get console font size. \n\nReason: \n";
-        cout << GetLastError();
-        cout << "\nThe program will now stop. \n";
+        wcout << "[1;1H[40m[91mERROR: Unable to get console font size. \n\nReason: \n";
+        wcout << GetLastError();
+        wcout << "\nThe program will now stop. \n";
         for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 

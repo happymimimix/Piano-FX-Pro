@@ -14,10 +14,10 @@ struct CloseBtn {
             Terminated = true;
         };
         CloseBtn->OnHover = [&]() {
-            cout << "[2;98H[91mx";
+            wcout << L"[2;98H[91mx";
         };
         CloseBtn->OnLeave = [&]() {
-            cout << "[2;98H[93mx";
+            wcout << L"[2;98H[93mx";
         };
     }
 };

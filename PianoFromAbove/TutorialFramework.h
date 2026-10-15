@@ -36,12 +36,12 @@ bool IsVisible(uint16_t ImageTop, uint16_t ImageHeight, uint16_t ViewTop, uint16
 
 void SetDocumentLength(uint16_t Length) {
     COORD bufferSize;
-    bufferSize.X = 102;
+    bufferSize.X = 100;
     bufferSize.Y = max(Length,35);
     if (!SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), bufferSize)) {
-        cout << "[1;1H[40m[91mERROR: Unable to set console buffer size. \n\nReason: \n";
-        cout << GetLastError();
-        cout << "\nThe program will now stop. \n";
+        wcout << "[1;1H[40m[91mERROR: Unable to set console buffer size. \n\nReason: \n";
+        wcout << GetLastError();
+        wcout << "\nThe program will now stop. \n";
         for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
@@ -54,7 +54,7 @@ void ShowText(string Content) {
     pos.X = 0;
     pos.Y = 0;
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
-    cout << Content;
+    wcout << Content;
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 }
 
@@ -63,9 +63,9 @@ void DrawBMP(Diagram BMP) {
     HDC ConsoleDC = GetDC(ConsoleHWND);
     CONSOLE_SCREEN_BUFFER_INFO BufInfo;
     if (!GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &BufInfo)) {
-        cout << "[1;1H[40m[91mERROR: Cannot obtain console buffer info. \n\nReason: \n";
-        cout << GetLastError();
-        cout << "\nThe program will now stop. \n";
+        wcout << "[1;1H[40m[91mERROR: Cannot obtain console buffer info. \n\nReason: \n";
+        wcout << GetLastError();
+        wcout << "\nThe program will now stop. \n";
         for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 

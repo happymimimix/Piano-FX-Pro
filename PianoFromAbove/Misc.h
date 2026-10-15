@@ -64,34 +64,34 @@ __forceinline string GetAddress(const T& Variable) {
     return sout.str();
 }
 
-__forceinline string IntSizeToCE(uint8_t Size) {
+__forceinline wstring IntSizeToCE(uint8_t Size) {
     if (Size == 1) {
-        return "ShortInteger";
+        return L"ShortInteger";
     }
     if (Size == 2) {
-        return "SmallInteger";
+        return L"SmallInteger";
     }
     if (Size == 4) {
-        return "Integer";
+        return L"Integer";
     }
     if (Size == 8) {
-        return "Qword";
+        return L"Qword";
     }
-    return "Bytes";
+    return L"Bytes";
 }
 
-__forceinline string FloatSizeToCE(uint8_t Size) {
+__forceinline wstring FloatSizeToCE(uint8_t Size) {
     if (Size == 4) {
-        return "Float";
+        return L"Float";
     }
     if (Size == 8) {
-        return "Double";
+        return L"Double";
     }
-    return "Bytes";
+    return L"Bytes";
 }
 
-__forceinline string CEPtr() {
-    return "Pointer->";
+__forceinline wstring CEPtr() {
+    return L"Pointer->";
 }
 
 inline wstring GetExePath(void) {

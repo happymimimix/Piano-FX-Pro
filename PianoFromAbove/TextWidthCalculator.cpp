@@ -58,7 +58,7 @@ int main() {
     while (getline(wcin, Line)) {
         if (Line.length() < 8 || Line.substr(0, 8) != L"#define ") {
             if ((Line.length() < 9 || Line.substr(0, 9) != L"#include ") && (Line.length() < 7 || Line.substr(0, 7) != L"#undef ")) {
-                wcout << Line << endl;
+                wwcout << Line << endl;
             }
             continue;
         }
@@ -86,7 +86,7 @@ int main() {
                 ReplaceAll(DefString, L"\\\\", L"\\");
                 SIZE TextSize;
                 GetTextExtentPointW(cmdDC, DefString.c_str(), DefString.length(), &TextSize);
-                wcout << L"#define " << DefName << L"W " << MulDiv(TextSize.cx, 4, baseX) << L" //Text: " << LineNdef.substr(Splitter + 1, LineNdef.length() - Splitter - 1) << endl;
+                wwcout << L"#define " << DefName << L"W " << MulDiv(TextSize.cx, 4, baseX) << L" //Text: " << LineNdef.substr(Splitter + 1, LineNdef.length() - Splitter - 1) << endl;
                 RECT cmdRECT;
                 GetClientRect(cmd, &cmdRECT);
                 LONG W = cmdRECT.right - cmdRECT.left;

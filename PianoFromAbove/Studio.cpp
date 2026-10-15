@@ -17,7 +17,7 @@ void StudioMain() {
     TabSwitcher::EnableAll();
 
     size_t LastCommandLength = 0;
-    cout << "[1;2H[40m[91m(0,0)";
+    wcout << "[1;2H[40m[91m(0,0)";
     while (!CloseBtn::Terminated) {
         POINT CursorPos = {};
         //Get mouse cursor position and button states
@@ -30,16 +30,16 @@ void StudioMain() {
             bool Clicked = false;
             if (GetAsyncKeyState(VK_LBUTTON) & 0x8000) {
                 // Button down - green text
-                cout << "[1;2H[40m[92m";
+                wcout << "[1;2H[40m[92m";
                 Clicked = true;
             }
             else {
                 // Button up - red text
-                cout << "[1;2H[40m[91m";
+                wcout << "[1;2H[40m[91m";
             }
-            cout << CommandText;
+            wcout << CommandText;
             while (ThisCommandLength < LastCommandLength) {
-                cout << "[96m═";
+                wcout << "[96m═";
                 ThisCommandLength++;
             }
             LastCommandLength = CommandText.length();

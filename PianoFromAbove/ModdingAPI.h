@@ -46,8 +46,8 @@ struct srcfile_t {
         wstringstream buffer;
         buffer << file.rdbuf();
         this->Content = buffer.str();
-        wcout << L"Loaded: " << this->FilePath << endl;
-        wcout << this->Content;
+        wwcout << L"Loaded: " << this->FilePath << endl;
+        wwcout << this->Content;
         file.close();
     }
     void Save() {
@@ -57,7 +57,7 @@ struct srcfile_t {
             throw runtime_error("Failed to open file.");
         }
         file << this->Content;
-        wcout << L"Saved: " << this->FilePath << endl;
+        wwcout << L"Saved: " << this->FilePath << endl;
         file.close();
     }
 };

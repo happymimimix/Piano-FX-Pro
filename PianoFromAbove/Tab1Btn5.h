@@ -31,10 +31,10 @@ void Tab1::SubViewBtn5::Open() {
         Tab1::EnableAll();
     };
     Close->OnHover = [&]() {
-        cout << "[17;66H[44m[93mx";
+        wcout << "[17;66H[44m[93mx";
     };
     Close->OnLeave = [&]() {
-        cout << "[17;66H[44m[91mx";
+        wcout << "[17;66H[44m[91mx";
     };
     Path.Create(6, 19, 51, 2);
     Browse = TouchEventManager::Create();

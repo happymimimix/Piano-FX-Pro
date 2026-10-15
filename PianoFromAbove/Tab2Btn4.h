@@ -52,10 +52,10 @@ void Tab2::SubViewBtn4::Open() {
         LoopingTask = [&]() {};
     };
     Close->OnHover = [&]() {
-        cout << "[14;76H[44m[93mx";
+        wcout << "[14;76H[44m[93mx";
     };
     Close->OnLeave = [&]() {
-        cout << "[14;76H[44m[91mx";
+        wcout << "[14;76H[44m[91mx";
     };
     AnimationType1.Create(22, 15, 21, 2);
     AnimationType1.AddItem(L"Instantaneous");
