@@ -179,6 +179,8 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „¤„Ÿ„Ÿ„ŸUpdates required
 „    „    „¥„Ÿ„Ÿ„ŸKorean
 „    „    „    „¤„Ÿ„Ÿ„ŸUpdates required
+„    „    „¥„Ÿ„Ÿ„ŸLocalize Piano-FX Studio
+„    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „¥„Ÿ„Ÿ„ŸNorthKorean
 „    „    „    „¤„Ÿ„Ÿ„ŸUpdates required
 „    „    „¥„Ÿ„Ÿ„ŸRussian
@@ -238,54 +240,303 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „        „¤„Ÿ„Ÿ„ŸTODO
 „    „¥„Ÿ„Ÿ„ŸReorganize preferences
 „    „    „¥„Ÿ„Ÿ„ŸAdd 'Background adjustments' to visuals
-„    „    „    „¥„Ÿ„Ÿ„ŸEdit 'Brightness value'
+„    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „¥„Ÿ„Ÿ„ŸEdit 'Hue value'
+„    „    „    „¥„Ÿ„Ÿ„ŸConfig.h (Structures)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „¥„Ÿ„Ÿ„ŸEdit 'Saturation value'
+„    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „¥„Ÿ„Ÿ„ŸLabel 'Background color adjustment'
+„    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „¥„Ÿ„Ÿ„ŸSlider 'Brightness'
-„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „¥„Ÿ„Ÿ„ŸSlider 'Hue'
-„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „¤„Ÿ„Ÿ„ŸSlider 'Saturation'
-„    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „¥„Ÿ„Ÿ„ŸEdit 'Brightness value'
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¥„Ÿ„Ÿ„ŸEdit 'Hue value'
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¥„Ÿ„Ÿ„ŸEdit 'Saturation value'
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¥„Ÿ„Ÿ„ŸLabel 'Background color adjustment'
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¥„Ÿ„Ÿ„ŸSlider 'Brightness'
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¥„Ÿ„Ÿ„ŸSlider 'Hue'
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¥„Ÿ„Ÿ„ŸSlider 'Saturation'
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¥„Ÿ„Ÿ„ŸSpinner 'Brightness value'
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¥„Ÿ„Ÿ„ŸSpinner 'Hue value'
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¤„Ÿ„Ÿ„ŸSpinner 'Saturation value'
+„    „    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
+„    „    „        „¥„Ÿ„Ÿ„ŸEdit 'Brightness value'
+„    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¥„Ÿ„Ÿ„ŸEdit 'Hue value'
+„    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¥„Ÿ„Ÿ„ŸEdit 'Saturation value'
+„    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¥„Ÿ„Ÿ„ŸLabel 'Background color adjustment'
+„    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¥„Ÿ„Ÿ„ŸSlider 'Brightness'
+„    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¥„Ÿ„Ÿ„ŸSlider 'Hue'
+„    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¥„Ÿ„Ÿ„ŸSlider 'Saturation'
+„    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¥„Ÿ„Ÿ„ŸSpinner 'Brightness value'
+„    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¥„Ÿ„Ÿ„ŸSpinner 'Hue value'
+„    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¤„Ÿ„Ÿ„ŸSpinner 'Saturation value'
+„    „    „            „¤„Ÿ„Ÿ„ŸTODO
 „    „    „¥„Ÿ„Ÿ„ŸAdd 'Mouse wheel scroll skips [____]x more than arrow keys.' to controls
-„    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Dump midi output' to track selection
-„    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Full screen capture' to controls (Next to video output)
-„    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Highlight playing notes' to render
-„    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Live loading (SMF3 Exclusive)' to controls
-„    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Port dependent pitchbend visualization' to controls
-„    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Show lyrics' to render
-„    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Topmost statistics' to render
-„    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „¥„Ÿ„Ÿ„ŸAdd '[x] Allow unknown SMF3 generators' to controls
-„    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „¥„Ÿ„Ÿ„ŸAdd '[x] Auto Play (Not implemented and probably never will)' to controls and make it checked and disabled forever
-„    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „¥„Ÿ„Ÿ„ŸAdd new preference page 'Export'
-„    „    „    „¥„Ÿ„Ÿ„ŸAdd 'Video frame rate [____]' to this new page
+„    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Precise event timestamp' to this new page
+„    „    „    „¥„Ÿ„Ÿ„ŸConfig.h (Structures)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „¥„Ÿ„Ÿ„ŸMove '[ ] Dump midi output' to this new page
+„    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „¥„Ÿ„Ÿ„ŸMove '[ ] Full screen capture' to this new page
+„    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „¤„Ÿ„Ÿ„ŸMove '[ ] Video output' to this new page
+„    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Dump midi output' to track selection
+„    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸConfig.h (Structures)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
+„    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Full screen capture' to controls (Next to video output)
+„    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸConfig.h (Structures)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
+„    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Highlight playing notes' to render
+„    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸConfig.h (Structures)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
+„    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Live loading (SMF3 Exclusive)' to controls
+„    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸConfig.h (Structures)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
+„    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Port dependent pitchbend visualization' to controls
+„    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸConfig.h (Structures)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
+„    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Show lyrics' to render
+„    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸConfig.h (Structures)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
+„    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Topmost statistics' to render
+„    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸConfig.h (Structures)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
+„    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „¥„Ÿ„Ÿ„ŸAdd '[x] Allow unknown SMF3 generators' to controls
+„    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸConfig.h (Structures)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
+„    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „¥„Ÿ„Ÿ„ŸAdd '[x] Auto Play (Not implemented and probably never will)' to controls and make it checked and disabled forever
+„    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸConfig.h (Structures)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
+„    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „¥„Ÿ„Ÿ„ŸAdd new preference page 'Export'
+„    „    „    „¥„Ÿ„Ÿ„ŸItems
+„    „    „    „    „¥„Ÿ„Ÿ„ŸAdd 'Video frame rate [____]' to this new page
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸConfig.h (Structures)
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
+„    „    „    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Precise event timestamp' to this new page
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸConfig.h (Structures)
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
+„    „    „    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¥„Ÿ„Ÿ„ŸMove '[ ] Dump midi output' to this new page
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸConfig.h (Structures)
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
+„    „    „    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¥„Ÿ„Ÿ„ŸMove '[ ] Full screen capture' to this new page
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸConfig.h (Structures)
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
+„    „    „    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¤„Ÿ„Ÿ„ŸMove '[ ] Video output' to this new page
+„    „    „    „        „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
+„    „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „        „¥„Ÿ„Ÿ„ŸConfig.h (Structures)
+„    „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „        „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
+„    „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „        „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „        „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „        „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
+„    „    „    „            „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¤„Ÿ„Ÿ„ŸPage
+„    „    „        „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
+„    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¥„Ÿ„Ÿ„ŸConfig.h (Structures)
+„    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
+„    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
+„    „    „            „¤„Ÿ„Ÿ„ŸTODO
 „    „    „¥„Ÿ„Ÿ„ŸMove '[ ] Piano override' to controls
-„    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸConfig.h (Structures)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
+„    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „¥„Ÿ„Ÿ„ŸMove '[ ] Slow down instead of lag' to controls
+„    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸConfig.h (Structures)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
+„    „    „        „¤„Ÿ„Ÿ„ŸTODO
 „    „    „¤„Ÿ„Ÿ„ŸReplace '[ ] Piano override' with a new 'Instrument override [____]' drop down (Format '[000] Acoustic Grand Piano' or 'Disabled')
-„    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „        „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
+„    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „        „¥„Ÿ„Ÿ„ŸConfig.h (Structures)
+„    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „        „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
+„    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „        „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „        „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „        „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
+„    „            „¤„Ÿ„Ÿ„ŸTODO
 „    „¥„Ÿ„Ÿ„ŸReplay skipped events
 „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „¥„Ÿ„Ÿ„ŸResouce script
@@ -403,6 +654,8 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „        „¤„Ÿ„Ÿ„ŸTODO
 „    „    „¤„Ÿ„Ÿ„ŸNew C++ colorizer that supports SMF3
 „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „¥„Ÿ„Ÿ„ŸConhost v1 support
+„    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „¥„Ÿ„Ÿ„ŸDocumentation
 „    „    „¥„Ÿ„Ÿ„ŸHow to create animation documentation
 „    „    „    „¤„Ÿ„Ÿ„ŸTODO
@@ -457,18 +710,31 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „        „    „¤„Ÿ„Ÿ„ŸTODO
 „    „        „¤„Ÿ„Ÿ„ŸWriteback modified image
 „    „            „¤„Ÿ„Ÿ„ŸTODO
-„    „¤„Ÿ„Ÿ„ŸSetup
+„    „¥„Ÿ„Ÿ„ŸSetup
+„    „    „¥„Ÿ„Ÿ„ŸDesign
+„    „    „    „¤„Ÿ„Ÿ„ŸDONE
+„    „    „¤„Ÿ„Ÿ„ŸImplementation
+„    „        „¥„Ÿ„Ÿ„ŸConvert to SMF1
+„    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „        „¥„Ÿ„Ÿ„ŸConvert to SMF3
+„    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „        „¥„Ÿ„Ÿ„ŸInstall Cheat Engine
+„    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „        „¤„Ÿ„Ÿ„ŸInstall FL 12.3 Templates
+„    „            „¤„Ÿ„Ÿ„ŸTODO
+„    „¤„Ÿ„Ÿ„Ÿ[NEW] Film
 „        „¥„Ÿ„Ÿ„ŸDesign
-„        „    „¤„Ÿ„Ÿ„ŸDONE
-„        „¤„Ÿ„Ÿ„ŸImplementation
-„            „¥„Ÿ„Ÿ„ŸConvert to SMF1
-„            „    „¤„Ÿ„Ÿ„ŸTODO
-„            „¥„Ÿ„Ÿ„ŸConvert to SMF3
-„            „    „¤„Ÿ„Ÿ„ŸTODO
-„            „¥„Ÿ„Ÿ„ŸInstall Cheat Engine
-„            „    „¤„Ÿ„Ÿ„ŸTODO
-„            „¤„Ÿ„Ÿ„ŸInstall FL 12.3 Templates
-„                „¤„Ÿ„Ÿ„ŸTODO
+„        „    „¤„Ÿ„Ÿ„ŸTODO
+„        „¥„Ÿ„Ÿ„ŸImage sequence to midi + color events switching to next frame every few ticks
+„        „¥„Ÿ„Ÿ„ŸPlanning
+„        „    „¥„Ÿ„Ÿ„Ÿ[CHECK] Allowed channels (1-16)
+„        „    „¥„Ÿ„Ÿ„Ÿ[CHECK] Double horizontal resolution (requires at least 2 spare channels and visualize pitch bend enabled)
+„        „    „¥„Ÿ„Ÿ„Ÿ[DROPDOWN] Output format (SMF1 or SMF3)
+„        „    „¥„Ÿ„Ÿ„Ÿ[FOLDER_SELECT] Image stream directory
+„        „    „¥„Ÿ„Ÿ„Ÿ[SPIN] Frame height (in ticks)
+„        „    „¥„Ÿ„Ÿ„Ÿ[SPIN] Frame time (in ticks
+„        „    „¤„Ÿ„Ÿ„Ÿ[SPIN] Max colors
+„        „¤„Ÿ„Ÿ„ŸVideo to image sequence (by invoking ffmpeg)
 „¤„Ÿ„Ÿ„ŸSource code level modding system
     „¥„Ÿ„Ÿ„ŸC++ AST Analyzation
     „    „¤„Ÿ„Ÿ„ŸTODO

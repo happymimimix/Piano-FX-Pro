@@ -179,6 +179,8 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   └───Updates required
 │   │   ├───Korean
 │   │   │   └───Updates required
+│   │   ├───Localize Piano-FX Studio
+│   │   │   └───TODO
 │   │   ├───NorthKorean
 │   │   │   └───Updates required
 │   │   ├───Russian
@@ -238,54 +240,303 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │       └───TODO
 │   ├───Reorganize preferences
 │   │   ├───Add 'Background adjustments' to visuals
-│   │   │   ├───Edit 'Brightness value'
+│   │   │   ├───Config.cpp (Load & store)
 │   │   │   │   └───TODO
-│   │   │   ├───Edit 'Hue value'
+│   │   │   ├───Config.h (Structures)
 │   │   │   │   └───TODO
-│   │   │   ├───Edit 'Saturation value'
+│   │   │   ├───ConfigProcs.cpp (UI logic)
 │   │   │   │   └───TODO
-│   │   │   ├───Label 'Background color adjustment'
+│   │   │   ├───GameState.cpp (Actual logic)
 │   │   │   │   └───TODO
-│   │   │   ├───Slider 'Brightness'
-│   │   │   │   └───TODO
-│   │   │   ├───Slider 'Hue'
-│   │   │   │   └───TODO
-│   │   │   └───Slider 'Saturation'
-│   │   │       └───TODO
+│   │   │   ├───PianoFromAbove.rc (UI)
+│   │   │   │   ├───Edit 'Brightness value'
+│   │   │   │   │   └───TODO
+│   │   │   │   ├───Edit 'Hue value'
+│   │   │   │   │   └───TODO
+│   │   │   │   ├───Edit 'Saturation value'
+│   │   │   │   │   └───TODO
+│   │   │   │   ├───Label 'Background color adjustment'
+│   │   │   │   │   └───TODO
+│   │   │   │   ├───Slider 'Brightness'
+│   │   │   │   │   └───TODO
+│   │   │   │   ├───Slider 'Hue'
+│   │   │   │   │   └───TODO
+│   │   │   │   ├───Slider 'Saturation'
+│   │   │   │   │   └───TODO
+│   │   │   │   ├───Spinner 'Brightness value'
+│   │   │   │   │   └───TODO
+│   │   │   │   ├───Spinner 'Hue value'
+│   │   │   │   │   └───TODO
+│   │   │   │   └───Spinner 'Saturation value'
+│   │   │   │       └───TODO
+│   │   │   └───Resource.h (ID definitions)
+│   │   │       ├───Edit 'Brightness value'
+│   │   │       │   └───TODO
+│   │   │       ├───Edit 'Hue value'
+│   │   │       │   └───TODO
+│   │   │       ├───Edit 'Saturation value'
+│   │   │       │   └───TODO
+│   │   │       ├───Label 'Background color adjustment'
+│   │   │       │   └───TODO
+│   │   │       ├───Slider 'Brightness'
+│   │   │       │   └───TODO
+│   │   │       ├───Slider 'Hue'
+│   │   │       │   └───TODO
+│   │   │       ├───Slider 'Saturation'
+│   │   │       │   └───TODO
+│   │   │       ├───Spinner 'Brightness value'
+│   │   │       │   └───TODO
+│   │   │       ├───Spinner 'Hue value'
+│   │   │       │   └───TODO
+│   │   │       └───Spinner 'Saturation value'
+│   │   │           └───TODO
 │   │   ├───Add 'Mouse wheel scroll skips [____]x more than arrow keys.' to controls
-│   │   ├───Add '[ ] Dump midi output' to track selection
-│   │   │   └───TODO
-│   │   ├───Add '[ ] Full screen capture' to controls (Next to video output)
-│   │   │   └───TODO
-│   │   ├───Add '[ ] Highlight playing notes' to render
-│   │   │   └───TODO
-│   │   ├───Add '[ ] Live loading (SMF3 Exclusive)' to controls
-│   │   │   └───TODO
-│   │   ├───Add '[ ] Port dependent pitchbend visualization' to controls
-│   │   │   └───TODO
-│   │   ├───Add '[ ] Show lyrics' to render
-│   │   │   └───TODO
-│   │   ├───Add '[ ] Topmost statistics' to render
-│   │   │   └───TODO
-│   │   ├───Add '[x] Allow unknown SMF3 generators' to controls
-│   │   │   └───TODO
-│   │   ├───Add '[x] Auto Play (Not implemented and probably never will)' to controls and make it checked and disabled forever
-│   │   │   └───TODO
-│   │   ├───Add new preference page 'Export'
-│   │   │   ├───Add 'Video frame rate [____]' to this new page
+│   │   │   ├───Config.cpp (Load & store)
 │   │   │   │   └───TODO
-│   │   │   ├───Add '[ ] Precise event timestamp' to this new page
+│   │   │   ├───Config.h (Structures)
 │   │   │   │   └───TODO
-│   │   │   ├───Move '[ ] Dump midi output' to this new page
+│   │   │   ├───ConfigProcs.cpp (UI logic)
 │   │   │   │   └───TODO
-│   │   │   ├───Move '[ ] Full screen capture' to this new page
+│   │   │   ├───GameState.cpp (Actual logic)
 │   │   │   │   └───TODO
-│   │   │   └───Move '[ ] Video output' to this new page
+│   │   │   ├───PianoFromAbove.rc (UI)
+│   │   │   │   └───TODO
+│   │   │   └───Resource.h (ID definitions)
 │   │   │       └───TODO
+│   │   ├───Add '[ ] Dump midi output' to track selection
+│   │   │   ├───Config.cpp (Load & store)
+│   │   │   │   └───TODO
+│   │   │   ├───Config.h (Structures)
+│   │   │   │   └───TODO
+│   │   │   ├───ConfigProcs.cpp (UI logic)
+│   │   │   │   └───TODO
+│   │   │   ├───GameState.cpp (Actual logic)
+│   │   │   │   └───TODO
+│   │   │   ├───PianoFromAbove.rc (UI)
+│   │   │   │   └───TODO
+│   │   │   └───Resource.h (ID definitions)
+│   │   │       └───TODO
+│   │   ├───Add '[ ] Full screen capture' to controls (Next to video output)
+│   │   │   ├───Config.cpp (Load & store)
+│   │   │   │   └───TODO
+│   │   │   ├───Config.h (Structures)
+│   │   │   │   └───TODO
+│   │   │   ├───ConfigProcs.cpp (UI logic)
+│   │   │   │   └───TODO
+│   │   │   ├───GameState.cpp (Actual logic)
+│   │   │   │   └───TODO
+│   │   │   ├───PianoFromAbove.rc (UI)
+│   │   │   │   └───TODO
+│   │   │   └───Resource.h (ID definitions)
+│   │   │       └───TODO
+│   │   ├───Add '[ ] Highlight playing notes' to render
+│   │   │   ├───Config.cpp (Load & store)
+│   │   │   │   └───TODO
+│   │   │   ├───Config.h (Structures)
+│   │   │   │   └───TODO
+│   │   │   ├───ConfigProcs.cpp (UI logic)
+│   │   │   │   └───TODO
+│   │   │   ├───GameState.cpp (Actual logic)
+│   │   │   │   └───TODO
+│   │   │   ├───PianoFromAbove.rc (UI)
+│   │   │   │   └───TODO
+│   │   │   └───Resource.h (ID definitions)
+│   │   │       └───TODO
+│   │   ├───Add '[ ] Live loading (SMF3 Exclusive)' to controls
+│   │   │   ├───Config.cpp (Load & store)
+│   │   │   │   └───TODO
+│   │   │   ├───Config.h (Structures)
+│   │   │   │   └───TODO
+│   │   │   ├───ConfigProcs.cpp (UI logic)
+│   │   │   │   └───TODO
+│   │   │   ├───GameState.cpp (Actual logic)
+│   │   │   │   └───TODO
+│   │   │   ├───PianoFromAbove.rc (UI)
+│   │   │   │   └───TODO
+│   │   │   └───Resource.h (ID definitions)
+│   │   │       └───TODO
+│   │   ├───Add '[ ] Port dependent pitchbend visualization' to controls
+│   │   │   ├───Config.cpp (Load & store)
+│   │   │   │   └───TODO
+│   │   │   ├───Config.h (Structures)
+│   │   │   │   └───TODO
+│   │   │   ├───ConfigProcs.cpp (UI logic)
+│   │   │   │   └───TODO
+│   │   │   ├───GameState.cpp (Actual logic)
+│   │   │   │   └───TODO
+│   │   │   ├───PianoFromAbove.rc (UI)
+│   │   │   │   └───TODO
+│   │   │   └───Resource.h (ID definitions)
+│   │   │       └───TODO
+│   │   ├───Add '[ ] Show lyrics' to render
+│   │   │   ├───Config.cpp (Load & store)
+│   │   │   │   └───TODO
+│   │   │   ├───Config.h (Structures)
+│   │   │   │   └───TODO
+│   │   │   ├───ConfigProcs.cpp (UI logic)
+│   │   │   │   └───TODO
+│   │   │   ├───GameState.cpp (Actual logic)
+│   │   │   │   └───TODO
+│   │   │   ├───PianoFromAbove.rc (UI)
+│   │   │   │   └───TODO
+│   │   │   └───Resource.h (ID definitions)
+│   │   │       └───TODO
+│   │   ├───Add '[ ] Topmost statistics' to render
+│   │   │   ├───Config.cpp (Load & store)
+│   │   │   │   └───TODO
+│   │   │   ├───Config.h (Structures)
+│   │   │   │   └───TODO
+│   │   │   ├───ConfigProcs.cpp (UI logic)
+│   │   │   │   └───TODO
+│   │   │   ├───GameState.cpp (Actual logic)
+│   │   │   │   └───TODO
+│   │   │   ├───PianoFromAbove.rc (UI)
+│   │   │   │   └───TODO
+│   │   │   └───Resource.h (ID definitions)
+│   │   │       └───TODO
+│   │   ├───Add '[x] Allow unknown SMF3 generators' to controls
+│   │   │   ├───Config.cpp (Load & store)
+│   │   │   │   └───TODO
+│   │   │   ├───Config.h (Structures)
+│   │   │   │   └───TODO
+│   │   │   ├───ConfigProcs.cpp (UI logic)
+│   │   │   │   └───TODO
+│   │   │   ├───GameState.cpp (Actual logic)
+│   │   │   │   └───TODO
+│   │   │   ├───PianoFromAbove.rc (UI)
+│   │   │   │   └───TODO
+│   │   │   └───Resource.h (ID definitions)
+│   │   │       └───TODO
+│   │   ├───Add '[x] Auto Play (Not implemented and probably never will)' to controls and make it checked and disabled forever
+│   │   │   ├───Config.cpp (Load & store)
+│   │   │   │   └───TODO
+│   │   │   ├───Config.h (Structures)
+│   │   │   │   └───TODO
+│   │   │   ├───ConfigProcs.cpp (UI logic)
+│   │   │   │   └───TODO
+│   │   │   ├───GameState.cpp (Actual logic)
+│   │   │   │   └───TODO
+│   │   │   ├───PianoFromAbove.rc (UI)
+│   │   │   │   └───TODO
+│   │   │   └───Resource.h (ID definitions)
+│   │   │       └───TODO
+│   │   ├───Add new preference page 'Export'
+│   │   │   ├───Items
+│   │   │   │   ├───Add 'Video frame rate [____]' to this new page
+│   │   │   │   │   ├───Config.cpp (Load & store)
+│   │   │   │   │   │   └───TODO
+│   │   │   │   │   ├───Config.h (Structures)
+│   │   │   │   │   │   └───TODO
+│   │   │   │   │   ├───ConfigProcs.cpp (UI logic)
+│   │   │   │   │   │   └───TODO
+│   │   │   │   │   ├───GameState.cpp (Actual logic)
+│   │   │   │   │   │   └───TODO
+│   │   │   │   │   ├───PianoFromAbove.rc (UI)
+│   │   │   │   │   │   └───TODO
+│   │   │   │   │   └───Resource.h (ID definitions)
+│   │   │   │   │       └───TODO
+│   │   │   │   ├───Add '[ ] Precise event timestamp' to this new page
+│   │   │   │   │   ├───Config.cpp (Load & store)
+│   │   │   │   │   │   └───TODO
+│   │   │   │   │   ├───Config.h (Structures)
+│   │   │   │   │   │   └───TODO
+│   │   │   │   │   ├───ConfigProcs.cpp (UI logic)
+│   │   │   │   │   │   └───TODO
+│   │   │   │   │   ├───GameState.cpp (Actual logic)
+│   │   │   │   │   │   └───TODO
+│   │   │   │   │   ├───PianoFromAbove.rc (UI)
+│   │   │   │   │   │   └───TODO
+│   │   │   │   │   └───Resource.h (ID definitions)
+│   │   │   │   │       └───TODO
+│   │   │   │   ├───Move '[ ] Dump midi output' to this new page
+│   │   │   │   │   ├───Config.cpp (Load & store)
+│   │   │   │   │   │   └───TODO
+│   │   │   │   │   ├───Config.h (Structures)
+│   │   │   │   │   │   └───TODO
+│   │   │   │   │   ├───ConfigProcs.cpp (UI logic)
+│   │   │   │   │   │   └───TODO
+│   │   │   │   │   ├───GameState.cpp (Actual logic)
+│   │   │   │   │   │   └───TODO
+│   │   │   │   │   ├───PianoFromAbove.rc (UI)
+│   │   │   │   │   │   └───TODO
+│   │   │   │   │   └───Resource.h (ID definitions)
+│   │   │   │   │       └───TODO
+│   │   │   │   ├───Move '[ ] Full screen capture' to this new page
+│   │   │   │   │   ├───Config.cpp (Load & store)
+│   │   │   │   │   │   └───TODO
+│   │   │   │   │   ├───Config.h (Structures)
+│   │   │   │   │   │   └───TODO
+│   │   │   │   │   ├───ConfigProcs.cpp (UI logic)
+│   │   │   │   │   │   └───TODO
+│   │   │   │   │   ├───GameState.cpp (Actual logic)
+│   │   │   │   │   │   └───TODO
+│   │   │   │   │   ├───PianoFromAbove.rc (UI)
+│   │   │   │   │   │   └───TODO
+│   │   │   │   │   └───Resource.h (ID definitions)
+│   │   │   │   │       └───TODO
+│   │   │   │   └───Move '[ ] Video output' to this new page
+│   │   │   │       ├───Config.cpp (Load & store)
+│   │   │   │       │   └───TODO
+│   │   │   │       ├───Config.h (Structures)
+│   │   │   │       │   └───TODO
+│   │   │   │       ├───ConfigProcs.cpp (UI logic)
+│   │   │   │       │   └───TODO
+│   │   │   │       ├───GameState.cpp (Actual logic)
+│   │   │   │       │   └───TODO
+│   │   │   │       ├───PianoFromAbove.rc (UI)
+│   │   │   │       │   └───TODO
+│   │   │   │       └───Resource.h (ID definitions)
+│   │   │   │           └───TODO
+│   │   │   └───Page
+│   │   │       ├───Config.cpp (Load & store)
+│   │   │       │   └───TODO
+│   │   │       ├───Config.h (Structures)
+│   │   │       │   └───TODO
+│   │   │       ├───ConfigProcs.cpp (UI logic)
+│   │   │       │   └───TODO
+│   │   │       ├───PianoFromAbove.rc (UI)
+│   │   │       │   └───TODO
+│   │   │       └───Resource.h (ID definitions)
+│   │   │           └───TODO
 │   │   ├───Move '[ ] Piano override' to controls
-│   │   │   └───TODO
+│   │   │   ├───Config.cpp (Load & store)
+│   │   │   │   └───TODO
+│   │   │   ├───Config.h (Structures)
+│   │   │   │   └───TODO
+│   │   │   ├───ConfigProcs.cpp (UI logic)
+│   │   │   │   └───TODO
+│   │   │   ├───GameState.cpp (Actual logic)
+│   │   │   │   └───TODO
+│   │   │   ├───PianoFromAbove.rc (UI)
+│   │   │   │   └───TODO
+│   │   │   └───Resource.h (ID definitions)
+│   │   │       └───TODO
+│   │   ├───Move '[ ] Slow down instead of lag' to controls
+│   │   │   ├───Config.cpp (Load & store)
+│   │   │   │   └───TODO
+│   │   │   ├───Config.h (Structures)
+│   │   │   │   └───TODO
+│   │   │   ├───ConfigProcs.cpp (UI logic)
+│   │   │   │   └───TODO
+│   │   │   ├───GameState.cpp (Actual logic)
+│   │   │   │   └───TODO
+│   │   │   ├───PianoFromAbove.rc (UI)
+│   │   │   │   └───TODO
+│   │   │   └───Resource.h (ID definitions)
+│   │   │       └───TODO
 │   │   └───Replace '[ ] Piano override' with a new 'Instrument override [____]' drop down (Format '[000] Acoustic Grand Piano' or 'Disabled')
-│   │       └───TODO
+│   │       ├───Config.cpp (Load & store)
+│   │       │   └───TODO
+│   │       ├───Config.h (Structures)
+│   │       │   └───TODO
+│   │       ├───ConfigProcs.cpp (UI logic)
+│   │       │   └───TODO
+│   │       ├───GameState.cpp (Actual logic)
+│   │       │   └───TODO
+│   │       ├───PianoFromAbove.rc (UI)
+│   │       │   └───TODO
+│   │       └───Resource.h (ID definitions)
+│   │           └───TODO
 │   ├───Replay skipped events
 │   │   └───DONE
 │   ├───Resouce script
@@ -403,6 +654,8 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │       └───TODO
 │   │   └───New C++ colorizer that supports SMF3
 │   │       └───TODO
+│   ├───Conhost v1 support
+│   │   └───TODO
 │   ├───Documentation
 │   │   ├───How to create animation documentation
 │   │   │   └───TODO
@@ -457,18 +710,31 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │       │   └───TODO
 │   │       └───Writeback modified image
 │   │           └───TODO
-│   └───Setup
+│   ├───Setup
+│   │   ├───Design
+│   │   │   └───DONE
+│   │   └───Implementation
+│   │       ├───Convert to SMF1
+│   │       │   └───TODO
+│   │       ├───Convert to SMF3
+│   │       │   └───TODO
+│   │       ├───Install Cheat Engine
+│   │       │   └───TODO
+│   │       └───Install FL 12.3 Templates
+│   │           └───TODO
+│   └───[NEW] Film
 │       ├───Design
-│       │   └───DONE
-│       └───Implementation
-│           ├───Convert to SMF1
-│           │   └───TODO
-│           ├───Convert to SMF3
-│           │   └───TODO
-│           ├───Install Cheat Engine
-│           │   └───TODO
-│           └───Install FL 12.3 Templates
-│               └───TODO
+│       │   └───TODO
+│       ├───Image sequence to midi + color events switching to next frame every few ticks
+│       ├───Planning
+│       │   ├───[CHECK] Allowed channels (1-16)
+│       │   ├───[CHECK] Double horizontal resolution (requires at least 2 spare channels and visualize pitch bend enabled)
+│       │   ├───[DROPDOWN] Output format (SMF1 or SMF3)
+│       │   ├───[FOLDER_SELECT] Image stream directory
+│       │   ├───[SPIN] Frame height (in ticks)
+│       │   ├───[SPIN] Frame time (in ticks
+│       │   └───[SPIN] Max colors
+│       └───Video to image sequence (by invoking ffmpeg)
 └───Source code level modding system
     ├───C++ AST Analyzation
     │   └───TODO
