@@ -434,7 +434,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   ├───PianoFromAbove.rc (UI)
 │   │   │   │   │   │   └───TODO
 │   │   │   │   │   └───Resource.h (ID definitions)
-│   │   │   │   │       └───TODO
+│   │   │   │   │       └───DONE
 │   │   │   │   ├───Add '[ ] Precise event timestamp' to this new page
 │   │   │   │   │   ├───Config.cpp (Load & store)
 │   │   │   │   │   │   └───TODO
@@ -447,7 +447,20 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   ├───PianoFromAbove.rc (UI)
 │   │   │   │   │   │   └───TODO
 │   │   │   │   │   └───Resource.h (ID definitions)
-│   │   │   │   │       └───TODO
+│   │   │   │   │       └───DONE
+│   │   │   │   ├───Add '[ ] Use SMPTE' to this new page (Disable precise timestamp when this one is checked)
+│   │   │   │   │   ├───Config.cpp (Load & store)
+│   │   │   │   │   │   └───TODO
+│   │   │   │   │   ├───Config.h (Structures)
+│   │   │   │   │   │   └───TODO
+│   │   │   │   │   ├───ConfigProcs.cpp (UI logic)
+│   │   │   │   │   │   └───TODO
+│   │   │   │   │   ├───GameState.cpp (Actual logic)
+│   │   │   │   │   │   └───TODO
+│   │   │   │   │   ├───PianoFromAbove.rc (UI)
+│   │   │   │   │   │   └───TODO
+│   │   │   │   │   └───Resource.h (ID definitions)
+│   │   │   │   │       └───DONE
 │   │   │   │   ├───Move '[ ] Dump midi output' to this new page
 │   │   │   │   │   ├───Config.cpp (Load & store)
 │   │   │   │   │   │   └───TODO
@@ -460,7 +473,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   ├───PianoFromAbove.rc (UI)
 │   │   │   │   │   │   └───TODO
 │   │   │   │   │   └───Resource.h (ID definitions)
-│   │   │   │   │       └───TODO
+│   │   │   │   │       └───DONE
 │   │   │   │   ├───Move '[ ] Full screen capture' to this new page
 │   │   │   │   │   ├───Config.cpp (Load & store)
 │   │   │   │   │   │   └───TODO
@@ -473,7 +486,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   ├───PianoFromAbove.rc (UI)
 │   │   │   │   │   │   └───TODO
 │   │   │   │   │   └───Resource.h (ID definitions)
-│   │   │   │   │       └───TODO
+│   │   │   │   │       └───DONE
 │   │   │   │   └───Move '[ ] Video output' to this new page
 │   │   │   │       ├───Config.cpp (Load & store)
 │   │   │   │       │   └───TODO
@@ -486,7 +499,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │       ├───PianoFromAbove.rc (UI)
 │   │   │   │       │   └───TODO
 │   │   │   │       └───Resource.h (ID definitions)
-│   │   │   │           └───TODO
+│   │   │   │           └───DONE
 │   │   │   └───Page
 │   │   │       ├───Config.cpp (Load & store)
 │   │   │       │   └───TODO
@@ -510,7 +523,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   ├───PianoFromAbove.rc (UI)
 │   │   │   │   └───TODO
 │   │   │   └───Resource.h (ID definitions)
-│   │   │       └───TODO
+│   │   │       └───DONE
 │   │   ├───Move '[ ] Piano override' to controls
 │   │   │   ├───Config.cpp (Load & store)
 │   │   │   │   └───TODO
@@ -523,7 +536,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   ├───PianoFromAbove.rc (UI)
 │   │   │   │   └───TODO
 │   │   │   └───Resource.h (ID definitions)
-│   │   │       └───TODO
+│   │   │       └───DONE
 │   │   ├───Move '[ ] Slow down instead of lag' to controls
 │   │   │   ├───Config.cpp (Load & store)
 │   │   │   │   └───TODO
@@ -536,7 +549,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   ├───PianoFromAbove.rc (UI)
 │   │   │   │   └───TODO
 │   │   │   └───Resource.h (ID definitions)
-│   │   │       └───TODO
+│   │   │       └───DONE
 │   │   └───Replace '[ ] Piano override' with a new 'Instrument override [____]' drop down (Format '[000] Acoustic Grand Piano' or 'Disabled')
 │   │       ├───Config.cpp (Load & store)
 │   │       │   └───TODO
@@ -549,7 +562,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │       ├───PianoFromAbove.rc (UI)
 │   │       │   └───TODO
 │   │       └───Resource.h (ID definitions)
-│   │           └───TODO
+│   │           └───DONE
 │   ├───Replay skipped events
 │   │   └───DONE
 │   ├───Resouce script

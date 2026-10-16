@@ -434,7 +434,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
-„    „    „    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Precise event timestamp' to this new page
 „    „    „    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
@@ -447,7 +447,20 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
-„    „    „    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
+„    „    „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Use SMPTE' to this new page (Disable precise timestamp when this one is checked)
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸConfig.h (Structures)
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
+„    „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¥„Ÿ„Ÿ„ŸMove '[ ] Dump midi output' to this new page
 „    „    „    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
@@ -460,7 +473,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
-„    „    „    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¥„Ÿ„Ÿ„ŸMove '[ ] Full screen capture' to this new page
 „    „    „    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
@@ -473,7 +486,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
-„    „    „    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¤„Ÿ„Ÿ„ŸMove '[ ] Video output' to this new page
 „    „    „    „        „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
 „    „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
@@ -486,7 +499,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „        „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
 „    „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „        „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
-„    „    „    „            „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „            „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „¤„Ÿ„Ÿ„ŸPage
 „    „    „        „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
 „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
@@ -510,7 +523,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
-„    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „¥„Ÿ„Ÿ„ŸMove '[ ] Piano override' to controls
 „    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
@@ -523,7 +536,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
-„    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „¥„Ÿ„Ÿ„ŸMove '[ ] Slow down instead of lag' to controls
 „    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
@@ -536,7 +549,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
-„    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „¤„Ÿ„Ÿ„ŸReplace '[ ] Piano override' with a new 'Instrument override [____]' drop down (Format '[000] Acoustic Grand Piano' or 'Disabled')
 „    „        „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
 „    „        „    „¤„Ÿ„Ÿ„ŸTODO
@@ -549,7 +562,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „        „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
 „    „        „    „¤„Ÿ„Ÿ„ŸTODO
 „    „        „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
-„    „            „¤„Ÿ„Ÿ„ŸTODO
+„    „            „¤„Ÿ„Ÿ„ŸDONE
 „    „¥„Ÿ„Ÿ„ŸReplay skipped events
 „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „¥„Ÿ„Ÿ„ŸResouce script

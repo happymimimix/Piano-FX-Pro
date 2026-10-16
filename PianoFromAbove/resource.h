@@ -127,6 +127,7 @@
 #define IDS_FPS                         IDC_STATIC
 #define IDC_MIDIDUMP                    705
 #define IDC_PRECISEDUMP                 706
+#define IDC_SMPTE                       707
 
 #define IDS_FILE                        IDC_STATIC
 #define IDC_FILE                        801
