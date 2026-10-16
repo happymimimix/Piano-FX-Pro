@@ -315,7 +315,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   ├───PianoFromAbove.rc (UI)
 │   │   │   │   └───TODO
 │   │   │   └───Resource.h (ID definitions)
-│   │   │       └───TODO
+│   │   │       └───DONE
 │   │   ├───Add '[ ] Full screen capture' to controls (Next to video output)
 │   │   │   ├───Config.cpp (Load & store)
 │   │   │   │   └───TODO
@@ -328,7 +328,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   ├───PianoFromAbove.rc (UI)
 │   │   │   │   └───TODO
 │   │   │   └───Resource.h (ID definitions)
-│   │   │       └───TODO
+│   │   │       └───DONE
 │   │   ├───Add '[ ] Highlight playing notes' to render
 │   │   │   ├───Config.cpp (Load & store)
 │   │   │   │   └───TODO
@@ -341,7 +341,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   ├───PianoFromAbove.rc (UI)
 │   │   │   │   └───TODO
 │   │   │   └───Resource.h (ID definitions)
-│   │   │       └───TODO
+│   │   │       └───DONE
 │   │   ├───Add '[ ] Live loading (SMF3 Exclusive)' to controls
 │   │   │   ├───Config.cpp (Load & store)
 │   │   │   │   └───TODO
@@ -354,7 +354,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   ├───PianoFromAbove.rc (UI)
 │   │   │   │   └───TODO
 │   │   │   └───Resource.h (ID definitions)
-│   │   │       └───TODO
+│   │   │       └───DONE
 │   │   ├───Add '[ ] Port dependent pitchbend visualization' to controls
 │   │   │   ├───Config.cpp (Load & store)
 │   │   │   │   └───TODO
@@ -367,7 +367,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   ├───PianoFromAbove.rc (UI)
 │   │   │   │   └───TODO
 │   │   │   └───Resource.h (ID definitions)
-│   │   │       └───TODO
+│   │   │       └───DONE
 │   │   ├───Add '[ ] Show lyrics' to render
 │   │   │   ├───Config.cpp (Load & store)
 │   │   │   │   └───TODO
@@ -380,7 +380,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   ├───PianoFromAbove.rc (UI)
 │   │   │   │   └───TODO
 │   │   │   └───Resource.h (ID definitions)
-│   │   │       └───TODO
+│   │   │       └───DONE
 │   │   ├───Add '[ ] Topmost statistics' to render
 │   │   │   ├───Config.cpp (Load & store)
 │   │   │   │   └───TODO
@@ -497,7 +497,20 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │       ├───PianoFromAbove.rc (UI)
 │   │   │       │   └───TODO
 │   │   │       └───Resource.h (ID definitions)
-│   │   │           └───TODO
+│   │   │           └───DONE
+│   │   ├───Change 'Marker encoding' to 'Text code page' (Marker text is no longer the only consumer ever since I added the track name display! This is what it should've been.)
+│   │   │   ├───Config.cpp (Load & store)
+│   │   │   │   └───TODO
+│   │   │   ├───Config.h (Structures)
+│   │   │   │   └───TODO
+│   │   │   ├───ConfigProcs.cpp (UI logic)
+│   │   │   │   └───TODO
+│   │   │   ├───GameState.cpp (Actual logic)
+│   │   │   │   └───TODO
+│   │   │   ├───PianoFromAbove.rc (UI)
+│   │   │   │   └───TODO
+│   │   │   └───Resource.h (ID definitions)
+│   │   │       └───TODO
 │   │   ├───Move '[ ] Piano override' to controls
 │   │   │   ├───Config.cpp (Load & store)
 │   │   │   │   └───TODO
@@ -710,6 +723,8 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │       │   └───TODO
 │   │       └───Writeback modified image
 │   │           └───TODO
+│   ├───New abstract console UI framework with proper multi-language support
+│   │   └───TODO
 │   ├───Setup
 │   │   ├───Design
 │   │   │   └───DONE

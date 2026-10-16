@@ -315,7 +315,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
-„    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Full screen capture' to controls (Next to video output)
 „    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
@@ -328,7 +328,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
-„    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Highlight playing notes' to render
 „    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
@@ -341,7 +341,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
-„    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Live loading (SMF3 Exclusive)' to controls
 „    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
@@ -354,7 +354,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
-„    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Port dependent pitchbend visualization' to controls
 „    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
@@ -367,7 +367,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
-„    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Show lyrics' to render
 „    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
@@ -380,7 +380,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
-„    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Topmost statistics' to render
 „    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
@@ -497,7 +497,20 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „        „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
 „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „        „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
-„    „    „            „¤„Ÿ„Ÿ„ŸTODO
+„    „    „            „¤„Ÿ„Ÿ„ŸDONE
+„    „    „¥„Ÿ„Ÿ„ŸChange 'Marker encoding' to 'Text code page' (Marker text is no longer the only consumer ever since I added the track name display! This is what it should've been.)
+„    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸConfig.h (Structures)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
+„    „    „        „¤„Ÿ„Ÿ„ŸTODO
 „    „    „¥„Ÿ„Ÿ„ŸMove '[ ] Piano override' to controls
 „    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
@@ -710,6 +723,8 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „        „    „¤„Ÿ„Ÿ„ŸTODO
 „    „        „¤„Ÿ„Ÿ„ŸWriteback modified image
 „    „            „¤„Ÿ„Ÿ„ŸTODO
+„    „¥„Ÿ„Ÿ„ŸNew abstract console UI framework with proper multi-language support
+„    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „¥„Ÿ„Ÿ„ŸSetup
 „    „    „¥„Ÿ„Ÿ„ŸDesign
 „    „    „    „¤„Ÿ„Ÿ„ŸDONE

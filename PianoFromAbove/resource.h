@@ -76,15 +76,18 @@
 #define IDS_RENDER                      IDC_STATIC
 #define IDC_TICKBASED                   501
 #define IDC_PITCHBENDS                  502
-#define IDC_SAMEWIDTH                   503
-#define IDC_MAPVEL                      504
-#define IDC_MARKERS                     505
-#define IDS_MARKERENC                   IDC_STATIC
-#define IDC_MARKERENC                   506
-#define IDC_LIMITFPS                    507
-#define IDC_DEBUG                       508
-#define IDC_DISABLEUI                   509
-#define IDC_OR                          510
+#define IDC_PITCHBENDS_PORTDEPENDENCY   503
+#define IDC_SAMEWIDTH                   504
+#define IDC_MAPVEL                      505
+#define IDC_HIGHLIGHTPLAYING            506
+#define IDC_MARKERS                     507
+#define IDC_LYRICS                      508
+#define IDS_CODEPAGE                    IDC_STATIC
+#define IDC_CODEPAGE                    509
+#define IDC_LIMITFPS                    510
+#define IDC_DEBUG                       511
+#define IDC_DISABLEUI                   512
+#define IDC_OR                          513
 
 #define IDS_CONTROLS                    IDC_STATIC
 #define IDS_LRARROWS                    IDC_STATIC
