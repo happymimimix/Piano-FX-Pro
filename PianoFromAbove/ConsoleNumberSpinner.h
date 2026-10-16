@@ -7,8 +7,8 @@ struct ConsoleNumberSpinner {
 
     void Create(uint8_t x, uint8_t y, uint8_t w, uint8_t h) {
         if (this->hEdit != NULL || this->hSpin != NULL) {
-            wcout << "[1;1H[40m[91mERROR: Trying to create a spinner that already exist! \n";
-            wcout << "\nThe program will now stop. \n";
+            wcout << L"[1;1H[40m[91mERROR: Trying to create a spinner that already exist! \n";
+            wcout << L"\nThe program will now stop. \n";
             for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
@@ -47,8 +47,8 @@ struct ConsoleNumberSpinner {
             SendMessage(this->hSpin, UDM_SETRANGE32, (WPARAM)MinLimit, (LPARAM)MaxLimit);
         }
         else {
-        wcout << "[1;1H[40m[91mERROR: Trying to set limit to a spinner that doesn't exist! \n";
-        wcout << "\nThe program will now stop. \n";
+        wcout << L"[1;1H[40m[91mERROR: Trying to set limit to a spinner that doesn't exist! \n";
+        wcout << L"\nThe program will now stop. \n";
         for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
@@ -64,8 +64,8 @@ struct ConsoleNumberSpinner {
             return Content;
         }
         else {
-            wcout << "[1;1H[40m[91mERROR: Trying to grab number from a spinner that doesn't exist! \n";
-            wcout << "\nThe program will now stop. \n";
+            wcout << L"[1;1H[40m[91mERROR: Trying to grab number from a spinner that doesn't exist! \n";
+            wcout << L"\nThe program will now stop. \n";
             for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
@@ -79,8 +79,8 @@ struct ConsoleNumberSpinner {
             💬();
         }
         else {
-            wcout << "[1;1H[40m[91mERROR: Trying to set number to a spinner that doesn't exist! \n";
-            wcout << "\nThe program will now stop. \n";
+            wcout << L"[1;1H[40m[91mERROR: Trying to set number to a spinner that doesn't exist! \n";
+            wcout << L"\nThe program will now stop. \n";
             for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
@@ -97,8 +97,8 @@ struct ConsoleNumberSpinner {
             💬();
         }
         else {
-            wcout << "[1;1H[40m[91mERROR: Trying to delete a number spinner that doesn't exist! \n";
-            wcout << "\nThe program will now stop. \n";
+            wcout << L"[1;1H[40m[91mERROR: Trying to delete a number spinner that doesn't exist! \n";
+            wcout << L"\nThe program will now stop. \n";
             for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
@@ -113,8 +113,8 @@ struct ConsoleNumberSpinner {
             💬();
         }
         else {
-            wcout << "[1;1H[40m[91mERROR: Trying to hide a number spinner that doesn't exist! \n";
-            wcout << "\nThe program will now stop. \n";
+            wcout << L"[1;1H[40m[91mERROR: Trying to hide a number spinner that doesn't exist! \n";
+            wcout << L"\nThe program will now stop. \n";
             for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
@@ -129,8 +129,8 @@ struct ConsoleNumberSpinner {
             💬();
         }
         else {
-            wcout << "[1;1H[40m[91mERROR: Trying to show a number spinner that doesn't exist! \n";
-            wcout << "\nThe program will now stop. \n";
+            wcout << L"[1;1H[40m[91mERROR: Trying to show a number spinner that doesn't exist! \n";
+            wcout << L"\nThe program will now stop. \n";
             for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
@@ -145,8 +145,8 @@ struct ConsoleNumberSpinner {
             💬();
         }
         else {
-            wcout << "[1;1H[40m[91mERROR: Trying to disable a number spinner that doesn't exist! \n";
-            wcout << "\nThe program will now stop. \n";
+            wcout << L"[1;1H[40m[91mERROR: Trying to disable a number spinner that doesn't exist! \n";
+            wcout << L"\nThe program will now stop. \n";
             for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
@@ -161,8 +161,8 @@ struct ConsoleNumberSpinner {
             💬();
         }
         else {
-            wcout << "[1;1H[40m[91mERROR: Trying to enable a number spinner that doesn't exist! \n";
-            wcout << "\nThe program will now stop. \n";
+            wcout << L"[1;1H[40m[91mERROR: Trying to enable a number spinner that doesn't exist! \n";
+            wcout << L"\nThe program will now stop. \n";
             for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 

@@ -20,9 +20,9 @@ void DisplayTutorial(Tutorials DocumentName) {
 		OpenTutorialDocument(LoadSMF3Intro());
 		break;
 	default:
-		wcout << "[1;1H[40m[91mERROR: Unknown tutorial document: ";
+		wcout << L"[1;1H[40m[91mERROR: Unknown tutorial document: ";
 		wcout << (short)DocumentName;
-		wcout << "\nThe program will now stop. \n";
+		wcout << L"\nThe program will now stop. \n";
 		for (;;) {
 			// Make the program hang instead of closing! 
 			// This way the user can clearly see the error message. 

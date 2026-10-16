@@ -55,11 +55,11 @@ inline static constexpr mms_t S = 1e+6;
 #define off2on(code) (code & 0x0F | 0x90)
 
 template <typename T>
-__forceinline string GetAddress(const T& Variable) {
+__forceinline wstring GetAddress(const T& Variable) {
     HMODULE ProcessBaseAddress = GetModuleHandle(NULL);
     uintptr_t VariableAddress = reinterpret_cast<uintptr_t>(&Variable);
     uintptr_t OffsetAddress = VariableAddress - reinterpret_cast<uintptr_t>(ProcessBaseAddress);
-    stringstream sout;
+    wstringstream sout;
     sout << uppercase << hex << OffsetAddress;
     return sout.str();
 }

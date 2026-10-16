@@ -31,7 +31,7 @@
 #include <Tutorials.h>
 #include <LuaCode.h>
 
-INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, INT nCmdShow);
+INT WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpszCmdLine, INT nCmdShow);
 DWORD WINAPI GameThread(LPVOID lpParameter);
 
 //-----------------------------------------------------------------------------
@@ -49,7 +49,7 @@ wstring GetProcessName() {
     GetModuleFileNameW(NULL, buffer, LONG_MAX_PATH);
     wstring fullPath(buffer);
     size_t pos = fullPath.find_last_of(L"\\");
-    return (pos != string::npos) ? fullPath.substr(pos + 1) : fullPath;
+    return (pos != wstring::npos) ? fullPath.substr(pos + 1) : fullPath;
 }
 
 wstring ProgramPath() {
@@ -196,7 +196,7 @@ wstring InitializeVariables() {
 
 wstring DefineMemoryAddress(wstring VariableName, wstring Address, bool Pointer) {
     wstring Code = L"";
-    Code += VariableName + L"=" + wstring(Pointer ? L"readPointer" : L"getAddress") + L"(\"" + WStringToUtf8(GetProcessName()) + L"+" + Address + L"\")\n";
+    Code += VariableName + L"=" + wstring(Pointer ? L"readPointer" : L"getAddress") + L"(\"" + GetProcessName() + L"+" + Address + L"\")\n";
     return Code;
 }
 
@@ -215,40 +215,40 @@ wstring GettersAndSetters(wstring VariableName, wstring Type, bool IsReadOnly, w
     return Code;
 }
 
-string StringTypeGettersAndSetters(string VariableName, size_t Size, bool IsReadOnly, string DebugList, bool IsCaption = false) {
+wstring StringTypeGettersAndSetters(wstring VariableName, size_t Size, bool IsReadOnly, wstring DebugList, bool IsCaption = false) {
     wstring Code = L"";
-    Code += L"function Get" + VariableName + "()\n";
-    Code += L"return readString(" + VariableName + ")\n";
+    Code += L"function Get" + VariableName + L"()\n";
+    Code += L"return readString(" + VariableName + L")\n";
     Code += L"end\n";
     if (!IsReadOnly) {
-        Code += L"function Set" + VariableName + "(VAL)\n";
-        Code += DebugList + "Add(\"" + VariableName + " -> \\\"\"..VAL..\"\\\"\")\n";
-        Code += L"if #VAL<" + to_string(Size) + " then\n";
-        Code += L"writeShortInteger(getAddress(" + VariableName + ")+#VAL,0)\n";
-        Code += L"writeString(" + VariableName + ",VAL)\n";
+        Code += L"function Set" + VariableName + L"(VAL)\n";
+        Code += DebugList + L"Add(\"" + VariableName + L" -> \\\"\"..VAL..\"\\\"\")\n";
+        Code += L"if #VAL<" + to_wstring(Size) + L" then\n";
+        Code += L"writeShortInteger(getAddress(" + VariableName + L")+#VAL,0)\n";
+        Code += L"writeString(" + VariableName + L",VAL)\n";
         Code += L"end\n";
         Code += L"end\n";
     }
     if (IsCaption) { //CE Caption need a special alignment setting
-        Code += L"function Set" + VariableName + "Alignment(VAL)\n";
+        Code += L"function Set" + VariableName + L"Alignment(VAL)\n";
         Code += L"if VAL==ALIGN_LEFT then\n";
-        Code += DebugList + "Add(\"" + VariableName + "Alignment -> \\\"L\\\"\")\n";
-        Code += L"writeString(" + VariableName + "Alignment,\"L\")\n";
+        Code += DebugList + L"Add(\"" + VariableName + L"Alignment -> \\\"L\\\"\")\n";
+        Code += L"writeString(" + VariableName + L"Alignment,\"L\")\n";
         Code += L"end\n";
         Code += L"if VAL==ALIGN_CENTER then\n";
-        Code += DebugList + "Add(\"" + VariableName + "Alignment -> \\\"C\\\"\")\n";
-        Code += L"writeString(" + VariableName + "Alignment,\"C\")\n";
+        Code += DebugList + L"Add(\"" + VariableName + L"Alignment -> \\\"C\\\"\")\n";
+        Code += L"writeString(" + VariableName + L"Alignment,\"C\")\n";
         Code += L"end\n";
         Code += L"if VAL==ALIGN_RIGHT then\n";
-        Code += DebugList + "Add(\"" + VariableName + "Alignment -> \\\"R\\\"\")\n";
-        Code += L"writeString(" + VariableName + "Alignment,\"R\")\n";
+        Code += DebugList + L"Add(\"" + VariableName + L"Alignment -> \\\"R\\\"\")\n";
+        Code += L"writeString(" + VariableName + L"Alignment,\"R\")\n";
         Code += L"end\n";
         Code += L"end\n";
     }
     return Code;
 }
 
-string SetResolutionFunction() {
+wstring SetResolutionFunction() {
     wstring Code = L"";
     Code += L"function SetResolution(W,H)\n";
     Code += L"HistoryAdd(\"Resolution -> \"..W..\"*\"..H)\n";
@@ -277,71 +277,71 @@ string SetResolutionFunction() {
     return Code;
 }
 
-string CloseDebugWindow(string Name) {
+wstring CloseDebugWindow(wstring Name) {
     wstring Code = L"";
-    Code += L"Debug" + Name + ".destroy()\n";
+    Code += L"Debug" + Name + L".destroy()\n";
     return Code;
 }
 
-string CleanUp() {
+wstring CleanUp() {
     wstring Code = L"";
     Code += L"while Incomplete() or ShaderWorking==true do Tick() end\n";
     Code += L"writeShortInteger(CE_Connected,0)\n";
     Code += L"EXE(QM(\"ReleaseDC\"),hGFX,PFXdc)\n";
     Code += L"EXE(QM(\"ReleaseDC\"),hGDI,GDIdc)\n";
     Code += L"if DebugPending~=nil then\n";
-    Code += CloseDebugWindow("Pending");
+    Code += CloseDebugWindow(L"Pending");
     Code += L"end\n";
     Code += L"if DebugActive~=nil then\n";
-    Code += CloseDebugWindow("Active");
+    Code += CloseDebugWindow(L"Active");
     Code += L"end\n";
     Code += L"if DebugHistory~=nil then\n";
-    Code += CloseDebugWindow("History");
+    Code += CloseDebugWindow(L"History");
     Code += L"end\n";
     Code += L"if DebugShader~=nil then\n";
-    Code += CloseDebugWindow("Shader");
+    Code += CloseDebugWindow(L"Shader");
     Code += L"end\n";
     Code += L"collectgarbage(\"collect\")\n";
     Code += MultiInstanceGuardRelease();
     return Code;
 }
 
-string CreateDebugWindow(string Name, string X, string Y, string W, string H, bool Del = true, bool Add = true) {
+wstring CreateDebugWindow(wstring Name, wstring X, wstring Y, wstring W, wstring H, bool Del = true, bool Add = true) {
     wstring Code = L"";
-    Code += L"Debug" + Name + "=createForm()\n";
-    Code += L"Debug" + Name + ".Caption=\"Piano-FX Pro Animation Debug\"\n";
-    Code += L"Debug" + Name + ".PopupMode=0\n";
-    Code += L"Debug" + Name + ".BorderStyle=\"bsSizeable\"\n";
-    Code += L"Debug" + Name + ".Left=" + X + "\n";
-    Code += L"Debug" + Name + ".Top=" + Y + "\n";
-    Code += L"Debug" + Name + ".Width=" + W + "\n";
-    Code += L"Debug" + Name + ".Height=" + H + "\n";
-    Code += L"Debug" + Name + ".OnClose=function()\n";
+    Code += L"Debug" + Name + L"=createForm()\n";
+    Code += L"Debug" + Name + L".Caption=\"Piano-FX Pro Animation Debug\"\n";
+    Code += L"Debug" + Name + L".PopupMode=0\n";
+    Code += L"Debug" + Name + L".BorderStyle=\"bsSizeable\"\n";
+    Code += L"Debug" + Name + L".Left=" + X + L"\n";
+    Code += L"Debug" + Name + L".Top=" + Y + L"\n";
+    Code += L"Debug" + Name + L".Width=" + W + L"\n";
+    Code += L"Debug" + Name + L".Height=" + H + L"\n";
+    Code += L"Debug" + Name + L".OnClose=function()\n";
     Code += L"SetMicroseconds(GetSongLength())\n";
     Code += CleanUp();
     Code += L"return caFree\n";
     Code += L"end\n";
-    Code += L"Debug" + Name + ".show()\n";
-    Code += L"Debug" + Name + "List=createListBox(Debug" + Name + ")\n";
-    Code += L"Debug" + Name + "List.Align=\"alClient\"\n";
-    Code += L"Debug" + Name + "List.Items.add(\"" + Name + ":\")\n";
-    Code += L"Debug" + Name + "List.Items.add(\"\")\n";
+    Code += L"Debug" + Name + L".show()\n";
+    Code += L"Debug" + Name + L"List=createListBox(Debug" + Name + L")\n";
+    Code += L"Debug" + Name + L"List.Align=\"alClient\"\n";
+    Code += L"Debug" + Name + L"List.Items.add(\"" + Name + L":\")\n";
+    Code += L"Debug" + Name + L"List.Items.add(\"\")\n";
     if (Add) {
-        Code += L"function " + Name + "Add(name)\n";
-        Code += L"if Debug" + Name + "List.Items~=nil then Debug" + Name + "List.Items.insert(2,name) end\n";
+        Code += L"function " + Name + L"Add(name)\n";
+        Code += L"if Debug" + Name + L"List.Items~=nil then Debug" + Name + L"List.Items.insert(2,name) end\n";
         Code += L"return name\n";
         Code += L"end\n";
     }
     if (Del) {
-        Code += L"function " + Name + "Del(name)\n";
-        Code += L"if Debug" + Name + "List.Items~=nil then Debug" + Name + "List.Items.delete(Debug" + Name + "List.Items.indexOf(name)) end\n";
+        Code += L"function " + Name + L"Del(name)\n";
+        Code += L"if Debug" + Name + L"List.Items~=nil then Debug" + Name + L"List.Items.delete(Debug" + Name + L"List.Items.indexOf(name)) end\n";
         Code += L"return name\n";
         Code += L"end\n";
     }
     return Code;
 }
 
-string EasingFunctions() {
+wstring EasingFunctions() {
     wstring Code = L"";
     Code += L"function EaseLinear(x)\n";
     Code += L"return x\n";
@@ -475,58 +475,58 @@ string EasingFunctions() {
     Code += L"end\n";
     Code += L"end\n";
     Code += L"function Incomplete()\n";
-    Code += L"return GetMicroseconds()<GetSongLength() and readShortInteger(\"" + WStringToUtf8(GetProcessName()) + "+" + GetAddress(PointersInitialized) + "\")!=0\n";
+    Code += L"return GetMicroseconds()<GetSongLength() and readShortInteger(\"" + GetProcessName() + L"+" + GetAddress(PointersInitialized) + L"\")!=0\n";
     Code += L"end\n";
     return Code;
 }
 
-string WaitUntil(bool TickBased, string DebugList) {
+wstring WaitUntil(bool TickBased, wstring DebugList) {
     wstring Code = L"";
-    Code += L"function WaitUntil" + string(TickBased ? "Tick" : "Time") + "(TargetTime)\n";
-    Code += L"local DbgItem=" + DebugList + "Add(\"WaitUntil" + string(TickBased ? "Tick" : "Time") + "(\"..TargetTime..\")\")\n";
-    Code += L"while (Get" + string(TickBased ? "Ticks" : "Microseconds") + "()<TargetTime and Incomplete()) do Tick() end\n";
-    Code += DebugList + "Del(DbgItem)\n";
+    Code += L"function WaitUntil" + wstring(TickBased ? L"Tick" : L"Time") + L"(TargetTime)\n";
+    Code += L"local DbgItem=" + DebugList + L"Add(\"WaitUntil" + wstring(TickBased ? L"Tick" : L"Time") + L"(\"..TargetTime..\")\")\n";
+    Code += L"while (Get" + wstring(TickBased ? L"Ticks" : L"Microseconds") + L"()<TargetTime and Incomplete()) do Tick() end\n";
+    Code += DebugList + L"Del(DbgItem)\n";
     Code += L"end\n";
     return Code;
 }
 
-string AnimationFunction(bool IsTarget, bool IsSliced, bool TickBased, bool Wait, string DebugList1, string DebugList2) {
+wstring AnimationFunction(bool IsTarget, bool IsSliced, bool TickBased, bool Wait, wstring DebugList1, wstring DebugList2) {
     wstring Code = L"";
-    Code += L"function " + string(IsSliced ? "Sliced" : "") + string(IsTarget ? "Target" : "Smooth") + "AnimationBy" + string(TickBased ? "Tick" : "Time") + string(Wait ? "AndWait" : "") + "(" + string(IsTarget ? "GetValueFunction" : "StartValue") + ",EndValue,StartTime,EndTime" + string(IsSliced ? ",Spacing" : "") + ",EasingFunction,SetValueFunction)\n";
-    Code += Wait ? "" : "Spawn(function()\n";
-    Code += L"local DbgItem=" + DebugList1 + "Add(\"" + string(IsSliced ? "Sliced" : "") + string(IsTarget ? "Target" : "Smooth") + "AnimationBy" + string(TickBased ? "Tick" : "Time") + string(Wait ? "AndWait" : "") + "(\".." + string(IsTarget ? "var2str(GetValueFunction)" : "StartValue") + "..\",\"..EndValue..\",\"..StartTime..\",\"..EndTime.." + string(IsSliced ? "\",\"..Spacing.." : "") + "\",\"..var2str(EasingFunction)..\",\"..var2str(SetValueFunction)..\")\")\n";
-    Code += L"while (Get" + string(TickBased ? "Ticks" : "Microseconds") + "()<StartTime and Incomplete()) do " + string(Wait ? "Tick()" : "Next()") + " end\n";
-    Code += IsTarget ? "local StartValue=GetValueFunction()\n" : "";
-    Code += IsSliced ? "local SliceIndex=1\n" : "";
-    Code += DebugList1 + "Del(DbgItem)\n";
-    Code += L"DbgItem=" + DebugList2 + "Add(" + string(IsTarget ? ("\"" + string(IsSliced ? "Sliced" : "") + "SmoothAnimationBy" + string(TickBased ? "Tick" : "Time") + string(Wait ? "AndWait" : "") + "(\"..StartValue..\",\"..EndValue..\",\"..StartTime..\",\"..EndTime.." + string(IsSliced ? "\",\"..Spacing.." : "") + "\",\"..var2str(EasingFunction)..\",\"..var2str(SetValueFunction)..\")\"") : "DbgItem") + ")\n";
-    Code += L"while (Get" + string(TickBased ? "Ticks" : "Microseconds") + "()<=EndTime and Incomplete()) do\n";
-    Code += L"SetValueFunction(StartValue+EasingFunction((Get" + string(TickBased ? "Ticks" : "Microseconds") + "()-StartTime)/(EndTime-StartTime))*(EndValue-StartValue))\n";
-    Code += IsSliced ? "while (Get" + string(TickBased ? "Ticks" : "Microseconds") + "()<StartTime+Spacing*SliceIndex and Incomplete()) do " + string(Wait ? "Tick()" : "Next()") + " end\n" : "";
-    Code += IsSliced ? "SliceIndex=SliceIndex+1\n" : "";
-    Code += IsSliced ? "" : (Wait ? "Tick()\n" : "Next()\n");
+    Code += L"function " + wstring(IsSliced ? L"Sliced" : L"") + wstring(IsTarget ? L"Target" : L"Smooth") + L"AnimationBy" + wstring(TickBased ? L"Tick" : L"Time") + wstring(Wait ? L"AndWait" : L"") + L"(" + wstring(IsTarget ? L"GetValueFunction" : L"StartValue") + L",EndValue,StartTime,EndTime" + wstring(IsSliced ? L",Spacing" : L"") + L",EasingFunction,SetValueFunction)\n";
+    Code += Wait ? L"" : L"Spawn(function()\n";
+    Code += L"local DbgItem=" + DebugList1 + L"Add(\"" + wstring(IsSliced ? L"Sliced" : L"") + wstring(IsTarget ? L"Target" : L"Smooth") + L"AnimationBy" + wstring(TickBased ? L"Tick" : L"Time") + wstring(Wait ? L"AndWait" : L"") + L"(\".." + wstring(IsTarget ? L"var2str(GetValueFunction)" : L"StartValue") + L"..\",\"..EndValue..\",\"..StartTime..\",\"..EndTime.." + wstring(IsSliced ? L"\",\"..Spacing.." : L"") + L"\",\"..var2str(EasingFunction)..\",\"..var2str(SetValueFunction)..\")\")\n";
+    Code += L"while (Get" + wstring(TickBased ? L"Ticks" : L"Microseconds") + L"()<StartTime and Incomplete()) do " + wstring(Wait ? L"Tick()" : L"Next()") + L" end\n";
+    Code += IsTarget ? L"local StartValue=GetValueFunction()\n" : L"";
+    Code += IsSliced ? L"local SliceIndex=1\n" : L"";
+    Code += DebugList1 + L"Del(DbgItem)\n";
+    Code += L"DbgItem=" + DebugList2 + L"Add(" + wstring(IsTarget ? (L"\"" + wstring(IsSliced ? L"Sliced" : L"") + L"SmoothAnimationBy" + wstring(TickBased ? L"Tick" : L"Time") + wstring(Wait ? L"AndWait" : L"") + L"(\"..StartValue..\",\"..EndValue..\",\"..StartTime..\",\"..EndTime.." + wstring(IsSliced ? L"\",\"..Spacing.." : L"") + L"\",\"..var2str(EasingFunction)..\",\"..var2str(SetValueFunction)..\")\"") : L"DbgItem") + L")\n";
+    Code += L"while (Get" + wstring(TickBased ? L"Ticks" : L"Microseconds") + L"()<=EndTime and Incomplete()) do\n";
+    Code += L"SetValueFunction(StartValue+EasingFunction((Get" + wstring(TickBased ? L"Ticks" : L"Microseconds") + L"()-StartTime)/(EndTime-StartTime))*(EndValue-StartValue))\n";
+    Code += IsSliced ? L"while (Get" + wstring(TickBased ? L"Ticks" : L"Microseconds") + L"()<StartTime+Spacing*SliceIndex and Incomplete()) do " + wstring(Wait ? L"Tick()" : L"Next()") + L" end\n" : L"";
+    Code += IsSliced ? L"SliceIndex=SliceIndex+1\n" : L"";
+    Code += IsSliced ? L"" : (Wait ? L"Tick()\n" : L"Next()\n");
     Code += L"end\n";
     Code += L"SetValueFunction(EndValue)\n";
-    Code += DebugList2 + "Del(DbgItem)\n";
-    Code += Wait ? "" : "end)\n";
+    Code += DebugList2 + L"Del(DbgItem)\n";
+    Code += Wait ? L"" : L"end)\n";
     Code += L"end\n";
     return Code;
 }
 
-string InstantaneousAnimationFunction(bool TickBased, bool Wait, string DebugList) {
+wstring InstantaneousAnimationFunction(bool TickBased, bool Wait, wstring DebugList) {
     wstring Code = L"";
-    Code += L"function InstantaneousAnimationBy" + string(TickBased ? "Tick" : "Time") + string(Wait ? "AndWait" : "") + "(Value,Time,SetValueFunction)\n";
-    Code += Wait ? "" : "Spawn(function()\n";
-    Code += L"local DbgItem=" + DebugList + "Add(\"InstantaneousAnimationBy" + string(TickBased ? "Tick" : "Time") + string(Wait ? "AndWait" : "") + "(\"..Value..\",\"..Time..\",\"..var2str(SetValueFunction)..\")\")\n";
-    Code += L"while (Get" + string(TickBased ? "Ticks" : "Microseconds") + "()<Time and Incomplete()) do " + string(Wait ? "Tick()" : "Next()") + " end\n";
+    Code += L"function InstantaneousAnimationBy" + wstring(TickBased ? L"Tick" : L"Time") + wstring(Wait ? L"AndWait" : L"") + L"(Value,Time,SetValueFunction)\n";
+    Code += Wait ? L"" : L"Spawn(function()\n";
+    Code += L"local DbgItem=" + DebugList + L"Add(\"InstantaneousAnimationBy" + wstring(TickBased ? L"Tick" : L"Time") + wstring(Wait ? L"AndWait" : L"") + L"(\"..Value..\",\"..Time..\",\"..var2str(SetValueFunction)..\")\")\n";
+    Code += L"while (Get" + wstring(TickBased ? L"Ticks" : L"Microseconds") + L"()<Time and Incomplete()) do " + wstring(Wait ? L"Tick()" : L"Next()") + L" end\n";
     Code += L"SetValueFunction(Value)\n";
-    Code += DebugList + "Del(DbgItem)\n";
-    Code += Wait ? "" : "end)\n";
+    Code += DebugList + L"Del(DbgItem)\n";
+    Code += Wait ? L"" : L"end)\n";
     Code += L"end\n";
     return Code;
 }
 
-string MethodsLookup() {
+wstring MethodsLookup() {
     wstring Code = L"";
     Code += L"AddressCache={}\n";
     Code += L"function QueryCachedNativeMethod(MethodName)\n";
@@ -539,25 +539,25 @@ string MethodsLookup() {
     return Code;
 }
 
-string RunShader(bool TickBased) {
+wstring RunShader(bool TickBased) {
     wstring Code = L"";
-    Code += L"function RunShaderBy" + string(TickBased ? "Tick" : "Time") + "(StartTime,EndTime,ShaderFunction,...)\n";
+    Code += L"function RunShaderBy" + wstring(TickBased ? L"Tick" : L"Time") + L"(StartTime,EndTime,ShaderFunction,...)\n";
     Code += L"local EffectParameters=table.pack(...)\n";
     Code += L"local Concat=\"\"\n";
     Code += L"for Entry=1,EffectParameters.n do Concat=Concat..\",\"..tostring(EffectParameters[Entry])end\n";
     Code += L"if hGDI==0 or DebugShaderList.Items==nil then return end\n";
     Code += L"ShaderLookupCounter=ShaderLookupCounter+1\n";
-    Code += L"ShaderLookupTable[ShaderLookupCounter]={Func=ShaderFunction,Param={TimingMethod=Get" + string(TickBased ? "Ticks" : "Microseconds") + ",StartTime=StartTime,EndTime=EndTime,EffectParameters=EffectParameters}}\n";
-    Code += L"DebugShaderList.Items.add(\"RunShaderBy" + string(TickBased ? "Tick" : "Time") + "(\"..StartTime..\",\"..EndTime..\",\"..var2str(ShaderFunction)..Concat..\") [ID:\"..ShaderLookupCounter..\"]\",ShaderLookupCounter)\n";
+    Code += L"ShaderLookupTable[ShaderLookupCounter]={Func=ShaderFunction,Param={TimingMethod=Get" + wstring(TickBased ? L"Ticks" : L"Microseconds") + L",StartTime=StartTime,EndTime=EndTime,EffectParameters=EffectParameters}}\n";
+    Code += L"DebugShaderList.Items.add(\"RunShaderBy" + wstring(TickBased ? L"Tick" : L"Time") + L"(\"..StartTime..\",\"..EndTime..\",\"..var2str(ShaderFunction)..Concat..\") [ID:\"..ShaderLookupCounter..\"]\",ShaderLookupCounter)\n";
     Code += L"end\n";
     return Code;
 }
 
-string ShaderEngine() {
+wstring ShaderEngine() {
     wstring Code = L"";
     // Shader debug window
     Code += L"if hGDI~=0 then\n";
-    Code += CreateDebugWindow("Shader", "750", "0", "350", "500", false, false);
+    Code += CreateDebugWindow(L"Shader", L"750", L"0", L"350", L"500", false, false);
     Code += L"end\n";
     Code += RunShader(false);
     Code += RunShader(true);
@@ -660,82 +660,82 @@ string ShaderEngine() {
 }
 
 struct EncodeColor {
-    static string ColorR;
-    static string ColorG;
-    static string ColorB;
-    static string ColorA;
-    static string MakeColor() { return "(" + ColorB + "<<16)|(" + ColorG + "<<8)|" + ColorR; }
-    static string MakeAlpha() { return "(" + ColorA + "<<16)|0x00000000"; }
+    static wstring ColorR;
+    static wstring ColorG;
+    static wstring ColorB;
+    static wstring ColorA;
+    static wstring MakeColor() { return L"(" + ColorB + L"<<16)|(" + ColorG + L"<<8)|" + ColorR; }
+    static wstring MakeAlpha() { return L"(" + ColorA + L"<<16)|0x00000000"; }
 };
-string EncodeColor::ColorR = "R";
-string EncodeColor::ColorG = "G";
-string EncodeColor::ColorB = "B";
-string EncodeColor::ColorA = "Alpha";
+wstring EncodeColor::ColorR = L"R";
+wstring EncodeColor::ColorG = L"G";
+wstring EncodeColor::ColorB = L"B";
+wstring EncodeColor::ColorA = L"Alpha";
 
-string BlankShader(bool IsDark) {
+wstring BlankShader(bool IsDark) {
     wstring Code = L"";
-    Code += L"function " + string(IsDark ? "Dark" : "Bright") + "BlankShader(DC,Time,Elapsed,W,H,PersistentData)\n";
-    Code += L"EXE(QM(\"PatBlt\"),DC,0,0,W,H," + string(IsDark ? "BLACKNESS" : "WHITENESS") + ")\n";
+    Code += L"function " + wstring(IsDark ? L"Dark" : L"Bright") + L"BlankShader(DC,Time,Elapsed,W,H,PersistentData)\n";
+    Code += L"EXE(QM(\"PatBlt\"),DC,0,0,W,H," + wstring(IsDark ? L"BLACKNESS" : L"WHITENESS") + L")\n";
     Code += L"end\n";
     return Code;
 }
 
-string WaveBitBlt(bool Vertical, string SRC, bool Persistent) {
-    string ShiftCode = "math.random(-math.abs(ShiftingAmount),math.abs(ShiftingAmount))";
-    return "EXE(QM(\"BitBlt\")," + string(Persistent ? "PersistentData.PersiDC" : "DC") + "," + string(Vertical ? "Line" : ShiftCode) + "," + string(Vertical ? ShiftCode : "Line") + "," + string(Vertical ? "MaxWaveWidth" : "W") + "," + string(Vertical ? "H" : "MaxWaveHeight") + ",DC," + string(Vertical ? "Line,0" : "0,Line") + "," + SRC + ")\n";
+wstring WaveBitBlt(bool Vertical, wstring SRC, bool Persistent) {
+    wstring ShiftCode = L"math.random(-math.abs(ShiftingAmount),math.abs(ShiftingAmount))";
+    return L"EXE(QM(\"BitBlt\")," + wstring(Persistent ? L"PersistentData.PersiDC" : L"DC") + L"," + wstring(Vertical ? L"Line" : ShiftCode) + L"," + wstring(Vertical ? ShiftCode : L"Line") + L"," + wstring(Vertical ? L"MaxWaveWidth" : L"W") + L"," + wstring(Vertical ? L"H" : L"MaxWaveHeight") + L",DC," + wstring(Vertical ? L"Line,0" : L"0,Line") + L"," + SRC + L")\n";
 }
 
-string WaveShader(string prefix, bool Vertical, bool Glitch) {
+wstring WaveShader(wstring prefix, bool Vertical, bool Glitch) {
     wstring Code = L"";
-    Code += L"function " + prefix + "Shader(DC,Final,Time,Elapsed,W,H,PersistentData,MaxWave" + string(Vertical ? "Width" : "Height") + ",MinWave" + string(Vertical ? "Width" : "Height") + ",ShiftingAmount)\n";
-    Code += L"if MaxWave" + string(Vertical ? "Width" : "Height") + "==nil then MaxWave" + string(Vertical ? "Width" : "Height") + "=" + string(Vertical ? "100" : "10") + " end\n";
-    Code += L"if MinWave" + string(Vertical ? "Width" : "Height") + "==nil then MinWave" + string(Vertical ? "Width" : "Height") + "=" + string(Vertical ? "20" : "5") + " end\n";
+    Code += L"function " + prefix + L"Shader(DC,Final,Time,Elapsed,W,H,PersistentData,MaxWave" + wstring(Vertical ? L"Width" : L"Height") + L",MinWave" + wstring(Vertical ? L"Width" : L"Height") + L",ShiftingAmount)\n";
+    Code += L"if MaxWave" + wstring(Vertical ? L"Width" : L"Height") + L"==nil then MaxWave" + wstring(Vertical ? L"Width" : L"Height") + L"=" + wstring(Vertical ? L"100" : L"10") + L" end\n";
+    Code += L"if MinWave" + wstring(Vertical ? L"Width" : L"Height") + L"==nil then MinWave" + wstring(Vertical ? L"Width" : L"Height") + L"=" + wstring(Vertical ? L"20" : L"5") + L" end\n";
     Code += L"if ShiftingAmount==nil then ShiftingAmount=10 end\n";
-    Code += Glitch ? "if PersistentData.PersiDC==nil then" : "";
-    Code += Glitch ? "PersistentData.PersiDC=EXE(QM(\"CreateCompatibleDC\"),DC)" : "";
-    Code += Glitch ? "PersistentData.PersiBMP=EXE(QM(\"CreateCompatibleBitmap\"),DC,W,H)" : "";
-    Code += Glitch ? "PersistentData.PersiW=W" : "";
-    Code += Glitch ? "PersistentData.PersiH=H" : "";
-    Code += Glitch ? "EXE(QM(\"BitBlt\"),PersistentData.PersiDC,0,0,W,H,DC,0,0,SRCCOPY)" : "";
-    Code += Glitch ? "end" : "";
-    Code += Glitch ? "if PersistentData.PersiW!=W or PersistentData.PersiH!=H then" : "";
-    Code += Glitch ? "EXE(QM(\"DeleteDC\"),PersistentData.PersiDC)\n" : "";
-    Code += Glitch ? "EXE(QM(\"DeleteObject\"),PersistentData.PersiBMP)\n" : "";
-    Code += Glitch ? "PersistentData.PersiDC=EXE(QM(\"CreateCompatibleDC\"),DC)" : "";
-    Code += Glitch ? "PersistentData.PersiBMP=EXE(QM(\"CreateCompatibleBitmap\"),DC,W,H)" : "";
-    Code += Glitch ? "PersistentData.PersiW=W" : "";
-    Code += Glitch ? "PersistentData.PersiH=H" : "";
-    Code += Glitch ? "EXE(QM(\"BitBlt\"),PersistentData.PersiDC,0,0,W,H,DC,0,0,SRCCOPY)" : "";
-    Code += Glitch ? "end" : "";
+    Code += Glitch ? L"if PersistentData.PersiDC==nil then" : L"";
+    Code += Glitch ? L"PersistentData.PersiDC=EXE(QM(\"CreateCompatibleDC\"),DC)" : L"";
+    Code += Glitch ? L"PersistentData.PersiBMP=EXE(QM(\"CreateCompatibleBitmap\"),DC,W,H)" : L"";
+    Code += Glitch ? L"PersistentData.PersiW=W" : L"";
+    Code += Glitch ? L"PersistentData.PersiH=H" : L"";
+    Code += Glitch ? L"EXE(QM(\"BitBlt\"),PersistentData.PersiDC,0,0,W,H,DC,0,0,SRCCOPY)" : L"";
+    Code += Glitch ? L"end" : L"";
+    Code += Glitch ? L"if PersistentData.PersiW!=W or PersistentData.PersiH!=H then" : L"";
+    Code += Glitch ? L"EXE(QM(\"DeleteDC\"),PersistentData.PersiDC)\n" : L"";
+    Code += Glitch ? L"EXE(QM(\"DeleteObject\"),PersistentData.PersiBMP)\n" : L"";
+    Code += Glitch ? L"PersistentData.PersiDC=EXE(QM(\"CreateCompatibleDC\"),DC)" : L"";
+    Code += Glitch ? L"PersistentData.PersiBMP=EXE(QM(\"CreateCompatibleBitmap\"),DC,W,H)" : L"";
+    Code += Glitch ? L"PersistentData.PersiW=W" : L"";
+    Code += Glitch ? L"PersistentData.PersiH=H" : L"";
+    Code += Glitch ? L"EXE(QM(\"BitBlt\"),PersistentData.PersiDC,0,0,W,H,DC,0,0,SRCCOPY)" : L"";
+    Code += Glitch ? L"end" : L"";
     Code += L"local Line=0\n";
-    Code += L"while Line<" + string(Vertical ? "W" : "H") + " do\n";
-    Code += Glitch ? "if math.random(0,1)==0 then\n" : "";
-    Code += Glitch ? "" : WaveBitBlt(Vertical, "SRCCOPY", false);
-    Code += Glitch ? WaveBitBlt(Vertical, "SRCPAINT", true) : "";
-    Code += Glitch ? "else\n" : "";
-    Code += Glitch ? WaveBitBlt(Vertical, "SRCAND", true) : "";
-    Code += Glitch ? "end\n" : "";
-    Code += L"Line=Line+math.random(MinWave" + string(Vertical ? "Width" : "Height") + ",MaxWave" + string(Vertical ? "Width" : "Height") + ")\n";
+    Code += L"while Line<" + wstring(Vertical ? L"W" : L"H") + L" do\n";
+    Code += Glitch ? L"if math.random(0,1)==0 then\n" : L"";
+    Code += Glitch ? L"" : WaveBitBlt(Vertical, L"SRCCOPY", false);
+    Code += Glitch ? WaveBitBlt(Vertical, L"SRCPAINT", true) : L"";
+    Code += Glitch ? L"else\n" : L"";
+    Code += Glitch ? WaveBitBlt(Vertical, L"SRCAND", true) : L"";
+    Code += Glitch ? L"end\n" : L"";
+    Code += L"Line=Line+math.random(MinWave" + wstring(Vertical ? L"Width" : L"Height") + L",MaxWave" + wstring(Vertical ? L"Width" : L"Height") + L")\n";
     Code += L"end\n";
-    Code += Glitch ? "EXE(QM(\"BitBlt\"),DC,0,0,W,H,PersistentData.PersiDC,0,0,SRCCOPY)\n" : "";
-    Code += Glitch ? "if Final then" : "";
-    Code += Glitch ? "EXE(QM(\"DeleteDC\"),PersistentData.PersiDC)\n" : "";
-    Code += Glitch ? "EXE(QM(\"DeleteObject\"),PersistentData.PersiBMP)\n" : "";
-    Code += Glitch ? "end" : "";
+    Code += Glitch ? L"EXE(QM(\"BitBlt\"),DC,0,0,W,H,PersistentData.PersiDC,0,0,SRCCOPY)\n" : L"";
+    Code += Glitch ? L"if Final then" : L"";
+    Code += Glitch ? L"EXE(QM(\"DeleteDC\"),PersistentData.PersiDC)\n" : L"";
+    Code += Glitch ? L"EXE(QM(\"DeleteObject\"),PersistentData.PersiBMP)\n" : L"";
+    Code += Glitch ? L"end" : L"";
     Code += L"end\n";
     return Code;
 }
 
-string ColorBurnShader() {
+wstring ColorBurnShader() {
     wstring Code = L"";
     Code += L"function ColorBurnShader(DC,Final,Time,Elapsed,W,H,PersistentData,R,G,B)\n";
     Code += L"if R==nil then R=0 end\n";
     Code += L"if G==nil then G=255 end\n";
     Code += L"if B==nil then B=0 end\n";
-    EncodeColor::ColorR = "R";
-    EncodeColor::ColorG = "G";
-    EncodeColor::ColorB = "B";
-    Code += L"local Color=" + EncodeColor::MakeColor() + "\n";
+    EncodeColor::ColorR = L"R";
+    EncodeColor::ColorG = L"G";
+    EncodeColor::ColorB = L"B";
+    Code += L"local Color=" + EncodeColor::MakeColor() + L"\n";
     Code += L"local Brush=EXE(QM(\"CreateSolidBrush\"),Color)\n";
     Code += L"EXE(QM(\"SelectObject\"),DC,Brush)\n";
     Code += L"EXE(QM(\"PatBlt\"),DC,0,0,W,H,PATINVERT)\n";
@@ -744,44 +744,44 @@ string ColorBurnShader() {
     return Code;
 }
 
-string RainbowBurnShader(bool Vertical, bool Animated, bool Reversed) {
+wstring RainbowBurnShader(bool Vertical, bool Animated, bool Reversed) {
     wstring Code = L"";
-    Code += L"function " + string(Reversed ? "Reversed" : "") + string(Animated ? "Animated" : "") + string(Vertical ? "Vertical" : "") + "RainbowBurnShader(DC,Final,Time,Elapsed,W,H,PersistentData,Initial_R,Initial_G,Initial_B,Final_R,Final_G,Final_B" + string(Animated ? ",Iteration" : "") + ",Bar" + string(Vertical ? "Width" : "Height") + ")\n";
+    Code += L"function " + wstring(Reversed ? L"Reversed" : L"") + wstring(Animated ? L"Animated" : L"") + wstring(Vertical ? L"Vertical" : L"") + L"RainbowBurnShader(DC,Final,Time,Elapsed,W,H,PersistentData,Initial_R,Initial_G,Initial_B,Final_R,Final_G,Final_B" + wstring(Animated ? L",Iteration" : L"") + L",Bar" + wstring(Vertical ? L"Width" : L"Height") + L")\n";
     Code += L"if Initial_R==nil then Initial_R=0 end\n";
     Code += L"if Initial_G==nil then Initial_G=255 end\n";
     Code += L"if Initial_B==nil then Initial_B=0 end\n";
     Code += L"if Final_R==nil then Final_R=0 end\n";
     Code += L"if Final_G==nil then Final_G=0 end\n";
     Code += L"if Final_B==nil then Final_B=255 end\n";
-    Code += Animated ? "if Iteration==nil then Iteration=10 end\n" : "";
-    Code += L"if Bar" + string(Vertical ? "Width" : "Height") + "==nil then Bar" + string(Vertical ? "Width" : "Height") + "=2 end\n";
+    Code += Animated ? L"if Iteration==nil then Iteration=10 end\n" : L"";
+    Code += L"if Bar" + wstring(Vertical ? L"Width" : L"Height") + L"==nil then Bar" + wstring(Vertical ? L"Width" : L"Height") + L"=2 end\n";
     Code += L"local Line=0\n";
-    Code += L"while Line<" + string(Vertical ? "W" : "H") + " do\n";
-    Code += Animated ? "local OffsetedLine=math.abs((Line+" + string(Reversed ? "(1.0-Time)" : "Time") + "*Iteration*" + string(Vertical ? "W" : "H") + ")%(2*" + string(Vertical ? "W" : "H") + ")-" + string(Vertical ? "W" : "H") + ")\n" : "";
-    Code += L"local R=math.ceil((" + string(Animated ? "OffsetedLine" : "Line") + "/" + string(Vertical ? "W" : "H") + ")*(Final_R-Initial_R)+Initial_R)\n";
-    Code += L"local G=math.ceil((" + string(Animated ? "OffsetedLine" : "Line") + "/" + string(Vertical ? "W" : "H") + ")*(Final_G-Initial_G)+Initial_G)\n";
-    Code += L"local B=math.ceil((" + string(Animated ? "OffsetedLine" : "Line") + "/" + string(Vertical ? "W" : "H") + ")*(Final_B-Initial_B)+Initial_B)\n";
-    EncodeColor::ColorR = "R";
-    EncodeColor::ColorG = "G";
-    EncodeColor::ColorB = "B";
-    Code += L"local Color=" + EncodeColor::MakeColor() + "\n";
+    Code += L"while Line<" + wstring(Vertical ? L"W" : L"H") + L" do\n";
+    Code += Animated ? L"local OffsetedLine=math.abs((Line+" + wstring(Reversed ? L"(1.0-Time)" : L"Time") + L"*Iteration*" + wstring(Vertical ? L"W" : L"H") + L")%(2*" + wstring(Vertical ? L"W" : L"H") + L")-" + wstring(Vertical ? L"W" : L"H") + L")\n" : L"";
+    Code += L"local R=math.ceil((" + wstring(Animated ? L"OffsetedLine" : L"Line") + L"/" + wstring(Vertical ? L"W" : L"H") + L")*(Final_R-Initial_R)+Initial_R)\n";
+    Code += L"local G=math.ceil((" + wstring(Animated ? L"OffsetedLine" : L"Line") + L"/" + wstring(Vertical ? L"W" : L"H") + L")*(Final_G-Initial_G)+Initial_G)\n";
+    Code += L"local B=math.ceil((" + wstring(Animated ? L"OffsetedLine" : L"Line") + L"/" + wstring(Vertical ? L"W" : L"H") + L")*(Final_B-Initial_B)+Initial_B)\n";
+    EncodeColor::ColorR = L"R";
+    EncodeColor::ColorG = L"G";
+    EncodeColor::ColorB = L"B";
+    Code += L"local Color=" + EncodeColor::MakeColor() + L"\n";
     Code += L"local Brush=EXE(QM(\"CreateSolidBrush\"),Color)\n";
     Code += L"EXE(QM(\"SelectObject\"),DC,Brush)\n";
-    Code += L"EXE(QM(\"PatBlt\"),DC," + string(Vertical ? "Line,0" : "0,Line") + "," + string(Vertical ? "BarWidth,H" : "W,BarHeight") + ",PATINVERT)\n";
+    Code += L"EXE(QM(\"PatBlt\"),DC," + wstring(Vertical ? L"Line,0" : L"0,Line") + L"," + wstring(Vertical ? L"BarWidth,H" : L"W,BarHeight") + L",PATINVERT)\n";
     Code += L"EXE(QM(\"DeleteObject\"),Brush)\n";
-    Code += L"Line=Line+Bar" + string(Vertical ? "Width" : "Height") + "\n";
+    Code += L"Line=Line+Bar" + wstring(Vertical ? L"Width" : L"Height") + L"\n";
     Code += L"end\n";
     Code += L"end\n";
     return Code;
 }
 
-string ColorOffset(bool WithWave) {
+wstring ColorOffset(bool WithWave) {
     wstring Code = L"";
-    Code += L"function ColorOffset" + string(WithWave ? "Wave" : "") + "Shader(DC,Final,Time,Elapsed,W,H,PersistentData,OffsettingAmount" + string(WithWave ? ",MaxWaveHeight,MinWaveHeight,ShiftingAmount" : "") + ")\n";
+    Code += L"function ColorOffset" + wstring(WithWave ? L"Wave" : L"") + L"Shader(DC,Final,Time,Elapsed,W,H,PersistentData,OffsettingAmount" + wstring(WithWave ? L",MaxWaveHeight,MinWaveHeight,ShiftingAmount" : L"") + L")\n";
     Code += L"if OffsettingAmount==nil then OffsettingAmount=5 end\n";
-    Code += WithWave ? "if MaxWaveHeight==nil then MaxWaveHeight=40 end\n" : "";
-    Code += WithWave ? "if MinWaveHeight==nil then MinWaveHeight=10 end\n" : "";
-    Code += WithWave ? "if ShiftingAmount==nil then ShiftingAmount=10 end\n" : "";
+    Code += WithWave ? L"if MaxWaveHeight==nil then MaxWaveHeight=40 end\n" : L"";
+    Code += WithWave ? L"if MinWaveHeight==nil then MinWaveHeight=10 end\n" : L"";
+    Code += WithWave ? L"if ShiftingAmount==nil then ShiftingAmount=10 end\n" : L"";
     Code += L"local MEMdc_R=EXE(QM(\"CreateCompatibleDC\"),DC)\n";
     Code += L"local BMP_R=EXE(QM(\"CreateCompatibleBitmap\"),DC,W,H)\n";
     Code += L"local MEMdc_G=EXE(QM(\"CreateCompatibleDC\"),DC)\n";
@@ -809,21 +809,21 @@ string ColorOffset(bool WithWave) {
     Code += L"EXE(QM(\"DeleteObject\"),Brush)\n";
     Code += L"EXE(QM(\"BitBlt\"),MEMdc_B,0,0,W,H,DC,0,0,SRCAND)\n";
     Code += L"EXE(QM(\"SelectObject\"),MEMdc_Main,BMP_Main)\n";
-    string ShiftCode = "math.random(-math.abs(OffsettingAmount),math.abs(OffsettingAmount))";
-    Code += WithWave ? "local Line=0\n" : "";
-    Code += WithWave ? "local OffsetRX=" + ShiftCode + "\n" : "";
-    Code += WithWave ? "local OffsetRY=" + ShiftCode + "\n" : "";
-    Code += WithWave ? "local OffsetGX=" + ShiftCode + "\n" : "";
-    Code += WithWave ? "local OffsetGY=" + ShiftCode + "\n" : "";
-    Code += WithWave ? "local OffsetBX=" + ShiftCode + "\n" : "";
-    Code += WithWave ? "local OffsetBY=" + ShiftCode + "\n" : "";
-    Code += WithWave ? "while Line<H do\n" : "";
-    ShiftCode = WithWave ? "math.random(-math.abs(ShiftingAmount),math.abs(ShiftingAmount))" : ShiftCode;
-    Code += L"EXE(QM(\"BitBlt\"),MEMdc_Main," + ShiftCode + "," + string(WithWave ? "Line" : ShiftCode) + ",W," + string(WithWave ? "MaxWaveHeight" : "H") + ",MEMdc_R," + string(WithWave ? "OffsetRX,Line+OffsetRY" : "0,0") + ",SRCPAINT)\n";
-    Code += L"EXE(QM(\"BitBlt\"),MEMdc_Main," + ShiftCode + "," + string(WithWave ? "Line" : ShiftCode) + ",W," + string(WithWave ? "MaxWaveHeight" : "H") + ",MEMdc_G," + string(WithWave ? "OffsetGX,Line+OffsetGY" : "0,0") + ",SRCPAINT)\n";
-    Code += L"EXE(QM(\"BitBlt\"),MEMdc_Main," + ShiftCode + "," + string(WithWave ? "Line" : ShiftCode) + ",W," + string(WithWave ? "MaxWaveHeight" : "H") + ",MEMdc_B," + string(WithWave ? "OffsetBX,Line+OffsetBY" : "0,0") + ",SRCPAINT)\n";
-    Code += WithWave ? "Line=Line+math.random(MinWaveHeight,MaxWaveHeight)\n" : "";
-    Code += WithWave ? "end\n" : "";
+    wstring ShiftCode = L"math.random(-math.abs(OffsettingAmount),math.abs(OffsettingAmount))";
+    Code += WithWave ? L"local Line=0\n" : L"";
+    Code += WithWave ? L"local OffsetRX=" + ShiftCode + L"\n" : L"";
+    Code += WithWave ? L"local OffsetRY=" + ShiftCode + L"\n" : L"";
+    Code += WithWave ? L"local OffsetGX=" + ShiftCode + L"\n" : L"";
+    Code += WithWave ? L"local OffsetGY=" + ShiftCode + L"\n" : L"";
+    Code += WithWave ? L"local OffsetBX=" + ShiftCode + L"\n" : L"";
+    Code += WithWave ? L"local OffsetBY=" + ShiftCode + L"\n" : L"";
+    Code += WithWave ? L"while Line<H do\n" : L"";
+    ShiftCode = WithWave ? L"math.random(-math.abs(ShiftingAmount),math.abs(ShiftingAmount))" : ShiftCode;
+    Code += L"EXE(QM(\"BitBlt\"),MEMdc_Main," + ShiftCode + L"," + wstring(WithWave ? L"Line" : ShiftCode) + L",W," + wstring(WithWave ? L"MaxWaveHeight" : L"H") + L",MEMdc_R," + wstring(WithWave ? L"OffsetRX,Line+OffsetRY" : L"0,0") + L",SRCPAINT)\n";
+    Code += L"EXE(QM(\"BitBlt\"),MEMdc_Main," + ShiftCode + L"," + wstring(WithWave ? L"Line" : ShiftCode) + L",W," + wstring(WithWave ? L"MaxWaveHeight" : L"H") + L",MEMdc_G," + wstring(WithWave ? L"OffsetGX,Line+OffsetGY" : L"0,0") + L",SRCPAINT)\n";
+    Code += L"EXE(QM(\"BitBlt\"),MEMdc_Main," + ShiftCode + L"," + wstring(WithWave ? L"Line" : ShiftCode) + L",W," + wstring(WithWave ? L"MaxWaveHeight" : L"H") + L",MEMdc_B," + wstring(WithWave ? L"OffsetBX,Line+OffsetBY" : L"0,0") + L",SRCPAINT)\n";
+    Code += WithWave ? L"Line=Line+math.random(MinWaveHeight,MaxWaveHeight)\n" : L"";
+    Code += WithWave ? L"end\n" : L"";
     Code += L"EXE(QM(\"BitBlt\"),DC,0,0,W,H,MEMdc_Main,0,0,SRCCOPY)\n";
     Code += L"EXE(QM(\"DeleteDC\"),MEMdc_R)\n";
     Code += L"EXE(QM(\"DeleteObject\"),BMP_R)\n";
@@ -837,18 +837,18 @@ string ColorOffset(bool WithWave) {
     return Code;
 }
 
-string FadeShader(bool IsDark, bool IsReversed) {
+wstring FadeShader(bool IsDark, bool IsReversed) {
     wstring Code = L"";
-    Code += L"function " + string(IsReversed ? "Reversed" : "") + string(IsDark ? "Dark" : "Bright") + "FadeShader(DC,Final,Time,Elapsed,W,H,PersistentData,MaxAlpha,MinAlpha)\n";
+    Code += L"function " + wstring(IsReversed ? L"Reversed" : L"") + wstring(IsDark ? L"Dark" : L"Bright") + L"FadeShader(DC,Final,Time,Elapsed,W,H,PersistentData,MaxAlpha,MinAlpha)\n";
     Code += L"if MaxAlpha==nil then MaxAlpha=255.0 end\n";
     Code += L"if MinAlpha==nil then MinAlpha=0.0 end\n";
     Code += L"local MEMdc=EXE(QM(\"CreateCompatibleDC\"),DC)\n";
     Code += L"local BMP=EXE(QM(\"CreateCompatibleBitmap\"),DC,W,H)\n";
     Code += L"EXE(QM(\"SelectObject\"),MEMdc,BMP)\n";
-    Code += L"EXE(QM(\"PatBlt\"),MEMdc,0,0,W,H," + string(IsDark ? "BLACKNESS" : "WHITENESS") + ")\n";
-    Code += L"local Alpha=math.floor((MaxAlpha-MinAlpha)*" + string(IsReversed ? "(1.0-Time)" : "Time") + "+MinAlpha)\n";
-    EncodeColor::ColorA = "Alpha";
-    Code += L"local BlendFunc=" + EncodeColor::MakeAlpha() + "\n";
+    Code += L"EXE(QM(\"PatBlt\"),MEMdc,0,0,W,H," + wstring(IsDark ? L"BLACKNESS" : L"WHITENESS") + L")\n";
+    Code += L"local Alpha=math.floor((MaxAlpha-MinAlpha)*" + wstring(IsReversed ? L"(1.0-Time)" : L"Time") + L"+MinAlpha)\n";
+    EncodeColor::ColorA = L"Alpha";
+    Code += L"local BlendFunc=" + EncodeColor::MakeAlpha() + L"\n";
     Code += L"EXE(QM(\"AlphaBlend\"),DC,0,0,W,H,MEMdc,0,0,W,H,BlendFunc)\n";
     Code += L"EXE(QM(\"DeleteDC\"),MEMdc)\n";
     Code += L"EXE(QM(\"DeleteObject\"),BMP)\n";
@@ -856,7 +856,7 @@ string FadeShader(bool IsDark, bool IsReversed) {
     return Code;
 }
 
-string HatchBrushShader() {
+wstring HatchBrushShader() {
     wstring Code = L"";
     Code += L"function HatchBrushShader(DC,Final,Time,Elapsed,W,H,PersistentData,R,G,B,BkR,BkG,BkB)\n";
     Code += L"if R==nil then R=0 end\n";
@@ -865,16 +865,16 @@ string HatchBrushShader() {
     Code += L"if BkR==nil then BkR=255 end\n";
     Code += L"if BkG==nil then BkG=0 end\n";
     Code += L"if BkB==nil then BkB=0 end\n";
-    EncodeColor::ColorR = "R";
-    EncodeColor::ColorG = "G";
-    EncodeColor::ColorB = "B";
-    Code += L"local Color=" + EncodeColor::MakeColor() + "\n";
+    EncodeColor::ColorR = L"R";
+    EncodeColor::ColorG = L"G";
+    EncodeColor::ColorB = L"B";
+    Code += L"local Color=" + EncodeColor::MakeColor() + L"\n";
     Code += L"local Brush=EXE(QM(\"CreateHatchBrush\"),math.random(0,5),Color)\n";
     Code += L"EXE(QM(\"SelectObject\"),DC,Brush)\n";
-    EncodeColor::ColorR = "BkR";
-    EncodeColor::ColorG = "BkG";
-    EncodeColor::ColorB = "BkB";
-    Code += L"local BkColor=" + EncodeColor::MakeColor() + "\n";
+    EncodeColor::ColorR = L"BkR";
+    EncodeColor::ColorG = L"BkG";
+    EncodeColor::ColorB = L"BkB";
+    Code += L"local BkColor=" + EncodeColor::MakeColor() + L"\n";
     Code += L"EXE(QM(\"SetBKColor\"),DC,BkColor)\n";
     Code += L"EXE(QM(\"PatBlt\"),DC,0,0,W,H,PATINVERT)\n";
     Code += L"EXE(QM(\"DeleteObject\"),Brush)\n";
@@ -882,9 +882,9 @@ string HatchBrushShader() {
     return Code;
 }
 
-string TextShader(bool Type, bool IsReversed) {
+wstring TextShader(bool Type, bool IsReversed) {
     wstring Code = L"";
-    Code += L"function " + string(Type ? (IsReversed ? "Delete" : "Type") : "") + "TextShader(DC,Final,Time,Elapsed,W,H,PersistentData,Text,FontHeight,FontWidth,FontWeight,FaceName,Alignment,Italic,Underline,StrikeOut,PosX,PosY,NoBackground,TextR,TextG,TextB,BkR,BkG,BkB)\n";
+    Code += L"function " + wstring(Type ? (IsReversed ? L"Delete" : L"Type") : L"") + L"TextShader(DC,Final,Time,Elapsed,W,H,PersistentData,Text,FontHeight,FontWidth,FontWeight,FaceName,Alignment,Italic,Underline,StrikeOut,PosX,PosY,NoBackground,TextR,TextG,TextB,BkR,BkG,BkB)\n";
     Code += L"if Text==nil then Text=\"Hello World\" end\n";
     Code += L"if FontHeight==nil then FontHeight=50 end\n";
     Code += L"if FontWidth==nil then FontWidth=30 end\n";
@@ -903,10 +903,10 @@ string TextShader(bool Type, bool IsReversed) {
     Code += L"if BkR==nil then BkR=255 end\n";
     Code += L"if BkG==nil then BkG=0 end\n";
     Code += L"if BkB==nil then BkB=0 end\n";
-    EncodeColor::ColorR = "TextR";
-    EncodeColor::ColorG = "TextG";
-    EncodeColor::ColorB = "TextB";
-    Code += L"local Color=" + EncodeColor::MakeColor() + "\n";
+    EncodeColor::ColorR = L"TextR";
+    EncodeColor::ColorG = L"TextG";
+    EncodeColor::ColorB = L"TextB";
+    Code += L"local Color=" + EncodeColor::MakeColor() + L"\n";
     Code += L"EXE(QM(\"SetTextColor\"),DC,Color)\n";
     Code += L"if NoBackground==true then\n";
     Code += L"EXE(QM(\"SetBkMode\"),DC,1)\n";
@@ -914,10 +914,10 @@ string TextShader(bool Type, bool IsReversed) {
     Code += L"if NoBackground==false then\n";
     Code += L"EXE(QM(\"SetBkMode\"),DC,2)\n";
     Code += L"end\n";
-    EncodeColor::ColorR = "BkR";
-    EncodeColor::ColorG = "BkG";
-    EncodeColor::ColorB = "BkB";
-    Code += L"local BkColor=" + EncodeColor::MakeColor() + "\n";
+    EncodeColor::ColorR = L"BkR";
+    EncodeColor::ColorG = L"BkG";
+    EncodeColor::ColorB = L"BkB";
+    Code += L"local BkColor=" + EncodeColor::MakeColor() + L"\n";
     Code += L"EXE(QM(\"SetBKColor\"),DC,BkColor)\n";
     Code += L"local Font=EXE(QM(\"CreateFontA\"),\n";
     Code += L"FontHeight,-- FontHeight\n";
@@ -938,62 +938,62 @@ string TextShader(bool Type, bool IsReversed) {
     Code += L"local MEM=createMemoryStream()\n";
     Code += L"MEM.Position=0\n";
     Code += L"MEM.size=8\n";
-    Code += L"EXE(QM(\"GetTextExtentPoint32A\"),DC,Text," + string(Type ? (IsReversed ? "math.ceil(#Text*(1.0-Time))" : "math.ceil(#Text*Time)") : "#Text") + ",MEM.Memory)\n";
+    Code += L"EXE(QM(\"GetTextExtentPoint32A\"),DC,Text," + wstring(Type ? (IsReversed ? L"math.ceil(#Text*(1.0-Time))" : L"math.ceil(#Text*Time)") : L"#Text") + L",MEM.Memory)\n";
     Code += L"MEM.Position=0\n";
     Code += L"local TextW=MEM.readDword()\n";
     Code += L"local TextH=MEM.readDword()\n";
     Code += L"MEM.destroy()\n";
     Code += L"local TextX=0\n";
     Code += L"local TextY=0\n";
-    string Left = "PosX";
-    string Center = "PosX-TextW/2";
-    string Right = "PosX-TextW";
-    string Top = "PosY";
-    string Middle = "PosY-TextH/2";
-    string Bottom = "PosY-TextH";
+    wstring Left = L"PosX";
+    wstring Center = L"PosX-TextW/2";
+    wstring Right = L"PosX-TextW";
+    wstring Top = L"PosY";
+    wstring Middle = L"PosY-TextH/2";
+    wstring Bottom = L"PosY-TextH";
     Code += L"if Alignment==0x0101 then\n";
-    Code += L"TextX=math.floor(" + Left + ")\n";
-    Code += L"TextY=math.floor(" + Top + ")\n";
+    Code += L"TextX=math.floor(" + Left + L")\n";
+    Code += L"TextY=math.floor(" + Top + L")\n";
     Code += L"end\n";
     Code += L"if Alignment==0x0102 then\n";
-    Code += L"TextX=math.floor(" + Left + ")\n";
-    Code += L"TextY=math.floor(" + Middle + ")\n";
+    Code += L"TextX=math.floor(" + Left + L")\n";
+    Code += L"TextY=math.floor(" + Middle + L")\n";
     Code += L"end\n";
     Code += L"if Alignment==0x0103 then\n";
-    Code += L"TextX=math.floor(" + Left + ")\n";
-    Code += L"TextY=math.floor(" + Bottom + ")\n";
+    Code += L"TextX=math.floor(" + Left + L")\n";
+    Code += L"TextY=math.floor(" + Bottom + L")\n";
     Code += L"end\n";
     Code += L"if Alignment==0x0201 then\n";
-    Code += L"TextX=math.floor(" + Center + ")\n";
-    Code += L"TextY=math.floor(" + Top + ")\n";
+    Code += L"TextX=math.floor(" + Center + L")\n";
+    Code += L"TextY=math.floor(" + Top + L")\n";
     Code += L"end\n";
     Code += L"if Alignment==0x0202 then\n";
-    Code += L"TextX=math.floor(" + Center + ")\n";
-    Code += L"TextY=math.floor(" + Middle + ")\n";
+    Code += L"TextX=math.floor(" + Center + L")\n";
+    Code += L"TextY=math.floor(" + Middle + L")\n";
     Code += L"end\n";
     Code += L"if Alignment==0x0203 then\n";
-    Code += L"TextX=math.floor(" + Center + ")\n";
-    Code += L"TextY=math.floor(" + Bottom + ")\n";
+    Code += L"TextX=math.floor(" + Center + L")\n";
+    Code += L"TextY=math.floor(" + Bottom + L")\n";
     Code += L"end\n";
     Code += L"if Alignment==0x0301 then\n";
-    Code += L"TextX=math.floor(" + Right + ")\n";
-    Code += L"TextY=math.floor(" + Top + ")\n";
+    Code += L"TextX=math.floor(" + Right + L")\n";
+    Code += L"TextY=math.floor(" + Top + L")\n";
     Code += L"end\n";
     Code += L"if Alignment==0x0302 then\n";
-    Code += L"TextX=math.floor(" + Right + ")\n";
-    Code += L"TextY=math.floor(" + Middle + ")\n";
+    Code += L"TextX=math.floor(" + Right + L")\n";
+    Code += L"TextY=math.floor(" + Middle + L")\n";
     Code += L"end\n";
     Code += L"if Alignment==0x0303 then\n";
-    Code += L"TextX=math.floor(" + Right + ")\n";
-    Code += L"TextY=math.floor(" + Bottom + ")\n";
+    Code += L"TextX=math.floor(" + Right + L")\n";
+    Code += L"TextY=math.floor(" + Bottom + L")\n";
     Code += L"end\n";
-    Code += L"EXE(QM(\"TextOutA\"),DC,TextX,TextY,Text," + string(Type ? (IsReversed ? "math.ceil(#Text*(1.0-Time))" : "math.ceil(#Text*Time)") : "#Text") + ")\n";
+    Code += L"EXE(QM(\"TextOutA\"),DC,TextX,TextY,Text," + wstring(Type ? (IsReversed ? L"math.ceil(#Text*(1.0-Time))" : L"math.ceil(#Text*Time)") : L"#Text") + L")\n";
     Code += L"EXE(QM(\"DeleteObject\"),Font)\n";
     Code += L"end\n";
     return Code;
 }
 
-string RotatePointTool() {
+wstring RotatePointTool() {
     wstring Code = L"";
     Code += L"function RotatePoint(X,Y,R,CX,CY)\n";
     Code += L"return CX+(X-CX)*math.cos(R)-(Y-CY)*math.sin(R),CY+(X-CX)*math.sin(R)+(Y-CY)*math.cos(R)\n";
@@ -1001,12 +1001,12 @@ string RotatePointTool() {
     return Code;
 }
 
-string RadialBlurShader(bool IsBlur, bool IsPaint) {
+wstring RadialBlurShader(bool IsBlur, bool IsPaint) {
     wstring Code = L"";
-    Code += L"function Radial" + string(IsBlur ? "Blur" : (IsPaint ? "Paint" : "And")) + "Shader(DC,Final,Time,Elapsed,W,H,PersistentData,MaxRotation,Precision" + string(IsBlur ? ",BlendAlpha" : "") + ",Iteration)\n";
+    Code += L"function Radial" + wstring(IsBlur ? L"Blur" : (IsPaint ? L"Paint" : L"And")) + L"Shader(DC,Final,Time,Elapsed,W,H,PersistentData,MaxRotation,Precision" + wstring(IsBlur ? L",BlendAlpha" : L"") + L",Iteration)\n";
     Code += L"if MaxRotation==nil then MaxRotation=0.05 end\n";
     Code += L"if Precision==nil then Precision=4 end\n";
-    Code += IsBlur ? "if BlendAlpha==nil then BlendAlpha=(1<<7)-1 end\n" : "";
+    Code += IsBlur ? L"if BlendAlpha==nil then BlendAlpha=(1<<7)-1 end\n" : L"";
     Code += L"if Iteration==nil then Iteration=5 end\n";
     Code += L"local MEM=createMemoryStream()\n";
     Code += L"MEM.size=24\n";
@@ -1027,10 +1027,10 @@ string RadialBlurShader(bool IsBlur, bool IsPaint) {
     Code += L"MEM.writeDword(math.floor(BottomLeftY))\n";
     Code += L"MEM.Position=0\n";
     Code += L"EXE(QM(\"PlgBlt\"),MEMdc,MEM.Memory,DC,0,0,W,H,0,0,0)\n";
-    EncodeColor::ColorA = "BlendAlpha";
-    Code += IsBlur ? "local BlendFunc=" + EncodeColor::MakeAlpha() + "\n" : "";
-    Code += IsBlur ? "EXE(QM(\"AlphaBlend\"),DC,0,0,W,H,MEMdc,0,0,W,H,BlendFunc)\n" : "";
-    Code += IsBlur ? "" : "EXE(QM(\"BitBlt\"),DC,0,0,W,H,MEMdc,0,0," + string(IsPaint ? "SRCPAINT" : "SRCAND") + ")\n";
+    EncodeColor::ColorA = L"BlendAlpha";
+    Code += IsBlur ? L"local BlendFunc=" + EncodeColor::MakeAlpha() + L"\n" : L"";
+    Code += IsBlur ? L"EXE(QM(\"AlphaBlend\"),DC,0,0,W,H,MEMdc,0,0,W,H,BlendFunc)\n" : L"";
+    Code += IsBlur ? L"" : L"EXE(QM(\"BitBlt\"),DC,0,0,W,H,MEMdc,0,0," + wstring(IsPaint ? L"SRCPAINT" : L"SRCAND") + L")\n";
     Code += L"end\n";
     Code += L"MEM.destroy()\n";
     Code += L"EXE(QM(\"DeleteDC\"),MEMdc)\n";
@@ -1039,12 +1039,12 @@ string RadialBlurShader(bool IsBlur, bool IsPaint) {
     return Code;
 }
 
-string PolygonShader(bool IsColored, bool IsRandom) {
+wstring PolygonShader(bool IsColored, bool IsRandom) {
     wstring Code = L"";
-    EncodeColor::ColorR = "R";
-    EncodeColor::ColorG = "G";
-    EncodeColor::ColorB = "B";
-    Code += L"function " + string(IsColored ? (IsRandom ? "RandomColor" : "Color") : "Invert") + "PolygonShader(DC,Final,Time,Elapsed,W,H,PersistentData,MaxSides,MinSides,MaxRadius,MinRadius,MaxCount,MinCount,MinRotationSpeed,MaxRotationSpeed,SpeedMultiplier,LineThickness,Delay" + string(IsColored ? (IsRandom ? "" : ",R,G,B") : "") + ")\n";
+    EncodeColor::ColorR = L"R";
+    EncodeColor::ColorG = L"G";
+    EncodeColor::ColorB = L"B";
+    Code += L"function " + wstring(IsColored ? (IsRandom ? L"RandomColor" : L"Color") : L"Invert") + L"PolygonShader(DC,Final,Time,Elapsed,W,H,PersistentData,MaxSides,MinSides,MaxRadius,MinRadius,MaxCount,MinCount,MinRotationSpeed,MaxRotationSpeed,SpeedMultiplier,LineThickness,Delay" + wstring(IsColored ? (IsRandom ? L"" : L",R,G,B") : L"") + L")\n";
     Code += L"if MaxSides==nil then MaxSides=10 end\n";
     Code += L"if MinSides==nil then MinSides=3 end\n";
     Code += L"if MaxRadius==nil then MaxRadius=400 end\n";
@@ -1056,12 +1056,12 @@ string PolygonShader(bool IsColored, bool IsRandom) {
     Code += L"if SpeedMultiplier==nil then SpeedMultiplier=1000 end\n";
     Code += L"if LineThickness==nil then LineThickness=50 end\n";
     Code += L"if Delay==nil then Delay=0.25*S end\n";
-    Code += IsColored ? (IsRandom ? "" : "if R==nil then R=0 end\n") : "";
-    Code += IsColored ? (IsRandom ? "" : "if G==nil then G=255 end\n") : "";
-    Code += IsColored ? (IsRandom ? "" : "if B==nil then B=0 end\n") : "";
+    Code += IsColored ? (IsRandom ? L"" : L"if R==nil then R=0 end\n") : L"";
+    Code += IsColored ? (IsRandom ? L"" : L"if G==nil then G=255 end\n") : L"";
+    Code += IsColored ? (IsRandom ? L"" : L"if B==nil then B=0 end\n") : L"";
     Code += L"if PersistentData.Shapes==nil then PersistentData.Shapes={} end\n";
-    Code += IsColored ? (IsRandom ? "if PersistentData.Colors==nil then PersistentData.Colors={} end\n" : "") : "";
-    Code += IsColored ? (IsRandom ? "if PersistentData.ShapesGenerated==nil then PersistentData.ShapesGenerated=false end\n" : "") : "";
+    Code += IsColored ? (IsRandom ? L"if PersistentData.Colors==nil then PersistentData.Colors={} end\n" : L"") : L"";
+    Code += IsColored ? (IsRandom ? L"if PersistentData.ShapesGenerated==nil then PersistentData.ShapesGenerated=false end\n" : L"") : L"";
     Code += L"if PersistentData.LastUpdate==nil then PersistentData.LastUpdate=0 end\n";
     Code += L"local Count=math.random(MinCount,MaxCount)\n";
     Code += L"if PersistentData.ShapesGenerated==true then Count=PersistentData.Count else PersistentData.Count=Count end\n";
@@ -1075,9 +1075,9 @@ string PolygonShader(bool IsColored, bool IsRandom) {
     Code += L"local Rotation=math.random()*(2*math.pi)\n";
     Code += L"local Speed=math.random(MinRotationSpeed*SpeedMultiplier,MaxRotationSpeed*SpeedMultiplier)/SpeedMultiplier\n";
     Code += L"local AngleStep=2*math.pi/Sides\n";
-    Code += IsColored ? (IsRandom ? "local R=math.random(0,255)\n" : "") : "";
-    Code += IsColored ? (IsRandom ? "local G=math.random(0,255)\n" : "") : "";
-    Code += IsColored ? (IsRandom ? "local B=math.random(0,255)\n" : "") : "";
+    Code += IsColored ? (IsRandom ? L"local R=math.random(0,255)\n" : L"") : L"";
+    Code += IsColored ? (IsRandom ? L"local G=math.random(0,255)\n" : L"") : L"";
+    Code += IsColored ? (IsRandom ? L"local B=math.random(0,255)\n" : L"") : L"";
     Code += L"if PersistentData.ShapesGenerated==true then\n";
     Code += L"Sides=PersistentData.Shapes[Shape].Sides\n";
     Code += L"Radius=PersistentData.Shapes[Shape].Radius\n";
@@ -1099,24 +1099,24 @@ string PolygonShader(bool IsColored, bool IsRandom) {
     Code += L"end\n";
     Code += L"MEM.Position=0\n";
     Code += L"table.insert(Polygons,EXE(QM(\"CreatePolygonRgn\"),MEM.Memory,Sides,2))\n";
-    Code += IsColored ? (IsRandom ? "if PersistentData.ShapesGenerated==false then table.insert(PersistentData.Colors," + EncodeColor::MakeColor() + ") end\n" : "") : "";
+    Code += IsColored ? (IsRandom ? L"if PersistentData.ShapesGenerated==false then table.insert(PersistentData.Colors," + EncodeColor::MakeColor() + L") end\n" : L"") : L"";
     Code += L"Radius=Radius-LineThickness\n";
     Code += L"end\n";
     Code += L"end\n";
     Code += L"PersistentData.ShapesGenerated=true\n";
     Code += L"MEM.destroy()\n";
-    Code += IsColored ? (IsRandom ? "" : "local Color=" + EncodeColor::MakeColor() + "\n") : "";
-    Code += IsColored ? (IsRandom ? "" : "local Brush=EXE(QM(\"CreateSolidBrush\"),Color)\n") : "";
-    Code += L"for " + string(IsRandom ? "PolygonID" : "_") + ",ThisPolygon in ipairs(Polygons) do\n";
-    Code += IsColored ? (IsRandom ? "local Brush=EXE(QM(\"CreateSolidBrush\"),PersistentData.Colors[PolygonID])\n" : "") : "";
-    Code += IsColored ? "EXE(QM(\"FrameRgn\"),DC,ThisPolygon,Brush,math.ceil(LineThickness/4),math.ceil(LineThickness/4))\n" : "EXE(QM(\"InvertRgn\"),DC,ThisPolygon)\n";
-    Code += IsColored ? (IsRandom ? "EXE(QM(\"DeleteObject\"),Brush)\n" : "") : "";
+    Code += IsColored ? (IsRandom ? L"" : L"local Color=" + EncodeColor::MakeColor() + L"\n") : L"";
+    Code += IsColored ? (IsRandom ? L"" : L"local Brush=EXE(QM(\"CreateSolidBrush\"),Color)\n") : L"";
+    Code += L"for " + wstring(IsRandom ? L"PolygonID" : L"_") + L",ThisPolygon in ipairs(Polygons) do\n";
+    Code += IsColored ? (IsRandom ? L"local Brush=EXE(QM(\"CreateSolidBrush\"),PersistentData.Colors[PolygonID])\n" : L"") : L"";
+    Code += IsColored ? L"EXE(QM(\"FrameRgn\"),DC,ThisPolygon,Brush,math.ceil(LineThickness/4),math.ceil(LineThickness/4))\n" : L"EXE(QM(\"InvertRgn\"),DC,ThisPolygon)\n";
+    Code += IsColored ? (IsRandom ? L"EXE(QM(\"DeleteObject\"),Brush)\n" : L"") : L"";
     Code += L"EXE(QM(\"DeleteObject\"),ThisPolygon)\n";
     Code += L"end\n";
-    Code += IsColored ? (IsRandom ? "" : "EXE(QM(\"DeleteObject\"),Brush)\n") : "";
+    Code += IsColored ? (IsRandom ? L"" : L"EXE(QM(\"DeleteObject\"),Brush)\n") : L"";
     Code += L"if Elapsed-PersistentData.LastUpdate>=Delay then\n";
     Code += L"PersistentData.Shapes={}\n";
-    Code += IsColored ? (IsRandom ? "PersistentData.Colors={}\n" : "") : "";
+    Code += IsColored ? (IsRandom ? L"PersistentData.Colors={}\n" : L"") : L"";
     Code += L"PersistentData.LastUpdate=Elapsed\n";
     Code += L"PersistentData.ShapesGenerated=false\n";
     Code += L"end\n";
@@ -1124,29 +1124,29 @@ string PolygonShader(bool IsColored, bool IsRandom) {
     return Code;
 }
 
-string TriangleFrameShader(bool IsRandom) {
+wstring TriangleFrameShader(bool IsRandom) {
     wstring Code = L"";
-    EncodeColor::ColorR = "R";
-    EncodeColor::ColorG = "G";
-    EncodeColor::ColorB = "B";
-    EncodeColor::ColorA = "Transparency";
-    Code += L"function " + string(IsRandom ? "RandomColor" : "") + "TriangleFrameShader(DC,Final,Time,Elapsed,W,H,PersistentData,Size,Speed,Transparency" + string(IsRandom ? "" : ",R,G,B") + ")\n";
+    EncodeColor::ColorR = L"R";
+    EncodeColor::ColorG = L"G";
+    EncodeColor::ColorB = L"B";
+    EncodeColor::ColorA = L"Transparency";
+    Code += L"function " + wstring(IsRandom ? L"RandomColor" : L"") + L"TriangleFrameShader(DC,Final,Time,Elapsed,W,H,PersistentData,Size,Speed,Transparency" + wstring(IsRandom ? L"" : L",R,G,B") + L")\n";
     Code += L"if Size==nil then Size=200 end\n";
     Code += L"if Speed==nil then Speed=5 end\n";
     Code += L"if Transparency==nil then Transparency=(1<<7)+(1<<6)-1 end\n";
-    Code += IsRandom ? "" : "if R==nil then R=0 end\n";
-    Code += IsRandom ? "" : "if G==nil then G=127 end\n";
-    Code += IsRandom ? "" : "if B==nil then B=255 end\n";
+    Code += IsRandom ? L"" : L"if R==nil then R=0 end\n";
+    Code += IsRandom ? L"" : L"if G==nil then G=127 end\n";
+    Code += IsRandom ? L"" : L"if B==nil then B=255 end\n";
     Code += L"if PersistentData.Offset==nil then PersistentData.Offset=1 end\n";
-    Code += IsRandom ? "if PersistentData.Colors==nil then PersistentData.Colors={} end\n" : "";
-    Code += IsRandom ? "if PersistentData.ColorsGenerated==nil then PersistentData.ColorsGenerated=false end\n" : "";
-    Code += IsRandom ? "if PersistentData.ColorOffset==nil then PersistentData.ColorOffset=2 end\n" : "";
+    Code += IsRandom ? L"if PersistentData.Colors==nil then PersistentData.Colors={} end\n" : L"";
+    Code += IsRandom ? L"if PersistentData.ColorsGenerated==nil then PersistentData.ColorsGenerated=false end\n" : L"";
+    Code += IsRandom ? L"if PersistentData.ColorOffset==nil then PersistentData.ColorOffset=2 end\n" : L"";
     Code += L"while PersistentData.Offset>0 do\n";
     Code += L"PersistentData.Offset=PersistentData.Offset-Size\n";
-    Code += IsRandom ? "PersistentData.ColorOffset=PersistentData.ColorOffset-2\n" : "";
-    Code += IsRandom ? "while PersistentData.ColorOffset<0 do\n" : "";
-    Code += IsRandom ? "PersistentData.ColorOffset=PersistentData.ColorOffset+#PersistentData.Colors\n" : "";
-    Code += IsRandom ? "end\n" : "";
+    Code += IsRandom ? L"PersistentData.ColorOffset=PersistentData.ColorOffset-2\n" : L"";
+    Code += IsRandom ? L"while PersistentData.ColorOffset<0 do\n" : L"";
+    Code += IsRandom ? L"PersistentData.ColorOffset=PersistentData.ColorOffset+#PersistentData.Colors\n" : L"";
+    Code += IsRandom ? L"end\n" : L"";
     Code += L"end\n";
     Code += L"local CurrentOffset=PersistentData.Offset\n";
     Code += L"local Polygons={}\n";
@@ -1165,12 +1165,12 @@ string TriangleFrameShader(bool IsRandom) {
     Code += L"MEM.writeDword(math.floor(Y3))\n";
     Code += L"MEM.Position=0\n";
     Code += L"table.insert(Polygons,EXE(QM(\"CreatePolygonRgn\"),MEM.Memory,3,2))\n";
-    Code += IsRandom ? "if PersistentData.ColorsGenerated==false then\n" : "";
-    Code += IsRandom ? "local R=math.random(0,255)\n" : "";
-    Code += IsRandom ? "local G=math.random(0,255)\n" : "";
-    Code += IsRandom ? "local B=math.random(0,255)\n" : "";
-    Code += IsRandom ? "table.insert(PersistentData.Colors," + EncodeColor::MakeColor() + ")\n" : "";
-    Code += IsRandom ? "end\n" : "";
+    Code += IsRandom ? L"if PersistentData.ColorsGenerated==false then\n" : L"";
+    Code += IsRandom ? L"local R=math.random(0,255)\n" : L"";
+    Code += IsRandom ? L"local G=math.random(0,255)\n" : L"";
+    Code += IsRandom ? L"local B=math.random(0,255)\n" : L"";
+    Code += IsRandom ? L"table.insert(PersistentData.Colors," + EncodeColor::MakeColor() + L")\n" : L"";
+    Code += IsRandom ? L"end\n" : L"";
     Code += L"X1,Y1=RotatePoint(X1,Y1,math.pi,W/2,H/2)\n";
     Code += L"X2,Y2=RotatePoint(X2,Y2,math.pi,W/2,H/2)\n";
     Code += L"X3,Y3=RotatePoint(X3,Y3,math.pi,W/2,H/2)\n";
@@ -1183,32 +1183,32 @@ string TriangleFrameShader(bool IsRandom) {
     Code += L"MEM.writeDword(math.floor(Y3))\n";
     Code += L"MEM.Position=0\n";
     Code += L"table.insert(Polygons,EXE(QM(\"CreatePolygonRgn\"),MEM.Memory,3,2))\n";
-    Code += IsRandom ? "if PersistentData.ColorsGenerated==false then\n" : "";
-    Code += IsRandom ? "local R=math.random(0,255)\n" : "";
-    Code += IsRandom ? "local G=math.random(0,255)\n" : "";
-    Code += IsRandom ? "local B=math.random(0,255)\n" : "";
-    Code += IsRandom ? "table.insert(PersistentData.Colors," + EncodeColor::MakeColor() + ")\n" : "";
-    Code += IsRandom ? "end\n" : "";
+    Code += IsRandom ? L"if PersistentData.ColorsGenerated==false then\n" : L"";
+    Code += IsRandom ? L"local R=math.random(0,255)\n" : L"";
+    Code += IsRandom ? L"local G=math.random(0,255)\n" : L"";
+    Code += IsRandom ? L"local B=math.random(0,255)\n" : L"";
+    Code += IsRandom ? L"table.insert(PersistentData.Colors," + EncodeColor::MakeColor() + L")\n" : L"";
+    Code += IsRandom ? L"end\n" : L"";
     Code += L"CurrentOffset=CurrentOffset+Size\n";
     Code += L"end\n";
-    Code += IsRandom ? "PersistentData.ColorsGenerated=true\n" : "";
+    Code += IsRandom ? L"PersistentData.ColorsGenerated=true\n" : L"";
     Code += L"MEM.destroy()\n";
     Code += L"local MEMdc=EXE(QM(\"CreateCompatibleDC\"),DC)\n";
     Code += L"local BMP=EXE(QM(\"CreateCompatibleBitmap\"),DC,W,H)\n";
     Code += L"EXE(QM(\"SelectObject\"),MEMdc,BMP)\n";
     Code += L"EXE(QM(\"BitBlt\"),MEMdc,0,0,W,H,DC,0,0,SRCCOPY)\n";
-    Code += IsRandom ? "" : "local Color=" + EncodeColor::MakeColor() + "\n";
-    Code += IsRandom ? "" : "local Brush=EXE(QM(\"CreateSolidBrush\"),Color)\n";
-    Code += IsRandom ? "" : "EXE(QM(\"SelectObject\"),MEMdc,Brush)\n";
-    Code += L"for " + string(IsRandom ? "PolygonID" : "_") + ",ThisPolygon in ipairs(Polygons) do\n";
-    Code += IsRandom ? "local Brush=EXE(QM(\"CreateSolidBrush\"),PersistentData.Colors[(PolygonID+PersistentData.ColorOffset-1)%#PersistentData.Colors+1])\n" : "";
-    Code += IsRandom ? "EXE(QM(\"SelectObject\"),MEMdc,Brush)\n" : "";
+    Code += IsRandom ? L"" : L"local Color=" + EncodeColor::MakeColor() + L"\n";
+    Code += IsRandom ? L"" : L"local Brush=EXE(QM(\"CreateSolidBrush\"),Color)\n";
+    Code += IsRandom ? L"" : L"EXE(QM(\"SelectObject\"),MEMdc,Brush)\n";
+    Code += L"for " + wstring(IsRandom ? L"PolygonID" : L"_") + L",ThisPolygon in ipairs(Polygons) do\n";
+    Code += IsRandom ? L"local Brush=EXE(QM(\"CreateSolidBrush\"),PersistentData.Colors[(PolygonID+PersistentData.ColorOffset-1)%#PersistentData.Colors+1])\n" : L"";
+    Code += IsRandom ? L"EXE(QM(\"SelectObject\"),MEMdc,Brush)\n" : L"";
     Code += L"EXE(QM(\"FillRgn\"),MEMdc,ThisPolygon,Brush)\n";
-    Code += IsRandom ? "EXE(QM(\"DeleteObject\"),Brush)\n" : "";
+    Code += IsRandom ? L"EXE(QM(\"DeleteObject\"),Brush)\n" : L"";
     Code += L"EXE(QM(\"DeleteObject\"),ThisPolygon)\n";
     Code += L"end\n";
-    Code += IsRandom ? "" : "EXE(QM(\"DeleteObject\"),Brush)\n";
-    Code += L"local BlendFunc=" + EncodeColor::MakeAlpha() + "\n";
+    Code += IsRandom ? L"" : L"EXE(QM(\"DeleteObject\"),Brush)\n";
+    Code += L"local BlendFunc=" + EncodeColor::MakeAlpha() + L"\n";
     Code += L"EXE(QM(\"AlphaBlend\"),DC,0,0,W,H,MEMdc,0,0,W,H,BlendFunc)\n";
     Code += L"EXE(QM(\"DeleteDC\"),MEMdc)\n";
     Code += L"EXE(QM(\"DeleteObject\"),BMP)\n";
@@ -1217,7 +1217,7 @@ string TriangleFrameShader(bool IsRandom) {
     return Code;
 }
 
-string CRTShader() {
+wstring CRTShader() {
     wstring Code = L"";
     Code += L"function CRTShader(DC,Final,Time,Elapsed,W,H,PersistentData,ColorOffsetAmount,ColorOffsetTransparency,ScanLineTransparency,ScanLineHeight,ScanLineSpacing)\n";
     Code += L"if ColorOffsetAmount==nil then ColorOffsetAmount=2 end\n";
@@ -1259,8 +1259,8 @@ string CRTShader() {
     Code += L"EXE(QM(\"BitBlt\"),MEMdc_Main,0,-ColorOffsetAmount,W,H,MEMdc_R,0,0,SRCPAINT)\n";
     Code += L"EXE(QM(\"BitBlt\"),MEMdc_Main,ColorOffsetAmount,-ColorOffsetAmount,W,H,MEMdc_G,0,0,SRCPAINT)\n";
     Code += L"EXE(QM(\"BitBlt\"),MEMdc_Main,-ColorOffsetAmount,ColorOffsetAmount,W,H,MEMdc_B,0,0,SRCPAINT)\n";
-    EncodeColor::ColorA = "ColorOffsetTransparency";
-    Code += L"local BlendFunc=" + EncodeColor::MakeAlpha() + "\n";
+    EncodeColor::ColorA = L"ColorOffsetTransparency";
+    Code += L"local BlendFunc=" + EncodeColor::MakeAlpha() + L"\n";
     Code += L"EXE(QM(\"AlphaBlend\"),DC,0,0,W,H,MEMdc_Main,0,0,W,H,BlendFunc)\n";
     Code += L"end\n";
     Code += L"if ScanLineTransparency>0 and ScanLineHeight~=0 then\n";
@@ -1273,8 +1273,8 @@ string CRTShader() {
     Code += L"Line=Line*2\n";
     Code += L"end\n";
     Code += L"EXE(QM(\"BitBlt\"),MEMdc_Main,0,0,W,H,DC,0,0,SRCAND)\n";
-    EncodeColor::ColorA = "ScanLineTransparency";
-    Code += L"local BlendFunc=" + EncodeColor::MakeAlpha() + "\n";
+    EncodeColor::ColorA = L"ScanLineTransparency";
+    Code += L"local BlendFunc=" + EncodeColor::MakeAlpha() + L"\n";
     Code += L"EXE(QM(\"AlphaBlend\"),DC,0,0,W,H,MEMdc_Main,0,0,W,H,BlendFunc)\n";
     Code += L"end\n";
     Code += L"EXE(QM(\"DeleteDC\"),MEMdc_R)\n";
@@ -1289,7 +1289,7 @@ string CRTShader() {
     return Code;
 }
 
-string NoiseShader() {
+wstring NoiseShader() {
     wstring Code = L"";
     Code += L"function NoiseShader(DC,Final,Time,Elapsed,W,H,PersistentData,MaxNoiseSize,MinNoiseSize,MaxNoiseAmount,MinNoiseAmount)\n";
     Code += L"if MaxNoiseSize==nil then MaxNoiseSize=3 end\n";
@@ -1305,32 +1305,32 @@ string NoiseShader() {
     return Code;
 }
 
-string FrameShader(bool IsAnimated) {
+wstring FrameShader(bool IsAnimated) {
     wstring Code = L"";
-    Code += L"function " + string(IsAnimated ? "Animated" : "") + "FrameShader(DC,Final,Time,Elapsed,W,H,PersistentData,FrameSize,Resolution" + string(IsAnimated ? ",Initial_R,Initial_G,Initial_B,Initial_A,Final_R,Final_G,Final_B,Final_A,Iteration" : ",R,G,B,A") + ")\n";
+    Code += L"function " + wstring(IsAnimated ? L"Animated" : L"") + L"FrameShader(DC,Final,Time,Elapsed,W,H,PersistentData,FrameSize,Resolution" + wstring(IsAnimated ? L",Initial_R,Initial_G,Initial_B,Initial_A,Final_R,Final_G,Final_B,Final_A,Iteration" : L",R,G,B,A") + L")\n";
     Code += L"if FrameSize==nil then FrameSize=(1<<7)-1 end\n";
     Code += L"if Resolution==nil then Resolution=2 end\n";
-    Code += IsAnimated ? "if Initial_R==nil then Initial_R=255 end\n" : "if R==nil then R=255 end\n";
-    Code += IsAnimated ? "if Initial_G==nil then Initial_G=0 end\n" : "if G==nil then G=0 end\n";
-    Code += IsAnimated ? "if Initial_B==nil then Initial_B=0 end\n" : "if B==nil then B=0 end\n";
-    Code += IsAnimated ? "if Initial_A==nil then Initial_A=255 end\n" : "if A==nil then A=255 end\n";
-    Code += IsAnimated ? "if Final_R==nil then Final_R=255 end\n" : "";
-    Code += IsAnimated ? "if Final_G==nil then Final_G=0 end\n" : "";
-    Code += IsAnimated ? "if Final_B==nil then Final_B=0 end\n" : "";
-    Code += IsAnimated ? "if Final_A==nil then Final_A=0 end\n" : "";
-    Code += IsAnimated ? "if Iteration==nil then Iteration=10 end\n" : "";
+    Code += IsAnimated ? L"if Initial_R==nil then Initial_R=255 end\n" : L"if R==nil then R=255 end\n";
+    Code += IsAnimated ? L"if Initial_G==nil then Initial_G=0 end\n" : L"if G==nil then G=0 end\n";
+    Code += IsAnimated ? L"if Initial_B==nil then Initial_B=0 end\n" : L"if B==nil then B=0 end\n";
+    Code += IsAnimated ? L"if Initial_A==nil then Initial_A=255 end\n" : L"if A==nil then A=255 end\n";
+    Code += IsAnimated ? L"if Final_R==nil then Final_R=255 end\n" : L"";
+    Code += IsAnimated ? L"if Final_G==nil then Final_G=0 end\n" : L"";
+    Code += IsAnimated ? L"if Final_B==nil then Final_B=0 end\n" : L"";
+    Code += IsAnimated ? L"if Final_A==nil then Final_A=0 end\n" : L"";
+    Code += IsAnimated ? L"if Iteration==nil then Iteration=10 end\n" : L"";
     Code += L"local MEMdc=EXE(QM(\"CreateCompatibleDC\"),DC)\n";
     Code += L"local BMP=EXE(QM(\"CreateCompatibleBitmap\"),DC,1,1)\n";
     Code += L"EXE(QM(\"SelectObject\"),MEMdc,BMP)\n";
-    Code += IsAnimated ? "local OffsetedTime=math.abs((Time*Iteration)%2.0-1.0)\n" : "";
-    Code += IsAnimated ? "local R=math.ceil(OffsetedTime*(Final_R-Initial_R)+Initial_R)\n" : "";
-    Code += IsAnimated ? "local G=math.ceil(OffsetedTime*(Final_G-Initial_G)+Initial_G)\n" : "";
-    Code += IsAnimated ? "local B=math.ceil(OffsetedTime*(Final_B-Initial_B)+Initial_B)\n" : "";
-    Code += IsAnimated ? "local A=math.ceil(OffsetedTime*(Final_A-Initial_A)+Initial_A)\n" : "";
-    EncodeColor::ColorR = "R";
-    EncodeColor::ColorG = "G";
-    EncodeColor::ColorB = "B";
-    Code += L"local Color=" + EncodeColor::MakeColor() + "\n";
+    Code += IsAnimated ? L"local OffsetedTime=math.abs((Time*Iteration)%2.0-1.0)\n" : L"";
+    Code += IsAnimated ? L"local R=math.ceil(OffsetedTime*(Final_R-Initial_R)+Initial_R)\n" : L"";
+    Code += IsAnimated ? L"local G=math.ceil(OffsetedTime*(Final_G-Initial_G)+Initial_G)\n" : L"";
+    Code += IsAnimated ? L"local B=math.ceil(OffsetedTime*(Final_B-Initial_B)+Initial_B)\n" : L"";
+    Code += IsAnimated ? L"local A=math.ceil(OffsetedTime*(Final_A-Initial_A)+Initial_A)\n" : L"";
+    EncodeColor::ColorR = L"R";
+    EncodeColor::ColorG = L"G";
+    EncodeColor::ColorB = L"B";
+    Code += L"local Color=" + EncodeColor::MakeColor() + L"\n";
     Code += L"local Brush=EXE(QM(\"CreateSolidBrush\"),Color)\n";
     Code += L"EXE(QM(\"SelectObject\"),MEMdc,Brush)\n";
     Code += L"EXE(QM(\"PatBlt\"),MEMdc,0,0,1,1,PATCOPY)\n";
@@ -1339,10 +1339,10 @@ string FrameShader(bool IsAnimated) {
     Code += L"while Line<FrameSize do\n";
     Code += L"local LeftTopA=math.ceil(((FrameSize-Line)/FrameSize)*A)\n";
     Code += L"local RightBottomA=math.ceil((Line/FrameSize)*A)\n";
-    EncodeColor::ColorA = "LeftTopA";
-    Code += L"local BlendFuncLeftTop=" + EncodeColor::MakeAlpha() + "\n";
-    EncodeColor::ColorA = "RightBottomA";
-    Code += L"local BlendFuncRightBottom=" + EncodeColor::MakeAlpha() + "\n";
+    EncodeColor::ColorA = L"LeftTopA";
+    Code += L"local BlendFuncLeftTop=" + EncodeColor::MakeAlpha() + L"\n";
+    EncodeColor::ColorA = L"RightBottomA";
+    Code += L"local BlendFuncRightBottom=" + EncodeColor::MakeAlpha() + L"\n";
     Code += L"EXE(QM(\"AlphaBlend\"),DC,0,Line,W,Resolution,MEMdc,0,0,1,1,BlendFuncLeftTop)\n";
     Code += L"EXE(QM(\"AlphaBlend\"),DC,Line,0,Resolution,H,MEMdc,0,0,1,1,BlendFuncLeftTop)\n";
     Code += L"EXE(QM(\"AlphaBlend\"),DC,0,H-FrameSize+Line,W,Resolution,MEMdc,0,0,1,1,BlendFuncRightBottom)\n";
@@ -1355,19 +1355,19 @@ string FrameShader(bool IsAnimated) {
     return Code;
 }
 
-string GlassShader(bool Reversed) {
+wstring GlassShader(bool Reversed) {
     wstring Code = L"";
-    Code += L"function " + string(Reversed ? "Reversed" : "") + "GlassFadeShader(DC,Final,Time,Elapsed,W,H,PersistentData,BlendAlpha,MaxBlur,MinBlur)\n";
+    Code += L"function " + wstring(Reversed ? L"Reversed" : L"") + L"GlassFadeShader(DC,Final,Time,Elapsed,W,H,PersistentData,BlendAlpha,MaxBlur,MinBlur)\n";
     Code += L"if BlendAlpha==nil then BlendAlpha=(1<<6)-1 end\n";
     Code += L"if MaxBlur==nil then MaxBlur=10 end\n";
     Code += L"if MinBlur==nil then MinBlur=0 end\n";
     Code += L"local MEMdc=EXE(QM(\"CreateCompatibleDC\"),DC)\n";
     Code += L"local BMP=EXE(QM(\"CreateCompatibleBitmap\"),DC,W,H)\n";
     Code += L"EXE(QM(\"SelectObject\"),MEMdc,BMP)\n";
-    EncodeColor::ColorA = "BlendAlpha";
-    Code += L"local BlendFunc=" + EncodeColor::MakeAlpha() + "\n";
+    EncodeColor::ColorA = L"BlendAlpha";
+    Code += L"local BlendFunc=" + EncodeColor::MakeAlpha() + L"\n";
     Code += L"EXE(QM(\"BitBlt\"),MEMdc,0,0,W,H,DC,0,0,SRCCOPY)\n";
-    Code += L"local Offset=math.ceil((MaxBlur-MinBlur)*" + string(Reversed ? "(1.0-Time)" : "Time") + "+MinBlur)\n";
+    Code += L"local Offset=math.ceil((MaxBlur-MinBlur)*" + wstring(Reversed ? L"(1.0-Time)" : L"Time") + L"+MinBlur)\n";
     Code += L"EXE(QM(\"AlphaBlend\"),MEMdc,Offset,Offset,W,H,DC,0,0,W,H,BlendFunc)\n";
     Code += L"EXE(QM(\"AlphaBlend\"),MEMdc,Offset,-Offset,W,H,DC,0,0,W,H,BlendFunc)\n";
     Code += L"EXE(QM(\"AlphaBlend\"),MEMdc,-Offset,Offset,W,H,DC,0,0,W,H,BlendFunc)\n";
@@ -1379,25 +1379,25 @@ string GlassShader(bool Reversed) {
     return Code;
 }
 
-string PixelateShader(bool WithAlpha) {
+wstring PixelateShader(bool WithAlpha) {
     wstring Code = L"";
-    Code += L"function " + string(WithAlpha ? "Alpha" : "") + "PixelateShader(DC,Final,Time,Elapsed,W,H,PersistentData,Multiplier" + string(WithAlpha ? ",Alpha" : "") + ")\n";
+    Code += L"function " + wstring(WithAlpha ? L"Alpha" : L"") + L"PixelateShader(DC,Final,Time,Elapsed,W,H,PersistentData,Multiplier" + wstring(WithAlpha ? L",Alpha" : L"") + L")\n";
     Code += L"if Multiplier==nil then Multiplier=4 end\n";
-    Code += WithAlpha ? "if Alpha==nil then Alpha=(1<<7)+(1<<6)-1 end\n" : "";
+    Code += WithAlpha ? L"if Alpha==nil then Alpha=(1<<7)+(1<<6)-1 end\n" : L"";
     Code += L"local MEMdc=EXE(QM(\"CreateCompatibleDC\"),DC)\n";
     Code += L"local BMP=EXE(QM(\"CreateCompatibleBitmap\"),DC,math.floor(W/Multiplier),math.floor(H/Multiplier))\n";
     Code += L"EXE(QM(\"SelectObject\"),MEMdc,BMP)\n";
     Code += L"EXE(QM(\"AlphaBlend\"),MEMdc,0,0,math.floor(W/Multiplier),math.floor(H/Multiplier),DC,0,0,W,H,0x00FF0000)\n";
-    EncodeColor::ColorA = "Alpha";
-    Code += WithAlpha ? "local BlendFunc=" + EncodeColor::MakeAlpha() + "\n" : "";
-    Code += L"EXE(QM(\"AlphaBlend\"),DC,0,0,W,H,MEMdc,0,0,math.floor(W/Multiplier),math.floor(H/Multiplier)," + string(WithAlpha ? "BlendFunc" : "0x00FF0000") + ")\n";
+    EncodeColor::ColorA = L"Alpha";
+    Code += WithAlpha ? L"local BlendFunc=" + EncodeColor::MakeAlpha() + L"\n" : L"";
+    Code += L"EXE(QM(\"AlphaBlend\"),DC,0,0,W,H,MEMdc,0,0,math.floor(W/Multiplier),math.floor(H/Multiplier)," + wstring(WithAlpha ? L"BlendFunc" : L"0x00FF0000") + L")\n";
     Code += L"EXE(QM(\"DeleteDC\"),MEMdc)\n";
     Code += L"EXE(QM(\"DeleteObject\"),BMP)\n";
     Code += L"end\n";
     return Code;
 }
 
-string MatrixShader() {
+wstring MatrixShader() {
     wstring Code = L"";
     Code += L"function MatrixShader(DC,Final,Time,Elapsed,W,H,PersistentData,Cols,CharHeight,FontWeight,MaxSpeed,MinSpeed,MaxTailLength,MinTailLength,FontName,R,G,B)\n";
     Code += L"if Cols==nil then Cols=50 end\n";
@@ -1449,10 +1449,10 @@ string MatrixShader() {
     Code += L"local NewR=math.ceil(R*Brightness)\n";
     Code += L"local NewG=math.ceil(G*Brightness)\n";
     Code += L"local NewB=math.ceil(B*Brightness)\n";
-    EncodeColor::ColorR = "NewR";
-    EncodeColor::ColorG = "NewG";
-    EncodeColor::ColorB = "NewB";
-    Code += L"local TextColor=" + EncodeColor::MakeColor() + "\n";
+    EncodeColor::ColorR = L"NewR";
+    EncodeColor::ColorG = L"NewG";
+    EncodeColor::ColorB = L"NewB";
+    Code += L"local TextColor=" + EncodeColor::MakeColor() + L"\n";
     Code += L"EXE(QM(\"SetTextColor\"),DC,TextColor)\n";
     Code += L"EXE(QM(\"TextOutA\"),DC,(Col-1)*CharWidth,math.floor(PieceY),string.char(math.random(0x00,0xFF)),1)\n";
     Code += L"end\n";
@@ -1463,13 +1463,13 @@ string MatrixShader() {
     return Code;
 }
 
-string BuiltinShaders() {
+wstring BuiltinShaders() {
     wstring Code = L"";
     Code += BlankShader(true);
     Code += BlankShader(false);
-    Code += WaveShader("Wave", false, false);
-    Code += WaveShader("Glitch", true, true);
-    Code += WaveShader("WaveGlitch", false, true);
+    Code += WaveShader(L"Wave", false, false);
+    Code += WaveShader(L"Glitch", true, true);
+    Code += WaveShader(L"WaveGlitch", false, true);
     Code += ColorBurnShader();
     Code += RainbowBurnShader(false, false, false);
     Code += RainbowBurnShader(true, false, false);
@@ -1512,7 +1512,7 @@ string BuiltinShaders() {
 // Name: wWinMain()
 // Desc: The application's entry point
 //-----------------------------------------------------------------------------
-INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
+INT WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, INT nCmdShow)
 {
     InitCommonControls();
     SetThemeAppProperties(STAP_ALLOW_CONTROLS | STAP_ALLOW_NONCLIENT);
@@ -1522,8 +1522,8 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
 
     //Debug console
     AllocConsole();
-    freopen("CONIN$", "r", stdin);
-    freopen("CONOUT$", "w", stdout);
+    _wfreopen(L"CONIN$", L"r", stdin);
+    _wfreopen(L"CONOUT$", L"w", stdout);
     SetConsoleCP(CP_UTF8);
     SetConsoleOutputCP(CP_UTF8);
     _setmode(_fileno(stdout), _O_U16TEXT);
@@ -1559,121 +1559,121 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
                 wstring Code = L"";
                 Code += MultiInstanceGuardInit();
                 Code += L"collectgarbage(\"collect\")\n";// Clean up any leftovers from previous run
-                Code += L"while readShortInteger(\"" + WStringToUtf8(GetProcessName()) + "+" + GetAddress(PointersInitialized) + "\")==0 do\n";
+                Code += L"while readShortInteger(\"" + GetProcessName() + L"+" + GetAddress(PointersInitialized) + L"\")==0 do\n";
                 Code += L"processMessages()\n";
                 Code += L"end\n";
                 Code += L"-- Variable Definitions: \n";
-                Code += DefineMemoryAddress("SongLength", GetAddress(Ptr_to_m_llMaxTime), true);
-                Code += DefineMemoryAddress("InitialSilence", GetAddress(Ptr_to_m_llMinTime), true);
-                Code += DefineMemoryAddress("Microseconds", GetAddress(Ptr_to_m_llStartTime), true);
-                Code += DefineMemoryAddress("Ticks", GetAddress(Ptr_to_m_iStartTick), true);
-                Code += DefineMemoryAddress("Resolution", GetAddress(Ptr_to_m_MIDI_iResolution), true);
-                Code += DefineMemoryAddress("NoteCount", GetAddress(Ptr_to_m_MIDI_iTotalNC), true);
-                Code += DefineMemoryAddress("NotesPerSecond", GetAddress(Ptr_to_m_iNPS), true);
-                Code += DefineMemoryAddress("Polyphony", GetAddress(Ptr_to_m_iPolyphony), true);
-                Code += DefineMemoryAddress("Passed", GetAddress(Ptr_to_m_iPassed), true);
-                Code += DefineMemoryAddress("Volume", cPlayback.GetVolumeAddress(), false);
-                Code += DefineMemoryAddress("Mute", cPlayback.GetMuteAddress(), false);
-                Code += DefineMemoryAddress("PlaybackSpeed", cPlayback.GetSpeedAddress(), false);
-                Code += DefineMemoryAddress("NoteSpeed", cPlayback.GetNSpeedAddress(), false);
-                Code += DefineMemoryAddress("OffsetX", cView.GetOffsetXAddress(), false);
-                Code += DefineMemoryAddress("OffsetY", cView.GetOffsetYAddress(), false);
-                Code += DefineMemoryAddress("Zoom", cView.GetZoomXAddress(), false);
-                Code += DefineMemoryAddress("UpdateNotePos", GetAddress(Ptr_to_m_bUpdateNotePos), true);
-                Code += DefineMemoryAddress("UpdateTrackColor", GetAddress(Ptr_to_m_bUpdateTrackColor), true);
-                Code += DefineMemoryAddress("SameWidth", GetAddress(cVideo.bSameWidth), false);
-                Code += DefineMemoryAddress("VelocityMapping", GetAddress(cVideo.bMapVel), false);
-                Code += DefineMemoryAddress("StartKey", GetAddress(cVisual.iFirstKey), false);
-                Code += DefineMemoryAddress("EndKey", GetAddress(cVisual.iLastKey), false);
-                Code += DefineMemoryAddress("KeyMode", GetAddress(cVisual.eKeysShown), false);
-                Code += DefineMemoryAddress("Width", GetAddress(Ptr_to_m_iWidth), true);
-                Code += DefineMemoryAddress("Height", GetAddress(Ptr_to_m_iHeight), true);
-                Code += DefineMemoryAddress("Paused", cPlayback.GetPausedAddress(), false);
-                Code += DefineMemoryAddress("Keyboard", cView.GetKeyboardAddress(), false);
-                Code += DefineMemoryAddress("VisualizePitchBends", GetAddress(cVideo.bVisualizePitchBends), false);
-                Code += DefineMemoryAddress("PhigrosMode", GetAddress(cControls.bPhigros), false);
-                Code += DefineMemoryAddress("ShowMarkers", GetAddress(cVideo.bShowMarkers), false);
-                Code += DefineMemoryAddress("TickBased", GetAddress(cVideo.bTickBased), false);
-                Code += DefineMemoryAddress("HideStatistics", GetAddress(cVideo.bDisableUI), false);
-                Code += DefineMemoryAddress("RemoveOverlaps", GetAddress(cVideo.bOR), false);
-                Code += DefineMemoryAddress("LimitFPS", GetAddress(cVideo.bLimitFPS), false);
-                Code += DefineMemoryAddress("VelocityThreshold", GetAddress(cControls.iVelocityThreshold), false);
-                Code += DefineMemoryAddress("Caption", GetAddress(Ptr_to_CaptionContent), true);
-                Code += DefineMemoryAddress("CaptionAlignment", GetAddress(Ptr_to_CheatEngineCaption), true);
-                Code += DefineMemoryAddress("DifficultyText", GetAddress(Ptr_to_Difficulty), true);
+                Code += DefineMemoryAddress(L"SongLength", GetAddress(Ptr_to_m_llMaxTime), true);
+                Code += DefineMemoryAddress(L"InitialSilence", GetAddress(Ptr_to_m_llMinTime), true);
+                Code += DefineMemoryAddress(L"Microseconds", GetAddress(Ptr_to_m_llStartTime), true);
+                Code += DefineMemoryAddress(L"Ticks", GetAddress(Ptr_to_m_iStartTick), true);
+                Code += DefineMemoryAddress(L"Resolution", GetAddress(Ptr_to_m_MIDI_iResolution), true);
+                Code += DefineMemoryAddress(L"NoteCount", GetAddress(Ptr_to_m_MIDI_iTotalNC), true);
+                Code += DefineMemoryAddress(L"NotesPerSecond", GetAddress(Ptr_to_m_iNPS), true);
+                Code += DefineMemoryAddress(L"Polyphony", GetAddress(Ptr_to_m_iPolyphony), true);
+                Code += DefineMemoryAddress(L"Passed", GetAddress(Ptr_to_m_iPassed), true);
+                Code += DefineMemoryAddress(L"Volume", cPlayback.GetVolumeAddress(), false);
+                Code += DefineMemoryAddress(L"Mute", cPlayback.GetMuteAddress(), false);
+                Code += DefineMemoryAddress(L"PlaybackSpeed", cPlayback.GetSpeedAddress(), false);
+                Code += DefineMemoryAddress(L"NoteSpeed", cPlayback.GetNSpeedAddress(), false);
+                Code += DefineMemoryAddress(L"OffsetX", cView.GetOffsetXAddress(), false);
+                Code += DefineMemoryAddress(L"OffsetY", cView.GetOffsetYAddress(), false);
+                Code += DefineMemoryAddress(L"Zoom", cView.GetZoomXAddress(), false);
+                Code += DefineMemoryAddress(L"UpdateNotePos", GetAddress(Ptr_to_m_bUpdateNotePos), true);
+                Code += DefineMemoryAddress(L"UpdateTrackColor", GetAddress(Ptr_to_m_bUpdateTrackColor), true);
+                Code += DefineMemoryAddress(L"SameWidth", GetAddress(cVideo.bSameWidth), false);
+                Code += DefineMemoryAddress(L"VelocityMapping", GetAddress(cVideo.bMapVel), false);
+                Code += DefineMemoryAddress(L"StartKey", GetAddress(cVisual.iFirstKey), false);
+                Code += DefineMemoryAddress(L"EndKey", GetAddress(cVisual.iLastKey), false);
+                Code += DefineMemoryAddress(L"KeyMode", GetAddress(cVisual.eKeysShown), false);
+                Code += DefineMemoryAddress(L"Width", GetAddress(Ptr_to_m_iWidth), true);
+                Code += DefineMemoryAddress(L"Height", GetAddress(Ptr_to_m_iHeight), true);
+                Code += DefineMemoryAddress(L"Paused", cPlayback.GetPausedAddress(), false);
+                Code += DefineMemoryAddress(L"Keyboard", cView.GetKeyboardAddress(), false);
+                Code += DefineMemoryAddress(L"VisualizePitchBends", GetAddress(cVideo.bVisualizePitchBends), false);
+                Code += DefineMemoryAddress(L"PhigrosMode", GetAddress(cControls.bPhigros), false);
+                Code += DefineMemoryAddress(L"ShowMarkers", GetAddress(cVideo.bShowMarkers), false);
+                Code += DefineMemoryAddress(L"TickBased", GetAddress(cVideo.bTickBased), false);
+                Code += DefineMemoryAddress(L"HideStatistics", GetAddress(cVideo.bDisableUI), false);
+                Code += DefineMemoryAddress(L"RemoveOverlaps", GetAddress(cVideo.bOR), false);
+                Code += DefineMemoryAddress(L"LimitFPS", GetAddress(cVideo.bLimitFPS), false);
+                Code += DefineMemoryAddress(L"VelocityThreshold", GetAddress(cControls.iVelocityThreshold), false);
+                Code += DefineMemoryAddress(L"Caption", GetAddress(Ptr_to_CaptionContent), true);
+                Code += DefineMemoryAddress(L"CaptionAlignment", GetAddress(Ptr_to_CheatEngineCaption), true);
+                Code += DefineMemoryAddress(L"DifficultyText", GetAddress(Ptr_to_Difficulty), true);
                 Code += L"-- FFMPEG Video Export\n";
-                Code += DefineMemoryAddress("CE_VideoOutput", GetAddress(Ptr_to_CE_VideoOutput), true);
-                Code += DefineMemoryAddress("CE_Connected", GetAddress(Ptr_to_CE_Connected), true);
-                Code += DefineMemoryAddress("CE_DoNextTick", GetAddress(Ptr_to_CE_DoNextTick), true);
-                Code += DefineMemoryAddress("CE_Responded", GetAddress(Ptr_to_CE_Responded), true);
-                Code += L"-- Custom Variable Definitions: (Version: " + WStringToUtf8(VersionString) + ")\n";
+                Code += DefineMemoryAddress(L"CE_VideoOutput", GetAddress(Ptr_to_CE_VideoOutput), true);
+                Code += DefineMemoryAddress(L"CE_Connected", GetAddress(Ptr_to_CE_Connected), true);
+                Code += DefineMemoryAddress(L"CE_DoNextTick", GetAddress(Ptr_to_CE_DoNextTick), true);
+                Code += DefineMemoryAddress(L"CE_Responded", GetAddress(Ptr_to_CE_Responded), true);
+                Code += L"-- Custom Variable Definitions: (Version: " VersionString L")\n";
                 Code += L"\n";
                 Code += L"-- Function Definitions: (DO NOT CHANGE!)\n";
                 Code += InitializeVariables();
                 Code += FakeThreadingEngine();
                 Code += MethodsLookup();
-                Code += CreateDebugWindow("Pending", "0", "0", "400", "250");
-                Code += CreateDebugWindow("Active", "0", "280", "400", "220");
-                Code += CreateDebugWindow("History", "400", "0", "350", "500", false);
-                Code += GettersAndSetters("SongLength", IntSizeToCE(sizeof(*Ptr_to_m_llMaxTime)), true, "History");
-                Code += GettersAndSetters("InitialSilence", IntSizeToCE(sizeof(*Ptr_to_m_llMinTime)), true, "History");
-                Code += GettersAndSetters("Microseconds", IntSizeToCE(sizeof(*Ptr_to_m_llStartTime)), false, "History");
-                Code += GettersAndSetters("Ticks", IntSizeToCE(sizeof(*Ptr_to_m_iStartTick)), false, "History", true);
-                Code += GettersAndSetters("Resolution", IntSizeToCE(sizeof(*Ptr_to_m_MIDI_iResolution)), true, "History");
-                Code += GettersAndSetters("NoteCount", IntSizeToCE(sizeof(*Ptr_to_m_MIDI_iTotalNC)), true, "History");
-                Code += GettersAndSetters("NotesPerSecond", IntSizeToCE(sizeof(*Ptr_to_m_iNPS)), true, "History");
-                Code += GettersAndSetters("Polyphony", IntSizeToCE(sizeof(*Ptr_to_m_iPolyphony)), true, "History");
-                Code += GettersAndSetters("Passed", IntSizeToCE(sizeof(*Ptr_to_m_iPassed)), true, "History");
-                Code += GettersAndSetters("Volume", FloatSizeToCE(cPlayback.GetVolumeSize()), false, "History");
-                Code += GettersAndSetters("Mute", IntSizeToCE(cPlayback.GetMuteSize()), false, "History");
-                Code += GettersAndSetters("PlaybackSpeed", FloatSizeToCE(cPlayback.GetSpeedSize()), false, "History");
-                Code += GettersAndSetters("NoteSpeed", FloatSizeToCE(cPlayback.GetNSpeedSize()), false, "History");
-                Code += GettersAndSetters("OffsetX", FloatSizeToCE(cView.GetOffsetXSize()), false, "History", false, true);
-                Code += GettersAndSetters("OffsetY", FloatSizeToCE(cView.GetOffsetYSize()), false, "History", false, true);
-                Code += GettersAndSetters("Zoom", FloatSizeToCE(cView.GetZoomXSize()), false, "History", false, true);
-                Code += GettersAndSetters("SameWidth", IntSizeToCE(sizeof(cVideo.bSameWidth)), false, "History", false, true);
-                Code += GettersAndSetters("VelocityMapping", IntSizeToCE(sizeof(cVideo.bMapVel)), false, "History");
-                Code += GettersAndSetters("StartKey", IntSizeToCE(sizeof(cVisual.iFirstKey)), false, "History", false, true);
-                Code += GettersAndSetters("EndKey", IntSizeToCE(sizeof(cVisual.iLastKey)), false, "History", false, true);
-                Code += GettersAndSetters("KeyMode", IntSizeToCE(sizeof(cVisual.eKeysShown)), false, "History", false, true);
-                Code += GettersAndSetters("Width", IntSizeToCE(sizeof(*Ptr_to_m_iWidth)), true, "History", true, true);
-                Code += GettersAndSetters("Height", IntSizeToCE(sizeof(*Ptr_to_m_iHeight)), true, "History", true, true);
+                Code += CreateDebugWindow(L"Pending", L"0", L"0", L"400", L"250");
+                Code += CreateDebugWindow(L"Active", L"0", L"280", L"400", L"220");
+                Code += CreateDebugWindow(L"History", L"400", L"0", L"350", L"500", false);
+                Code += GettersAndSetters(L"SongLength", IntSizeToCE(sizeof(*Ptr_to_m_llMaxTime)), true, L"History");
+                Code += GettersAndSetters(L"InitialSilence", IntSizeToCE(sizeof(*Ptr_to_m_llMinTime)), true, L"History");
+                Code += GettersAndSetters(L"Microseconds", IntSizeToCE(sizeof(*Ptr_to_m_llStartTime)), false, L"History");
+                Code += GettersAndSetters(L"Ticks", IntSizeToCE(sizeof(*Ptr_to_m_iStartTick)), false, L"History", true);
+                Code += GettersAndSetters(L"Resolution", IntSizeToCE(sizeof(*Ptr_to_m_MIDI_iResolution)), true, L"History");
+                Code += GettersAndSetters(L"NoteCount", IntSizeToCE(sizeof(*Ptr_to_m_MIDI_iTotalNC)), true, L"History");
+                Code += GettersAndSetters(L"NotesPerSecond", IntSizeToCE(sizeof(*Ptr_to_m_iNPS)), true, L"History");
+                Code += GettersAndSetters(L"Polyphony", IntSizeToCE(sizeof(*Ptr_to_m_iPolyphony)), true, L"History");
+                Code += GettersAndSetters(L"Passed", IntSizeToCE(sizeof(*Ptr_to_m_iPassed)), true, L"History");
+                Code += GettersAndSetters(L"Volume", FloatSizeToCE(cPlayback.GetVolumeSize()), false, L"History");
+                Code += GettersAndSetters(L"Mute", IntSizeToCE(cPlayback.GetMuteSize()), false, L"History");
+                Code += GettersAndSetters(L"PlaybackSpeed", FloatSizeToCE(cPlayback.GetSpeedSize()), false, L"History");
+                Code += GettersAndSetters(L"NoteSpeed", FloatSizeToCE(cPlayback.GetNSpeedSize()), false, L"History");
+                Code += GettersAndSetters(L"OffsetX", FloatSizeToCE(cView.GetOffsetXSize()), false, L"History", false, true);
+                Code += GettersAndSetters(L"OffsetY", FloatSizeToCE(cView.GetOffsetYSize()), false, L"History", false, true);
+                Code += GettersAndSetters(L"Zoom", FloatSizeToCE(cView.GetZoomXSize()), false, L"History", false, true);
+                Code += GettersAndSetters(L"SameWidth", IntSizeToCE(sizeof(cVideo.bSameWidth)), false, L"History", false, true);
+                Code += GettersAndSetters(L"VelocityMapping", IntSizeToCE(sizeof(cVideo.bMapVel)), false, L"History");
+                Code += GettersAndSetters(L"StartKey", IntSizeToCE(sizeof(cVisual.iFirstKey)), false, L"History", false, true);
+                Code += GettersAndSetters(L"EndKey", IntSizeToCE(sizeof(cVisual.iLastKey)), false, L"History", false, true);
+                Code += GettersAndSetters(L"KeyMode", IntSizeToCE(sizeof(cVisual.eKeysShown)), false, L"History", false, true);
+                Code += GettersAndSetters(L"Width", IntSizeToCE(sizeof(*Ptr_to_m_iWidth)), true, L"History", true, true);
+                Code += GettersAndSetters(L"Height", IntSizeToCE(sizeof(*Ptr_to_m_iHeight)), true, L"History", true, true);
                 Code += SetResolutionFunction();
-                Code += GettersAndSetters("Paused", IntSizeToCE(cPlayback.GetPausedSize()), false, "History");
-                Code += GettersAndSetters("Keyboard", IntSizeToCE(cView.GetKeyboardVarSize()), false, "History");
-                Code += GettersAndSetters("VisualizePitchBends", IntSizeToCE(sizeof(cVideo.bVisualizePitchBends)), false, "History", false, true);
-                Code += GettersAndSetters("PhigrosMode", IntSizeToCE(sizeof(cControls.bPhigros)), false, "History");
-                Code += GettersAndSetters("ShowMarkers", IntSizeToCE(sizeof(cVideo.bShowMarkers)), false, "History");
-                Code += GettersAndSetters("TickBased", IntSizeToCE(sizeof(cVideo.bTickBased)), false, "History");
-                Code += GettersAndSetters("HideStatistics", IntSizeToCE(sizeof(cVideo.bDisableUI)), false, "History");
-                Code += GettersAndSetters("RemoveOverlaps", IntSizeToCE(sizeof(cVideo.bOR)), false, "History");
-                Code += GettersAndSetters("LimitFPS", IntSizeToCE(sizeof(cVideo.bLimitFPS)), false, "History");
-                Code += GettersAndSetters("VelocityThreshold", IntSizeToCE(sizeof(cControls.iVelocityThreshold)), false, "History");
-                Code += StringTypeGettersAndSetters("Caption", MainScreen::CE_Caption_Size(), false, "History", true);
-                Code += StringTypeGettersAndSetters("DifficultyText", MainScreen::Difficulty_Size(), false, "History");
+                Code += GettersAndSetters(L"Paused", IntSizeToCE(cPlayback.GetPausedSize()), false, L"History");
+                Code += GettersAndSetters(L"Keyboard", IntSizeToCE(cView.GetKeyboardVarSize()), false, L"History");
+                Code += GettersAndSetters(L"VisualizePitchBends", IntSizeToCE(sizeof(cVideo.bVisualizePitchBends)), false, L"History", false, true);
+                Code += GettersAndSetters(L"PhigrosMode", IntSizeToCE(sizeof(cControls.bPhigros)), false, L"History");
+                Code += GettersAndSetters(L"ShowMarkers", IntSizeToCE(sizeof(cVideo.bShowMarkers)), false, L"History");
+                Code += GettersAndSetters(L"TickBased", IntSizeToCE(sizeof(cVideo.bTickBased)), false, L"History");
+                Code += GettersAndSetters(L"HideStatistics", IntSizeToCE(sizeof(cVideo.bDisableUI)), false, L"History");
+                Code += GettersAndSetters(L"RemoveOverlaps", IntSizeToCE(sizeof(cVideo.bOR)), false, L"History");
+                Code += GettersAndSetters(L"LimitFPS", IntSizeToCE(sizeof(cVideo.bLimitFPS)), false, L"History");
+                Code += GettersAndSetters(L"VelocityThreshold", IntSizeToCE(sizeof(cControls.iVelocityThreshold)), false, L"History");
+                Code += StringTypeGettersAndSetters(L"Caption", MainScreen::CE_Caption_Size(), false, L"History", true);
+                Code += StringTypeGettersAndSetters(L"DifficultyText", MainScreen::Difficulty_Size(), false, L"History");
                 Code += EasingFunctions();
-                Code += WaitUntil(false, "Pending");
-                Code += WaitUntil(true, "Pending");
-                Code += AnimationFunction(false, false, false, false, "Pending", "Active");
-                Code += AnimationFunction(true, false, false, false, "Pending", "Active");
-                Code += AnimationFunction(false, true, false, false, "Pending", "Active");
-                Code += AnimationFunction(true, true, false, false, "Pending", "Active");
-                Code += InstantaneousAnimationFunction(false, false, "Pending");
-                Code += AnimationFunction(false, false, true, false, "Pending", "Active");
-                Code += AnimationFunction(true, false, true, false, "Pending", "Active");
-                Code += AnimationFunction(false, true, true, false, "Pending", "Active");
-                Code += AnimationFunction(true, true, true, false, "Pending", "Active");
-                Code += InstantaneousAnimationFunction(true, false, "Pending");
-                Code += AnimationFunction(false, false, false, true, "Pending", "Active");
-                Code += AnimationFunction(true, false, false, true, "Pending", "Active");
-                Code += AnimationFunction(false, true, false, true, "Pending", "Active");
-                Code += AnimationFunction(true, true, false, true, "Pending", "Active");
-                Code += InstantaneousAnimationFunction(false, true, "Pending");
-                Code += AnimationFunction(false, false, true, true, "Pending", "Active");
-                Code += AnimationFunction(true, false, true, true, "Pending", "Active");
-                Code += AnimationFunction(false, true, true, true, "Pending", "Active");
-                Code += AnimationFunction(true, true, true, true, "Pending", "Active");
-                Code += InstantaneousAnimationFunction(true, true, "Pending");
+                Code += WaitUntil(false, L"Pending");
+                Code += WaitUntil(true, L"Pending");
+                Code += AnimationFunction(false, false, false, false, L"Pending", L"Active");
+                Code += AnimationFunction(true, false, false, false, L"Pending", L"Active");
+                Code += AnimationFunction(false, true, false, false, L"Pending", L"Active");
+                Code += AnimationFunction(true, true, false, false, L"Pending", L"Active");
+                Code += InstantaneousAnimationFunction(false, false, L"Pending");
+                Code += AnimationFunction(false, false, true, false, L"Pending", L"Active");
+                Code += AnimationFunction(true, false, true, false, L"Pending", L"Active");
+                Code += AnimationFunction(false, true, true, false, L"Pending", L"Active");
+                Code += AnimationFunction(true, true, true, false, L"Pending", L"Active");
+                Code += InstantaneousAnimationFunction(true, false, L"Pending");
+                Code += AnimationFunction(false, false, false, true, L"Pending", L"Active");
+                Code += AnimationFunction(true, false, false, true, L"Pending", L"Active");
+                Code += AnimationFunction(false, true, false, true, L"Pending", L"Active");
+                Code += AnimationFunction(true, true, false, true, L"Pending", L"Active");
+                Code += InstantaneousAnimationFunction(false, true, L"Pending");
+                Code += AnimationFunction(false, false, true, true, L"Pending", L"Active");
+                Code += AnimationFunction(true, false, true, true, L"Pending", L"Active");
+                Code += AnimationFunction(false, true, true, true, L"Pending", L"Active");
+                Code += AnimationFunction(true, true, true, true, L"Pending", L"Active");
+                Code += InstantaneousAnimationFunction(true, true, L"Pending");
                 Code += ShaderEngine();
                 Code += L"-- Builtin GDI Shaders: \n";
                 Code += BuiltinShaders();
@@ -1824,7 +1824,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
             }
             ffmpeg_len = decompressed_size;
         }
-        string FFmpegPath = ProgramPath() + "\\FFMPEG.exe";
+        wstring FFmpegPath = ProgramPath() + L"\\FFMPEG.exe";
         if (!filesystem::exists(FFmpegPath)) {
             ofstream FFmpegFile(FFmpegPath, ios::binary);
             FFmpegFile.write(reinterpret_cast<const char*>(pData), ffmpeg_len);
@@ -1833,13 +1833,13 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
         delete[] pData;
     }
     else {
-        cout << "Embedded ffmpeg.exe data length incorrect! \n";
-        cout << "Expected: ";
-        cout << ffmpeg_len;
-        cout << "\n";
-        cout << "Actual: ";
-        cout << offset;
-        cout << "\n";
+        wcout << L"Embedded ffmpeg.exe data length incorrect! \n";
+        wcout << L"Expected: ";
+        wcout << ffmpeg_len;
+        wcout << L"\n";
+        wcout << L"Actual: ";
+        wcout << offset;
+        wcout << L"\n";
         for (;;) {
 
         }
@@ -1932,13 +1932,10 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
         ShowWindow(g_hWnd, nCmdShow);
         UpdateWindow(g_hWnd);
         SetFocus(g_hWndGfx);
-        size_t llFilenameLength = mbstowcs(nullptr, __argv[1], 0);
-        wstring sFilename(llFilenameLength, L'\0');
-        mbstowcs(&sFilename[0], __argv[1], llFilenameLength);
-        PlayFile(sFilename);
+        PlayFile(__wargv[1]);
     }
     else {
-        cout << WStringToUtf8(StartupStage2Text) << "\n";
+        wcout << StartupStage2Text << L"\n";
         // Get the game going
         hThread = CreateThread(NULL, 0, GameThread, new SplashScreen(NULL, NULL), 0, NULL);
         if (!hThread) return 1;
@@ -1951,7 +1948,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, INT nCmdShow)
         UpdateWindow(g_hWnd);
         SetFocus(g_hWndGfx);
     }
-    cout << WStringToUtf8(StartupStage3Text) << "\n";
+    wcout << StartupStage3Text << L"\n";
 
     // Enter the message loop
     MSG msg = {};
@@ -1988,7 +1985,7 @@ DWORD WINAPI GameThread(LPVOID lpParameter)
     if (FAILED(get<0>(init_res)))
     {
         wchar_t msg[LONG_MAX_PATH] = {};
-        _snwprintf_s(msg, LONG_MAX_PATH, L"Fatal error initializing Direct3D. Is DirectX 11 installed properly? \n%S failed with code 0x%x. ", get<1>(init_res), get<0>(init_res));
+        _snwprintf_s(msg, LONG_MAX_PATH, L"Fatal error initializing Direct3D. Is DirectX 11 installed properly? \n%s failed with code 0x%x. ", get<1>(init_res), get<0>(init_res));
         MessageBox(g_hWnd, msg, TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
         PostMessage(g_hWnd, WM_QUIT, 1, 0);
         return 1;

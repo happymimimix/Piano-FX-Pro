@@ -41,8 +41,8 @@ struct TouchEventManager {
     }
     static void Delete(TouchEventListener* &ListenerPointer) {
         if (ListenerPointer == nullptr) {
-            wcout << "[1;1H[40m[91mERROR: Trying to remove a touch event listener that doesn't exist! \n";
-            wcout << "\nThe program will now stop. \n";
+            wcout << L"[1;1H[40m[91mERROR: Trying to remove a touch event listener that doesn't exist! \n";
+            wcout << L"\nThe program will now stop. \n";
             for (;;) {
                 // Make the program hang instead of closing! 
                 // This way the user can clearly see the error message. 
@@ -71,25 +71,25 @@ struct TouchEventManager {
                 }
                 else {
                     // Oh no! We're triggering more than one TouchEventListeners at the same time! 
-                    wcout << "[1;1H[40m[91mERROR: Touch event listeners cannot overlap! \n\n";
-                    wcout << "The TouchEventListener at (";
+                    wcout << L"[1;1H[40m[91mERROR: Touch event listeners cannot overlap! \n\n";
+                    wcout << L"The TouchEventListener at (";
                     wcout << (int)Touched->X;
-                    wcout << ", ";
+                    wcout << L", ";
                     wcout << (int)Touched->Y;
-                    wcout << ") with size ";
+                    wcout << L") with size ";
                     wcout << (int)Touched->W;
-                    wcout << " * ";
+                    wcout << L" * ";
                     wcout << (int)Touched->H;
-                    wcout << " is overlapping with another TouchEventListener at (";
+                    wcout << L" is overlapping with another TouchEventListener at (";
                     wcout << (int)CurrentListener->X;
-                    wcout << ", ";
+                    wcout << L", ";
                     wcout << (int)CurrentListener->Y;
-                    wcout << ") with size ";
+                    wcout << L") with size ";
                     wcout << (int)CurrentListener->W;
-                    wcout << " * ";
+                    wcout << L" * ";
                     wcout << (int)CurrentListener->H;
-                    wcout << "! \n";
-                    wcout << "\nThe program will now stop. \n";
+                    wcout << L"! \n";
+                    wcout << L"\nThe program will now stop. \n";
                     for (;;) {
                         // Make the program hang instead of closing! 
                         // This way the user can clearly see the error message. 

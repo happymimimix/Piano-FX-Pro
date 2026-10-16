@@ -25,16 +25,16 @@ void Tab1::SubViewBtn5::Open() {
         Path.Delete();
         TouchEventManager::Delete(Browse);
         TouchEventManager::Delete(Convert);
-        FillConsole(3, 16, 65, 9, ' ', 0x0F);
+        FillConsole(3, 16, 65, 9, L' ', 0x0F);
         Tab1Graphics::Btn5(3, 14, Normal);
         TabSwitcher::EnableAll();
         Tab1::EnableAll();
     };
     Close->OnHover = [&]() {
-        wcout << "[17;66H[44m[93mx";
+        wcout << L"[17;66H[44m[93mx";
     };
     Close->OnLeave = [&]() {
-        wcout << "[17;66H[44m[91mx";
+        wcout << L"[17;66H[44m[91mx";
     };
     Path.Create(6, 19, 51, 2);
     Browse = TouchEventManager::Create();

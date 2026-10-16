@@ -22,13 +22,13 @@
 
 ComPtr<IWICImagingFactory> Renderer11::s_pWICFactory;
 
-tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
+tuple<HRESULT, const wchar_t*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
     HRESULT res;
 
     // Create DXGI factory
     res = CreateDXGIFactory1(IID_PPV_ARGS(&m_pFactory));
     if (FAILED(res))
-        return make_tuple(res, "CreateDXGIFactory1");
+        return make_tuple(res, L"CreateDXGIFactory1");
 
     // Create device
     // TODO: Allow device selection for people with multiple GPUs
@@ -42,7 +42,7 @@ tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
 
         DXGI_ADAPTER_DESC1 desc = {};
         res = adapter->GetDesc1(&desc);
-        if (FAILED(res)) return make_tuple(res, "GetDesc1");
+        if (FAILED(res)) return make_tuple(res, L"GetDesc1");
 
         if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE || (desc.VendorId == 0x1414 && desc.DeviceId == 0x008C)) continue;
 
@@ -75,14 +75,14 @@ tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
         res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_WARP, NULL,
             D3D11_CREATE_DEVICE_BGRA_SUPPORT, wanted, _countof(wanted),
             D3D11_SDK_VERSION, &m_pDevice, &featureLevel, &m_pContext);
-        if (FAILED(res)) return make_tuple(res, "D3D11CreateDevice");
+        if (FAILED(res)) return make_tuple(res, L"D3D11CreateDevice");
     }
 
     // Create shaders
     res = m_pDevice->CreateVertexShader(g_pRectVertexShader, sizeof(g_pRectVertexShader), NULL, &m_pRectVS);
-    if (FAILED(res)) return make_tuple(res, "CreateVertexShader (rect)");
+    if (FAILED(res)) return make_tuple(res, L"CreateVertexShader (rect)");
     res = m_pDevice->CreatePixelShader(g_pRectPixelShader, sizeof(g_pRectPixelShader), NULL, &m_pRectPS);
-    if (FAILED(res)) return make_tuple(res, "CreatePixelShader (rect)");
+    if (FAILED(res)) return make_tuple(res, L"CreatePixelShader (rect)");
 
     // Create rect input layout
     D3D11_INPUT_ELEMENT_DESC rect_input[] = {
@@ -90,21 +90,21 @@ tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
         {"COLOR", 0, DXGI_FORMAT_B8G8R8A8_UNORM, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
     };
     res = m_pDevice->CreateInputLayout(rect_input, _countof(rect_input), g_pRectVertexShader, sizeof(g_pRectVertexShader), &m_pRectInputLayout);
-    if (FAILED(res)) return make_tuple(res, "CreateInputLayout (rect)");
+    if (FAILED(res)) return make_tuple(res, L"CreateInputLayout (rect)");
 
     // Create note shaders
     res = m_pDevice->CreateVertexShader(g_pNoteVertexShader, sizeof(g_pNoteVertexShader), NULL, &m_pNoteVS);
-    if (FAILED(res)) return make_tuple(res, "CreateVertexShader (note)");
+    if (FAILED(res)) return make_tuple(res, L"CreateVertexShader (note)");
     res = m_pDevice->CreateVertexShader(g_pNoteVertexShaderSameWidth, sizeof(g_pNoteVertexShaderSameWidth), NULL, &m_pNoteSameWidthVS);
-    if (FAILED(res)) return make_tuple(res, "CreateVertexShader (same width note)");
+    if (FAILED(res)) return make_tuple(res, L"CreateVertexShader (same width note)");
     res = m_pDevice->CreatePixelShader(g_pNotePixelShader, sizeof(g_pNotePixelShader), NULL, &m_pNotePS);
-    if (FAILED(res)) return make_tuple(res, "CreatePixelShader (note)");
+    if (FAILED(res)) return make_tuple(res, L"CreatePixelShader (note)");
 
     // Create background shaders
     res = m_pDevice->CreateVertexShader(g_pBackgroundVertexShader, sizeof(g_pBackgroundVertexShader), NULL, &m_pBackgroundVS);
-    if (FAILED(res)) return make_tuple(res, "CreateVertexShader (background)");
+    if (FAILED(res)) return make_tuple(res, L"CreateVertexShader (background)");
     res = m_pDevice->CreatePixelShader(g_pBackgroundPixelShader, sizeof(g_pBackgroundPixelShader), NULL, &m_pBackgroundPS);
-    if (FAILED(res)) return make_tuple(res, "CreatePixelShader (background)");
+    if (FAILED(res)) return make_tuple(res, L"CreatePixelShader (background)");
 
     // Create blend state
     // Inverted alpha blending inherited from the original PianoFromAbove codebase created by BrianPantano. (0 is opaque, 255 is transparent)
@@ -117,7 +117,7 @@ tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
         D3D11_COLOR_WRITE_ENABLE_ALL
     };
     res = m_pDevice->CreateBlendState(&bd, &m_pBlendState);
-    if (FAILED(res)) return make_tuple(res, "CreateBlendState");
+    if (FAILED(res)) return make_tuple(res, L"CreateBlendState");
 
     // Create rasterizer state
     D3D11_RASTERIZER_DESC rd = {};
@@ -125,22 +125,22 @@ tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
     rd.CullMode = D3D11_CULL_NONE;
     rd.DepthClipEnable = TRUE;
     res = m_pDevice->CreateRasterizerState(&rd, &m_pRasterizerState);
-    if (FAILED(res)) return make_tuple(res, "CreateRasterizerState");
+    if (FAILED(res)) return make_tuple(res, L"CreateRasterizerState");
 
     // Create depth stencil states
     D3D11_DEPTH_STENCIL_DESC dd = {};
     res = m_pDevice->CreateDepthStencilState(&dd, &m_pDepthDisabledState);
-    if (FAILED(res)) return make_tuple(res, "CreateDepthStencilState (disabled)");
+    if (FAILED(res)) return make_tuple(res, L"CreateDepthStencilState (disabled)");
 
     dd.DepthEnable = TRUE;
     dd.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
     dd.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
     res = m_pDevice->CreateDepthStencilState(&dd, &m_pDepthLessEqualState);
-    if (FAILED(res)) return make_tuple(res, "CreateDepthStencilState (less-equal)");
+    if (FAILED(res)) return make_tuple(res, L"CreateDepthStencilState (less-equal)");
 
     dd.DepthFunc = D3D11_COMPARISON_LESS;
     res = m_pDevice->CreateDepthStencilState(&dd, &m_pDepthLessState);
-    if (FAILED(res)) return make_tuple(res, "CreateDepthStencilState (less)");
+    if (FAILED(res)) return make_tuple(res, L"CreateDepthStencilState (less)");
 
     // Create background sampler
     D3D11_SAMPLER_DESC sd = {};
@@ -148,7 +148,7 @@ tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
     sd.AddressU = sd.AddressV = sd.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
     sd.MaxLOD = D3D11_FLOAT32_MAX;
     res = m_pDevice->CreateSamplerState(&sd, &m_pBackgroundSampler);
-    if (FAILED(res)) return make_tuple(res, "CreateSamplerState");
+    if (FAILED(res)) return make_tuple(res, L"CreateSamplerState");
 
     // Create constant buffer (replaces DX12 root constants)
     D3D11_BUFFER_DESC cbDesc = {};
@@ -157,7 +157,7 @@ tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
     cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
     cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
     res = m_pDevice->CreateBuffer(&cbDesc, NULL, &m_pConstantBuffer);
-    if (FAILED(res)) return make_tuple(res, "CreateBuffer (constant buffer)");
+    if (FAILED(res)) return make_tuple(res, L"CreateBuffer (constant buffer)");
 
     // Create fixed size constants structured buffer
     D3D11_BUFFER_DESC fixedDesc = {};
@@ -167,14 +167,14 @@ tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
     fixedDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
     fixedDesc.StructureByteStride = sizeof(FixedSizeConstants);
     res = m_pDevice->CreateBuffer(&fixedDesc, NULL, &m_pFixedBuffer);
-    if (FAILED(res)) return make_tuple(res, "CreateBuffer (fixed buffer)");
+    if (FAILED(res)) return make_tuple(res, L"CreateBuffer (fixed buffer)");
 
     D3D11_SHADER_RESOURCE_VIEW_DESC fixedSrvDesc = {};
     fixedSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
     fixedSrvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
     fixedSrvDesc.Buffer.NumElements = 1;
     res = m_pDevice->CreateShaderResourceView(m_pFixedBuffer.Get(), &fixedSrvDesc, &m_pFixedSRV);
-    if (FAILED(res)) return make_tuple(res, "CreateSRV (fixed buffer)");
+    if (FAILED(res)) return make_tuple(res, L"CreateSRV (fixed buffer)");
 
     // Create track color structured buffer
     D3D11_BUFFER_DESC trackDesc = {};
@@ -184,14 +184,14 @@ tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
     trackDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
     trackDesc.StructureByteStride = sizeof(TrackColor);
     res = m_pDevice->CreateBuffer(&trackDesc, NULL, &m_pTrackColorBuffer);
-    if (FAILED(res)) return make_tuple(res, "CreateBuffer (track color buffer)");
+    if (FAILED(res)) return make_tuple(res, L"CreateBuffer (track color buffer)");
 
     D3D11_SHADER_RESOURCE_VIEW_DESC trackSrvDesc = {};
     trackSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
     trackSrvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
     trackSrvDesc.Buffer.NumElements = MaxTrackColors * MaxChannelColors;
     res = m_pDevice->CreateShaderResourceView(m_pTrackColorBuffer.Get(), &trackSrvDesc, &m_pTrackColorSRV);
-    if (FAILED(res)) return make_tuple(res, "CreateSRV (track color buffer)");
+    if (FAILED(res)) return make_tuple(res, L"CreateSRV (track color buffer)");
 
     // Create dynamic rect vertex buffer
     D3D11_BUFFER_DESC vbDesc = {};
@@ -200,7 +200,7 @@ tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
     vbDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
     vbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
     res = m_pDevice->CreateBuffer(&vbDesc, NULL, &m_pRectVertexBuffer);
-    if (FAILED(res)) return make_tuple(res, "CreateBuffer (rect vertex buffer)");
+    if (FAILED(res)) return make_tuple(res, L"CreateBuffer (rect vertex buffer)");
 
     // Create dynamic note structured buffer
     D3D11_BUFFER_DESC noteDesc = {};
@@ -211,14 +211,14 @@ tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
     noteDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
     noteDesc.StructureByteStride = sizeof(NoteData);
     res = m_pDevice->CreateBuffer(&noteDesc, NULL, &m_pNoteBuffer);
-    if (FAILED(res)) return make_tuple(res, "CreateBuffer (note buffer)");
+    if (FAILED(res)) return make_tuple(res, L"CreateBuffer (note buffer)");
 
     D3D11_SHADER_RESOURCE_VIEW_DESC noteSrvDesc = {};
     noteSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
     noteSrvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
     noteSrvDesc.Buffer.NumElements = RectsPerPass;
     res = m_pDevice->CreateShaderResourceView(m_pNoteBuffer.Get(), &noteSrvDesc, &m_pNoteSRV);
-    if (FAILED(res)) return make_tuple(res, "CreateSRV (note buffer)");
+    if (FAILED(res)) return make_tuple(res, L"CreateSRV (note buffer)");
 
     // Create index buffer
     vector<uint32_t> index_buffer_vec(IndexBufferCount);
@@ -237,17 +237,17 @@ tuple<HRESULT, const char*> Renderer11::Init(HWND hWnd, bool bLimitFPS) {
     ibDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
     D3D11_SUBRESOURCE_DATA ibData = { index_buffer_vec.data() };
     res = m_pDevice->CreateBuffer(&ibDesc, &ibData, &m_pIndexBuffer);
-    if (FAILED(res)) return make_tuple(res, "CreateBuffer (index buffer)");
+    if (FAILED(res)) return make_tuple(res, L"CreateBuffer (index buffer)");
 
     // Make the swap chain
     auto res2 = CreateWindowDependentObjects(hWnd);
     if (FAILED(get<0>(res2)))
         return res2;
 
-    return make_tuple(S_OK, "");
+    return make_tuple(S_OK, L"");
 }
 
-tuple<HRESULT, const char*> Renderer11::CreateWindowDependentObjects(HWND hWnd) {
+tuple<HRESULT, const wchar_t*> Renderer11::CreateWindowDependentObjects(HWND hWnd) {
     HRESULT res;
     if (m_pSwapChain) {
         // Release window-dependent objects
@@ -260,7 +260,7 @@ tuple<HRESULT, const char*> Renderer11::CreateWindowDependentObjects(HWND hWnd) 
         m_pDepthBuffer.Reset();
         // Resize the swap chain
         res = m_pSwapChain->ResizeBuffers(1, 0, 0, DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_GDI_COMPATIBLE);
-        if (FAILED(res)) return make_tuple(res, "ResizeBuffers");
+        if (FAILED(res)) return make_tuple(res, L"ResizeBuffers");
     }
     else {
         // Create swap chain with GDI compatibility
@@ -274,16 +274,16 @@ tuple<HRESULT, const char*> Renderer11::CreateWindowDependentObjects(HWND hWnd) 
         scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
         scd.Flags = DXGI_SWAP_CHAIN_FLAG_GDI_COMPATIBLE;
         res = m_pFactory->CreateSwapChain(m_pDevice.Get(), &scd, &m_pSwapChain);
-        if (FAILED(res)) return make_tuple(res, "CreateSwapChain");
+        if (FAILED(res)) return make_tuple(res, L"CreateSwapChain");
         m_pFactory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER);
     }
 
     // Get backbuffer and its GDI-compatible surface
     res = m_pSwapChain->GetBuffer(0, IID_PPV_ARGS(&m_pBackBuffer));
-    if (FAILED(res)) return make_tuple(res, "GetBuffer");
+    if (FAILED(res)) return make_tuple(res, L"GetBuffer");
 
     res = m_pBackBuffer.As(&m_pBackBufferSurface);
-    if (FAILED(res)) return make_tuple(res, "QueryInterface (IDXGISurface1)");
+    if (FAILED(res)) return make_tuple(res, L"QueryInterface (IDXGISurface1)");
 
     // Read backbuffer width and height
     D3D11_TEXTURE2D_DESC bbDesc = {};
@@ -293,7 +293,7 @@ tuple<HRESULT, const char*> Renderer11::CreateWindowDependentObjects(HWND hWnd) 
 
     // Create render target view
     res = m_pDevice->CreateRenderTargetView(m_pBackBuffer.Get(), nullptr, &m_pRenderTargetView);
-    if (FAILED(res)) return make_tuple(res, "CreateRenderTargetView");
+    if (FAILED(res)) return make_tuple(res, L"CreateRenderTargetView");
 
     // Create depth buffer
     D3D11_TEXTURE2D_DESC depthDesc = {};
@@ -306,9 +306,9 @@ tuple<HRESULT, const char*> Renderer11::CreateWindowDependentObjects(HWND hWnd) 
     depthDesc.Usage = D3D11_USAGE_DEFAULT;
     depthDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
     res = m_pDevice->CreateTexture2D(&depthDesc, NULL, &m_pDepthBuffer);
-    if (FAILED(res)) return make_tuple(res, "CreateTexture2D (depth buffer)");
+    if (FAILED(res)) return make_tuple(res, L"CreateTexture2D (depth buffer)");
     res = m_pDevice->CreateDepthStencilView(m_pDepthBuffer.Get(), NULL, &m_pDepthStencilView);
-    if (FAILED(res)) return make_tuple(res, "CreateDepthStencilView");
+    if (FAILED(res)) return make_tuple(res, L"CreateDepthStencilView");
 
     // Create background image texture
     m_pBackgroundTexture.Reset();
@@ -323,9 +323,9 @@ tuple<HRESULT, const char*> Renderer11::CreateWindowDependentObjects(HWND hWnd) 
     bgDesc.Usage = D3D11_USAGE_DEFAULT;
     bgDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     res = m_pDevice->CreateTexture2D(&bgDesc, NULL, &m_pBackgroundTexture);
-    if (FAILED(res)) return make_tuple(res, "CreateTexture2D (background texture)");
+    if (FAILED(res)) return make_tuple(res, L"CreateTexture2D (background texture)");
     res = m_pDevice->CreateShaderResourceView(m_pBackgroundTexture.Get(), nullptr, &m_pBackgroundTextureSRV);
-    if (FAILED(res)) return make_tuple(res, "CreateSRV (background texture)");
+    if (FAILED(res)) return make_tuple(res, L"CreateSRV (background texture)");
 
     // Scale and upload background image
     UploadBackgroundBitmap();
@@ -343,7 +343,7 @@ tuple<HRESULT, const char*> Renderer11::CreateWindowDependentObjects(HWND hWnd) 
     };
     memcpy(m_RootConstants.proj, mvp, sizeof(mvp));
 
-    return make_tuple(S_OK, "");
+    return make_tuple(S_OK, L"");
 }
 
 HRESULT Renderer11::ResetDeviceIfNeeded() {

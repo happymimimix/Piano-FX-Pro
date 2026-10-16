@@ -9,7 +9,6 @@ TouchEventListener* Tab1::SubViewBtn2::Browse = nullptr;
 TouchEventListener* Tab1::SubViewBtn2::Install = nullptr;
 
 UINT_PTR CALLBACK FolderPickHook(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam) {
-    OutputDebugStringA("Hook called!\n");
     if (msg == WM_NOTIFY) {
         OFNOTIFY* ofn = (OFNOTIFY*)lParam;
         HWND hParent = GetParent(hDlg);
@@ -33,7 +32,7 @@ void Tab1::SubViewBtn2::Open() {
     Tab1::DisableAll();
     InvalidateRect(GetConsoleWindow(), NULL, TRUE);
     DoTransition(3, 8, 50, 9, 3, 16, 0x00001000);
-    FillConsole(3, 8, 50, 9, ' ', 0x0F);
+    FillConsole(3, 8, 50, 9, L' ', 0x0F);
     Tab1Graphics::Btn3(3, 16, Normal);
     Tab1Graphics::Btn4(3, 19, Normal);
     Tab1Graphics::Btn5(3, 22, Normal);
@@ -50,18 +49,18 @@ void Tab1::SubViewBtn2::Open() {
         Path.Delete();
         TouchEventManager::Delete(Browse);
         TouchEventManager::Delete(Install);
-        FillConsole(3, 7, 65, 9, ' ', 0x0F);
+        FillConsole(3, 7, 65, 9, L' ', 0x0F);
         Tab1Graphics::Btn2(3, 5, Normal);
         DoTransition(3, 16, 50, 10, 3, 8, 0x00001000);
         TabSwitcher::EnableAll();
         Tab1::EnableAll();
-        FillConsole(3, 17, 50, 9, ' ', 0x0F);
+        FillConsole(3, 17, 50, 9, L' ', 0x0F);
     };
     Close->OnHover = [&]() {
-        wcout << "[8;66H[44m[93mx";
+        wcout << L"[8;66H[44m[93mx";
     };
     Close->OnLeave = [&]() {
-        wcout << "[8;66H[44m[91mx";
+        wcout << L"[8;66H[44m[91mx";
     };
     Path.Create(6, 10, 51, 2);
     Path.SetText(L"C:\\Program Files (x86)\\Image-Line\\FL Studio 12");

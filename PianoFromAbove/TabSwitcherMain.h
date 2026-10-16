@@ -13,8 +13,8 @@ uint8_t TabSwitcher::CurrentTab = 1;
 
 void TabSwitcher::EnableAll() {
     if (Tab1 != nullptr || Tab2 != nullptr || Tab3 != nullptr || Tab4 != nullptr) {
-        wcout << "[1;1H[40m[91mERROR: Trying to enable a TouchEventListener that is already enabled. \n";
-        wcout << "\nThe program will now stop. \n";
+        wcout << L"[1;1H[40m[91mERROR: Trying to enable a TouchEventListener that is already enabled. \n";
+        wcout << L"\nThe program will now stop. \n";
         for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
@@ -35,12 +35,12 @@ void TabSwitcher::EnableAll() {
         };
         Tab1->OnHover = [&]() {
             if (TabSwitcher::CurrentTab != 1) {
-                wcout << "[34;4H[93mSetup";
+                wcout << L"[34;4H[93mSetup";
             }
         };
         Tab1->OnLeave = [&]() {
             if (TabSwitcher::CurrentTab != 1) {
-                wcout << "[34;4H[91mSetup";
+                wcout << L"[34;4H[91mSetup";
             }
         };
         Tab2 = TouchEventManager::Create();
@@ -57,12 +57,12 @@ void TabSwitcher::EnableAll() {
         };
         Tab2->OnHover = [&]() {
             if (TabSwitcher::CurrentTab != 2) {
-                wcout << "[34;13H[93mAnimate";
+                wcout << L"[34;13H[93mAnimate";
             }
         };
         Tab2->OnLeave = [&]() {
             if (TabSwitcher::CurrentTab != 2) {
-                wcout << "[34;13H[91mAnimate";
+                wcout << L"[34;13H[91mAnimate";
             }
         };
         Tab3 = TouchEventManager::Create();
@@ -79,12 +79,12 @@ void TabSwitcher::EnableAll() {
         };
         Tab3->OnHover = [&]() {
             if (TabSwitcher::CurrentTab != 3) {
-                wcout << "[34;24H[93mColorize";
+                wcout << L"[34;24H[93mColorize";
             }
         };
         Tab3->OnLeave = [&]() {
             if (TabSwitcher::CurrentTab != 3) {
-                wcout << "[34;24H[91mColorize";
+                wcout << L"[34;24H[91mColorize";
             }
         };
         Tab4 = TouchEventManager::Create();
@@ -101,12 +101,12 @@ void TabSwitcher::EnableAll() {
         };
         Tab4->OnHover = [&]() {
             if (TabSwitcher::CurrentTab != 4) {
-                wcout << "[34;36H[93mGDI";
+                wcout << L"[34;36H[93mGDI";
             }
         };
         Tab4->OnLeave = [&]() {
             if (TabSwitcher::CurrentTab != 4) {
-                wcout << "[34;36H[91mGDI";
+                wcout << L"[34;36H[91mGDI";
             }
         };
     }
@@ -123,38 +123,38 @@ void TabSwitcher::EnableTab(uint8_t Tab) {
     DrawBG();
     switch (Tab) {
     case 1:
-        wcout << "[33;2H[40m[96m╕       ╒╤═════════╤╤══════════╤╤═════╤";
-        wcout << "[34;2H[40m[96m│ [92mSetup[96m ││ [91mAnimate[96m ││ [91mColorize[96m ││ [91mGDI[96m │";
-        wcout << "[35;2H[40m[96m└───────┘└─────────┘└──────────┘└─────┘";
+        wcout << L"[33;2H[40m[96m╕       ╒╤═════════╤╤══════════╤╤═════╤";
+        wcout << L"[34;2H[40m[96m│ [92mSetup[96m ││ [91mAnimate[96m ││ [91mColorize[96m ││ [91mGDI[96m │";
+        wcout << L"[35;2H[40m[96m└───────┘└─────────┘└──────────┘└─────┘";
         Tab1::EnableAll();
         break;
     case 2:
-        wcout << "[33;2H[40m[96m╤═══════╤╕         ╒╤══════════╤╤═════╤";
-        wcout << "[34;2H[40m[96m│ [91mSetup[96m ││ [92mAnimate[96m ││ [91mColorize[96m ││ [91mGDI[96m │";
-        wcout << "[35;2H[40m[96m└───────┘└─────────┘└──────────┘└─────┘";
+        wcout << L"[33;2H[40m[96m╤═══════╤╕         ╒╤══════════╤╤═════╤";
+        wcout << L"[34;2H[40m[96m│ [91mSetup[96m ││ [92mAnimate[96m ││ [91mColorize[96m ││ [91mGDI[96m │";
+        wcout << L"[35;2H[40m[96m└───────┘└─────────┘└──────────┘└─────┘";
         Tab2::EnableAll();
         break;
     case 3:
-        wcout << "[33;2H[40m[96m╤═══════╤╤═════════╤╕          ╒╤═════╤";
-        wcout << "[34;2H[40m[96m│ [91mSetup[96m ││ [91mAnimate[96m ││ [92mColorize[96m ││ [91mGDI[96m │";
-        wcout << "[35;2H[40m[96m└───────┘└─────────┘└──────────┘└─────┘";
+        wcout << L"[33;2H[40m[96m╤═══════╤╤═════════╤╕          ╒╤═════╤";
+        wcout << L"[34;2H[40m[96m│ [91mSetup[96m ││ [91mAnimate[96m ││ [92mColorize[96m ││ [91mGDI[96m │";
+        wcout << L"[35;2H[40m[96m└───────┘└─────────┘└──────────┘└─────┘";
         Tab3::EnableAll();
         break;
     case 4:
-        wcout << "[33;2H[40m[96m╤═══════╤╤═════════╤╤══════════╤╕     ╒";
-        wcout << "[34;2H[40m[96m│ [91mSetup[96m ││ [91mAnimate[96m ││ [91mColorize[96m ││ [92mGDI[96m │";
-        wcout << "[35;2H[40m[96m└───────┘└─────────┘└──────────┘└─────┘";
+        wcout << L"[33;2H[40m[96m╤═══════╤╤═════════╤╤══════════╤╕     ╒";
+        wcout << L"[34;2H[40m[96m│ [91mSetup[96m ││ [91mAnimate[96m ││ [91mColorize[96m ││ [92mGDI[96m │";
+        wcout << L"[35;2H[40m[96m└───────┘└─────────┘└──────────┘└─────┘";
         Tab4::EnableAll();
         break;
     default:
-        wcout << "[1;1H[40m[91mERROR: Switching to an unknown tab: ";
+        wcout << L"[1;1H[40m[91mERROR: Switching to an unknown tab: ";
         wcout << (int)Tab;
-        wcout << "\n\nAllowed tab IDs: \n";
-        wcout << "1 (Setup)\n";
-        wcout << "2 (Animate)\n";
-        wcout << "3 (Colorize)\n";
-        wcout << "4 (GDI)\n";
-        wcout << "\nThe program will now stop. \n";
+        wcout << L"\n\nAllowed tab IDs: \n";
+        wcout << L"1 (Setup)\n";
+        wcout << L"2 (Animate)\n";
+        wcout << L"3 (Colorize)\n";
+        wcout << L"4 (GDI)\n";
+        wcout << L"\nThe program will now stop. \n";
         for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
@@ -178,14 +178,14 @@ void TabSwitcher::DisableTab(uint8_t Tab) {
         Tab4::DisableAll();
         break;
     default:
-        wcout << "[1;1H[40m[91mERROR: Switching from an unknown tab: ";
+        wcout << L"[1;1H[40m[91mERROR: Switching from an unknown tab: ";
         wcout << (int)Tab;
-        wcout << "\n\nAllowed tab IDs: \n";
-        wcout << "1 (Setup)\n";
-        wcout << "2 (Animate)\n";
-        wcout << "3 (Colorize)\n";
-        wcout << "4 (GDI)\n";
-        wcout << "\nThe program will now stop. \n";
+        wcout << L"\n\nAllowed tab IDs: \n";
+        wcout << L"1 (Setup)\n";
+        wcout << L"2 (Animate)\n";
+        wcout << L"3 (Colorize)\n";
+        wcout << L"4 (GDI)\n";
+        wcout << L"\nThe program will now stop. \n";
         for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 

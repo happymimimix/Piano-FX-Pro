@@ -277,7 +277,7 @@ void CreateFLP(wstring Path, uint16_t PPQ) {
     DefinePage(ID_Plugin_Parameters, "NRPN", Cursor);
     DefinePage(ID_Plugin_Parameters, "Reserved", Cursor);
 
-    MessageBoxA(0, to_string(Cursor).c_str(), "Cursor:", 0);
+    MessageBoxW(0, to_wstring(Cursor).c_str(), L"Cursor:", 0);
     
     for (uint16_t Channel = 0; Channel < 16; Channel++) {
         ID_Plugin_Parameters[4] = Channel >= 9 ? Channel + 1 : Channel; //MIDI output channel

@@ -11,8 +11,8 @@ TouchEventListener* Tab1::Btn5 = nullptr;
 
 void Tab1::EnableAll() {
     if (AnyGoodPtr(Btn1,Btn2,Btn3,Btn4,Btn5)) {
-        wcout << "[1;1H[40m[91mERROR: Trying to enable a TouchEventListener that is already enabled. \n";
-        wcout << "\nThe program will now stop. \n";
+        wcout << L"[1;1H[40m[91mERROR: Trying to enable a TouchEventListener that is already enabled. \n";
+        wcout << L"\nThe program will now stop. \n";
         for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
@@ -59,13 +59,13 @@ void Tab1::EnableAll() {
         Btn3->OnTouch = [&]() {
             Tab1Graphics::Btn3(3, 8, Touched);
             Sleep(500);
-            char ProgramPath[LONG_MAX_PATH] = {};
-            GetModuleFileNameA(NULL, ProgramPath, LONG_MAX_PATH);
-            string Command = "start \"Standard MIDI Format Type 3 Introduction\" \"";
+            wchar_t ProgramPath[LONG_MAX_PATH] = {};
+            GetModuleFileNameW(NULL, ProgramPath, LONG_MAX_PATH);
+            wstring Command = L"start \"Standard MIDI Format Type 3 Introduction\" \"";
             Command += ProgramPath;
-            Command += "\" ";
-            Command += "OPEN SMF3Intro";
-            system(Command.c_str());
+            Command += L"\" ";
+            Command += L"OPEN SMF3Intro";
+            _wsystem(Command.c_str());
             Btn3->OnLeave();
         };
         Btn3->OnHover = [&]() {
@@ -112,8 +112,8 @@ void Tab1::EnableAll() {
 
 void Tab1::DisableAll() {
     if (AnyNullPtr(Btn1, Btn2, Btn3, Btn4, Btn5)) {
-        wcout << "[1;1H[40m[91mERROR: Trying to disable a tab that isn't enabled. \n";
-        wcout << "\nThe program will now stop. \n";
+        wcout << L"[1;1H[40m[91mERROR: Trying to disable a tab that isn't enabled. \n";
+        wcout << L"\nThe program will now stop. \n";
         for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
@@ -130,8 +130,8 @@ void Tab1::DisableAll() {
 
 void Tab1::Draw() {
     if (AnyNullPtr(Btn1, Btn2, Btn3, Btn4, Btn5)) {
-        wcout << "[1;1H[40m[91mERROR: Trying to render a button that doesn't exist. \n";
-        wcout << "\nThe program will now stop. \n";
+        wcout << L"[1;1H[40m[91mERROR: Trying to render a button that doesn't exist. \n";
+        wcout << L"\nThe program will now stop. \n";
         for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 

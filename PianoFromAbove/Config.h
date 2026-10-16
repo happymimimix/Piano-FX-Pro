@@ -125,11 +125,11 @@ public:
     double GetSpeed() const { return m_dSpeed; }
     double GetNSpeed() const { return m_dNSpeed; }
     double GetVolume() const { return max(min(m_dVolume, 2.0), 0.0); }
-    string GetPausedAddress() const { return GetAddress(m_bPaused); }
-    string GetMuteAddress() const { return GetAddress(m_bMute); }
-    string GetSpeedAddress() const { return GetAddress(m_dSpeed); }
-    string GetNSpeedAddress() const { return GetAddress(m_dNSpeed); }
-    string GetVolumeAddress() const { return GetAddress(m_dVolume); }
+    wstring GetPausedAddress() const { return GetAddress(m_bPaused); }
+    wstring GetMuteAddress() const { return GetAddress(m_bMute); }
+    wstring GetSpeedAddress() const { return GetAddress(m_dSpeed); }
+    wstring GetNSpeedAddress() const { return GetAddress(m_dNSpeed); }
+    wstring GetVolumeAddress() const { return GetAddress(m_dVolume); }
     uint8_t GetPausedSize() const { return sizeof(m_bPaused); }
     uint8_t GetMuteSize() const { return sizeof(m_bMute); }
     uint8_t GetSpeedSize() const { return sizeof(m_dSpeed); }
@@ -173,15 +173,15 @@ public:
     float GetOffsetX() const { return m_fOffsetX; }
     float GetOffsetY() const { return m_fOffsetY; }
     float GetZoomX() const { return m_fZoomX; }
-    string GetOffsetXAddress() const { return GetAddress(m_fOffsetX); }
-    string GetOffsetYAddress() const { return GetAddress(m_fOffsetY); }
-    string GetZoomXAddress() const { return GetAddress(m_fZoomX); }
+    wstring GetOffsetXAddress() const { return GetAddress(m_fOffsetX); }
+    wstring GetOffsetYAddress() const { return GetAddress(m_fOffsetY); }
+    wstring GetZoomXAddress() const { return GetAddress(m_fZoomX); }
     uint8_t GetOffsetXSize() const { return sizeof(m_fOffsetX); }
     uint8_t GetOffsetYSize() const { return sizeof(m_fOffsetY); }
     uint8_t GetZoomXSize() const { return sizeof(m_fZoomX); }
     bool GetControls() const { return m_bControls; }
     bool GetKeyboard() const { return m_bKeyboard; }
-    string GetKeyboardAddress() const { return GetAddress(m_bKeyboard); }
+    wstring GetKeyboardAddress() const { return GetAddress(m_bKeyboard); }
     uint8_t GetKeyboardVarSize() const { return sizeof(m_bKeyboard); }
     bool GetOnTop() const { return m_bOnTop; }
     bool GetFullScreen() const { return m_bFullScreen; }

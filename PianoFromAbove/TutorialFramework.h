@@ -24,7 +24,7 @@ struct HighlightedArea {
 
 struct TutorialDocument {
     uint16_t DocumentLength = 0;
-    string TextContent = R"MultilineText(
+    wstring TextContent = LR"MultilineText(
 )MultilineText";
     vector<Diagram> DiagramsList = {};
 };
@@ -39,9 +39,9 @@ void SetDocumentLength(uint16_t Length) {
     bufferSize.X = 100;
     bufferSize.Y = max(Length,35);
     if (!SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), bufferSize)) {
-        wcout << "[1;1H[40m[91mERROR: Unable to set console buffer size. \n\nReason: \n";
+        wcout << L"[1;1H[40m[91mERROR: Unable to set console buffer size. \n\nReason: \n";
         wcout << GetLastError();
-        wcout << "\nThe program will now stop. \n";
+        wcout << L"\nThe program will now stop. \n";
         for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
@@ -49,7 +49,7 @@ void SetDocumentLength(uint16_t Length) {
     }
 }
 
-void ShowText(string Content) {
+void ShowText(wstring Content) {
     COORD pos = {};
     pos.X = 0;
     pos.Y = 0;
@@ -63,9 +63,9 @@ void DrawBMP(Diagram BMP) {
     HDC ConsoleDC = GetDC(ConsoleHWND);
     CONSOLE_SCREEN_BUFFER_INFO BufInfo;
     if (!GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &BufInfo)) {
-        wcout << "[1;1H[40m[91mERROR: Cannot obtain console buffer info. \n\nReason: \n";
+        wcout << L"[1;1H[40m[91mERROR: Cannot obtain console buffer info. \n\nReason: \n";
         wcout << GetLastError();
-        wcout << "\nThe program will now stop. \n";
+        wcout << L"\nThe program will now stop. \n";
         for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 

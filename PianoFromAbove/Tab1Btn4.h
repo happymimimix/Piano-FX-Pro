@@ -13,7 +13,7 @@ void Tab1::SubViewBtn4::Open() {
     Tab1::DisableAll();
     InvalidateRect(GetConsoleWindow(), NULL, TRUE);
     DoTransition(3, 14, 50, 3, 3, 22, 0x00001000);
-    FillConsole(3, 14, 50, 3, ' ', 0x0F);
+    FillConsole(3, 14, 50, 3, L' ', 0x0F);
     Tab1Graphics::Btn5(3, 22, Normal);
     // Draw the UI
     Tab1Graphics::Btn4Graphics::Main(3, 13);
@@ -28,18 +28,18 @@ void Tab1::SubViewBtn4::Open() {
         Path.Delete();
         TouchEventManager::Delete(Browse);
         TouchEventManager::Delete(Convert);
-        FillConsole(3, 13, 65, 9, ' ', 0x0F);
+        FillConsole(3, 13, 65, 9, L' ', 0x0F);
         Tab1Graphics::Btn4(3, 11, Normal);
         DoTransition(3, 22, 50, 4, 3, 14, 0x00001000);
         TabSwitcher::EnableAll();
         Tab1::EnableAll();
-        FillConsole(3, 22, 50, 3, ' ', 0x0F);
+        FillConsole(3, 22, 50, 3, L' ', 0x0F);
     };
     Close->OnHover = [&]() {
-        wcout << "[14;66H[44m[93mx";
+        wcout << L"[14;66H[44m[93mx";
     };
     Close->OnLeave = [&]() {
-        wcout << "[14;66H[44m[91mx";
+        wcout << L"[14;66H[44m[91mx";
     };
     Path.Create(6, 16, 51, 2);
     Browse = TouchEventManager::Create();

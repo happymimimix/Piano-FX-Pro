@@ -96,7 +96,7 @@ public:
         PtrToRendererName = nullptr;
     }
 
-    tuple<HRESULT, const char*> Init(HWND hWnd, bool bLimitFPS);
+    tuple<HRESULT, const wchar_t*> Init(HWND hWnd, bool bLimitFPS);
     HRESULT ResetDeviceIfNeeded();
     HRESULT ResetDevice();
     HRESULT ClearAndBeginScene(DWORD color);
@@ -132,7 +132,7 @@ public:
     bool LoadBackgroundBitmap(wstring path);
 
 private:
-    tuple<HRESULT, const char*> CreateWindowDependentObjects(HWND hWnd);
+    tuple<HRESULT, const wchar_t*> CreateWindowDependentObjects(HWND hWnd);
     HRESULT DrawRectRange(size_t startVert, size_t endVert);
     HRESULT FlushText();
     bool UploadBackgroundBitmap();

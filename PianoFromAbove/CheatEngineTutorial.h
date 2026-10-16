@@ -3,7 +3,7 @@
 TutorialDocument LoadCheatEngineTutorial() {
 	TutorialDocument Document;
 	Document.DocumentLength = 500;
-	Document.TextContent = R"MultilineText(Testing document...
+	Document.TextContent = LR"MultilineText(Testing document...
 
  ┌─────────────────────────────┐
  │                             │

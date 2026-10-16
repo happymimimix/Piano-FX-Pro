@@ -17,7 +17,7 @@ void StudioMain() {
     TabSwitcher::EnableAll();
 
     size_t LastCommandLength = 0;
-    wcout << "[1;2H[40m[91m(0,0)";
+    wcout << L"[1;2H[40m[91m(0,0)";
     while (!CloseBtn::Terminated) {
         POINT CursorPos = {};
         //Get mouse cursor position and button states
@@ -25,21 +25,21 @@ void StudioMain() {
             ScreenToClient(GetConsoleWindow(), &CursorPos);
             CursorPos.x /= ChW;
             CursorPos.y /= ChH;
-            string CommandText = "(" + to_string(CursorPos.x) + ", " + to_string(CursorPos.y) + ")";
+            wstring CommandText = L"(" + to_wstring(CursorPos.x) + L", " + to_wstring(CursorPos.y) + L")";
             size_t ThisCommandLength = CommandText.length();
             bool Clicked = false;
             if (GetAsyncKeyState(VK_LBUTTON) & 0x8000) {
                 // Button down - green text
-                wcout << "[1;2H[40m[92m";
+                wcout << L"[1;2H[40m[92m";
                 Clicked = true;
             }
             else {
                 // Button up - red text
-                wcout << "[1;2H[40m[91m";
+                wcout << L"[1;2H[40m[91m";
             }
             wcout << CommandText;
             while (ThisCommandLength < LastCommandLength) {
-                wcout << "[96m═";
+                wcout << L"[96m═";
                 ThisCommandLength++;
             }
             LastCommandLength = CommandText.length();

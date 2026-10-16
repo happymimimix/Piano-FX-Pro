@@ -45,17 +45,17 @@ void Tab2::SubViewBtn4::Open() {
         SliceInterval.Delete();
         TouchEventManager::Delete(UseThreads);
         TouchEventManager::Delete(Generate);
-        FillConsole(3, 13, 75, 17, ' ', 0x0F);
+        FillConsole(3, 13, 75, 17, L' ', 0x0F);
         Tab2Graphics::Btn4(3, 11, Normal);
         TabSwitcher::EnableAll();
         Tab2::EnableAll();
         LoopingTask = [&]() {};
     };
     Close->OnHover = [&]() {
-        wcout << "[14;76H[44m[93mx";
+        wcout << L"[14;76H[44m[93mx";
     };
     Close->OnLeave = [&]() {
-        wcout << "[14;76H[44m[91mx";
+        wcout << L"[14;76H[44m[91mx";
     };
     AnimationType1.Create(22, 15, 21, 2);
     AnimationType1.AddItem(L"Instantaneous");

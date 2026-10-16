@@ -3,7 +3,7 @@
 TutorialDocument LoadSMF3Intro() {
 	TutorialDocument Document;
 	Document.DocumentLength = 300;
-	Document.TextContent = R"MultilineText(
+	Document.TextContent = LR"MultilineText(
 SMF3 Intro
 )MultilineText";
 	return Document;

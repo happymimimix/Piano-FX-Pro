@@ -32,12 +32,12 @@ INT_PTR CALLBACK SetResolutionProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM) {
         GetWindowRect(g_hWndGfx, &rect);
         win32_t width = rect.right - rect.left;
         win32_t height = rect.bottom - rect.top;
-        char buf[LONG_MAX_PATH] = {};
+        wchar_t buf[LONG_MAX_PATH] = {};
 
-        _snprintf_s(buf, sizeof(buf), "%d", width);
-        SetWindowTextA(GetDlgItem(hwnd, IDC_WIDTH), buf);
-        _snprintf_s(buf, sizeof(buf), "%d", height);
-        SetWindowTextA(GetDlgItem(hwnd, IDC_HEIGHT), buf);
+        _snwprintf_s(buf, LONG_MAX_PATH, L"%d", width);
+        SetWindowTextW(GetDlgItem(hwnd, IDC_WIDTH), buf);
+        _snwprintf_s(buf, LONG_MAX_PATH, L"%d", height);
+        SetWindowTextW(GetDlgItem(hwnd, IDC_HEIGHT), buf);
 
         return true;
     }
@@ -46,11 +46,11 @@ INT_PTR CALLBACK SetResolutionProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM) {
         switch (iId) {
         case IDOK:
         {
-            char buf[LONG_MAX_PATH] = {};
-            GetWindowTextA(GetDlgItem(hwnd, IDC_WIDTH), buf, sizeof(buf));
-            win32_t width = atoi(buf);
-            GetWindowTextA(GetDlgItem(hwnd, IDC_HEIGHT), buf, sizeof(buf));
-            win32_t height = atoi(buf);
+            wchar_t buf[LONG_MAX_PATH] = {};
+            GetWindowTextW(GetDlgItem(hwnd, IDC_WIDTH), buf, LONG_MAX_PATH);
+            win32_t width = _wtoi(buf);
+            GetWindowTextW(GetDlgItem(hwnd, IDC_HEIGHT), buf, LONG_MAX_PATH);
+            win32_t height = _wtoi(buf);
 
             if (Config::GetConfig().GetViewSettings().GetControls()) {
                 RECT rcBarDlg;

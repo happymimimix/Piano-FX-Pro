@@ -4,8 +4,8 @@ TouchEventListener* Tab4::Btn1 = nullptr;
 
 void Tab4::EnableAll() {
     if (Btn1 != nullptr) {
-        wcout << "[1;1H[40m[91mERROR: Trying to enable a TouchEventListener that is already enabled. \n";
-        wcout << "\nThe program will now stop. \n";
+        wcout << L"[1;1H[40m[91mERROR: Trying to enable a TouchEventListener that is already enabled. \n";
+        wcout << L"\nThe program will now stop. \n";
         for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
@@ -19,16 +19,16 @@ void Tab4::EnableAll() {
 
 void Tab4::DisableAll() {
     if (Btn1 == nullptr) {
-        wcout << "[1;1H[40m[91mERROR: Trying to disable a tab that isn't enabled. \n";
-        wcout << "\nThe program will now stop. \n";
+        wcout << L"[1;1H[40m[91mERROR: Trying to disable a tab that isn't enabled. \n";
+        wcout << L"\nThe program will now stop. \n";
     }
     TouchEventManager::Delete(Btn1);
 }
 
 void Tab4::Draw() {
     if (Btn1 == nullptr) {
-        wcout << "[1;1H[40m[91mERROR: Trying to render a button that doesn't exist. \n";
-        wcout << "\nThe program will now stop. \n";
+        wcout << L"[1;1H[40m[91mERROR: Trying to render a button that doesn't exist. \n";
+        wcout << L"\nThe program will now stop. \n";
         for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 

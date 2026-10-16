@@ -10,8 +10,8 @@ TouchEventListener* Tab2::Btn4 = nullptr;
 
 void Tab2::EnableAll() {
     if (AnyGoodPtr(Btn1,Btn2,Btn3,Btn4)) {
-        wcout << "[1;1H[40m[91mERROR: Trying to enable a TouchEventListener that is already enabled. \n";
-        wcout << "\nThe program will now stop. \n";
+        wcout << L"[1;1H[40m[91mERROR: Trying to enable a TouchEventListener that is already enabled. \n";
+        wcout << L"\nThe program will now stop. \n";
         for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
@@ -26,13 +26,13 @@ void Tab2::EnableAll() {
         Btn1->OnTouch = [&]() {
             Tab2Graphics::Btn1(3, 2, Touched);
             Sleep(500);
-            char ProgramPath[LONG_MAX_PATH] = {};
-            GetModuleFileNameA(NULL, ProgramPath, LONG_MAX_PATH);
-            string Command = "start \"Visualize pitch bend tutorial\" \"";
+            wchar_t ProgramPath[LONG_MAX_PATH] = {};
+            GetModuleFileNameW(NULL, ProgramPath, LONG_MAX_PATH);
+            wstring Command = L"start \"Visualize pitch bend tutorial\" \"";
             Command += ProgramPath;
-            Command += "\" ";
-            Command += "OPEN VisualizePitchBendTutorial";
-            system(Command.c_str());
+            Command += L"\" ";
+            Command += L"OPEN VisualizePitchBendTutorial";
+            _wsystem(Command.c_str());
             Btn1->OnLeave();
         };
         Btn1->OnHover = [&]() {
@@ -49,13 +49,13 @@ void Tab2::EnableAll() {
         Btn2->OnTouch = [&]() {
             Tab2Graphics::Btn2(3, 5, Touched);
             Sleep(500);
-            char ProgramPath[LONG_MAX_PATH] = {};
-            GetModuleFileNameA(NULL, ProgramPath, LONG_MAX_PATH);
-            string Command = "start \"Cheat engine Lua scripting tutorial\" \"";
+            wchar_t ProgramPath[LONG_MAX_PATH] = {};
+            GetModuleFileNameW(NULL, ProgramPath, LONG_MAX_PATH);
+            wstring Command = L"start \"Cheat engine Lua scripting tutorial\" \"";
             Command += ProgramPath;
-            Command += "\" ";
-            Command += "OPEN CheatEngineTutorial";
-            system(Command.c_str());
+            Command += L"\" ";
+            Command += L"OPEN CheatEngineTutorial";
+            _wsystem(Command.c_str());
             Btn2->OnLeave();
         };
         Btn2->OnHover = [&]() {
@@ -73,7 +73,7 @@ void Tab2::EnableAll() {
             Tab2Graphics::Btn3(3, 8, Touched);
             Sleep(500);
             Copy(LuaCode);
-            MessageBoxA(GetConsoleWindow(), "Cheat Engine lua code template has been copied to clipboard. \nOpen Cheat Engine and paste them into Table -> Show Cheat Table Lua Script. ", "Success", NULL);
+            MessageBoxW(GetConsoleWindow(), L"Cheat Engine lua code template has been copied to clipboard. \nOpen Cheat Engine and paste them into Table -> Show Cheat Table Lua Script. ", L"Success", NULL);
             Btn3->OnLeave();
         };
         Btn3->OnHover = [&]() {
@@ -104,8 +104,8 @@ void Tab2::EnableAll() {
 
 void Tab2::DisableAll() {
     if (AnyNullPtr(Btn1, Btn2, Btn3, Btn4)) {
-        wcout << "[1;1H[40m[91mERROR: Trying to disable a tab that isn't enabled. \n";
-        wcout << "\nThe program will now stop. \n";
+        wcout << L"[1;1H[40m[91mERROR: Trying to disable a tab that isn't enabled. \n";
+        wcout << L"\nThe program will now stop. \n";
         for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 
@@ -121,8 +121,8 @@ void Tab2::DisableAll() {
 
 void Tab2::Draw() {
     if (AnyNullPtr(Btn1, Btn2, Btn3, Btn4)) {
-        wcout << "[1;1H[40m[91mERROR: Trying to render a button that doesn't exist. \n";
-        wcout << "\nThe program will now stop. \n";
+        wcout << L"[1;1H[40m[91mERROR: Trying to render a button that doesn't exist. \n";
+        wcout << L"\nThe program will now stop. \n";
         for (;;) {
             // Make the program hang instead of closing! 
             // This way the user can clearly see the error message. 

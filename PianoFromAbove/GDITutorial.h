@@ -2,7 +2,7 @@
 
 TutorialDocument LoadGDITutorial() {
 	TutorialDocument Document;
-	Document.TextContent = R"MultilineText(
+	Document.TextContent = LR"MultilineText(
 
 )MultilineText";
 	return Document;
