@@ -498,7 +498,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │       │   └───TODO
 │   │   │       └───Resource.h (ID definitions)
 │   │   │           └───DONE
-│   │   ├───Change 'Marker encoding' to 'Text code page' (Marker text is no longer the only consumer ever since I added the track name display! This is what it should've been.)
+│   │   ├───Change 'Marker encoding' to 'Text code page' (Marker text is no longer the only consumer ever since I added the track name display!)
 │   │   │   ├───Config.cpp (Load & store)
 │   │   │   │   └───TODO
 │   │   │   ├───Config.h (Structures)
