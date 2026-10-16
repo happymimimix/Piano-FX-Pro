@@ -34,9 +34,9 @@ INT_PTR CALLBACK SetResolutionProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM) {
         win32_t height = rect.bottom - rect.top;
         wchar_t buf[LONG_MAX_PATH] = {};
 
-        _snwprintf_s(buf, LONG_MAX_PATH, L"%d", width);
+        _snwprintf_s(buf, _countof(buf), L"%d", width);
         SetWindowTextW(GetDlgItem(hwnd, IDC_WIDTH), buf);
-        _snwprintf_s(buf, LONG_MAX_PATH, L"%d", height);
+        _snwprintf_s(buf, _countof(buf), L"%d", height);
         SetWindowTextW(GetDlgItem(hwnd, IDC_HEIGHT), buf);
 
         return true;
@@ -47,9 +47,9 @@ INT_PTR CALLBACK SetResolutionProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM) {
         case IDOK:
         {
             wchar_t buf[LONG_MAX_PATH] = {};
-            GetWindowTextW(GetDlgItem(hwnd, IDC_WIDTH), buf, LONG_MAX_PATH);
+            GetWindowTextW(GetDlgItem(hwnd, IDC_WIDTH), buf, _countof(buf));
             win32_t width = _wtoi(buf);
-            GetWindowTextW(GetDlgItem(hwnd, IDC_HEIGHT), buf, LONG_MAX_PATH);
+            GetWindowTextW(GetDlgItem(hwnd, IDC_HEIGHT), buf, _countof(buf));
             win32_t height = _wtoi(buf);
 
             if (Config::GetConfig().GetViewSettings().GetControls()) {

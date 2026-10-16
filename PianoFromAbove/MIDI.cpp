@@ -288,7 +288,7 @@ MIDI::MIDI(const wstring& sFilename)
                 }
                 ret = lzma_stream_footer_decode(&stream_flags, &compressed[footer_pos]);
                 if (ret != LZMA_OK) {
-                    swprintf(err, sizeof(err) / sizeof(err[0]) - 1, L"Decoding stream footer failed: %d\nCorrupt file?", ret);
+                    swprintf(err, _countof(err) - 1, L"Decoding stream footer failed: %d\nCorrupt file?", ret);
                     MessageBoxW(NULL, err, L"Piano-FX Pro", MB_OK | MB_ICONERROR);
                     lzma_index_end(index, NULL);
                     delete[] pcMemBlock;
@@ -309,7 +309,7 @@ MIDI::MIDI(const wstring& sFilename)
                 pos += stream_flags.backward_size;
                 ret = lzma_code(&strm, LZMA_RUN);
                 if (ret != LZMA_STREAM_END) {
-                    swprintf(err, sizeof(err) / sizeof(err[0]) - 1, L"Index decode failed: %d\nCorrupt file?", ret);
+                    swprintf(err, _countof(err) - 1, L"Index decode failed: %d\nCorrupt file?", ret);
                     MessageBoxW(NULL, err, L"Piano-FX Pro", MB_OK | MB_ICONERROR);
                     lzma_index_end(index, NULL);
                     delete[] pcMemBlock;
@@ -364,7 +364,7 @@ MIDI::MIDI(const wstring& sFilename)
                     delete[] pcMemBlock;
                     return;
                 default:
-                    swprintf(err, sizeof(err) / sizeof(err[0]) - 1, L"An error occurred while decompressing: %d\nCorrupt file?", ret);
+                    swprintf(err, _countof(err) - 1, L"An error occurred while decompressing: %d\nCorrupt file?", ret);
                     MessageBoxW(NULL, err, L"Piano-FX Pro", MB_OK | MB_ICONERROR);
                     delete[] compressed;
                     delete[] pcMemBlock;
