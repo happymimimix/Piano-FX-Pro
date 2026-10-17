@@ -475,7 +475,7 @@ wstring EasingFunctions() {
     Code += L"end\n";
     Code += L"end\n";
     Code += L"function Incomplete()\n";
-    Code += L"return GetMicroseconds()<GetSongLength() and readShortInteger(\"" + GetProcessName() + L"+" + GetAddress(PointersInitialized) + L"\")!=0\n";
+    Code += L"return readShortInteger(PointersInitialized)~=0 and GetMicroseconds()<GetSongLength()\n";
     Code += L"end\n";
     return Code;
 }
@@ -582,7 +582,7 @@ wstring ShaderEngine() {
     Code += L"EnginePersistentData.MEMdc=EXE(QM(\"CreateCompatibleDC\"),GDIdc)\n";
     Code += L"EnginePersistentData.BMP=EXE(QM(\"CreateCompatibleBitmap\"),GDIdc,W,H)\n";
     Code += L"EXE(QM(\"SelectObject\"),EnginePersistentData.MEMdc,EnginePersistentData.BMP)\n";
-    Code += L"EnginePersistentData.Font=EXE(QM(\"CreateFontA\"),\n";
+    Code += L"EnginePersistentData.Font=EXE(QM(\"CreateFontW\"),\n";
     Code += L"16,-- FontHeight\n";
     Code += L"0,-- FontWidth\n";
     Code += L"0,-- Escapement\n";
@@ -691,22 +691,22 @@ wstring WaveShader(wstring prefix, bool Vertical, bool Glitch) {
     Code += L"if MaxWave" + wstring(Vertical ? L"Width" : L"Height") + L"==nil then MaxWave" + wstring(Vertical ? L"Width" : L"Height") + L"=" + wstring(Vertical ? L"100" : L"10") + L" end\n";
     Code += L"if MinWave" + wstring(Vertical ? L"Width" : L"Height") + L"==nil then MinWave" + wstring(Vertical ? L"Width" : L"Height") + L"=" + wstring(Vertical ? L"20" : L"5") + L" end\n";
     Code += L"if ShiftingAmount==nil then ShiftingAmount=10 end\n";
-    Code += Glitch ? L"if PersistentData.PersiDC==nil then" : L"";
-    Code += Glitch ? L"PersistentData.PersiDC=EXE(QM(\"CreateCompatibleDC\"),DC)" : L"";
-    Code += Glitch ? L"PersistentData.PersiBMP=EXE(QM(\"CreateCompatibleBitmap\"),DC,W,H)" : L"";
-    Code += Glitch ? L"PersistentData.PersiW=W" : L"";
-    Code += Glitch ? L"PersistentData.PersiH=H" : L"";
-    Code += Glitch ? L"EXE(QM(\"BitBlt\"),PersistentData.PersiDC,0,0,W,H,DC,0,0,SRCCOPY)" : L"";
-    Code += Glitch ? L"end" : L"";
-    Code += Glitch ? L"if PersistentData.PersiW!=W or PersistentData.PersiH!=H then" : L"";
+    Code += Glitch ? L"if PersistentData.PersiDC==nil then\n" : L"";
+    Code += Glitch ? L"PersistentData.PersiDC=EXE(QM(\"CreateCompatibleDC\"),DC)\n" : L"";
+    Code += Glitch ? L"PersistentData.PersiBMP=EXE(QM(\"CreateCompatibleBitmap\"),DC,W,H)\n" : L"";
+    Code += Glitch ? L"PersistentData.PersiW=W\n" : L"";
+    Code += Glitch ? L"PersistentData.PersiH=H\n" : L"";
+    Code += Glitch ? L"EXE(QM(\"BitBlt\"),PersistentData.PersiDC,0,0,W,H,DC,0,0,SRCCOPY)\n" : L"";
+    Code += Glitch ? L"end\n" : L"";
+    Code += Glitch ? L"if PersistentData.PersiW~=W or PersistentData.PersiH~=H then\n" : L"";
     Code += Glitch ? L"EXE(QM(\"DeleteDC\"),PersistentData.PersiDC)\n" : L"";
     Code += Glitch ? L"EXE(QM(\"DeleteObject\"),PersistentData.PersiBMP)\n" : L"";
-    Code += Glitch ? L"PersistentData.PersiDC=EXE(QM(\"CreateCompatibleDC\"),DC)" : L"";
-    Code += Glitch ? L"PersistentData.PersiBMP=EXE(QM(\"CreateCompatibleBitmap\"),DC,W,H)" : L"";
-    Code += Glitch ? L"PersistentData.PersiW=W" : L"";
-    Code += Glitch ? L"PersistentData.PersiH=H" : L"";
-    Code += Glitch ? L"EXE(QM(\"BitBlt\"),PersistentData.PersiDC,0,0,W,H,DC,0,0,SRCCOPY)" : L"";
-    Code += Glitch ? L"end" : L"";
+    Code += Glitch ? L"PersistentData.PersiDC=EXE(QM(\"CreateCompatibleDC\"),DC)\n" : L"";
+    Code += Glitch ? L"PersistentData.PersiBMP=EXE(QM(\"CreateCompatibleBitmap\"),DC,W,H)\n" : L"";
+    Code += Glitch ? L"PersistentData.PersiW=W\n" : L"";
+    Code += Glitch ? L"PersistentData.PersiH=H\n" : L"";
+    Code += Glitch ? L"EXE(QM(\"BitBlt\"),PersistentData.PersiDC,0,0,W,H,DC,0,0,SRCCOPY)\n" : L"";
+    Code += Glitch ? L"end\n" : L"";
     Code += L"local Line=0\n";
     Code += L"while Line<" + wstring(Vertical ? L"W" : L"H") + L" do\n";
     Code += Glitch ? L"if math.random(0,1)==0 then\n" : L"";
@@ -718,10 +718,10 @@ wstring WaveShader(wstring prefix, bool Vertical, bool Glitch) {
     Code += L"Line=Line+math.random(MinWave" + wstring(Vertical ? L"Width" : L"Height") + L",MaxWave" + wstring(Vertical ? L"Width" : L"Height") + L")\n";
     Code += L"end\n";
     Code += Glitch ? L"EXE(QM(\"BitBlt\"),DC,0,0,W,H,PersistentData.PersiDC,0,0,SRCCOPY)\n" : L"";
-    Code += Glitch ? L"if Final then" : L"";
+    Code += Glitch ? L"if Final then\n" : L"";
     Code += Glitch ? L"EXE(QM(\"DeleteDC\"),PersistentData.PersiDC)\n" : L"";
     Code += Glitch ? L"EXE(QM(\"DeleteObject\"),PersistentData.PersiBMP)\n" : L"";
-    Code += Glitch ? L"end" : L"";
+    Code += Glitch ? L"end\n" : L"";
     Code += L"end\n";
     return Code;
 }
@@ -919,7 +919,7 @@ wstring TextShader(bool Type, bool IsReversed) {
     EncodeColor::ColorB = L"BkB";
     Code += L"local BkColor=" + EncodeColor::MakeColor() + L"\n";
     Code += L"EXE(QM(\"SetBKColor\"),DC,BkColor)\n";
-    Code += L"local Font=EXE(QM(\"CreateFontA\"),\n";
+    Code += L"local Font=EXE(QM(\"CreateFontW\"),\n";
     Code += L"FontHeight,-- FontHeight\n";
     Code += L"FontWidth,-- FontWidth\n";
     Code += L"0,-- Escapement\n";
@@ -933,12 +933,13 @@ wstring TextShader(bool Type, bool IsReversed) {
     Code += L"0,-- ClipPrecision\n";
     Code += L"0,-- Quality\n";
     Code += L"0,-- PitchAndFamily\n";
-    Code += L"FaceName)-- FaceName\n";
+    Code += L"{type=4,value=FaceName})-- FaceName\n";
     Code += L"EXE(QM(\"SelectObject\"),DC,Font)\n";
+    Code += L"local TextLen=#wideStringToByteTable(Text)//2\n";
     Code += L"local MEM=createMemoryStream()\n";
     Code += L"MEM.Position=0\n";
     Code += L"MEM.size=8\n";
-    Code += L"EXE(QM(\"GetTextExtentPoint32A\"),DC,Text," + wstring(Type ? (IsReversed ? L"math.ceil(#Text*(1.0-Time))" : L"math.ceil(#Text*Time)") : L"#Text") + L",MEM.Memory)\n";
+    Code += L"EXE(QM(\"GetTextExtentPoint32W\"),DC,{type=4,value=Text}," + wstring(Type ? (IsReversed ? L"math.ceil(TextLen*(1.0-Time))" : L"math.ceil(TextLen*Time)") : L"TextLen") + L",MEM.Memory)\n";
     Code += L"MEM.Position=0\n";
     Code += L"local TextW=MEM.readDword()\n";
     Code += L"local TextH=MEM.readDword()\n";
@@ -987,7 +988,7 @@ wstring TextShader(bool Type, bool IsReversed) {
     Code += L"TextX=math.floor(" + Right + L")\n";
     Code += L"TextY=math.floor(" + Bottom + L")\n";
     Code += L"end\n";
-    Code += L"EXE(QM(\"TextOutA\"),DC,TextX,TextY,Text," + wstring(Type ? (IsReversed ? L"math.ceil(#Text*(1.0-Time))" : L"math.ceil(#Text*Time)") : L"#Text") + L")\n";
+    Code += L"EXE(QM(\"TextOutW\"),DC,TextX,TextY,{type=4,value=Text}," + wstring(Type ? (IsReversed ? L"math.ceil(TextLen*(1.0-Time))" : L"math.ceil(TextLen*Time)") : L"TextLen") + L")\n";
     Code += L"EXE(QM(\"DeleteObject\"),Font)\n";
     Code += L"end\n";
     return Code;
@@ -1418,7 +1419,7 @@ wstring MatrixShader() {
     Code += L"end\n";
     Code += L"end\n";
     Code += L"EXE(QM(\"SetBkMode\"),DC,1)\n";
-    Code += L"local Font=EXE(QM(\"CreateFontA\"),\n";
+    Code += L"local Font=EXE(QM(\"CreateFontW\"),\n";
     Code += L"CharHeight,-- FontHeight\n";
     Code += L"CharWidth,-- FontWidth\n";
     Code += L"0,-- Escapement\n";
@@ -1432,7 +1433,7 @@ wstring MatrixShader() {
     Code += L"0,-- ClipPrecision\n";
     Code += L"0,-- Quality\n";
     Code += L"0,-- PitchAndFamily\n";
-    Code += L"FontName)-- FaceName\n";
+    Code += L"{type=4,value=FontName})-- FaceName\n";
     Code += L"EXE(QM(\"SelectObject\"),DC,Font)\n";
     Code += L"for Col=1,Cols do\n";
     Code += L"local ColData=PersistentData[Col]\n";
@@ -1454,7 +1455,7 @@ wstring MatrixShader() {
     EncodeColor::ColorB = L"NewB";
     Code += L"local TextColor=" + EncodeColor::MakeColor() + L"\n";
     Code += L"EXE(QM(\"SetTextColor\"),DC,TextColor)\n";
-    Code += L"EXE(QM(\"TextOutA\"),DC,(Col-1)*CharWidth,math.floor(PieceY),string.char(math.random(0x00,0xFF)),1)\n";
+    Code += L"EXE(QM(\"TextOutW\"),DC,(Col-1)*CharWidth,math.floor(PieceY),{type=4,value=utf8.char(math.random(0x00,0xFF))},1)\n";
     Code += L"end\n";
     Code += L"end\n";
     Code += L"end\n";
@@ -1558,11 +1559,12 @@ INT WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, INT nCmdShow)
                 const PlaybackSettings& cPlayback = config.GetPlaybackSettings();
                 wstring Code = L"";
                 Code += MultiInstanceGuardInit();
+                Code += L"-- Variable Definitions: \n";
+                Code += DefineMemoryAddress(L"PointersInitialized", GetAddress(PointersInitialized), false);
                 Code += L"collectgarbage(\"collect\")\n";// Clean up any leftovers from previous run
-                Code += L"while readShortInteger(\"" + GetProcessName() + L"+" + GetAddress(PointersInitialized) + L"\")==0 do\n";
+                Code += L"while readShortInteger(PointersInitialized)==0 do\n";
                 Code += L"processMessages()\n";
                 Code += L"end\n";
-                Code += L"-- Variable Definitions: \n";
                 Code += DefineMemoryAddress(L"SongLength", GetAddress(Ptr_to_m_llMaxTime), true);
                 Code += DefineMemoryAddress(L"InitialSilence", GetAddress(Ptr_to_m_llMinTime), true);
                 Code += DefineMemoryAddress(L"Microseconds", GetAddress(Ptr_to_m_llStartTime), true);
@@ -1606,6 +1608,10 @@ INT WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, INT nCmdShow)
                 Code += DefineMemoryAddress(L"CE_Connected", GetAddress(Ptr_to_CE_Connected), true);
                 Code += DefineMemoryAddress(L"CE_DoNextTick", GetAddress(Ptr_to_CE_DoNextTick), true);
                 Code += DefineMemoryAddress(L"CE_Responded", GetAddress(Ptr_to_CE_Responded), true);
+                Code += DefineMemoryAddress(L"CE_Disconnect", GetAddress(Ptr_to_CE_Disconnect), true);
+                Code += L"while readShortInteger(CE_Disconnect)~=0 do\n";
+                Code += L"processMessages()\n";
+                Code += L"end\n";
                 Code += L"-- Custom Variable Definitions: (Version: " VersionString L")\n";
                 Code += L"\n";
                 Code += L"-- Function Definitions: (DO NOT CHANGE!)\n";

@@ -719,9 +719,12 @@ void MainScreen::InitState() {
     Ptr_to_CE_Connected = &CE_Connected;
     Ptr_to_CE_DoNextTick = &CE_DoNextTick;
     Ptr_to_CE_Responded = &CE_Responded;
+    Ptr_to_CE_Disconnect = &CE_Disconnect;
     Ptr_to_CheatEngineCaption = &CheatEngineCaption[0];
     Ptr_to_CaptionContent = &CheatEngineCaption[1];
     Ptr_to_Difficulty = &Difficulty[0];
+
+    CE_Disconnect = false;
 }
 
 // Called immediately before changing to this state
@@ -1349,6 +1352,7 @@ GameState::GameError MainScreen::Logic() {
 
     // Song's over
     if (!m_bPaused && ((m_dSpeed < 0) ? (m_llStartTime < m_llMinTime) : (m_llStartTime > m_llMaxTime))) {
+        CE_Disconnect = true;
         if (m_bDumpFrames) {
             wchar_t buf[LONG_MAX_PATH] = {};
             swprintf(buf, LONG_MAX_PATH, L"start \"Result\" \"C:\\Windows\\Explorer.exe\" \"%s\\PianoFX_Framedump\\\"", GetExePath().c_str());
@@ -1357,6 +1361,9 @@ GameState::GameError MainScreen::Logic() {
             m_bDumpFrames = false;
         }
         cPlayback.SetPaused(true, true);
+    }
+    else {
+        CE_Disconnect = false;
     }
 
     if (m_Timer.m_bManualTimer) m_Timer.IncrementFrame();

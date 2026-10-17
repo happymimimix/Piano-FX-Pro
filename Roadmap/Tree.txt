@@ -715,13 +715,13 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   ├───Shader engine v2
 │   │   │   ├───Clean up flag
 │   │   │   │   └───DONE
+│   │   │   ├───Fix SelectObject cleanup missing
+│   │   │   │   └───TODO
 │   │   │   ├───Frame dump support
 │   │   │   │   └───DONE
-│   │   │   ├───Lazy bitmap allocation
-│   │   │   │   └───Validation needed (I forgot where I was)
 │   │   │   ├───Persistent state management
 │   │   │   │   └───DONE
-│   │   │   ├───SelectObject cleanup missing fix
+│   │   │   ├───Save all GDI objects in PersiState until cleanup == true
 │   │   │   │   └───TODO
 │   │   │   └───Stacking shaders
 │   │   │       └───DONE

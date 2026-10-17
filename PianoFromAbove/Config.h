@@ -198,7 +198,7 @@ class Config : public ISettings
 public:
     // Singleton
     static Config& GetConfig();
-    static string GetFolder();
+    static wstring GetFolder();
 
     // Interface
     void LoadDefaultValues();

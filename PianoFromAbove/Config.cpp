@@ -29,17 +29,17 @@ Config::Config()
     LoadConfigValues();
 }
 
-string Config::GetFolder()
+wstring Config::GetFolder()
 {
-    char sAppData[LONG_MAX_PATH];
-    if (FAILED(SHGetFolderPathA(NULL, CSIDL_APPDATA, NULL, SHGFP_TYPE_CURRENT, sAppData)))
-        return string();
+    wchar_t sAppData[LONG_MAX_PATH];
+    if (FAILED(SHGetFolderPathW(NULL, CSIDL_APPDATA, NULL, SHGFP_TYPE_CURRENT, sAppData)))
+        return wstring();
 
-    strcat_s(sAppData, "\\");
-    strcat_s(sAppData, APPNAME);
-    if (GetFileAttributesA(sAppData) == INVALID_FILE_ATTRIBUTES)
-        if (!CreateDirectoryA(sAppData, NULL))
-            return string();
+    wcscat_s(sAppData, L"\\");
+    wcscat_s(sAppData, TEXT(APPNAME));
+    if (GetFileAttributesW(sAppData) == INVALID_FILE_ATTRIBUTES)
+        if (!CreateDirectoryW(sAppData, NULL))
+            return wstring();
 
     return sAppData;
 }
@@ -57,12 +57,16 @@ void Config::LoadDefaultValues()
 void Config::LoadConfigValues()
 {
     // Where to load?
-    string sPath = GetFolder();
+    wstring sPath = GetFolder();
     if (sPath.length() == 0) return;
 
     // Load it
-    TiXmlDocument doc(sPath + "\\Config.xml");
-    if (!doc.LoadFile()) return;
+    TiXmlDocument doc;
+    FILE* fp = nullptr;
+    if (_wfopen_s(&fp, (sPath + L"\\Config.xml").c_str(), L"rb") != 0) return;
+    bool bLoaded = doc.LoadFile(fp);
+    fclose(fp);
+    if (!bLoaded) return;
 
     // Get the root element
     TiXmlElement* txRoot = doc.FirstChildElement();
@@ -84,7 +88,7 @@ void Config::LoadConfigValues(TiXmlElement* txRoot)
 bool Config::SaveConfigValues()
 {
     // Where to save?
-    string sPath = GetFolder();
+    wstring sPath = GetFolder();
     if (sPath.length() == 0) return false;
 
     // Create the XML document
@@ -98,7 +102,11 @@ bool Config::SaveConfigValues()
     SaveConfigValues(txRoot);
 
     // Write it!
-    return doc.SaveFile(sPath + "\\Config.xml");
+    FILE* fp = nullptr;
+    if (_wfopen_s(&fp, (sPath + L"\\Config.xml").c_str(), L"w") != 0) return false;
+    bool bSaved = doc.SaveFile(fp);
+    fclose(fp);
+    return bSaved;
 }
 
 bool Config::SaveConfigValues(TiXmlElement* txRoot)

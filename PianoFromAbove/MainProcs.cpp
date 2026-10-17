@@ -59,7 +59,7 @@ INT_PTR CALLBACK SetResolutionProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM) {
             }
 
             RECT adjusted = { 0, 0, width, height };
-            AdjustWindowRectEx(&adjusted, GetWindowLongA(g_hWnd, GWL_STYLE), TRUE, GetWindowLongA(g_hWnd, GWL_EXSTYLE));
+            AdjustWindowRectEx(&adjusted, GetWindowLongW(g_hWnd, GWL_STYLE), TRUE, GetWindowLongW(g_hWnd, GWL_EXSTYLE));
             SetWindowPos(g_hWnd, NULL, 0, 0, adjusted.right - adjusted.left, adjusted.bottom - adjusted.top, SWP_NOMOVE);
         }
         case IDCANCEL:

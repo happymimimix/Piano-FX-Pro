@@ -36,6 +36,7 @@ inline bool* Ptr_to_CE_VideoOutput = nullptr;
 inline bool* Ptr_to_CE_Connected = nullptr;
 inline bool* Ptr_to_CE_DoNextTick = nullptr;
 inline bool* Ptr_to_CE_Responded = nullptr;
+inline bool* Ptr_to_CE_Disconnect = nullptr;
 inline char* Ptr_to_CheatEngineCaption = nullptr;
 inline char* Ptr_to_CaptionContent = nullptr;
 inline char* Ptr_to_Difficulty = nullptr;
@@ -522,6 +523,7 @@ private:
     bool CE_Connected = false;
     bool CE_DoNextTick = false;
     bool CE_Responded = false;
+    bool CE_Disconnect = true;
 
     char CheatEngineCaption[1 << 19] = { 'C' };
     char Difficulty[1 << 10] = {};
