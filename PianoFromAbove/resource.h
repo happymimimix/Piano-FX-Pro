@@ -12,11 +12,12 @@
 #define IDD_PP1_VISUAL                  201
 #define IDD_PP2_AUDIO                   202
 #define IDD_PP3_VIDEO                   203
-#define IDD_PP4_CONTROLS                204
-#define IDD_TRACKSETTINGS               205
-#define IDD_ABOUT                       206
-#define IDD_LOADING                     207
-#define IDD_SETRESOLUTION               208
+#define IDD_PP4_CONTROL                 204
+#define IDD_PP5_EXPORT                  205
+#define IDD_TRACKSETTINGS               206
+#define IDD_ABOUT                       207
+#define IDD_LOADING                     208
+#define IDD_SETRESOLUTION               209
 
 #define IDS_SHOWKEYS                    IDC_STATIC
 #define IDC_SHOWALLKEYS                 301
@@ -67,6 +68,7 @@
 #define IDC_BKGADJUST_L_SLIDE           336
 #define IDC_BKGADJUST_L                 337
 #define IDC_BKGADJUST_L_SPIN            338
+#define IDC_BKGADJUSTRESET              339
 #define IDS_PP3_VIDEO                   IDC_STATIC
 
 #define IDS_MIDIOUT                     IDC_STATIC

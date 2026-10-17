@@ -125,7 +125,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │       └───DONE
 │   │   └───Retire signed index type completely
 │   │       └───DONE
-│   ├───Background image&background HSB adjustment
+│   ├───Background HSL adjustment
 │   │   └───TODO
 │   ├───Bitset based state tracking
 │   │   └───DONE
@@ -239,7 +239,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   └───Parse track port events correctly
 │   │       └───TODO
 │   ├───Reorganize preferences
-│   │   ├───Add 'Background adjustments' to visuals
+│   │   ├───Add 'Background HSL adjustments' to visuals
 │   │   │   ├───Config.cpp (Load & store)
 │   │   │   │   └───TODO
 │   │   │   ├───Config.h (Structures)
@@ -249,47 +249,51 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   ├───GameState.cpp (Actual logic)
 │   │   │   │   └───TODO
 │   │   │   ├───PianoFromAbove.rc (UI)
-│   │   │   │   ├───Edit 'Brightness value'
+│   │   │   │   ├───Buton 'Reset HSL adjustments'
 │   │   │   │   │   └───TODO
-│   │   │   │   ├───Edit 'Hue value'
+│   │   │   │   ├───Edit 'Hue shift'
 │   │   │   │   │   └───TODO
-│   │   │   │   ├───Edit 'Saturation value'
+│   │   │   │   ├───Edit 'Luminosity shift'
+│   │   │   │   │   └───TODO
+│   │   │   │   ├───Edit 'Saturation shift'
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───Label 'Background color adjustment'
 │   │   │   │   │   └───TODO
-│   │   │   │   ├───Slider 'Brightness'
+│   │   │   │   ├───Slider 'Hue shift'
 │   │   │   │   │   └───TODO
-│   │   │   │   ├───Slider 'Hue'
+│   │   │   │   ├───Slider 'Luminosity shift'
 │   │   │   │   │   └───TODO
-│   │   │   │   ├───Slider 'Saturation'
+│   │   │   │   ├───Slider 'Saturation shift'
 │   │   │   │   │   └───TODO
-│   │   │   │   ├───Spinner 'Brightness value'
+│   │   │   │   ├───Spinner 'Hue shift'
 │   │   │   │   │   └───TODO
-│   │   │   │   ├───Spinner 'Hue value'
+│   │   │   │   ├───Spinner 'Luminosity shift'
 │   │   │   │   │   └───TODO
-│   │   │   │   └───Spinner 'Saturation value'
+│   │   │   │   └───Spinner 'Saturation shift'
 │   │   │   │       └───TODO
 │   │   │   └───Resource.h (ID definitions)
-│   │   │       ├───Edit 'Brightness value'
-│   │   │       │   └───TODO
-│   │   │       ├───Edit 'Hue value'
-│   │   │       │   └───TODO
-│   │   │       ├───Edit 'Saturation value'
-│   │   │       │   └───TODO
+│   │   │       ├───Buton 'Reset HSL adjustments'
+│   │   │       │   └───DONE
+│   │   │       ├───Edit 'Hue shift'
+│   │   │       │   └───DONE
+│   │   │       ├───Edit 'Luminosity shift'
+│   │   │       │   └───DONE
+│   │   │       ├───Edit 'Saturation shift'
+│   │   │       │   └───DONE
 │   │   │       ├───Label 'Background color adjustment'
+│   │   │       │   └───DONE
+│   │   │       ├───Slider 'Hue shift'
 │   │   │       │   └───TODO
-│   │   │       ├───Slider 'Brightness'
-│   │   │       │   └───TODO
-│   │   │       ├───Slider 'Hue'
-│   │   │       │   └───TODO
-│   │   │       ├───Slider 'Saturation'
-│   │   │       │   └───TODO
-│   │   │       ├───Spinner 'Brightness value'
-│   │   │       │   └───TODO
-│   │   │       ├───Spinner 'Hue value'
-│   │   │       │   └───TODO
-│   │   │       └───Spinner 'Saturation value'
-│   │   │           └───TODO
+│   │   │       ├───Slider 'Luminosity shift'
+│   │   │       │   └───DONE
+│   │   │       ├───Slider 'Saturation shift'
+│   │   │       │   └───DONE
+│   │   │       ├───Spinner 'Hue shift'
+│   │   │       │   └───DONE
+│   │   │       ├───Spinner 'Luminosity shift'
+│   │   │       │   └───DONE
+│   │   │       └───Spinner 'Saturation shift'
+│   │   │           └───DONE
 │   │   ├───Add 'Mouse wheel scroll skips [____]x more than arrow keys.' to controls
 │   │   │   ├───Config.cpp (Load & store)
 │   │   │   │   └───TODO

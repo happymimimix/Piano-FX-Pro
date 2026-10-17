@@ -125,7 +125,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „¤„Ÿ„Ÿ„ŸRetire signed index type completely
 „    „        „¤„Ÿ„Ÿ„ŸDONE
-„    „¥„Ÿ„Ÿ„ŸBackground image&background HSB adjustment
+„    „¥„Ÿ„Ÿ„ŸBackground HSL adjustment
 „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „¥„Ÿ„Ÿ„ŸBitset based state tracking
 „    „    „¤„Ÿ„Ÿ„ŸDONE
@@ -239,7 +239,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „¤„Ÿ„Ÿ„ŸParse track port events correctly
 „    „        „¤„Ÿ„Ÿ„ŸTODO
 „    „¥„Ÿ„Ÿ„ŸReorganize preferences
-„    „    „¥„Ÿ„Ÿ„ŸAdd 'Background adjustments' to visuals
+„    „    „¥„Ÿ„Ÿ„ŸAdd 'Background HSL adjustments' to visuals
 „    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¥„Ÿ„Ÿ„ŸConfig.h (Structures)
@@ -249,47 +249,51 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
-„    „    „    „    „¥„Ÿ„Ÿ„ŸEdit 'Brightness value'
+„    „    „    „    „¥„Ÿ„Ÿ„ŸButon 'Reset HSL adjustments'
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „¥„Ÿ„Ÿ„ŸEdit 'Hue value'
+„    „    „    „    „¥„Ÿ„Ÿ„ŸEdit 'Hue shift'
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „¥„Ÿ„Ÿ„ŸEdit 'Saturation value'
+„    „    „    „    „¥„Ÿ„Ÿ„ŸEdit 'Luminosity shift'
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¥„Ÿ„Ÿ„ŸEdit 'Saturation shift'
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „¥„Ÿ„Ÿ„ŸLabel 'Background color adjustment'
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „¥„Ÿ„Ÿ„ŸSlider 'Brightness'
+„    „    „    „    „¥„Ÿ„Ÿ„ŸSlider 'Hue shift'
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „¥„Ÿ„Ÿ„ŸSlider 'Hue'
+„    „    „    „    „¥„Ÿ„Ÿ„ŸSlider 'Luminosity shift'
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „¥„Ÿ„Ÿ„ŸSlider 'Saturation'
+„    „    „    „    „¥„Ÿ„Ÿ„ŸSlider 'Saturation shift'
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „¥„Ÿ„Ÿ„ŸSpinner 'Brightness value'
+„    „    „    „    „¥„Ÿ„Ÿ„ŸSpinner 'Hue shift'
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „¥„Ÿ„Ÿ„ŸSpinner 'Hue value'
+„    „    „    „    „¥„Ÿ„Ÿ„ŸSpinner 'Luminosity shift'
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „¤„Ÿ„Ÿ„ŸSpinner 'Saturation value'
+„    „    „    „    „¤„Ÿ„Ÿ„ŸSpinner 'Saturation shift'
 „    „    „    „        „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
-„    „    „        „¥„Ÿ„Ÿ„ŸEdit 'Brightness value'
-„    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „        „¥„Ÿ„Ÿ„ŸEdit 'Hue value'
-„    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „        „¥„Ÿ„Ÿ„ŸEdit 'Saturation value'
-„    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¥„Ÿ„Ÿ„ŸButon 'Reset HSL adjustments'
+„    „    „        „    „¤„Ÿ„Ÿ„ŸDONE
+„    „    „        „¥„Ÿ„Ÿ„ŸEdit 'Hue shift'
+„    „    „        „    „¤„Ÿ„Ÿ„ŸDONE
+„    „    „        „¥„Ÿ„Ÿ„ŸEdit 'Luminosity shift'
+„    „    „        „    „¤„Ÿ„Ÿ„ŸDONE
+„    „    „        „¥„Ÿ„Ÿ„ŸEdit 'Saturation shift'
+„    „    „        „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „        „¥„Ÿ„Ÿ„ŸLabel 'Background color adjustment'
+„    „    „        „    „¤„Ÿ„Ÿ„ŸDONE
+„    „    „        „¥„Ÿ„Ÿ„ŸSlider 'Hue shift'
 „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „        „¥„Ÿ„Ÿ„ŸSlider 'Brightness'
-„    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „        „¥„Ÿ„Ÿ„ŸSlider 'Hue'
-„    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „        „¥„Ÿ„Ÿ„ŸSlider 'Saturation'
-„    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „        „¥„Ÿ„Ÿ„ŸSpinner 'Brightness value'
-„    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „        „¥„Ÿ„Ÿ„ŸSpinner 'Hue value'
-„    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „        „¤„Ÿ„Ÿ„ŸSpinner 'Saturation value'
-„    „    „            „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¥„Ÿ„Ÿ„ŸSlider 'Luminosity shift'
+„    „    „        „    „¤„Ÿ„Ÿ„ŸDONE
+„    „    „        „¥„Ÿ„Ÿ„ŸSlider 'Saturation shift'
+„    „    „        „    „¤„Ÿ„Ÿ„ŸDONE
+„    „    „        „¥„Ÿ„Ÿ„ŸSpinner 'Hue shift'
+„    „    „        „    „¤„Ÿ„Ÿ„ŸDONE
+„    „    „        „¥„Ÿ„Ÿ„ŸSpinner 'Luminosity shift'
+„    „    „        „    „¤„Ÿ„Ÿ„ŸDONE
+„    „    „        „¤„Ÿ„Ÿ„ŸSpinner 'Saturation shift'
+„    „    „            „¤„Ÿ„Ÿ„ŸDONE
 „    „    „¥„Ÿ„Ÿ„ŸAdd 'Mouse wheel scroll skips [____]x more than arrow keys.' to controls
 „    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO

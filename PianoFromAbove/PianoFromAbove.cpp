@@ -20,8 +20,6 @@
 #include <ffmpeg3.h>
 #include <ffmpeg4.h>
 #endif
-#include <resource.h>
-#include <PackWrapper.hpp>
 #include <MainProcs.h>
 #include <Config.h>
 #include <GameState.h>
@@ -1455,7 +1453,7 @@ wstring MatrixShader() {
     EncodeColor::ColorB = L"NewB";
     Code += L"local TextColor=" + EncodeColor::MakeColor() + L"\n";
     Code += L"EXE(QM(\"SetTextColor\"),DC,TextColor)\n";
-    Code += L"EXE(QM(\"TextOutW\"),DC,(Col-1)*CharWidth,math.floor(PieceY),{type=4,value=utf8.char(math.random(0x00,0xFF))},1)\n";
+    Code += L"EXE(QM(\"TextOutA\"),DC,(Col-1)*CharWidth,math.floor(PieceY),string.char(math.random(0x21,0x7E)),1)\n";
     Code += L"end\n";
     Code += L"end\n";
     Code += L"end\n";
@@ -1555,7 +1553,7 @@ INT WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, INT nCmdShow)
                 const VisualSettings& cVisual = config.GetVisualSettings();
                 const ViewSettings& cView = config.GetViewSettings();
                 const VideoSettings& cVideo = config.GetVideoSettings();
-                const ControlsSettings& cControls = config.GetControlsSettings();
+                const ControlSettings& cControl = config.GetControlSettings();
                 const PlaybackSettings& cPlayback = config.GetPlaybackSettings();
                 wstring Code = L"";
                 Code += MultiInstanceGuardInit();
@@ -1593,13 +1591,13 @@ INT WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, INT nCmdShow)
                 Code += DefineMemoryAddress(L"Paused", cPlayback.GetPausedAddress(), false);
                 Code += DefineMemoryAddress(L"Keyboard", cView.GetKeyboardAddress(), false);
                 Code += DefineMemoryAddress(L"VisualizePitchBends", GetAddress(cVideo.bVisualizePitchBends), false);
-                Code += DefineMemoryAddress(L"PhigrosMode", GetAddress(cControls.bPhigros), false);
+                Code += DefineMemoryAddress(L"PhigrosMode", GetAddress(cControl.bPhigros), false);
                 Code += DefineMemoryAddress(L"ShowMarkers", GetAddress(cVideo.bShowMarkers), false);
                 Code += DefineMemoryAddress(L"TickBased", GetAddress(cVideo.bTickBased), false);
                 Code += DefineMemoryAddress(L"HideStatistics", GetAddress(cVideo.bDisableUI), false);
                 Code += DefineMemoryAddress(L"RemoveOverlaps", GetAddress(cVideo.bOR), false);
                 Code += DefineMemoryAddress(L"LimitFPS", GetAddress(cVideo.bLimitFPS), false);
-                Code += DefineMemoryAddress(L"VelocityThreshold", GetAddress(cControls.iVelocityThreshold), false);
+                Code += DefineMemoryAddress(L"VelocityThreshold", GetAddress(cControl.iVelocityThreshold), false);
                 Code += DefineMemoryAddress(L"Caption", GetAddress(Ptr_to_CaptionContent), true);
                 Code += DefineMemoryAddress(L"CaptionAlignment", GetAddress(Ptr_to_CheatEngineCaption), true);
                 Code += DefineMemoryAddress(L"DifficultyText", GetAddress(Ptr_to_Difficulty), true);
@@ -1648,13 +1646,13 @@ INT WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, INT nCmdShow)
                 Code += GettersAndSetters(L"Paused", IntSizeToCE(cPlayback.GetPausedSize()), false, L"History");
                 Code += GettersAndSetters(L"Keyboard", IntSizeToCE(cView.GetKeyboardVarSize()), false, L"History");
                 Code += GettersAndSetters(L"VisualizePitchBends", IntSizeToCE(sizeof(cVideo.bVisualizePitchBends)), false, L"History", false, true);
-                Code += GettersAndSetters(L"PhigrosMode", IntSizeToCE(sizeof(cControls.bPhigros)), false, L"History");
+                Code += GettersAndSetters(L"PhigrosMode", IntSizeToCE(sizeof(cControl.bPhigros)), false, L"History");
                 Code += GettersAndSetters(L"ShowMarkers", IntSizeToCE(sizeof(cVideo.bShowMarkers)), false, L"History");
                 Code += GettersAndSetters(L"TickBased", IntSizeToCE(sizeof(cVideo.bTickBased)), false, L"History");
                 Code += GettersAndSetters(L"HideStatistics", IntSizeToCE(sizeof(cVideo.bDisableUI)), false, L"History");
                 Code += GettersAndSetters(L"RemoveOverlaps", IntSizeToCE(sizeof(cVideo.bOR)), false, L"History");
                 Code += GettersAndSetters(L"LimitFPS", IntSizeToCE(sizeof(cVideo.bLimitFPS)), false, L"History");
-                Code += GettersAndSetters(L"VelocityThreshold", IntSizeToCE(sizeof(cControls.iVelocityThreshold)), false, L"History");
+                Code += GettersAndSetters(L"VelocityThreshold", IntSizeToCE(sizeof(cControl.iVelocityThreshold)), false, L"History");
                 Code += StringTypeGettersAndSetters(L"Caption", MainScreen::CE_Caption_Size(), false, L"History", true);
                 Code += StringTypeGettersAndSetters(L"DifficultyText", MainScreen::Difficulty_Size(), false, L"History");
                 Code += EasingFunctions();
@@ -1992,7 +1990,7 @@ DWORD WINAPI GameThread(LPVOID lpParameter)
     {
         wchar_t msg[LONG_MAX_PATH] = {};
         _snwprintf_s(msg, LONG_MAX_PATH, L"Fatal error initializing Direct3D. Is DirectX 11 installed properly? \n%s failed with code 0x%x. ", get<1>(init_res), get<0>(init_res));
-        MessageBox(g_hWnd, msg, TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
+        MessageBoxW(g_hWnd, msg, ErrorTitle, MB_OK | MB_ICONERROR);
         PostMessage(g_hWnd, WM_QUIT, 1, 0);
         return 1;
     }
@@ -2026,14 +2024,14 @@ DWORD WINAPI GameThread(LPVOID lpParameter)
         if ((ErrorLevel = pGameState->Logic()) != GameState::Success) {
             PostMessage(g_hWnd, WM_COMMAND, ID_GAMEERROR, ErrorLevel);
             if (GameState::ChangeState(new IntroScreen(NULL, NULL), &pGameState) != GameState::Success) {
-                MessageBoxW(g_hWnd, GameState::Errors[ErrorLevel].c_str(), L"Unrecoverable Fatal Error", MB_OK | MB_ICONERROR);
+                MessageBoxW(g_hWnd, GameState::Errors[ErrorLevel].c_str(), ErrorTitle, MB_OK | MB_ICONERROR);
                 PostMessage(g_hWnd, WM_QUIT, 1, 0);
             }
         }
         if ((ErrorLevel = pGameState->Render()) != GameState::Success) {
             PostMessage(g_hWnd, WM_COMMAND, ID_GAMEERROR, ErrorLevel);
             if (GameState::ChangeState(new IntroScreen(NULL, NULL), &pGameState) != GameState::Success) {
-                MessageBoxW(g_hWnd, GameState::Errors[ErrorLevel].c_str(), L"Unrecoverable Fatal Error", MB_OK | MB_ICONERROR);
+                MessageBoxW(g_hWnd, GameState::Errors[ErrorLevel].c_str(), ErrorTitle, MB_OK | MB_ICONERROR);
                 PostMessage(g_hWnd, WM_QUIT, 1, 0);
             }
         }

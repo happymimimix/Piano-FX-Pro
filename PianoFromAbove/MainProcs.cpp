@@ -14,8 +14,6 @@
 #include <set>
 #include <thread>
 #include <Uxtheme.h>
-#include <resource.h>
-#include <PackWrapper.hpp>
 #include <MainProcs.h>
 #include <ConfigProcs.h>
 #include <Globals.h>
@@ -86,7 +84,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     static PlaybackSettings& cPlayback = Config::GetConfig().GetPlaybackSettings();
     static ViewSettings& cView = Config::GetConfig().GetViewSettings();
-    static const ControlsSettings& cControls = Config::GetConfig().GetControlsSettings();
+    static const ControlSettings& cControl = Config::GetConfig().GetControlSettings();
     static bool bInSizeMove = false;
 
     switch (msg)
@@ -167,19 +165,19 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             if (cPlayback.GetPlayMode()) HandOffMsg(msg, wParam, lParam);
             return 0;
         case ID_PLAY_INCREASERATE:
-            cPlayback.SetSpeed(cPlayback.GetSpeed() * (1.0 + cControls.dSpeedUpPct / 100.0), true);
+            cPlayback.SetSpeed(cPlayback.GetSpeed() * (1.0 + cControl.dSpeedUpPct / 100.0), true);
             return 0;
         case ID_PLAY_DECREASERATE:
-            cPlayback.SetSpeed(cPlayback.GetSpeed() / (1.0 + cControls.dSpeedUpPct / 100.0), true);
+            cPlayback.SetSpeed(cPlayback.GetSpeed() / (1.0 + cControl.dSpeedUpPct / 100.0), true);
             return 0;
         case ID_PLAY_RESETRATE:
             cPlayback.SetSpeed(1.0, true);
             return 0;
         case ID_PLAY_NFASTER:
-            cPlayback.SetNSpeed(cPlayback.GetNSpeed() / (1.0 + cControls.dSpeedUpPct / 100.0), true);
+            cPlayback.SetNSpeed(cPlayback.GetNSpeed() / (1.0 + cControl.dSpeedUpPct / 100.0), true);
             return 0;
         case ID_PLAY_NSLOWER:
-            cPlayback.SetNSpeed(cPlayback.GetNSpeed() * (1.0 + cControls.dSpeedUpPct / 100.0), true);
+            cPlayback.SetNSpeed(cPlayback.GetNSpeed() * (1.0 + cControl.dSpeedUpPct / 100.0), true);
             return 0;
         case ID_PLAY_NRESET:
             cPlayback.SetNSpeed(0.25, true);
@@ -222,7 +220,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             DialogBox(g_hInstance, MAKEINTRESOURCE(IDD_ABOUT), g_hWnd, AboutProc);
             return 0;
         case ID_GAMEERROR:
-            MessageBoxW(hWnd, GameState::Errors[lParam].c_str(), L"Error", MB_OK | MB_ICONEXCLAMATION);
+            MessageBoxW(hWnd, GameState::Errors[lParam].c_str(), ErrorTitle, MB_OK | MB_ICONERROR);
             return 0;
         case ID_STUDIO:
             wchar_t ProgramPath[LONG_MAX_PATH] = {};
@@ -322,7 +320,7 @@ HMENU GetMainMenu()
 VOID SizeWindows(win32_t iMainWidth, win32_t iMainHeight)
 {
     static const ViewSettings& cView = Config::GetConfig().GetViewSettings();
-    static const ControlsSettings& cControls = Config::GetConfig().GetControlsSettings();
+    static const ControlSettings& cControl = Config::GetConfig().GetControlSettings();
     win32_t iBarHeight = 0;
     UINT swpFlags = SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOOWNERZORDER;
 
@@ -342,7 +340,7 @@ VOID SizeWindows(win32_t iMainWidth, win32_t iMainHeight)
         iBarHeight = rcBarDlg.bottom - rcBarDlg.top;
         if (hdwp) hdwp = DeferWindowPos(hdwp, g_hWndBar, NULL, 0, 0, iMainWidth, iBarHeight, swpFlags);
     }
-    if (cView.GetFullScreen() && !cControls.bAlwaysShowControls) iBarHeight = 0;
+    if (cView.GetFullScreen() && !cControl.bAlwaysShowControls) iBarHeight = 0;
     if (hdwp) hdwp = DeferWindowPos(hdwp, g_hWndGfx, NULL, NULL, iBarHeight, iMainWidth, iMainHeight - iBarHeight, swpFlags);
     if (hdwp) EndDeferWindowPos(hdwp);
 }
@@ -351,7 +349,7 @@ LRESULT WINAPI GfxProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     // Static vars for poping up the lib and bar in full screen mode
     static const ViewSettings& cView = Config::GetConfig().GetViewSettings();
-    static const ControlsSettings& cControls = Config::GetConfig().GetControlsSettings();
+    static const ControlSettings& cControl = Config::GetConfig().GetControlSettings();
     static bool bShowBar;
     static win32_t iBarHeight;
 
@@ -420,7 +418,7 @@ LRESULT WINAPI GfxProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 iBarHeight = rcBar.bottom - rcBar.top;
             }
 
-            if (!cControls.bAlwaysShowControls)
+            if (!cControl.bAlwaysShowControls)
             {
                 if (iYPos < iBarHeight && cView.GetControls())
                 {
@@ -957,9 +955,9 @@ VOID HandOffMsg(UINT msg, WPARAM wParam, LPARAM lParam)
 VOID ShowControls(BOOL bShow)
 {
     static const ViewSettings& cView = Config::GetConfig().GetViewSettings();
-    static const ControlsSettings& cControls = Config::GetConfig().GetControlsSettings();
+    static const ControlSettings& cControl = Config::GetConfig().GetControlSettings();
     SizeWindows(0, 0);
-    if (!cView.GetFullScreen() || cControls.bAlwaysShowControls)
+    if (!cView.GetFullScreen() || cControl.bAlwaysShowControls)
         ShowWindow(g_hWndBar, bShow ? SW_SHOWNA : SW_HIDE);
     else if (cView.GetFullScreen())
         ShowWindow(g_hWndBar, SW_HIDE);
@@ -985,7 +983,7 @@ VOID SetOnTop(BOOL bOnTop)
 VOID SetFullScreen(BOOL bFullScreen)
 {
     static const ViewSettings& cView = Config::GetConfig().GetViewSettings();
-    static const ControlsSettings& cControls = Config::GetConfig().GetControlsSettings();
+    static const ControlSettings& cControl = Config::GetConfig().GetControlSettings();
     static RECT rcOld = {};
     HMENU hMenu = GetMainMenu();
 
@@ -1173,7 +1171,7 @@ BOOL PlayFile(const wstring& sFile)
     Config& config = Config::GetConfig();
     PlaybackSettings& cPlayback = config.GetPlaybackSettings();
     static ViewSettings& cView = config.GetViewSettings();
-    static const ControlsSettings& cControls = config.GetControlsSettings();
+    static const ControlSettings& cControl = config.GetControlSettings();
 
     // Try loading the file
     MainScreen* pGameState = NULL;
@@ -1189,7 +1187,7 @@ BOOL PlayFile(const wstring& sFile)
     gamethread.join();
     if (!pGameState->IsValid())
     {
-        MessageBox(g_hWnd, (ErrorOpenSong + sFile).c_str(), TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
+        MessageBoxW(g_hWnd, (ErrorOpenSong + sFile).c_str(), ErrorTitle, MB_OK | MB_ICONERROR);
         delete pGameState;
         return FALSE;
     }
@@ -1207,7 +1205,7 @@ BOOL PlayFile(const wstring& sFile)
     cPlayback.SetPosition(0);
     cView.SetZoomMove(false);
     TCHAR sTitle[LONG_MAX_PATH];
-    if (cControls.bDumpFrames) {
+    if (cControl.bDumpFrames) {
         _stprintf_s(sTitle, TitleRender, sFile.c_str() + (sFile.find_last_of(L'\\') + 1));
     }
     else {
@@ -1224,7 +1222,7 @@ BOOL PlayFile(const wstring& sFile)
 VOID CheckActivity(BOOL bIsActive, POINT* ptNew, BOOL bToggleEnable)
 {
     static const ViewSettings& cView = Config::GetConfig().GetViewSettings();
-    static const ControlsSettings& cControls = Config::GetConfig().GetControlsSettings();
+    static const ControlSettings& cControl = Config::GetConfig().GetControlSettings();
     static bool bEnabled = true;
     static bool bWasActive = true;
     static bool bMouseHidden = false;
@@ -1253,7 +1251,7 @@ VOID CheckActivity(BOOL bIsActive, POINT* ptNew, BOOL bToggleEnable)
         bWasActive = true;
         if (bMouseHidden) bMouseHidden = (ShowCursor(TRUE) < 0);
     }
-    else if (!bIsActive && GetFocus() == g_hWndGfx && (!IsWindowVisible(g_hWndBar) || cControls.bAlwaysShowControls))
+    else if (!bIsActive && GetFocus() == g_hWndGfx && (!IsWindowVisible(g_hWndBar) || cControl.bAlwaysShowControls))
     {
         if (bWasActive)
             bWasActive = false;

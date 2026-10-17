@@ -8,7 +8,6 @@
 *
 *************************************************************************************************/
 #include <ShlObj.h>
-#include <resource.h>
 #include <Globals.h>
 #include <Renderer.h>
 #include <Config.h>

@@ -14,15 +14,7 @@
 #include <MIDI.h>
 MIDILoadingProgress g_LoadingProgress;
 
-const wstring MIDI::SMF3ErrorText[] =
-{
-    L"Missing digital signature.",
-    L"This file was produced by an untrusted generator.",
-    L"Unsupported 64bit event indexing.",
-    L"This file does not contain pre-computed microseconds.",
-    L"This file does not provide note pair linking.",
-    L"This file does not contain track layout summary."
-};
+const wstring MIDI::SMF3ErrorText[] = { ErrorLoadingSMF3 };
 
 //-----------------------------------------------------------------------------
 // MIDIPos functions
@@ -231,7 +223,7 @@ MIDI::MIDI(const wstring& sFilename)
 
         // Go to the beginning of the file to prepare for parsing
         if (_fseeki64(stream, 0, SEEK_SET)) {
-            MessageBoxW(NULL, L"_fseeki64 encountered an error.", L"Piano-FX Pro", MB_OK | MB_ICONERROR);
+            MessageBoxW(NULL, Error_fseeki64, ErrorTitle, MB_OK | MB_ICONERROR);
             return;
         }
 
@@ -249,7 +241,6 @@ MIDI::MIDI(const wstring& sFilename)
             // Get the decompressed size
             // This is a real pain in the ass for concatenated .xz files, lots of sanity checking is skipped here
             // See https://github.com/kobolabs/liblzma/blob/master/src/xz/list.c
-            wchar_t err[LONG_MAX_PATH] = {};
             uint64_t decompressed_size = 0;
             lzma_stream strm = LZMA_STREAM_INIT;
             lzma_stream_flags stream_flags;
@@ -259,7 +250,7 @@ MIDI::MIDI(const wstring& sFilename)
             do {
                 // Position sanity check
                 if (pos < LZMA_STREAM_HEADER_SIZE * 2) {
-                    MessageBoxW(NULL, L"Position sanity check failed. Corrupted file?", L"Piano-FX Pro", MB_OK | MB_ICONERROR);
+                    MessageBoxW(NULL, ErrorLzmaPos, ErrorTitle, MB_OK | MB_ICONERROR);
                     lzma_index_end(index, NULL);
                     delete[] pcMemBlock;
                     return;
@@ -270,7 +261,7 @@ MIDI::MIDI(const wstring& sFilename)
                 uint64_t footer_pos;
                 for (;;) {
                     if (pos < LZMA_STREAM_HEADER_SIZE) {
-                        MessageBoxW(NULL, L"Locating stream footer failed. Corrupted file?", L"Piano-FX Pro", MB_OK | MB_ICONERROR);
+                        MessageBoxW(NULL, ErrorLzmaStream, ErrorTitle, MB_OK | MB_ICONERROR);
                         lzma_index_end(index, NULL);
                         delete[] pcMemBlock;
                         return;
@@ -288,14 +279,13 @@ MIDI::MIDI(const wstring& sFilename)
                 }
                 ret = lzma_stream_footer_decode(&stream_flags, &compressed[footer_pos]);
                 if (ret != LZMA_OK) {
-                    swprintf(err, _countof(err) - 1, L"Decoding stream footer failed: %d\nCorrupt file?", ret);
-                    MessageBoxW(NULL, err, L"Piano-FX Pro", MB_OK | MB_ICONERROR);
+                    MessageBoxW(NULL, ErrorLzmaStreamDecode, ErrorTitle, MB_OK | MB_ICONERROR);
                     lzma_index_end(index, NULL);
                     delete[] pcMemBlock;
                     return;
                 }
                 if ((lzma_vli)pos < stream_flags.backward_size + LZMA_STREAM_HEADER_SIZE) {
-                    MessageBoxW(NULL, L"Stream footer position sanity check failed. Corrupted file?", L"Piano-FX Pro", MB_OK | MB_ICONERROR);
+                    MessageBoxW(NULL, ErrorLzmaStreamPos, ErrorTitle, MB_OK | MB_ICONERROR);
                     lzma_index_end(index, NULL);
                     delete[] pcMemBlock;
                     return;
@@ -309,15 +299,14 @@ MIDI::MIDI(const wstring& sFilename)
                 pos += stream_flags.backward_size;
                 ret = lzma_code(&strm, LZMA_RUN);
                 if (ret != LZMA_STREAM_END) {
-                    swprintf(err, _countof(err) - 1, L"Index decode failed: %d\nCorrupt file?", ret);
-                    MessageBoxW(NULL, err, L"Piano-FX Pro", MB_OK | MB_ICONERROR);
+                    MessageBoxW(NULL, ErrorLzmaIndex, ErrorTitle, MB_OK | MB_ICONERROR);
                     lzma_index_end(index, NULL);
                     delete[] pcMemBlock;
                     return;
                 }
                 pos -= stream_flags.backward_size + LZMA_STREAM_HEADER_SIZE;
                 if ((lzma_vli)pos < lzma_index_total_size(index)) {
-                    MessageBoxW(NULL, L"Index position sanity check failed. Corrupted file?", L"Piano-FX Pro", MB_OK | MB_ICONERROR);
+                    MessageBoxW(NULL, ErrorLzmaIndexPos, ErrorTitle, MB_OK | MB_ICONERROR);
                     lzma_index_end(index, NULL);
                     delete[] pcMemBlock;
                     return;
@@ -359,13 +348,12 @@ MIDI::MIDI(const wstring& sFilename)
                 case LZMA_OK:
                     break;
                 case LZMA_MEM_ERROR:
-                    MessageBoxW(NULL, L"Ran out of memory while decompressing.", L"Piano-FX Pro", MB_OK | MB_ICONERROR);
+                    MessageBoxW(NULL, ErrorLzmaMemory, ErrorTitle, MB_OK | MB_ICONERROR);
                     delete[] compressed;
                     delete[] pcMemBlock;
                     return;
                 default:
-                    swprintf(err, _countof(err) - 1, L"An error occurred while decompressing: %d\nCorrupt file?", ret);
-                    MessageBoxW(NULL, err, L"Piano-FX Pro", MB_OK | MB_ICONERROR);
+                    MessageBoxW(NULL, ErrorLzmaUnknown, ErrorTitle, MB_OK | MB_ICONERROR);
                     delete[] compressed;
                     delete[] pcMemBlock;
                     return;
@@ -413,35 +401,7 @@ MIDIChannelEvent* MIDI::AllocChannelEvent() {
     return ev;
 }
 
-const wstring MIDI::Instruments[(1 << 7) + 1] =
-{
-    L"Acoustic Grand Piano", L"Bright Acoustic Piano", L"Electric Grand Piano", L"Honky-tonk Piano", L"Electric Piano 1",
-    L"Electric Piano 2", L"Harpsichord", L"Clavi", L"Celesta", L"Glockenspiel",
-    L"Music Box", L"Vibraphone", L"Marimba", L"Xylophone", L"Tubular Bells",
-    L"Dulcimer", L"Drawbar Organ", L"Percussive Organ", L"Rock Organ", L"Church Organ",
-    L"Reed Organ", L"Accordion", L"Harmonica", L"Tango Accordion", L"Acoustic Guitar (nylon)",
-    L"Acoustic Guitar (steel)", L"Electric Guitar (jazz)", L"Electric Guitar (clean)", L"Electric Guitar (muted)", L"Overdriven Guitar",
-    L"Distortion Guitar", L"Guitar harmonics", L"Acoustic Bass", L"Electric Bass (finger)", L"Electric Bass (pick)",
-    L"Fretless Bass", L"Slap Bass 1", L"Slap Bass 2", L"Synth Bass 1", L"Synth Bass 2",
-    L"Violin", L"Viola", L"Cello", L"Contrabass", L"Tremolo Strings",
-    L"Pizzicato Strings", L"Orchestral Harp", L"Timpani", L"String Ensemble 1", L"String Ensemble 2",
-    L"SynthStrings 1", L"SynthStrings 2", L"Choir Aahs", L"Voice Oohs", L"Synth Voice",
-    L"Orchestra Hit", L"Trumpet", L"Trombone", L"Tuba", L"Muted Trumpet",
-    L"French Horn", L"Brass Section", L"SynthBrass 1", L"SynthBrass 2", L"Soprano Sax",
-    L"Alto Sax", L"Tenor Sax", L"Baritone Sax", L"Oboe", L"English Horn",
-    L"Bassoon", L"Clarinet", L"Piccolo", L"Flute", L"Recorder",
-    L"Pan Flute", L"Blown Bottle", L"Shakuhachi", L"Whistle", L"Ocarina",
-    L"Lead 1 (square)", L"Lead 2 (sawtooth)", L"Lead 3 (calliope)", L"Lead 4 (chiff)", L"Lead 5 (charang)",
-    L"Lead 6 (voice)", L"Lead 7 (fifths)", L"Lead 8 (bass + lead)", L"Pad 1 (new age)", L"Pad 2 (warm)",
-    L"Pad 3 (polysynth)", L"Pad 4 (choir)", L"Pad 5 (bowed)", L"Pad 6 (metallic)", L"Pad 7 (halo)",
-    L"Pad 8 (sweep)", L"FX 1 (rain)", L"FX 2 (soundtrack)", L"FX 3 (crystal)", L"FX 4 (atmosphere)",
-    L"FX 5 (brightness)", L"FX 6 (goblins)", L"FX 7 (echoes)", L"FX 8 (sci-fi)", L"Sitar",
-    L"Banjo", L"Shamisen", L"Koto", L"Kalimba", L"Bag pipe",
-    L"Fiddle", L"Shanai", L"Tinkle Bell", L"Agogo", L"Steel Drums",
-    L"Woodblock", L"Taiko Drum", L"Melodic Tom", L"Synth Drum", L"Reverse Cymbal",
-    L"Guitar Fret Noise", L"Breath Noise", L"Seashore", L"Bird Tweet", L"Telephone Ring",
-    L"Helicopter", L"Applause", L"Gunshot", L"Various"
-};
+const wstring MIDI::Instruments[(1 << 7) + 1] = { InstrumentNames };
 
 wstring MIDI::aNoteNames[MIDI::KEYS + 1];
 MIDI::Note MIDI::aNoteVal[MIDI::KEYS];
@@ -487,7 +447,7 @@ void MIDI::InitArrays()
     aWhiteCount[0] = 0;
     for (key_t i = 1; i <= MIDI::KEYS; i++)
         aWhiteCount[i] = aWhiteCount[i - 1] + !aIsSharp[i - 1];
-    aNoteNames[MIDI::KEYS] = L"Invalid";
+    aNoteNames[MIDI::KEYS] = InvalidKey;
 }
 
 void MIDI::clear(void)
@@ -535,26 +495,26 @@ fileln_t MIDI::ParseMIDI(const unsigned char* pcData, fileln_t iMaxSize)
         iTotal += Parse32BitLE(pcData + iTotal, iHdrSize - (iTotal - 8), reinterpret_cast<uint32_t*>(&FeatureFlags));
         if (FeatureFlags & SMF3FEATURES__$BIGIDXRANGE) {
 #ifndef BIG_INDEX
-            MessageBoxW(g_hWnd, SMF3ErrorText[Unsupported64Bit].c_str(), L"Error", MB_OK);
+            MessageBoxW(g_hWnd, SMF3ErrorText[Unsupported64Bit].c_str(), ErrorTitle, MB_OK);
             return 0;
 #else
             m_Info.iFormatType = 769;
 #endif
         }
         if (!(FeatureFlags & SMF3FEATURES__$CERTIFICATE)) {
-            MessageBoxW(g_hWnd, SMF3ErrorText[NoCertificate].c_str(), L"Error", MB_OK);
+            MessageBoxW(g_hWnd, SMF3ErrorText[NoCertificate].c_str(), ErrorTitle, MB_OK);
             return 0;
         }
         if (!(FeatureFlags & SMF3FEATURES__$MICROSECOND)) {
-            MessageBoxW(g_hWnd, SMF3ErrorText[MissingMicrosecond].c_str(), L"Error", MB_OK);
+            MessageBoxW(g_hWnd, SMF3ErrorText[MissingMicrosecond].c_str(), ErrorTitle, MB_OK);
             return 0;
         }
         if (!(FeatureFlags & SMF3FEATURES__$NOTEPAIRING)) {
-            MessageBoxW(g_hWnd, SMF3ErrorText[MissingNotePairing].c_str(), L"Error", MB_OK);
+            MessageBoxW(g_hWnd, SMF3ErrorText[MissingNotePairing].c_str(), ErrorTitle, MB_OK);
             return 0;
         }
         if (!(FeatureFlags & SMF3FEATURES__$TRACKLAYOUT)) {
-            MessageBoxW(g_hWnd, SMF3ErrorText[MissingTrackLayout].c_str(), L"Error", MB_OK);
+            MessageBoxW(g_hWnd, SMF3ErrorText[MissingTrackLayout].c_str(), ErrorTitle, MB_OK);
             return 0;
         }
 #ifndef BIG_INDEX

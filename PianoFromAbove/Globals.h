@@ -11,6 +11,8 @@
 
 #include <Windows.h>
 #include <Misc.h>
+#include <PackWrapper.hpp>
+#include <Resource.h>
 using namespace std;
 
 extern HINSTANCE g_hInstance;

@@ -49,7 +49,7 @@ void Config::LoadDefaultValues()
     m_VisualSettings.LoadDefaultValues();
     m_AudioSettings.LoadDefaultValues();
     m_VideoSettings.LoadDefaultValues();
-    m_ControlsSettings.LoadDefaultValues();
+    m_ControlSettings.LoadDefaultValues();
     m_PlaybackSettings.LoadDefaultValues();
     m_ViewSettings.LoadDefaultValues();
 }
@@ -80,7 +80,7 @@ void Config::LoadConfigValues(TiXmlElement* txRoot)
     m_VisualSettings.LoadConfigValues(txRoot);
     m_AudioSettings.LoadConfigValues(txRoot);
     m_VideoSettings.LoadConfigValues(txRoot);
-    m_ControlsSettings.LoadConfigValues(txRoot);
+    m_ControlSettings.LoadConfigValues(txRoot);
     m_PlaybackSettings.LoadConfigValues(txRoot);
     m_ViewSettings.LoadConfigValues(txRoot);
 }
@@ -115,7 +115,7 @@ bool Config::SaveConfigValues(TiXmlElement* txRoot)
     bSaved &= m_VisualSettings.SaveConfigValues(txRoot);
     bSaved &= m_AudioSettings.SaveConfigValues(txRoot);
     bSaved &= m_VideoSettings.SaveConfigValues(txRoot);
-    bSaved &= m_ControlsSettings.SaveConfigValues(txRoot);
+    bSaved &= m_ControlSettings.SaveConfigValues(txRoot);
     bSaved &= m_PlaybackSettings.SaveConfigValues(txRoot);
     bSaved &= m_ViewSettings.SaveConfigValues(txRoot);
     return bSaved;
@@ -171,7 +171,7 @@ void VideoSettings::LoadDefaultValues()
     bOR = false;
 }
 
-void ControlsSettings::LoadDefaultValues()
+void ControlSettings::LoadDefaultValues()
 {
     dFwdBackSecs = 5;
     dSpeedUpPct = 10;
@@ -338,7 +338,7 @@ void VideoSettings::LoadConfigValues(TiXmlElement* txRoot)
         bOR = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
 }
 
-void ControlsSettings::LoadConfigValues(TiXmlElement* txRoot)
+void ControlSettings::LoadConfigValues(TiXmlElement* txRoot)
 {
     TiXmlElement* txControls = txRoot->FirstChildElement("Controls");
     if (!txControls) return;
@@ -537,7 +537,7 @@ bool VideoSettings::SaveConfigValues(TiXmlElement* txRoot)
     return true;
 }
 
-bool ControlsSettings::SaveConfigValues(TiXmlElement* txRoot)
+bool ControlSettings::SaveConfigValues(TiXmlElement* txRoot)
 {
     TiXmlElement* txControls = new TiXmlElement("Controls");
     txRoot->LinkEndChild(txControls);

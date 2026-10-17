@@ -14,8 +14,6 @@
 #include <Dbt.h>
 #include <Fonts.h>
 #include <imguiCompressedFont2GDI.h>
-#include <resource.h>
-#include <PackWrapper.hpp>
 #include <ConfigProcs.h>
 #include <MainProcs.h>
 #include <Globals.h>
@@ -23,9 +21,9 @@
 
 VOID DoPreferences(HWND hWndOwner)
 {
-    win32_t pDialogs[] = { IDD_PP1_VISUAL, IDD_PP2_AUDIO, IDD_PP3_VIDEO, IDD_PP4_CONTROLS };
-    DLGPROC pProcs[] = { VisualProc, AudioProc, VideoProc, ControlsProc };
-    LPCWSTR pTitles[] = { Property1Title, Property2Title, Property3Title, Property4Title };
+    win32_t pDialogs[] = { IDD_PP1_VISUALS, IDD_PP2_AUDIO, IDD_PP3_VIDEO, IDD_PP4_CONTROL, IDD_PP5_EXPORT };
+    DLGPROC pProcs[] = { VisualProc, AudioProc, VideoProc, ControlProc, ExportProc };
+    LPCWSTR pTitles[] = { Property1Title, Property2Title, Property3Title, Property4Title, Property5Title };
     PROPSHEETPAGE psp[sizeof(pDialogs) / sizeof(win32_t)];
     PROPSHEETHEADER psh;
 
@@ -418,27 +416,27 @@ INT_PTR WINAPI VideoProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     return FALSE;
 }
 
-INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+INT_PTR WINAPI ControlProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg)
     {
     case WM_INITDIALOG:
     {
         // Config to fill out the form
-        const ControlsSettings& cControls = Config::GetConfig().GetControlsSettings();
+        const ControlSettings& cControl = Config::GetConfig().GetControlSettings();
 
         // Edit boxes
         TCHAR buf[LONG_MAX_PATH];
-        _stprintf_s(buf, TEXT("%g"), cControls.dFwdBackSecs);
+        _stprintf_s(buf, TEXT("%g"), cControl.dFwdBackSecs);
         SetDlgItemTextW(hWnd, IDC_LRARROWS, buf);
-        _stprintf_s(buf, TEXT("%g"), cControls.dSpeedUpPct);
+        _stprintf_s(buf, TEXT("%g"), cControl.dSpeedUpPct);
         SetDlgItemTextW(hWnd, IDC_UDARROWS, buf);
-        CheckDlgButton(hWnd, IDC_SHOWCONTROLS, cControls.bAlwaysShowControls);
-        CheckDlgButton(hWnd, IDC_PHIGROS, cControls.bPhigros);
-        SetDlgItemTextW(hWnd, IDC_SPLASHMIDI, cControls.sSplashMIDI.c_str());
-        _stprintf_s(buf, TEXT("%hhu"), cControls.iVelocityThreshold);
+        CheckDlgButton(hWnd, IDC_SHOWCONTROLS, cControl.bAlwaysShowControls);
+        CheckDlgButton(hWnd, IDC_PHIGROS, cControl.bPhigros);
+        SetDlgItemTextW(hWnd, IDC_SPLASHMIDI, cControl.sSplashMIDI.c_str());
+        _stprintf_s(buf, TEXT("%hhu"), cControl.iVelocityThreshold);
         SetDlgItemTextW(hWnd, IDC_VELSTRSHLD, buf);
-        CheckDlgButton(hWnd, IDC_FFMPEG, cControls.bDumpFrames);
+        CheckDlgButton(hWnd, IDC_FFMPEG, cControl.bDumpFrames);
 
         return TRUE;
     }
@@ -530,7 +528,7 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         {
             // Get a copy of the config to overwrite the settings
             Config& config = Config::GetConfig();
-            ControlsSettings cControls = config.GetControlsSettings();
+            ControlSettings cControl = config.GetControlSettings();
 
             // Edit boxes
             TCHAR buf[LONG_MAX_PATH];
@@ -539,10 +537,10 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             HWND hWndFwdBack = GetDlgItem(hWnd, IDC_LRARROWS);
             win32_t len = GetWindowText(hWndFwdBack, buf, LONG_MAX_PATH);
             if (len > 0 && _stscanf_s(buf, TEXT("%lf"), &dEditVal))
-                cControls.dFwdBackSecs = dEditVal;
+                cControl.dFwdBackSecs = dEditVal;
             else
             {
-                MessageBox(hWnd, TEXT("Please specify a numeric value! "), TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
+                MessageBoxW(hWnd, ErrorDigitOnly, ErrorTitle, MB_OK | MB_ICONERROR);
                 PostMessage(hWnd, WM_NEXTDLGCTL, (WPARAM)hWndFwdBack, TRUE);
                 SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_INVALID);
                 return TRUE;
@@ -551,37 +549,217 @@ INT_PTR WINAPI ControlsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             HWND hWndSpeedPct = GetDlgItem(hWnd, IDC_UDARROWS);
             len = GetWindowText(hWndSpeedPct, buf, LONG_MAX_PATH);
             if (len > 0 && _stscanf_s(buf, TEXT("%lf"), &dEditVal))
-                cControls.dSpeedUpPct = dEditVal;
+                cControl.dSpeedUpPct = dEditVal;
             else
             {
-                MessageBox(hWnd, TEXT("Please specify a numeric value! "), TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
+                MessageBoxW(hWnd, ErrorDigitOnly, ErrorTitle, MB_OK | MB_ICONERROR);
                 PostMessage(hWnd, WM_NEXTDLGCTL, (WPARAM)hWndSpeedPct, TRUE);
                 SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_INVALID);
                 return TRUE;
             }
 
-            cControls.bAlwaysShowControls = IsDlgButtonChecked(hWnd, IDC_SHOWCONTROLS);
-            cControls.bPhigros = IsDlgButtonChecked(hWnd, IDC_PHIGROS);
+            cControl.bAlwaysShowControls = IsDlgButtonChecked(hWnd, IDC_SHOWCONTROLS);
+            cControl.bPhigros = IsDlgButtonChecked(hWnd, IDC_PHIGROS);
             wchar_t splash[LONG_MAX_PATH]{};
             GetWindowTextW(GetDlgItem(hWnd, IDC_SPLASHMIDI), splash, LONG_MAX_PATH);
-            cControls.sSplashMIDI = splash;
+            cControl.sSplashMIDI = splash;
 
             HWND hWndVelStrshld = GetDlgItem(hWnd, IDC_VELSTRSHLD);
             len = GetWindowText(hWndVelStrshld, buf, LONG_MAX_PATH);
             if (len > 0 && _stscanf_s(buf, TEXT("%hhu"), reinterpret_cast<uint8_t*>(&dEditVal)))
-                cControls.iVelocityThreshold = *reinterpret_cast<uint8_t*>(&dEditVal) & 0x7F;
+                cControl.iVelocityThreshold = *reinterpret_cast<uint8_t*>(&dEditVal) & 0x7F;
             else
             {
-                MessageBox(hWnd, TEXT("Please specify a numeric value! "), TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
+                MessageBoxW(hWnd, ErrorDigitOnly, ErrorTitle, MB_OK | MB_ICONERROR);
                 PostMessage(hWnd, WM_NEXTDLGCTL, (WPARAM)hWndSpeedPct, TRUE);
                 SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_INVALID);
                 return TRUE;
             }
 
-            cControls.bDumpFrames = IsDlgButtonChecked(hWnd, IDC_FFMPEG);
+            cControl.bDumpFrames = IsDlgButtonChecked(hWnd, IDC_FFMPEG);
 
             // Report success and return
-            config.SetControlsSettings(cControls);
+            config.SetControlsSettings(cControl);
+            SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_NOERROR);
+
+            // Save settings
+            config.SaveConfigValues();
+
+            if (PointersInitialized) *Ptr_to_m_bUpdateNotePos = true; //Update Note Pos! 
+            return TRUE;
+        }
+        }
+        break;
+    }
+    }
+
+    return FALSE;
+}
+
+INT_PTR WINAPI ExportProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+    switch (msg)
+    {
+    case WM_INITDIALOG:
+    {
+        // Config to fill out the form
+        const ControlSettings& cControl = Config::GetConfig().GetControlSettings();
+
+        // Edit boxes
+        TCHAR buf[LONG_MAX_PATH];
+        _stprintf_s(buf, TEXT("%g"), cControl.dFwdBackSecs);
+        SetDlgItemTextW(hWnd, IDC_LRARROWS, buf);
+        _stprintf_s(buf, TEXT("%g"), cControl.dSpeedUpPct);
+        SetDlgItemTextW(hWnd, IDC_UDARROWS, buf);
+        CheckDlgButton(hWnd, IDC_SHOWCONTROLS, cControl.bAlwaysShowControls);
+        CheckDlgButton(hWnd, IDC_PHIGROS, cControl.bPhigros);
+        SetDlgItemTextW(hWnd, IDC_SPLASHMIDI, cControl.sSplashMIDI.c_str());
+        _stprintf_s(buf, TEXT("%hhu"), cControl.iVelocityThreshold);
+        SetDlgItemTextW(hWnd, IDC_VELSTRSHLD, buf);
+        CheckDlgButton(hWnd, IDC_FFMPEG, cControl.bDumpFrames);
+
+        return TRUE;
+    }
+    case WM_COMMAND: {
+        winword_t iId = LOWORD(wParam);
+        winword_t iCode = HIWORD(wParam);
+        if (iCode == LBN_SELCHANGE || iCode == EN_CHANGE || iCode == BN_CLICKED) Changed(hWnd);
+        switch (iId)
+        {
+        case IDC_SPLASHBROWSE: {
+            OPENFILENAME ofn = {};
+            TCHAR sFilename[LONG_MAX_PATH] = {};
+            ofn.lStructSize = sizeof(OPENFILENAME);
+            ofn.hwndOwner = hWnd;
+            ofn.lpstrFilter = TEXT("MIDI Files (*.mid, *.mid.xz)\0*.mid;*.xz\0");
+            ofn.lpstrFile = sFilename;
+            ofn.nMaxFile = sizeof(sFilename) / sizeof(TCHAR);
+            ofn.lpstrTitle = OpenSplashFileTitle;
+            ofn.Flags = OFN_EXPLORER | OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
+            if (GetOpenFileName(&ofn))
+                SetDlgItemTextW(hWnd, IDC_SPLASHMIDI, sFilename);
+            return TRUE;
+        }
+        case IDC_SPLASHRESET: {
+            SetDlgItemTextW(hWnd, IDC_SPLASHMIDI, L"");
+            return TRUE;
+        }
+        }
+        break;
+    }
+    case WM_NOTIFY:
+    {
+        LPNMHDR lpnmhdr = (LPNMHDR)lParam;
+        switch (lpnmhdr->code)
+        {
+            // Spin boxes. Just increment or decrement
+        case UDN_DELTAPOS:
+            switch (lpnmhdr->idFrom)
+            {
+            case IDC_LRARROWSSPIN:
+            {
+                TCHAR buf[LONG_MAX_PATH];
+                LPNMUPDOWN lpnmud = (LPNMUPDOWN)lParam;
+                HWND hWndFwdBack = GetDlgItem(hWnd, IDC_LRARROWS);
+                double dOldVal = 0;
+                win32_t len = GetWindowText(hWndFwdBack, buf, LONG_MAX_PATH);
+                if (len > 0 && _stscanf_s(buf, TEXT("%lf"), &dOldVal))
+                {
+                    double dNewVal = dOldVal - lpnmud->iDelta * .1;
+                    _stprintf_s(buf, TEXT("%g"), dNewVal);
+                    SetWindowText(hWndFwdBack, buf);
+                }
+                return TRUE;
+            }
+            case IDC_UDARROWSSPIN:
+            {
+                TCHAR buf[LONG_MAX_PATH];
+                LPNMUPDOWN lpnmud = (LPNMUPDOWN)lParam;
+                HWND hWndSpeedPct = GetDlgItem(hWnd, IDC_UDARROWS);
+                double dOldVal = 0;
+                win32_t len = GetWindowText(hWndSpeedPct, buf, LONG_MAX_PATH);
+                if (len > 0 && _stscanf_s(buf, TEXT("%lf"), &dOldVal))
+                {
+                    double dNewVal = dOldVal - lpnmud->iDelta;
+                    _stprintf_s(buf, TEXT("%g"), dNewVal);
+                    SetWindowText(hWndSpeedPct, buf);
+                }
+                return TRUE;
+            }
+            case IDC_VELSTRSHLDSPIN:
+            {
+                TCHAR buf[LONG_MAX_PATH];
+                LPNMUPDOWN lpnmud = (LPNMUPDOWN)lParam;
+                HWND hWndVelTh = GetDlgItem(hWnd, IDC_VELSTRSHLD);
+                uint8_t iOldVal = 0;
+                win32_t len = GetWindowText(hWndVelTh, buf, LONG_MAX_PATH);
+                if (len > 0 && _stscanf_s(buf, TEXT("%hhu"), &iOldVal))
+                {
+                    uint8_t iNewVal = (iOldVal - lpnmud->iDelta) & 0x7F;
+                    _stprintf_s(buf, TEXT("%hhu"), iNewVal);
+                    SetWindowText(hWndVelTh, buf);
+                }
+                return TRUE;
+            }
+            }
+            break;
+            // OK or Apply button pressed
+        case PSN_APPLY:
+        {
+            // Get a copy of the config to overwrite the settings
+            Config& config = Config::GetConfig();
+            ControlSettings cControl = config.GetControlSettings();
+
+            // Edit boxes
+            TCHAR buf[LONG_MAX_PATH];
+            double dEditVal = 0;
+
+            HWND hWndFwdBack = GetDlgItem(hWnd, IDC_LRARROWS);
+            win32_t len = GetWindowText(hWndFwdBack, buf, LONG_MAX_PATH);
+            if (len > 0 && _stscanf_s(buf, TEXT("%lf"), &dEditVal))
+                cControl.dFwdBackSecs = dEditVal;
+            else
+            {
+                MessageBoxW(hWnd, ErrorDigitOnly, ErrorTitle, MB_OK | MB_ICONERROR);
+                PostMessage(hWnd, WM_NEXTDLGCTL, (WPARAM)hWndFwdBack, TRUE);
+                SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_INVALID);
+                return TRUE;
+            }
+
+            HWND hWndSpeedPct = GetDlgItem(hWnd, IDC_UDARROWS);
+            len = GetWindowText(hWndSpeedPct, buf, LONG_MAX_PATH);
+            if (len > 0 && _stscanf_s(buf, TEXT("%lf"), &dEditVal))
+                cControl.dSpeedUpPct = dEditVal;
+            else
+            {
+                MessageBoxW(hWnd, ErrorDigitOnly, ErrorTitle, MB_OK | MB_ICONERROR);
+                PostMessage(hWnd, WM_NEXTDLGCTL, (WPARAM)hWndSpeedPct, TRUE);
+                SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_INVALID);
+                return TRUE;
+            }
+
+            cControl.bAlwaysShowControls = IsDlgButtonChecked(hWnd, IDC_SHOWCONTROLS);
+            cControl.bPhigros = IsDlgButtonChecked(hWnd, IDC_PHIGROS);
+            wchar_t splash[LONG_MAX_PATH]{};
+            GetWindowTextW(GetDlgItem(hWnd, IDC_SPLASHMIDI), splash, LONG_MAX_PATH);
+            cControl.sSplashMIDI = splash;
+
+            HWND hWndVelStrshld = GetDlgItem(hWnd, IDC_VELSTRSHLD);
+            len = GetWindowText(hWndVelStrshld, buf, LONG_MAX_PATH);
+            if (len > 0 && _stscanf_s(buf, TEXT("%hhu"), reinterpret_cast<uint8_t*>(&dEditVal)))
+                cControl.iVelocityThreshold = *reinterpret_cast<uint8_t*>(&dEditVal) & 0x7F;
+            else
+            {
+                MessageBoxW(hWnd, ErrorDigitOnly, ErrorTitle, MB_OK | MB_ICONERROR);
+                PostMessage(hWnd, WM_NEXTDLGCTL, (WPARAM)hWndSpeedPct, TRUE);
+                SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_INVALID);
+                return TRUE;
+            }
+
+            cControl.bDumpFrames = IsDlgButtonChecked(hWnd, IDC_FFMPEG);
+
+            // Report success and return
+            config.SetControlsSettings(cControl);
             SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_NOERROR);
 
             // Save settings
@@ -738,7 +916,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         RECT rcItem = { LVIR_BOUNDS,LVIR_BOUNDS,LVIR_BOUNDS,LVIR_BOUNDS };
         SendMessage(hWndTracks, LVM_GETITEMRECT, 0, (LPARAM)&rcItem);
 
-        if (Config::GetConfig().GetControlsSettings().bDumpFrames) {
+        if (Config::GetConfig().GetControlSettings().bDumpFrames) {
             SendMessage(GetDlgItem(hWnd, IDC_NOLAG), BM_SETCHECK, BST_CHECKED, 0);
             EnableWindow(GetDlgItem(hWnd, IDC_NOLAG), FALSE);
         }

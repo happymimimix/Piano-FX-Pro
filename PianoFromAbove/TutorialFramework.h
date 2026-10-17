@@ -1,7 +1,7 @@
 #pragma once
 #include <PFXSTUDIO_Global_Imports.h>
 #include <ConsoleSetupScript.h>
-#include <resource.h>
+#include <Resource.h>
 
 int8_t RedrawTimer = 0;
 

@@ -73,7 +73,7 @@ void Tab2::EnableAll() {
             Tab2Graphics::Btn3(3, 8, Touched);
             Sleep(500);
             Copy(LuaCode);
-            MessageBoxW(GetConsoleWindow(), L"Cheat Engine lua code template has been copied to clipboard. \nOpen Cheat Engine and paste them into Table -> Show Cheat Table Lua Script. ", L"Success", NULL);
+            MessageBoxW(GetConsoleWindow(), L"Cheat Engine lua code template has been copied to clipboard. \nOpen Cheat Engine and paste them into Table -> Show Cheat Table Lua Script. ", L"Success", MB_OK | MB_ICONEXCLAMATION);
             Btn3->OnLeave();
         };
         Btn3->OnHover = [&]() {

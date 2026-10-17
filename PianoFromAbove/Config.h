@@ -80,7 +80,7 @@ struct VideoSettings : public ISettings
     bool bOR;
 };
 
-struct ControlsSettings : public ISettings
+struct ControlSettings : public ISettings
 {
     void LoadDefaultValues();
     void LoadConfigValues(TiXmlElement* txRoot);
@@ -212,14 +212,14 @@ public:
     const VisualSettings& GetVisualSettings() const { return m_VisualSettings; }
     const AudioSettings& GetAudioSettings() const { return m_AudioSettings; }
     const VideoSettings& GetVideoSettings() const { return m_VideoSettings; }
-    const ControlsSettings& GetControlsSettings() const { return m_ControlsSettings; }
+    const ControlSettings& GetControlSettings() const { return m_ControlSettings; }
     PlaybackSettings& GetPlaybackSettings() { return m_PlaybackSettings; }
     ViewSettings& GetViewSettings() { return m_ViewSettings; }
 
     void SetVisualSettings(const VisualSettings& VisualSettings) { m_VisualSettings = VisualSettings; }
     void SetAudioSettings(const AudioSettings& audioSettings) { m_AudioSettings = audioSettings; }
     void SetVideoSettings(const VideoSettings& videoSettings) { m_VideoSettings = videoSettings; }
-    void SetControlsSettings(const ControlsSettings& ControlsSettings) { m_ControlsSettings = ControlsSettings; }
+    void SetControlsSettings(const ControlSettings& ControlSettings) { m_ControlSettings = ControlSettings; }
 
 private:
     // Singleton
@@ -231,7 +231,7 @@ private:
     VisualSettings m_VisualSettings;
     AudioSettings m_AudioSettings;
     VideoSettings m_VideoSettings;
-    ControlsSettings m_ControlsSettings;
+    ControlSettings m_ControlSettings;
     PlaybackSettings m_PlaybackSettings;
     ViewSettings m_ViewSettings;
 };

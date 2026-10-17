@@ -14,21 +14,12 @@
 #include <d3d9types.h>
 #include <numeric>
 #include <lzma.h>
-#include <resource.h>
-#include <PackWrapper.hpp>
 #include <Globals.h>
 #include <GameState.h>
 #include <Config.h>
 #include <ConfigProcs.h>
 
-const wstring GameState::Errors[] =
-{
-    L"Success.",
-    L"Invalid pointer passed. It would be nice if you could submit feedback with a description of how this happened.",
-    L"Failed to reconstruct state for the selected time. It would be nice if you could submit feedback with a description of how this happened.",
-    L"Out of memory.",
-    L"Error calling DirectX. It would be nice if you could submit feedback with a description of how this happened."
-};
+const wstring GameState::Errors[] = { ErrorGameState };
 
 // Sets to a random color
 void ChannelSettings::SetColor() {
@@ -148,15 +139,15 @@ SplashScreen::SplashScreen(HWND hWnd, Renderer11* pRenderer) : GameState(hWnd, p
     unsigned char* pData = (unsigned char*)LockResource(hRes);
 
     Config& config = Config::GetConfig();
-    const ControlsSettings& cControls = config.GetControlsSettings();
+    const ControlSettings& cControl = config.GetControlSettings();
 
     // Parse MIDI
-    if (!cControls.sSplashMIDI.empty()) {
+    if (!cControl.sSplashMIDI.empty()) {
         // this is REALLY BAD, but i can't figure out how to make it move ownership of the memory pool vector instead of copying
         m_MIDI.~MIDI();
-        new (&m_MIDI) MIDI(cControls.sSplashMIDI);
+        new (&m_MIDI) MIDI(cControl.sSplashMIDI);
         if (!m_MIDI.IsValid()) {
-            MessageBox(hWnd, L"The custom splash MIDI failed to load. Please choose a different MIDI.", L"", MB_ICONWARNING);
+            MessageBoxW(hWnd, ErrorOpenSplash, ErrorTitle, MB_OK | MB_ICONERROR);
             m_MIDI.~MIDI();
             new (&m_MIDI) MIDI();
             goto SplashFailed;
@@ -235,7 +226,7 @@ SplashScreen::SplashScreen(HWND hWnd, Renderer11* pRenderer) : GameState(hWnd, p
     m_vEvents.reserve(m_MIDI.GetInfo().iEventCount);
     bool IsPostProcessOK = m_MIDI.PostProcess(m_vEvents);
     if (!IsPostProcessOK) {
-        MessageBoxW(hWnd, Errors[GameError::OutOfMemory].c_str(), L"Error", MB_OK);
+        MessageBoxW(hWnd, Errors[GameError::OutOfMemory].c_str(), ErrorTitle, MB_OK | MB_ICONERROR);
         return;
     }
     // Allocate
@@ -425,11 +416,11 @@ GameState::GameError SplashScreen::Logic() {
 
 void SplashScreen::UpdateState(idx_t idx, idx_t sister_idx) {
     if (sister_idx == IDX_MAX) {
-        if (m_pState->IsActive(idx)) MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
+        if (m_pState->IsActive(idx)) MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), ErrorTitle, MB_OK | MB_ICONERROR);
         m_pState->Activate(idx);
     }
     else {
-        if (!m_pState->IsActive(sister_idx)) MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
+        if (!m_pState->IsActive(sister_idx)) MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), ErrorTitle, MB_OK | MB_ICONERROR);
         m_pState->Deactivate(sister_idx);
     }
 }
@@ -583,7 +574,7 @@ MainScreen::MainScreen(wstring sMIDIFile, HWND hWnd, Renderer11* pRenderer) : Ga
     m_vEvents.reserve(m_MIDI.GetInfo().iEventCount);
     bool IsPostProcessOK = m_MIDI.PostProcess(m_vEvents, &m_vMetaEvents, &m_vTempo, &m_vSignature, &m_vMarkers, &m_vReplayTable, &m_vColors, &m_vSysExEvents);
     if (!IsPostProcessOK) {
-        MessageBoxW(hWnd, Errors[GameError::OutOfMemory].c_str(), L"Error", MB_OK);
+        MessageBoxW(hWnd, Errors[GameError::OutOfMemory].c_str(), ErrorTitle, MB_OK | MB_ICONERROR);
         return;
     }
     // Allocate
@@ -628,7 +619,7 @@ void MainScreen::InitState() {
     static Config& config = Config::GetConfig();
     static const PlaybackSettings& cPlayback = config.GetPlaybackSettings();
     static const ViewSettings& cView = config.GetViewSettings();
-    static const ControlsSettings& cControls = config.GetControlsSettings();
+    static const ControlSettings& cControl = config.GetControlSettings();
     static const VideoSettings& cVideo = config.GetVideoSettings();
 
     m_iStartPos = NULL;
@@ -688,7 +679,7 @@ void MainScreen::InitState() {
     m_bUpdateTrackColor = true;
     m_bUpdateNotePos = true;
 
-    m_bDumpFrames = cControls.bDumpFrames;
+    m_bDumpFrames = cControl.bDumpFrames;
     if (m_bDumpFrames) {
         //Running ffmpeg
         wchar_t buf[LONG_MAX_PATH] = {};
@@ -752,7 +743,7 @@ GameState::GameError MainScreen::Init() {
         memset(&timing_info, 0, sizeof(timing_info));
         timing_info.cbSize = sizeof(timing_info);
         if (FAILED(DwmGetCompositionTimingInfo(NULL, &timing_info))) {
-            MessageBox(NULL, L"Failed to get the screen refresh rate! Defaulting to 60hz...", L"", MB_ICONERROR);
+            MessageBoxW(NULL, ErrorFPS, ErrorTitle, MB_OK | MB_ICONERROR);
             m_Timer.SetFrameRate(60);
         }
         else {
@@ -822,7 +813,7 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
     static Config& config = Config::GetConfig();
     static PlaybackSettings& cPlayback = config.GetPlaybackSettings();
     static ViewSettings& cView = config.GetViewSettings();
-    static const ControlsSettings& cControls = config.GetControlsSettings();
+    static const ControlSettings& cControl = config.GetControlSettings();
     static const AudioSettings& cAudio = config.GetAudioSettings();
 
     switch (msg)
@@ -847,14 +838,14 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
         case ID_PLAY_SKIPFWD:
         {
             bool StartTimer = (JumpTarget == ~0);
-            JumpTarget = static_cast<mms_t>(m_llStartTime + cControls.dFwdBackSecs * S);
+            JumpTarget = static_cast<mms_t>(m_llStartTime + cControl.dFwdBackSecs * S);
             if (StartTimer) SetTimer(g_hWnd, IDC_POSNDELAY, nxtdelay, NULL); //Async JumpTo process
             return Success;
         }
         case ID_PLAY_SKIPBACK:
         {
             bool StartTimer = (JumpTarget == ~0);
-            JumpTarget = static_cast<mms_t>(m_llStartTime - cControls.dFwdBackSecs * S);
+            JumpTarget = static_cast<mms_t>(m_llStartTime - cControl.dFwdBackSecs * S);
             if (StartTimer) SetTimer(g_hWnd, IDC_POSNDELAY, nxtdelay, NULL); //Async JumpTo process
             return Success;
         }
@@ -896,7 +887,7 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
     case WM_MOUSEWHEEL:
     {
         bool StartTimer = (JumpTarget == ~0);
-        JumpTarget = static_cast<mms_t>(m_llStartTime + cControls.dFwdBackSecs * S * (static_cast<double>(GET_WHEEL_DELTA_WPARAM(wParam)) / static_cast<double>(WHEEL_DELTA)));
+        JumpTarget = static_cast<mms_t>(m_llStartTime + cControl.dFwdBackSecs * S * (static_cast<double>(GET_WHEEL_DELTA_WPARAM(wParam)) / static_cast<double>(WHEEL_DELTA)));
         if (StartTimer) SetTimer(g_hWnd, IDC_POSNDELAY, nxtdelay, NULL); //Async JumpTo process
         return Success;
     }
@@ -999,7 +990,7 @@ GameState::GameError MainScreen::Logic() {
     static const ViewSettings& cView = config.GetViewSettings();
     static const VisualSettings& cVisual = config.GetVisualSettings();
     static const VideoSettings& cVideo = config.GetVideoSettings();
-    static const ControlsSettings& cControls = config.GetControlsSettings();
+    static const ControlSettings& cControl = config.GetControlSettings();
 
     // people are probably going to yell at me if you can't change the bar color during playback
     m_csKBRed.SetColor(cVisual.iBarColor, 0.5f);
@@ -1012,7 +1003,7 @@ GameState::GameError MainScreen::Logic() {
     mms_t llTimeSpan = static_cast<mms_t>(3.0 * abs(dNSpeed) * 1000000);
     bool bPausedChanged = (bPaused != m_bPaused);
     bool bMuteChanged = (bMute != m_bMute);
-    key_t velthrshld = cControls.iVelocityThreshold % (1 << 7);
+    key_t velthrshld = cControl.iVelocityThreshold % (1 << 7);
 
     // Set the state
     m_bTickMode = cVideo.bTickBased && !(m_MIDI.GetInfo().iDivision & 0x8000);
@@ -1269,7 +1260,7 @@ GameState::GameError MainScreen::Logic() {
                     }
                     EndSearch:
                     if (iFound != iSimultaneous) {
-                        MessageBoxW(g_hWnd, Errors[GameError::JumpToFailure].c_str(), L"Error", MB_OK);
+                        MessageBoxW(g_hWnd, Errors[GameError::JumpToFailure].c_str(), ErrorTitle, MB_OK | MB_ICONERROR);
                     }
                 }
             }
@@ -1304,7 +1295,7 @@ GameState::GameError MainScreen::Logic() {
                     case 1: goto StateUpdateReturnLocation_01;
                     case 2: goto StateUpdateReturnLocation_02;
                     case 3: goto StateUpdateReturnLocation_03;
-                    default: MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
+                    default: MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), ErrorTitle, MB_OK | MB_ICONERROR);
                     }
                 }
             }
@@ -1408,22 +1399,22 @@ GameState::GameError MainScreen::Logic() {
 
 void MainScreen::UpdateState(idx_t idx, idx_t sister_idx) {
     if (sister_idx == IDX_MAX) {
-        if (m_pState->IsActive(idx) && JumpTarget == ~0) MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
+        if (m_pState->IsActive(idx) && JumpTarget == ~0) MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), ErrorTitle, MB_OK | MB_ICONERROR);
         m_pState->Activate(idx);
     }
     else {
-        if (!m_pState->IsActive(sister_idx) && JumpTarget == ~0) MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
+        if (!m_pState->IsActive(sister_idx) && JumpTarget == ~0) MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), ErrorTitle, MB_OK | MB_ICONERROR);
         m_pState->Deactivate(sister_idx);
     }
 }
 
 void MainScreen::UpdateReversedState(idx_t idx, idx_t sister_idx) {
     if (sister_idx == IDX_MAX) {
-        if (m_pStateReversed->IsActive(idx) && JumpTarget == ~0) MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
+        if (m_pStateReversed->IsActive(idx) && JumpTarget == ~0) MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), ErrorTitle, MB_OK | MB_ICONERROR);
         m_pStateReversed->Activate(idx);
     }
     else {
-        if (!m_pStateReversed->IsActive(sister_idx) && JumpTarget == ~0) MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), L"Error", MB_OK);
+        if (!m_pStateReversed->IsActive(sister_idx) && JumpTarget == ~0) MessageBoxW(g_hWnd, Errors[GameError::BadPointer].c_str(), ErrorTitle, MB_OK | MB_ICONERROR);
         m_pStateReversed->Deactivate(sister_idx);
     }
 }
@@ -1512,7 +1503,7 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
             }
             EndSearch:
             if (iFound != iSimultaneous) {
-                MessageBoxW(g_hWnd, Errors[GameError::JumpToFailure].c_str(), L"Error", MB_OK);
+                MessageBoxW(g_hWnd, Errors[GameError::JumpToFailure].c_str(), ErrorTitle, MB_OK | MB_ICONERROR);
             }
         }
     }
@@ -2380,16 +2371,16 @@ void MainScreen::RenderKeys() {
 void MainScreen::RenderText() {
     static Config& config = Config::GetConfig();
     static const VideoSettings& cVideo = config.GetVideoSettings();
-    static const ControlsSettings& cControls = config.GetControlsSettings();
+    static const ControlSettings& cControl = config.GetControlSettings();
 
     unsigned char Lines = 10; //Basic info
     if (cVideo.bDebug) {
         Lines += 10; //Debug info
     }
-    if (cControls.bPhigros) {
+    if (cControl.bPhigros) {
         Lines += 4; //Score and level
     }
-    if (cControls.bDumpFrames) {
+    if (cControl.bDumpFrames) {
         if (cVideo.bDebug) {
             Lines += 1; //Playback speed
         }
@@ -2402,7 +2393,7 @@ void MainScreen::RenderText() {
             Lines += 1; //Playback speed
         }
     }
-    if (cControls.bDumpFrames) {
+    if (cControl.bDumpFrames) {
         Lines -= 1; //Don't show FPS when exporting videos
     }
     if (cVideo.bDisableUI) {
@@ -2475,7 +2466,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
     const VisualSettings& cVisual = config.GetVisualSettings();
     const ViewSettings& cView = config.GetViewSettings();
     const VideoSettings& cVideo = config.GetVideoSettings();
-    const ControlsSettings& cControls = config.GetControlsSettings();
+    const ControlSettings& cControl = config.GetControlSettings();
     const PlaybackSettings& cPlayback = config.GetPlaybackSettings();
 
     mms_t min = abs(m_llStartTime) / 60000000;
@@ -2542,7 +2533,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
     if (cVideo.bDebug) {
         RenderStatusLine(cur_line++, StatisticsText5, L"%lld", m_llStartTime);
     }
-    if (!cControls.bDumpFrames) {
+    if (!cControl.bDumpFrames) {
         RenderStatusLine(cur_line++, StatisticsText6, L"%.2lf", m_dFPS);
     }
     if (m_MIDI.GetInfo().iDivision & 0x8000) {
@@ -2555,7 +2546,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
     else {
         RenderStatusLine(cur_line++, StatisticsText7, L"%.3lf BPM", tempo);
     }
-    if (cControls.bPhigros) {
+    if (cControl.bPhigros) {
         RenderStatusLine(cur_line++, StatisticsText8, L"%s", passedFormatted.c_str());
         RenderStatusLine(cur_line++, StatisticsText9, L"%s", npsFormatted.c_str());
         RenderStatusLine(cur_line++, StatisticsText10, L"%s", polyFormatted.c_str());
@@ -2574,7 +2565,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
             RenderStatusLine(cur_line++, StatisticsText15, L"%.0lf%%", cPlayback.GetVolume() * 100);
         }
     }
-    if (cControls.bDumpFrames) {
+    if (cControl.bDumpFrames) {
         if (cVideo.bDebug) {
             RenderStatusLine(cur_line++, StatisticsText17, L"%.0lf%%", cPlayback.GetSpeed() * 100);
         }
@@ -2601,9 +2592,9 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         RenderStatusLine(cur_line++, StatisticsText21, L"%f", cView.GetZoomX() * m_fTempZoomX);
         RenderStatusLine(cur_line++, StatisticsText22, L"%d*%d", m_iScreenWidth, m_iScreenHeight);
         RenderStatusLine(cur_line++, StatisticsText23, L"%hhu~%hhu", m_bFlipKeyboard ? m_iEndNote : m_iStartNote, m_bFlipKeyboard ? m_iStartNote : m_iEndNote);
-        RenderStatusLine(cur_line++, StatisticsText24, L"%hhu", cControls.iVelocityThreshold);
+        RenderStatusLine(cur_line++, StatisticsText24, L"%hhu", cControl.iVelocityThreshold);
     }
-    if (cControls.bPhigros) {
+    if (cControl.bPhigros) {
         RenderStatusLine(cur_line++, StatisticsText25, L"%07.0f", (m_iPassed == m_MIDI.GetInfo().iNoteCount ? 1000000 : floor(static_cast<float>(m_iPassed) / static_cast<float>(m_MIDI.GetInfo().iNoteCount) * 1000000)));
         RenderStatusLine(cur_line++, StatisticsText26, L"%s", Utf8ToWString(Difficulty).c_str());
         RenderStatusLine(cur_line++, StatisticsText27, L"%s", StatisticsText28 L" ");
@@ -2792,7 +2783,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         SetConsoleCursorPosition(hConsole, pos);
         wcout << wstring(csbi.dwSize.X - 1, ' ') << L"\n";
         SetConsoleCursorPosition(hConsole, pos);
-        wcout << L"    PhigrosMode: " + to_wstring(cControls.bPhigros) + L" (" + IntSizeToCE(sizeof(cControls.bPhigros)) + L" +" + GetAddress(cControls.bPhigros) + L") [Read / Write]";
+        wcout << L"    PhigrosMode: " + to_wstring(cControl.bPhigros) + L" (" + IntSizeToCE(sizeof(cControl.bPhigros)) + L" +" + GetAddress(cControl.bPhigros) + L") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
@@ -2828,7 +2819,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         SetConsoleCursorPosition(hConsole, pos);
         wcout << wstring(csbi.dwSize.X - 1, ' ') << L"\n";
         SetConsoleCursorPosition(hConsole, pos);
-        wcout << L"    VelocityThreshold: " + to_wstring(cControls.iVelocityThreshold & 0x7F) + L" (" + IntSizeToCE(sizeof(cControls.iVelocityThreshold)) + L" +" + GetAddress(cControls.iVelocityThreshold) + L") [Read / Write]";
+        wcout << L"    VelocityThreshold: " + to_wstring(cControl.iVelocityThreshold & 0x7F) + L" (" + IntSizeToCE(sizeof(cControl.iVelocityThreshold)) + L" +" + GetAddress(cControl.iVelocityThreshold) + L") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
