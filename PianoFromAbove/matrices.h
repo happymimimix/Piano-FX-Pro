@@ -153,28 +153,9 @@
 #define moBorder mpBorder+mBorder //Octuple
 #define mnBorder moBorder+mBorder //Nonuple
 #define mcBorder mnBorder+mBorder //deCuple
-#define UpDownWidth 12
-#define dUpDownWidth UpDownWidth+UpDownWidth //Double
-#define tUpDownWidth dUpDownWidth+UpDownWidth //Triple
-#define qUpDownWidth tUpDownWidth+UpDownWidth //Quadruple
-#define iUpDownWidth qUpDownWidth+UpDownWidth //quIntuple
-#define xUpDownWidth iUpDownWidth+UpDownWidth //seXtuple
-#define pUpDownWidth xUpDownWidth+UpDownWidth //sePtuple
-#define oUpDownWidth pUpDownWidth+UpDownWidth //Octuple
-#define nUpDownWidth oUpDownWidth+UpDownWidth //Nonuple
-#define cUpDownWidth nUpDownWidth+UpDownWidth //deCuple
-#define mUpDownWidth 0-UpDownWidth //Minus
-#define mdUpDownWidth mUpDownWidth+mUpDownWidth //Double
-#define mtUpDownWidth mdUpDownWidth+mUpDownWidth //Triple
-#define mqUpDownWidth mtUpDownWidth+mUpDownWidth //Quadruple
-#define miUpDownWidth mqUpDownWidth+mUpDownWidth //quIntuple
-#define mxUpDownWidth miUpDownWidth+mUpDownWidth //seXtuple
-#define mpUpDownWidth mxUpDownWidth+mUpDownWidth //sePtuple
-#define moUpDownWidth mpUpDownWidth+mUpDownWidth //Octuple
-#define mnUpDownWidth moUpDownWidth+mUpDownWidth //Nonuple
-#define mcUpDownWidth mnUpDownWidth+mUpDownWidth //deCuple
 #define KeySelectW 30+Margin
 #define SpinnerW 40+Margin
+#define mSpinnerW 0-40+mMargin
 #define MarkerEncodingW 140+Margin
 #if Property1Text15W >= Property1Text16W && Property1Text15W >= Property1Text17W
 #define HSLAlign Property1Text15W
@@ -325,26 +306,6 @@
 #define mBorder_8x moBorder
 #define mBorder_9x mnBorder
 #define mBorder_0x mcBorder
-#define UpDownWidth_1x UpDownWidth
-#define UpDownWidth_2x dUpDownWidth
-#define UpDownWidth_3x tUpDownWidth
-#define UpDownWidth_4x qUpDownWidth
-#define UpDownWidth_5x iUpDownWidth
-#define UpDownWidth_6x xUpDownWidth
-#define UpDownWidth_7x pUpDownWidth
-#define UpDownWidth_8x oUpDownWidth
-#define UpDownWidth_9x nUpDownWidth
-#define UpDownWidth_0x cUpDownWidth
-#define mUpDownWidth_1x mUpDownWidth
-#define mUpDownWidth_2x mdUpDownWidth
-#define mUpDownWidth_3x mtUpDownWidth
-#define mUpDownWidth_4x mqUpDownWidth
-#define mUpDownWidth_5x miUpDownWidth
-#define mUpDownWidth_6x mxUpDownWidth
-#define mUpDownWidth_7x mpUpDownWidth
-#define mUpDownWidth_8x moUpDownWidth
-#define mUpDownWidth_9x mnUpDownWidth
-#define mUpDownWidth_0x mcUpDownWidth
 #define BoxSpacing_m1x mBoxSpacing
 #define BoxSpacing_m2x mdBoxSpacing
 #define BoxSpacing_m3x mtBoxSpacing
@@ -425,16 +386,6 @@
 #define Border_m8x moBorder
 #define Border_m9x mnBorder
 #define Border_m0x mcBorder
-#define UpDownWidth_m1x mUpDownWidth
-#define UpDownWidth_m2x mdUpDownWidth
-#define UpDownWidth_m3x mtUpDownWidth
-#define UpDownWidth_m4x mqUpDownWidth
-#define UpDownWidth_m5x miUpDownWidth
-#define UpDownWidth_m6x mxUpDownWidth
-#define UpDownWidth_m7x mpUpDownWidth
-#define UpDownWidth_m8x moUpDownWidth
-#define UpDownWidth_m9x mnUpDownWidth
-#define UpDownWidth_m0x mcUpDownWidth
 #define BoxSpacing01 BoxSpacing
 #define BoxSpacing02 dBoxSpacing
 #define BoxSpacing03 tBoxSpacing
@@ -565,26 +516,6 @@
 #define mBorder08 moBorder
 #define mBorder09 mnBorder
 #define mBorder10 mcBorder
-#define UpDownWidth01 UpDownWidth
-#define UpDownWidth02 dUpDownWidth
-#define UpDownWidth03 tUpDownWidth
-#define UpDownWidth04 qUpDownWidth
-#define UpDownWidth05 iUpDownWidth
-#define UpDownWidth06 xUpDownWidth
-#define UpDownWidth07 pUpDownWidth
-#define UpDownWidth08 oUpDownWidth
-#define UpDownWidth09 nUpDownWidth
-#define UpDownWidth10 cUpDownWidth
-#define mUpDownWidth01 mUpDownWidth
-#define mUpDownWidth02 mdUpDownWidth
-#define mUpDownWidth03 mtUpDownWidth
-#define mUpDownWidth04 mqUpDownWidth
-#define mUpDownWidth05 miUpDownWidth
-#define mUpDownWidth06 mxUpDownWidth
-#define mUpDownWidth07 mpUpDownWidth
-#define mUpDownWidth08 moUpDownWidth
-#define mUpDownWidth09 mnUpDownWidth
-#define mUpDownWidth10 mcUpDownWidth
 #define BoxSpacing_1 BoxSpacing
 #define BoxSpacing_2 dBoxSpacing
 #define BoxSpacing_3 tBoxSpacing
@@ -715,26 +646,6 @@
 #define mBorder_8 moBorder
 #define mBorder_9 mnBorder
 #define mBorder_0 mcBorder
-#define UpDownWidth_1 UpDownWidth
-#define UpDownWidth_2 dUpDownWidth
-#define UpDownWidth_3 tUpDownWidth
-#define UpDownWidth_4 qUpDownWidth
-#define UpDownWidth_5 iUpDownWidth
-#define UpDownWidth_6 xUpDownWidth
-#define UpDownWidth_7 pUpDownWidth
-#define UpDownWidth_8 oUpDownWidth
-#define UpDownWidth_9 nUpDownWidth
-#define UpDownWidth_0 cUpDownWidth
-#define mUpDownWidth_1 mUpDownWidth
-#define mUpDownWidth_2 mdUpDownWidth
-#define mUpDownWidth_3 mtUpDownWidth
-#define mUpDownWidth_4 mqUpDownWidth
-#define mUpDownWidth_5 miUpDownWidth
-#define mUpDownWidth_6 mxUpDownWidth
-#define mUpDownWidth_7 mpUpDownWidth
-#define mUpDownWidth_8 moUpDownWidth
-#define mUpDownWidth_9 mnUpDownWidth
-#define mUpDownWidth_0 mcUpDownWidth
 #define BoxSpacing_m1 mBoxSpacing
 #define BoxSpacing_m2 mdBoxSpacing
 #define BoxSpacing_m3 mtBoxSpacing
@@ -815,16 +726,6 @@
 #define Border_m8 moBorder
 #define Border_m9 mnBorder
 #define Border_m0 mcBorder
-#define UpDownWidth_m1 mUpDownWidth
-#define UpDownWidth_m2 mdUpDownWidth
-#define UpDownWidth_m3 mtUpDownWidth
-#define UpDownWidth_m4 mqUpDownWidth
-#define UpDownWidth_m5 miUpDownWidth
-#define UpDownWidth_m6 mxUpDownWidth
-#define UpDownWidth_m7 mpUpDownWidth
-#define UpDownWidth_m8 moUpDownWidth
-#define UpDownWidth_m9 mnUpDownWidth
-#define UpDownWidth_m0 mcUpDownWidth
 #define bx01 BoxSpacing
 #define bx02 dBoxSpacing
 #define bx03 tBoxSpacing
@@ -955,26 +856,6 @@
 #define mbd08 moBorder
 #define mbd09 mnBorder
 #define mbd10 mcBorder
-#define ud01 UpDownWidth
-#define ud02 dUpDownWidth
-#define ud03 tUpDownWidth
-#define ud04 qUpDownWidth
-#define ud05 iUpDownWidth
-#define ud06 xUpDownWidth
-#define ud07 pUpDownWidth
-#define ud08 oUpDownWidth
-#define ud09 nUpDownWidth
-#define ud10 cUpDownWidth
-#define mud01 mUpDownWidth
-#define mud02 mdUpDownWidth
-#define mud03 mtUpDownWidth
-#define mud04 mqUpDownWidth
-#define mud05 miUpDownWidth
-#define mud06 mxUpDownWidth
-#define mud07 mpUpDownWidth
-#define mud08 moUpDownWidth
-#define mud09 mnUpDownWidth
-#define mud10 mcUpDownWidth
 #define bx BoxSpacing
 #define dbx dBoxSpacing
 #define tbx tBoxSpacing
@@ -1103,23 +984,3 @@
 #define mobd moBorder
 #define mnbd mnBorder
 #define mcbd mcBorder
-#define ud UpDownWidth
-#define dud dUpDownWidth
-#define tud tUpDownWidth
-#define qud qUpDownWidth
-#define iud iUpDownWidth
-#define xud xUpDownWidth
-#define pud pUpDownWidth
-#define oud oUpDownWidth
-#define nud nUpDownWidth
-#define cud cUpDownWidth
-#define mud mUpDownWidth
-#define mdud mdUpDownWidth
-#define mtud mtUpDownWidth
-#define mqud mqUpDownWidth
-#define miud miUpDownWidth
-#define mxud mxUpDownWidth
-#define mpud mpUpDownWidth
-#define moud moUpDownWidth
-#define mnud mnUpDownWidth
-#define mcud mcUpDownWidth
