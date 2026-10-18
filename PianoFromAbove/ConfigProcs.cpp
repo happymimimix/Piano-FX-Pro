@@ -21,7 +21,7 @@
 
 VOID DoPreferences(HWND hWndOwner)
 {
-    win32_t pDialogs[] = { IDD_PP1_VISUALS, IDD_PP2_AUDIO, IDD_PP3_VIDEO, IDD_PP4_CONTROL, IDD_PP5_EXPORT };
+    win32_t pDialogs[] = { IDD_PP1_VISUAL, IDD_PP2_AUDIO, IDD_PP3_VIDEO, IDD_PP4_CONTROL, IDD_PP5_EXPORT };
     DLGPROC pProcs[] = { VisualProc, AudioProc, VideoProc, ControlProc, ExportProc };
     LPCWSTR pTitles[] = { Property1Title, Property2Title, Property3Title, Property4Title, Property5Title };
     PROPSHEETPAGE psp[sizeof(pDialogs) / sizeof(win32_t)];
@@ -571,7 +571,7 @@ INT_PTR WINAPI ControlProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             else
             {
                 MessageBoxW(hWnd, ErrorDigitOnly, ErrorTitle, MB_OK | MB_ICONERROR);
-                PostMessage(hWnd, WM_NEXTDLGCTL, (WPARAM)hWndSpeedPct, TRUE);
+                PostMessage(hWnd, WM_NEXTDLGCTL, (WPARAM)hWndVelStrshld, TRUE);
                 SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_INVALID);
                 return TRUE;
             }

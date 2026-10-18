@@ -1342,7 +1342,7 @@ GameState::GameError MainScreen::Logic() {
     if (llOldPos != llNewPos && JumpTarget == ~0) cPlayback.SetPosition(LOWORD(llNewPos));
 
     // Song's over
-    if (!m_bPaused && ((m_dSpeed < 0) ? (m_llStartTime < m_llMinTime) : (m_llStartTime > m_llMaxTime))) {
+    if ((m_dSpeed < 0) ? (m_llStartTime < m_llMinTime) : (m_llStartTime > m_llMaxTime)) {
         CE_Disconnect = true;
         if (m_bDumpFrames) {
             wchar_t buf[LONG_MAX_PATH] = {};
@@ -1352,10 +1352,7 @@ GameState::GameError MainScreen::Logic() {
             m_bDumpFrames = false;
         }
         cPlayback.SetPaused(true, true);
-    }
-    else {
-        CE_Disconnect = false;
-    }
+    } else CE_Disconnect = false;
 
     if (m_Timer.m_bManualTimer) m_Timer.IncrementFrame();
 
