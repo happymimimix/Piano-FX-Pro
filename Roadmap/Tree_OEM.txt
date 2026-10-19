@@ -248,9 +248,9 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
@@ -261,9 +261,9 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
@@ -274,9 +274,9 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
@@ -287,9 +287,9 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
@@ -300,9 +300,9 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
@@ -313,9 +313,9 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
@@ -326,9 +326,9 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
@@ -339,9 +339,9 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „        „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
 „    „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „        „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „        „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „        „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „        „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
 „    „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „        „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „            „¤„Ÿ„Ÿ„ŸDONE
@@ -352,7 +352,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „        „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
 „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „        „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „        „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
 „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „        „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „            „¤„Ÿ„Ÿ„ŸDONE
@@ -365,9 +365,9 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
@@ -378,9 +378,9 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
@@ -391,9 +391,9 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
@@ -404,9 +404,9 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
@@ -417,9 +417,9 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
@@ -430,9 +430,9 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
@@ -443,9 +443,9 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „        „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
 „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „        „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „        „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „        „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „        „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
 „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „        „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „            „¤„Ÿ„Ÿ„ŸDONE
@@ -457,9 +457,9 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
@@ -470,10 +470,10 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
-„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Show lyrics' to render
@@ -483,9 +483,9 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
@@ -496,10 +496,10 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
-„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „¤„Ÿ„Ÿ„ŸChange 'Marker encoding' to 'Text code page' (Marker text is no longer the only consumer ever since I added the track name display!)
@@ -509,10 +509,10 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „        „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
 „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „        „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „    „        „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „        „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
-„    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
+„    „    „        „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „        „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „            „¤„Ÿ„Ÿ„ŸDONE
 „    „    „¤„Ÿ„Ÿ„ŸExisting page 'Visual'
@@ -523,9 +523,9 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „            „    „¤„Ÿ„Ÿ„ŸTODO
 „    „            „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
 „    „            „    „¤„Ÿ„Ÿ„ŸTODO
-„    „            „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
+„    „            „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „            „    „¤„Ÿ„Ÿ„ŸTODO
-„    „            „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
+„    „            „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
 „    „            „    „¥„Ÿ„Ÿ„ŸButon 'Reset HSL adjustments'
 „    „            „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „            „    „¥„Ÿ„Ÿ„ŸEdit 'Hue shift'
