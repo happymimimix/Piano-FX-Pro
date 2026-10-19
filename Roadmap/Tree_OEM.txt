@@ -250,27 +250,27 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
 „    „    „    „    „¥„Ÿ„Ÿ„ŸButon 'Reset HSL adjustments'
-„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¥„Ÿ„Ÿ„ŸEdit 'Hue shift'
-„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¥„Ÿ„Ÿ„ŸEdit 'Luminosity shift'
-„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¥„Ÿ„Ÿ„ŸEdit 'Saturation shift'
-„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¥„Ÿ„Ÿ„ŸLabel 'Background color adjustment'
-„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¥„Ÿ„Ÿ„ŸSlider 'Hue shift'
-„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¥„Ÿ„Ÿ„ŸSlider 'Luminosity shift'
-„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¥„Ÿ„Ÿ„ŸSlider 'Saturation shift'
-„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¥„Ÿ„Ÿ„ŸSpinner 'Hue shift'
-„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¥„Ÿ„Ÿ„ŸSpinner 'Luminosity shift'
-„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¤„Ÿ„Ÿ„ŸSpinner 'Saturation shift'
-„    „    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „        „¥„Ÿ„Ÿ„ŸButon 'Reset HSL adjustments'
 „    „    „        „    „¤„Ÿ„Ÿ„ŸDONE
@@ -306,7 +306,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
-„    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Dump midi output' to track selection
 „    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
@@ -343,7 +343,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
-„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Live loading (SMF3 Exclusive)' to controls
@@ -382,7 +382,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Actual logic)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
-„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Topmost statistics' to render
@@ -397,7 +397,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
-„    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „¥„Ÿ„Ÿ„ŸAdd '[x] Allow unknown SMF3 generators' to controls
 „    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
@@ -410,7 +410,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
-„    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „¥„Ÿ„Ÿ„ŸAdd '[x] Auto Play (Not implemented and probably never will)' to controls and make it checked and disabled forever
 „    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
@@ -423,7 +423,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI)
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
-„    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „¥„Ÿ„Ÿ„ŸAdd new preference page 'Export'
 „    „    „    „¥„Ÿ„Ÿ„ŸItems
 „    „    „    „    „¥„Ÿ„Ÿ„ŸAdd 'Video frame rate [____]' to this new page

@@ -250,27 +250,27 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   └───TODO
 │   │   │   ├───PianoFromAbove.rc (UI)
 │   │   │   │   ├───Buton 'Reset HSL adjustments'
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───Edit 'Hue shift'
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───Edit 'Luminosity shift'
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───Edit 'Saturation shift'
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───Label 'Background color adjustment'
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───Slider 'Hue shift'
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───Slider 'Luminosity shift'
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───Slider 'Saturation shift'
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───Spinner 'Hue shift'
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───Spinner 'Luminosity shift'
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   └───Spinner 'Saturation shift'
-│   │   │   │       └───TODO
+│   │   │   │       └───DONE
 │   │   │   └───Resource.h (ID definitions)
 │   │   │       ├───Buton 'Reset HSL adjustments'
 │   │   │       │   └───DONE
@@ -306,7 +306,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   ├───PianoFromAbove.rc (UI)
 │   │   │   │   └───TODO
 │   │   │   └───Resource.h (ID definitions)
-│   │   │       └───TODO
+│   │   │       └───DONE
 │   │   ├───Add '[ ] Dump midi output' to track selection
 │   │   │   ├───Config.cpp (Load & store)
 │   │   │   │   └───TODO
@@ -343,7 +343,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   ├───GameState.cpp (Actual logic)
 │   │   │   │   └───TODO
 │   │   │   ├───PianoFromAbove.rc (UI)
-│   │   │   │   └───TODO
+│   │   │   │   └───DONE
 │   │   │   └───Resource.h (ID definitions)
 │   │   │       └───DONE
 │   │   ├───Add '[ ] Live loading (SMF3 Exclusive)' to controls
@@ -382,7 +382,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   ├───GameState.cpp (Actual logic)
 │   │   │   │   └───TODO
 │   │   │   ├───PianoFromAbove.rc (UI)
-│   │   │   │   └───TODO
+│   │   │   │   └───DONE
 │   │   │   └───Resource.h (ID definitions)
 │   │   │       └───DONE
 │   │   ├───Add '[ ] Topmost statistics' to render
@@ -397,7 +397,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   ├───PianoFromAbove.rc (UI)
 │   │   │   │   └───TODO
 │   │   │   └───Resource.h (ID definitions)
-│   │   │       └───TODO
+│   │   │       └───DONE
 │   │   ├───Add '[x] Allow unknown SMF3 generators' to controls
 │   │   │   ├───Config.cpp (Load & store)
 │   │   │   │   └───TODO
@@ -410,7 +410,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   ├───PianoFromAbove.rc (UI)
 │   │   │   │   └───TODO
 │   │   │   └───Resource.h (ID definitions)
-│   │   │       └───TODO
+│   │   │       └───DONE
 │   │   ├───Add '[x] Auto Play (Not implemented and probably never will)' to controls and make it checked and disabled forever
 │   │   │   ├───Config.cpp (Load & store)
 │   │   │   │   └───TODO
@@ -423,7 +423,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   ├───PianoFromAbove.rc (UI)
 │   │   │   │   └───TODO
 │   │   │   └───Resource.h (ID definitions)
-│   │   │       └───TODO
+│   │   │       └───DONE
 │   │   ├───Add new preference page 'Export'
 │   │   │   ├───Items
 │   │   │   │   ├───Add 'Video frame rate [____]' to this new page

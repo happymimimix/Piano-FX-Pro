@@ -2,7 +2,7 @@
 #include <WidthsWrapper.h>
 #include <Fonts.h>
 #define PropertyWindowW 300
-#define PropertyWindowH 200
+#define PropertyWindowH 214
 #define TrackWindowW 400
 #define TrackWindowH 250
 #define AboutWindowW 250
@@ -23,7 +23,7 @@
 #define DialogStyleExtra WS_EX_WINDOWEDGE
 #define LTR_STYLE NULL
 #endif
-#define BoxSpacing 14
+#define BoxSpacing 12
 #define dBoxSpacing BoxSpacing+BoxSpacing //Double
 #define tBoxSpacing dBoxSpacing+BoxSpacing //Triple
 #define qBoxSpacing tBoxSpacing+BoxSpacing //Quadruple
