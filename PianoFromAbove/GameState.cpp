@@ -638,7 +638,7 @@ void MainScreen::InitState() {
     m_iPrevTick = m_iStartTick;
     m_pMarkerData = nullptr;
     m_iMarkerSize = 0;
-    m_iCurEncoding = cVideo.eMarkerEncoding;
+    m_iCurEncoding = cVideo.eTextEncoding;
 
     m_fZoomX = cView.GetZoomX();
     m_fOffsetX = cView.GetOffsetX();
@@ -1041,8 +1041,8 @@ GameState::GameError MainScreen::Logic() {
     m_pRenderer->SetLimitFPS(cVideo.bLimitFPS);
     if (cVisual.iBkgColor != m_csBackground.iOrigBGR) m_csBackground.SetColor(cVisual.iBkgColor, 0.7f, 1.3f);
 
-    if (cVideo.eMarkerEncoding != m_iCurEncoding) {
-        m_iCurEncoding = cVideo.eMarkerEncoding;
+    if (cVideo.eTextEncoding != m_iCurEncoding) {
+        m_iCurEncoding = cVideo.eTextEncoding;
         ApplyMarker(m_pMarkerData, m_iMarkerSize);
     }
 
@@ -1623,9 +1623,9 @@ void MainScreen::ApplyMarker(unsigned char* data, msgln_t size) {
         memcpy(temp_str, data, size);
         temp_str[size] = '\0';
 
-        auto wide_len = MultiByteToWideChar(cVideo.eMarkerEncoding, 0, temp_str, size + 1, NULL, 0);
+        auto wide_len = MultiByteToWideChar(cVideo.eTextEncoding, 0, temp_str, size + 1, NULL, 0);
         auto wide_temp_str = new WCHAR[wide_len];
-        MultiByteToWideChar(cVideo.eMarkerEncoding, 0, temp_str, size + 1, wide_temp_str, wide_len);
+        MultiByteToWideChar(cVideo.eTextEncoding, 0, temp_str, size + 1, wide_temp_str, wide_len);
 
         m_sMarker = wstring(wide_temp_str);
 
@@ -2393,7 +2393,7 @@ void MainScreen::RenderText() {
     if (cControl.bDumpFrames) {
         Lines -= 1; //Don't show FPS when exporting videos
     }
-    if (cVideo.bDisableUI) {
+    if (cVideo.bDisableStats) {
         Lines = 2; //Still gotta keep the version number
     }
 
@@ -2519,7 +2519,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
 
     RenderStatusLine(cur_line++, StatisticsText1, L"%s", L"v" VersionString);
     RenderStatusLine(cur_line++, StatisticsText2, L"");
-    if (Config::GetConfig().GetVideoSettings().bDisableUI) goto NoStats;
+    if (Config::GetConfig().GetVideoSettings().bDisableStats) goto NoStats;
     RenderStatusLine(cur_line++, L"", L"");
     RenderStatusLine(cur_line++, StatisticsText3, L"%s%lld:%02lld.%lld / %s%lld:%02lld.%lld",
         m_llStartTime < 0 ? L"-" : L"",
@@ -2798,7 +2798,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         SetConsoleCursorPosition(hConsole, pos);
         wcout << wstring(csbi.dwSize.X - 1, ' ') << L"\n";
         SetConsoleCursorPosition(hConsole, pos);
-        wcout << L"    HideStatistics: " + to_wstring(cVideo.bDisableUI) + L" (" + IntSizeToCE(sizeof(cVideo.bDisableUI)) + L" +" + GetAddress(cVideo.bDisableUI) + L") [Read / Write]";
+        wcout << L"    HideStatistics: " + to_wstring(cVideo.bDisableStats) + L" (" + IntSizeToCE(sizeof(cVideo.bDisableStats)) + L" +" + GetAddress(cVideo.bDisableStats) + L") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);

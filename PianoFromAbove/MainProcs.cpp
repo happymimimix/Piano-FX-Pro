@@ -251,7 +251,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
         LPMINMAXINFO lpmmi = (LPMINMAXINFO)lParam;
         lpmmi->ptMinTrackSize.x = 640;
-        lpmmi->ptMinTrackSize.y = 480;
+        lpmmi->ptMinTrackSize.y = 360;
         return 0;
     }
     case WM_SIZE:

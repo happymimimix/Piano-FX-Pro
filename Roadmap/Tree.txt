@@ -260,7 +260,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   │   └───TODO
 │   │   │   │   │   ├───PianoFromAbove.rc (UI design)
 │   │   │   │   │   │   └───DONE
-│   │   │   │   │   └───Resource.h (ID definitions)
+│   │   │   │   │   └───Resource.h (ID definition)
 │   │   │   │   │       └───DONE
 │   │   │   │   ├───Add '[ ] Dump midi output' to track selection
 │   │   │   │   │   ├───Config.cpp (Load & store)
@@ -273,7 +273,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   │   └───TODO
 │   │   │   │   │   ├───PianoFromAbove.rc (UI design)
 │   │   │   │   │   │   └───DONE
-│   │   │   │   │   └───Resource.h (ID definitions)
+│   │   │   │   │   └───Resource.h (ID definition)
 │   │   │   │   │       └───DONE
 │   │   │   │   ├───Add '[ ] Full screen capture' to controls (Next to video output)
 │   │   │   │   │   ├───Config.cpp (Load & store)
@@ -286,7 +286,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   │   └───TODO
 │   │   │   │   │   ├───PianoFromAbove.rc (UI design)
 │   │   │   │   │   │   └───DONE
-│   │   │   │   │   └───Resource.h (ID definitions)
+│   │   │   │   │   └───Resource.h (ID definition)
 │   │   │   │   │       └───DONE
 │   │   │   │   ├───Add '[ ] Precise event timestamp' to this new page
 │   │   │   │   │   ├───Config.cpp (Load & store)
@@ -299,7 +299,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   │   └───TODO
 │   │   │   │   │   ├───PianoFromAbove.rc (UI design)
 │   │   │   │   │   │   └───DONE
-│   │   │   │   │   └───Resource.h (ID definitions)
+│   │   │   │   │   └───Resource.h (ID definition)
 │   │   │   │   │       └───DONE
 │   │   │   │   ├───Add '[ ] Use SMPTE' to this new page (Disable precise timestamp when this one is checked)
 │   │   │   │   │   ├───Config.cpp (Load & store)
@@ -312,7 +312,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   │   └───TODO
 │   │   │   │   │   ├───PianoFromAbove.rc (UI design)
 │   │   │   │   │   │   └───DONE
-│   │   │   │   │   └───Resource.h (ID definitions)
+│   │   │   │   │   └───Resource.h (ID definition)
 │   │   │   │   │       └───DONE
 │   │   │   │   ├───Move '[ ] Dump midi output' to this new page
 │   │   │   │   │   ├───Config.cpp (Load & store)
@@ -325,7 +325,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   │   └───TODO
 │   │   │   │   │   ├───PianoFromAbove.rc (UI design)
 │   │   │   │   │   │   └───DONE
-│   │   │   │   │   └───Resource.h (ID definitions)
+│   │   │   │   │   └───Resource.h (ID definition)
 │   │   │   │   │       └───DONE
 │   │   │   │   ├───Move '[ ] Full screen capture' to this new page
 │   │   │   │   │   ├───Config.cpp (Load & store)
@@ -338,7 +338,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   │   └───TODO
 │   │   │   │   │   ├───PianoFromAbove.rc (UI design)
 │   │   │   │   │   │   └───DONE
-│   │   │   │   │   └───Resource.h (ID definitions)
+│   │   │   │   │   └───Resource.h (ID definition)
 │   │   │   │   │       └───DONE
 │   │   │   │   └───Move '[ ] Video output' to this new page
 │   │   │   │       ├───Config.cpp (Load & store)
@@ -351,7 +351,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │       │   └───TODO
 │   │   │   │       ├───PianoFromAbove.rc (UI design)
 │   │   │   │       │   └───DONE
-│   │   │   │       └───Resource.h (ID definitions)
+│   │   │   │       └───Resource.h (ID definition)
 │   │   │   │           └───DONE
 │   │   │   └───Page
 │   │   │       ├───Config.cpp (Load & store)
@@ -362,7 +362,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │       │   └───TODO
 │   │   │       ├───PianoFromAbove.rc (UI design)
 │   │   │       │   └───DONE
-│   │   │       └───Resource.h (ID definitions)
+│   │   │       └───Resource.h (ID definition)
 │   │   │           └───DONE
 │   │   ├───Existing page 'Audio'
 │   │   ├───Existing page 'Behavior'
@@ -377,7 +377,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───PianoFromAbove.rc (UI design)
 │   │   │   │   │   └───DONE
-│   │   │   │   └───Resource.h (ID definitions)
+│   │   │   │   └───Resource.h (ID definition)
 │   │   │   │       └───DONE
 │   │   │   ├───Add '[ ] Live loading (SMF3 Exclusive)' to controls
 │   │   │   │   ├───Config.cpp (Load & store)
@@ -390,7 +390,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───PianoFromAbove.rc (UI design)
 │   │   │   │   │   └───DONE
-│   │   │   │   └───Resource.h (ID definitions)
+│   │   │   │   └───Resource.h (ID definition)
 │   │   │   │       └───DONE
 │   │   │   ├───Add '[x] Allow unknown SMF3 generators' to controls
 │   │   │   │   ├───Config.cpp (Load & store)
@@ -403,7 +403,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───PianoFromAbove.rc (UI design)
 │   │   │   │   │   └───DONE
-│   │   │   │   └───Resource.h (ID definitions)
+│   │   │   │   └───Resource.h (ID definition)
 │   │   │   │       └───DONE
 │   │   │   ├───Add '[x] Auto Play (Not implemented and probably never will)' to controls and make it checked and disabled forever
 │   │   │   │   ├───Config.cpp (Load & store)
@@ -416,7 +416,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───PianoFromAbove.rc (UI design)
 │   │   │   │   │   └───DONE
-│   │   │   │   └───Resource.h (ID definitions)
+│   │   │   │   └───Resource.h (ID definition)
 │   │   │   │       └───DONE
 │   │   │   ├───Move '[ ] Piano override' to controls
 │   │   │   │   ├───Config.cpp (Load & store)
@@ -429,7 +429,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───PianoFromAbove.rc (UI design)
 │   │   │   │   │   └───DONE
-│   │   │   │   └───Resource.h (ID definitions)
+│   │   │   │   └───Resource.h (ID definition)
 │   │   │   │       └───DONE
 │   │   │   ├───Move '[ ] Slow down instead of lag' to controls
 │   │   │   │   ├───Config.cpp (Load & store)
@@ -442,7 +442,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───PianoFromAbove.rc (UI design)
 │   │   │   │   │   └───DONE
-│   │   │   │   └───Resource.h (ID definitions)
+│   │   │   │   └───Resource.h (ID definition)
 │   │   │   │       └───DONE
 │   │   │   └───Replace '[ ] Piano override' with a new 'Instrument override [____]' drop down (Format '[000] Acoustic Grand Piano' or 'Disabled')
 │   │   │       ├───Config.cpp (Load & store)
@@ -455,7 +455,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │       │   └───TODO
 │   │   │       ├───PianoFromAbove.rc (UI design)
 │   │   │       │   └───DONE
-│   │   │       └───Resource.h (ID definitions)
+│   │   │       └───Resource.h (ID definition)
 │   │   │           └───DONE
 │   │   ├───Existing page 'Render'
 │   │   │   ├───Add '[ ] Highlight playing notes' to render
@@ -469,7 +469,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───PianoFromAbove.rc (UI design)
 │   │   │   │   │   └───DONE
-│   │   │   │   └───Resource.h (ID definitions)
+│   │   │   │   └───Resource.h (ID definition)
 │   │   │   │       └───DONE
 │   │   │   ├───Add '[ ] Port dependent pitchbend visualization' to render
 │   │   │   │   ├───Config.cpp (Load & store)
@@ -482,7 +482,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───PianoFromAbove.rc (UI design)
 │   │   │   │   │   └───DONE
-│   │   │   │   └───Resource.h (ID definitions)
+│   │   │   │   └───Resource.h (ID definition)
 │   │   │   │       └───DONE
 │   │   │   ├───Add '[ ] Show lyrics' to render
 │   │   │   │   ├───Config.cpp (Load & store)
@@ -495,7 +495,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───PianoFromAbove.rc (UI design)
 │   │   │   │   │   └───DONE
-│   │   │   │   └───Resource.h (ID definitions)
+│   │   │   │   └───Resource.h (ID definition)
 │   │   │   │       └───DONE
 │   │   │   ├───Add '[ ] Topmost statistics' to render
 │   │   │   │   ├───Config.cpp (Load & store)
@@ -508,7 +508,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───PianoFromAbove.rc (UI design)
 │   │   │   │   │   └───DONE
-│   │   │   │   └───Resource.h (ID definitions)
+│   │   │   │   └───Resource.h (ID definition)
 │   │   │   │       └───DONE
 │   │   │   ├───Add '[ ] Track dependent lyric display' to render
 │   │   │   │   ├───Config.cpp (Load & store)
@@ -520,8 +520,8 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   ├───GameState.cpp (Implementation)
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───PianoFromAbove.rc (UI design)
-│   │   │   │   │   └───TODO
-│   │   │   │   └───Resource.h (ID definitions)
+│   │   │   │   │   └───DONE
+│   │   │   │   └───Resource.h (ID definition)
 │   │   │   │       └───TODO
 │   │   │   └───Change 'Marker encoding' to 'Text code page' (Marker text is no longer the only consumer ever since I added the track name display!)
 │   │   │       ├───Config.cpp (Load & store)
@@ -534,7 +534,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │       │   └───TODO
 │   │   │       ├───PianoFromAbove.rc (UI design)
 │   │   │       │   └───DONE
-│   │   │       └───Resource.h (ID definitions)
+│   │   │       └───Resource.h (ID definition)
 │   │   │           └───DONE
 │   │   └───Existing page 'Visual'
 │   │       └───Add 'Background HSL adjustments' to visuals
@@ -569,7 +569,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │           │   │   └───DONE
 │   │           │   └───Spinner 'Saturation shift'
 │   │           │       └───DONE
-│   │           └───Resource.h (ID definitions)
+│   │           └───Resource.h (ID definition)
 │   │               ├───Buton 'Reset HSL adjustments'
 │   │               │   └───DONE
 │   │               ├───Edit 'Hue shift'

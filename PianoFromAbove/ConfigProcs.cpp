@@ -350,7 +350,7 @@ INT_PTR WINAPI VideoProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             UINT SavedCP;
         };
         static thread_local CPEnumContext EnumContext = {};
-        EnumContext = { GetDlgItem(hWnd, IDC_MARKERENC), static_cast<UINT>(cVideo.eMarkerEncoding) };
+        EnumContext = { GetDlgItem(hWnd, IDC_MARKERENC), static_cast<UINT>(cVideo.eTextEncoding) };
         EnumSystemCodePages([](LPWSTR CPtxt) -> BOOL {
             const CPEnumContext Context = EnumContext;
             WORD CP = static_cast<WORD>(wcstoul(CPtxt, NULL, 10));
@@ -364,7 +364,7 @@ INT_PTR WINAPI VideoProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         }, CP_SUPPORTED);
         CheckDlgButton(hWnd, IDC_LIMITFPS, cVideo.bLimitFPS);
         CheckDlgButton(hWnd, IDC_DEBUG, cVideo.bDebug);
-        CheckDlgButton(hWnd, IDC_DISABLEUI, cVideo.bDisableUI);
+        CheckDlgButton(hWnd, IDC_DISABLEUI, cVideo.bDisableStats);
         CheckDlgButton(hWnd, IDC_OR, cVideo.bOR);
 
         return TRUE;
@@ -393,10 +393,10 @@ INT_PTR WINAPI VideoProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             cVideo.bShowMarkers = IsDlgButtonChecked(hWnd, IDC_MARKERS);
             const LRESULT ItemLocation = SendMessage(GetDlgItem(hWnd, IDC_MARKERENC), CB_GETCURSEL, NULL, NULL);
             const LRESULT CP = SendMessageW(GetDlgItem(hWnd, IDC_MARKERENC), CB_GETITEMDATA, static_cast<WPARAM>(ItemLocation), NULL);
-            cVideo.eMarkerEncoding = static_cast<WORD>(CP);
+            cVideo.eTextEncoding = static_cast<WORD>(CP);
             cVideo.bLimitFPS = IsDlgButtonChecked(hWnd, IDC_LIMITFPS);
             cVideo.bDebug = IsDlgButtonChecked(hWnd, IDC_DEBUG);
-            cVideo.bDisableUI = IsDlgButtonChecked(hWnd, IDC_DISABLEUI);
+            cVideo.bDisableStats = IsDlgButtonChecked(hWnd, IDC_DISABLEUI);
             cVideo.bOR = IsDlgButtonChecked(hWnd, IDC_OR);
 
             // Report success and return
@@ -888,9 +888,9 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                     string NarrowTitle = mTrackInfo.sSequenceName;
                     static Config& config = Config::GetConfig();
                     static const VideoSettings& cVideo = config.GetVideoSettings();
-                    size_t size_needed = MultiByteToWideChar(cVideo.eMarkerEncoding, 0, NarrowTitle.data(), (win32_t)NarrowTitle.size(), nullptr, 0);
+                    size_t size_needed = MultiByteToWideChar(cVideo.eTextEncoding, 0, NarrowTitle.data(), (win32_t)NarrowTitle.size(), nullptr, 0);
                     wstring WideTitle(size_needed, 0);
-                    MultiByteToWideChar(cVideo.eMarkerEncoding, 0, NarrowTitle.data(), (win32_t)NarrowTitle.size(), &WideTitle[0], size_needed);
+                    MultiByteToWideChar(cVideo.eTextEncoding, 0, NarrowTitle.data(), (win32_t)NarrowTitle.size(), &WideTitle[0], size_needed);
                     _stprintf_s(buf, TEXT("%s"), WideTitle.c_str());
                     SendMessage(hWndTracks, LVM_SETITEM, 0, (LPARAM)&lvi);
 

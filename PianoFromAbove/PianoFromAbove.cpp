@@ -1594,7 +1594,7 @@ INT WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, INT nCmdShow)
                 Code += DefineMemoryAddress(L"PhigrosMode", GetAddress(cControl.bPhigros), false);
                 Code += DefineMemoryAddress(L"ShowMarkers", GetAddress(cVideo.bShowMarkers), false);
                 Code += DefineMemoryAddress(L"TickBased", GetAddress(cVideo.bTickBased), false);
-                Code += DefineMemoryAddress(L"HideStatistics", GetAddress(cVideo.bDisableUI), false);
+                Code += DefineMemoryAddress(L"HideStatistics", GetAddress(cVideo.bDisableStats), false);
                 Code += DefineMemoryAddress(L"RemoveOverlaps", GetAddress(cVideo.bOR), false);
                 Code += DefineMemoryAddress(L"LimitFPS", GetAddress(cVideo.bLimitFPS), false);
                 Code += DefineMemoryAddress(L"VelocityThreshold", GetAddress(cControl.iVelocityThreshold), false);
@@ -1649,7 +1649,7 @@ INT WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, INT nCmdShow)
                 Code += GettersAndSetters(L"PhigrosMode", IntSizeToCE(sizeof(cControl.bPhigros)), false, L"History");
                 Code += GettersAndSetters(L"ShowMarkers", IntSizeToCE(sizeof(cVideo.bShowMarkers)), false, L"History");
                 Code += GettersAndSetters(L"TickBased", IntSizeToCE(sizeof(cVideo.bTickBased)), false, L"History");
-                Code += GettersAndSetters(L"HideStatistics", IntSizeToCE(sizeof(cVideo.bDisableUI)), false, L"History");
+                Code += GettersAndSetters(L"HideStatistics", IntSizeToCE(sizeof(cVideo.bDisableStats)), false, L"History");
                 Code += GettersAndSetters(L"RemoveOverlaps", IntSizeToCE(sizeof(cVideo.bOR)), false, L"History");
                 Code += GettersAndSetters(L"LimitFPS", IntSizeToCE(sizeof(cVideo.bLimitFPS)), false, L"History");
                 Code += GettersAndSetters(L"VelocityThreshold", IntSizeToCE(sizeof(cControl.iVelocityThreshold)), false, L"History");

@@ -83,12 +83,13 @@
 #define IDC_OR                          507
 #define IDC_MARKERS                     508
 #define IDC_LYRICS                      509
+#define IDC_LYRICS_TRACKDEPENDENCY      510
 #define IDS_CODEPAGE                    IDC_STATIC
-#define IDC_CODEPAGE                    510
-#define IDC_LIMITFPS                    511
-#define IDC_DEBUG                       512
-#define IDC_TOPMOSTUI                   513
-#define IDC_DISABLEUI                   514
+#define IDC_CODEPAGE                    511
+#define IDC_LIMITFPS                    512
+#define IDC_DEBUG                       513
+#define IDC_TOPMOSTUI                   514
+#define IDC_DISABLEUI                   515
 
 #define IDS_CONTROLS                    IDC_STATIC
 #define IDS_LRARROWS                    IDC_STATIC

@@ -71,13 +71,14 @@ struct VideoSettings : public ISettings
 
     bool bTickBased;
     bool bVisualizePitchBends;
-    bool bPortDependentPitchBendVisualization;
+    bool bPortDependentPitchBends;
     bool bSameWidth;
     bool bMapVel;
     bool bHighlight;
     bool bOR;
     bool bShowMarkers;
     bool bShowLyrics;
+    bool bTrackDependentLyrics;
     WORD eTextEncoding;
     bool bLimitFPS;
     bool bDebug;
