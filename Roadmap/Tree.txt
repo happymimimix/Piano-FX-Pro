@@ -192,7 +192,15 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │           └───TODO
 │   ├───Menu
 │   │   └───New 'Replay skipped midi events' item in Play
-│   │       └───TODO
+│   │       ├───Menu item
+│   │       │   ├───GameState.cpp (Implementation)
+│   │       │   │   └───TODO
+│   │       │   ├───PianoFromAbove.rc (UI design)
+│   │       │   │   └───DONE
+│   │       │   └───Resource.h (ID definition)
+│   │       │       └───DONE
+│   │       └───Separate skipped event catchup routine from jumpto
+│   │           └───TODO
 │   ├───New git-based about screen
 │   │   ├───Parse commit
 │   │   │   └───TODO
@@ -251,7 +259,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   ├───GameState.cpp (Implementation)
 │   │   │   │   │   │   └───TODO
 │   │   │   │   │   ├───PianoFromAbove.rc (UI design)
-│   │   │   │   │   │   └───TODO
+│   │   │   │   │   │   └───DONE
 │   │   │   │   │   └───Resource.h (ID definitions)
 │   │   │   │   │       └───DONE
 │   │   │   │   ├───Add '[ ] Dump midi output' to track selection
@@ -264,7 +272,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   ├───GameState.cpp (Implementation)
 │   │   │   │   │   │   └───TODO
 │   │   │   │   │   ├───PianoFromAbove.rc (UI design)
-│   │   │   │   │   │   └───TODO
+│   │   │   │   │   │   └───DONE
 │   │   │   │   │   └───Resource.h (ID definitions)
 │   │   │   │   │       └───DONE
 │   │   │   │   ├───Add '[ ] Full screen capture' to controls (Next to video output)
@@ -277,7 +285,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   ├───GameState.cpp (Implementation)
 │   │   │   │   │   │   └───TODO
 │   │   │   │   │   ├───PianoFromAbove.rc (UI design)
-│   │   │   │   │   │   └───TODO
+│   │   │   │   │   │   └───DONE
 │   │   │   │   │   └───Resource.h (ID definitions)
 │   │   │   │   │       └───DONE
 │   │   │   │   ├───Add '[ ] Precise event timestamp' to this new page
@@ -290,7 +298,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   ├───GameState.cpp (Implementation)
 │   │   │   │   │   │   └───TODO
 │   │   │   │   │   ├───PianoFromAbove.rc (UI design)
-│   │   │   │   │   │   └───TODO
+│   │   │   │   │   │   └───DONE
 │   │   │   │   │   └───Resource.h (ID definitions)
 │   │   │   │   │       └───DONE
 │   │   │   │   ├───Add '[ ] Use SMPTE' to this new page (Disable precise timestamp when this one is checked)
@@ -303,7 +311,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   ├───GameState.cpp (Implementation)
 │   │   │   │   │   │   └───TODO
 │   │   │   │   │   ├───PianoFromAbove.rc (UI design)
-│   │   │   │   │   │   └───TODO
+│   │   │   │   │   │   └───DONE
 │   │   │   │   │   └───Resource.h (ID definitions)
 │   │   │   │   │       └───DONE
 │   │   │   │   ├───Move '[ ] Dump midi output' to this new page
@@ -316,7 +324,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   ├───GameState.cpp (Implementation)
 │   │   │   │   │   │   └───TODO
 │   │   │   │   │   ├───PianoFromAbove.rc (UI design)
-│   │   │   │   │   │   └───TODO
+│   │   │   │   │   │   └───DONE
 │   │   │   │   │   └───Resource.h (ID definitions)
 │   │   │   │   │       └───DONE
 │   │   │   │   ├───Move '[ ] Full screen capture' to this new page
@@ -329,7 +337,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   ├───GameState.cpp (Implementation)
 │   │   │   │   │   │   └───TODO
 │   │   │   │   │   ├───PianoFromAbove.rc (UI design)
-│   │   │   │   │   │   └───TODO
+│   │   │   │   │   │   └───DONE
 │   │   │   │   │   └───Resource.h (ID definitions)
 │   │   │   │   │       └───DONE
 │   │   │   │   └───Move '[ ] Video output' to this new page
@@ -342,7 +350,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │       ├───GameState.cpp (Implementation)
 │   │   │   │       │   └───TODO
 │   │   │   │       ├───PianoFromAbove.rc (UI design)
-│   │   │   │       │   └───TODO
+│   │   │   │       │   └───DONE
 │   │   │   │       └───Resource.h (ID definitions)
 │   │   │   │           └───DONE
 │   │   │   └───Page
@@ -353,7 +361,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │       ├───ConfigProcs.cpp (UI logic)
 │   │   │       │   └───TODO
 │   │   │       ├───PianoFromAbove.rc (UI design)
-│   │   │       │   └───TODO
+│   │   │       │   └───DONE
 │   │   │       └───Resource.h (ID definitions)
 │   │   │           └───DONE
 │   │   ├───Existing page 'Audio'
@@ -502,6 +510,19 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │   └───DONE
 │   │   │   │   └───Resource.h (ID definitions)
 │   │   │   │       └───DONE
+│   │   │   ├───Add '[ ] Track dependent lyric display' to render
+│   │   │   │   ├───Config.cpp (Load & store)
+│   │   │   │   │   └───TODO
+│   │   │   │   ├───Config.h (Structures)
+│   │   │   │   │   └───TODO
+│   │   │   │   ├───ConfigProcs.cpp (UI logic)
+│   │   │   │   │   └───TODO
+│   │   │   │   ├───GameState.cpp (Implementation)
+│   │   │   │   │   └───TODO
+│   │   │   │   ├───PianoFromAbove.rc (UI design)
+│   │   │   │   │   └───TODO
+│   │   │   │   └───Resource.h (ID definitions)
+│   │   │   │       └───TODO
 │   │   │   └───Change 'Marker encoding' to 'Text code page' (Marker text is no longer the only consumer ever since I added the track name display!)
 │   │   │       ├───Config.cpp (Load & store)
 │   │   │       │   └───TODO
@@ -588,51 +609,61 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   └───DONE
 │   │   └───Reversed state tracking
 │   │       └───DONE
-│   └───SMF3
-│       ├───Generator
-│       │   ├───Core
+│   ├───SMF3
+│   │   ├───Generator
+│   │   │   ├───Core
+│   │   │   │   └───TODO
+│   │   │   ├───Optional flags
+│   │   │   │   ├───(24) SMF3FEATURES__$REPLAYTABLE
+│   │   │   │   │   └───TODO
+│   │   │   │   ├───(25) SMF3FEATURES__$TRACKLAYOUT
+│   │   │   │   │   └───TODO
+│   │   │   │   ├───(26) SMF3FEATURES__$SIMULTANITY
+│   │   │   │   │   └───TODO
+│   │   │   │   ├───(27) SMF3FEATURES__$PITCHTABLES
+│   │   │   │   │   └───TODO
+│   │   │   │   ├───(28) SMF3FEATURES__$NOTEPAIRING
+│   │   │   │   │   └───TODO
+│   │   │   │   ├───(29) SMF3FEATURES__$MICROSECOND
+│   │   │   │   │   └───TODO
+│   │   │   │   ├───(30) SMF3FEATURES__$BIGIDXRANGE
+│   │   │   │   │   └───TODO
+│   │   │   │   └───(31) SMF3FEATURES__$CERTIFICATE
+│   │   │   │       ├───Basic signing
+│   │   │   │       │   └───TODO
+│   │   │   │       ├───Generate private key on build if missing
+│   │   │   │       │   └───TODO
+│   │   │   │       └───Private key obfuscation
+│   │   │   │           └───TODO
+│   │   │   └───UI
+│   │   │       ├───Design
+│   │   │       │   └───DONE
+│   │   │       └───Implementation
+│   │   │           └───TODO
+│   │   ├───Parser
+│   │   │   ├───Big index support
+│   │   │   │   └───TODO
+│   │   │   ├───Core
+│   │   │   │   └───TODO
+│   │   │   ├───Digital signature validation
+│   │   │   │   ├───Core
+│   │   │   │   │   └───TODO
+│   │   │   │   └───Customizable white list
+│   │   │   │       └───TODO
+│   │   │   └───Live mode
+│   │   │       └───TODO
+│   │   └───Specification
+│   │       └───DONE
+│   └───Track dependent lyric display
+│       ├───GameState.cpp (Implementation)
+│       │   ├───AdvanceIterators()
 │       │   │   └───TODO
-│       │   ├───Optional flags
-│       │   │   ├───(24) SMF3FEATURES__$REPLAYTABLE
-│       │   │   │   └───TODO
-│       │   │   ├───(25) SMF3FEATURES__$TRACKLAYOUT
-│       │   │   │   └───TODO
-│       │   │   ├───(26) SMF3FEATURES__$SIMULTANITY
-│       │   │   │   └───TODO
-│       │   │   ├───(27) SMF3FEATURES__$PITCHTABLES
-│       │   │   │   └───TODO
-│       │   │   ├───(28) SMF3FEATURES__$NOTEPAIRING
-│       │   │   │   └───TODO
-│       │   │   ├───(29) SMF3FEATURES__$MICROSECOND
-│       │   │   │   └───TODO
-│       │   │   ├───(30) SMF3FEATURES__$BIGIDXRANGE
-│       │   │   │   └───TODO
-│       │   │   └───(31) SMF3FEATURES__$CERTIFICATE
-│       │   │       ├───Basic signing
-│       │   │       │   └───TODO
-│       │   │       ├───Generate private key on build if missing
-│       │   │       │   └───TODO
-│       │   │       └───Private key obfuscation
-│       │   │           └───TODO
-│       │   └───UI
-│       │       ├───Design
-│       │       │   └───DONE
-│       │       └───Implementation
-│       │           └───TODO
-│       ├───Parser
-│       │   ├───Big index support
+│       │   ├───JumpTo()
 │       │   │   └───TODO
-│       │   ├───Core
-│       │   │   └───TODO
-│       │   ├───Digital signature validation
-│       │   │   ├───Core
-│       │   │   │   └───TODO
-│       │   │   └───Customizable white list
-│       │   │       └───TODO
-│       │   └───Live mode
+│       │   └───RenderText()
 │       │       └───TODO
-│       └───Specification
-│           └───DONE
+│       └───GameState.h (Memory layout design)
+│           └───TODO
 ├───Piano-FX Studio
 │   ├───Animate
 │   │   ├───Animation engine v2

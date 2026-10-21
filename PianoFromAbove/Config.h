@@ -47,6 +47,7 @@ struct VisualSettings : public ISettings
     color_t iBarColor;
     bool bRandomizeColor;
     wstring sBackground;
+    color_t iBackgroundHSL;
 };
 
 struct AudioSettings : public ISettings
@@ -70,14 +71,18 @@ struct VideoSettings : public ISettings
 
     bool bTickBased;
     bool bVisualizePitchBends;
+    bool bPortDependentPitchBendVisualization;
     bool bSameWidth;
     bool bMapVel;
+    bool bHighlight;
+    bool bOR;
     bool bShowMarkers;
-    WORD eMarkerEncoding;
+    bool bShowLyrics;
+    WORD eTextEncoding;
     bool bLimitFPS;
     bool bDebug;
-    bool bDisableUI;
-    bool bOR;
+    bool bTopmostStats;
+    bool bDisableStats;
 };
 
 struct ControlSettings : public ISettings
@@ -89,11 +94,26 @@ struct ControlSettings : public ISettings
     double dFwdBackSecs, dSpeedUpPct, dWheelMul;
     bool bAlwaysShowControls;
     bool bPhigros;
-    key_t iVelocityThreshold;
-    wstring sSplashMIDI;
-    bool bDumpFrames;
     bool bManualTimer;
-    bool eInstrumentOverride;
+    key_t iVelocityThreshold;
+    key_t eInstrumentOverride;
+    bool bAllowUnknown;
+    bool bLiveMode;
+    wstring sSplashMIDI;
+};
+
+struct ExportSettings : public ISettings
+{
+    void LoadDefaultValues();
+    void LoadConfigValues(TiXmlElement* txRoot);
+    bool SaveConfigValues(TiXmlElement* txRoot);
+
+    bool bDumpFrames;
+    bool bFullScreenCapture;
+    unsigned short iFPS;
+    bool bDumpEvents;
+    bool bPreciseEventDump;
+    bool bUseSMPTE;
 };
 
 class PlaybackSettings : public ISettings

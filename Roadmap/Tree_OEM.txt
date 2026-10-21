@@ -192,7 +192,15 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „            „¤„Ÿ„Ÿ„ŸTODO
 „    „¥„Ÿ„Ÿ„ŸMenu
 „    „    „¤„Ÿ„Ÿ„ŸNew 'Replay skipped midi events' item in Play
-„    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „        „¥„Ÿ„Ÿ„ŸMenu item
+„    „        „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
+„    „        „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „        „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
+„    „        „    „    „¤„Ÿ„Ÿ„ŸDONE
+„    „        „    „¤„Ÿ„Ÿ„ŸResource.h (ID definition)
+„    „        „        „¤„Ÿ„Ÿ„ŸDONE
+„    „        „¤„Ÿ„Ÿ„ŸSeparate skipped event catchup routine from jumpto
+„    „            „¤„Ÿ„Ÿ„ŸTODO
 „    „¥„Ÿ„Ÿ„ŸNew git-based about screen
 „    „    „¥„Ÿ„Ÿ„ŸParse commit
 „    „    „    „¤„Ÿ„Ÿ„ŸTODO
@@ -251,7 +259,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
-„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Dump midi output' to track selection
@@ -264,7 +272,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
-„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Full screen capture' to controls (Next to video output)
@@ -277,7 +285,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
-„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Precise event timestamp' to this new page
@@ -290,7 +298,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
-„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Use SMPTE' to this new page (Disable precise timestamp when this one is checked)
@@ -303,7 +311,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
-„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¥„Ÿ„Ÿ„ŸMove '[ ] Dump midi output' to this new page
@@ -316,7 +324,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
-„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¥„Ÿ„Ÿ„ŸMove '[ ] Full screen capture' to this new page
@@ -329,7 +337,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
-„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¤„Ÿ„Ÿ„ŸMove '[ ] Video output' to this new page
@@ -342,7 +350,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „        „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „        „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
-„    „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „        „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „        „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „            „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „¤„Ÿ„Ÿ„ŸPage
@@ -353,7 +361,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „        „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
 „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „        „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
-„    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „        „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „            „¤„Ÿ„Ÿ„ŸDONE
 „    „    „¥„Ÿ„Ÿ„ŸExisting page 'Audio'
@@ -502,6 +510,19 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
+„    „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Track dependent lyric display' to render
+„    „    „    „    „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¥„Ÿ„Ÿ„ŸConfig.h (Structures)
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¥„Ÿ„Ÿ„ŸConfigProcs.cpp (UI logic)
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
+„    „    „    „        „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¤„Ÿ„Ÿ„ŸChange 'Marker encoding' to 'Text code page' (Marker text is no longer the only consumer ever since I added the track name display!)
 „    „    „        „¥„Ÿ„Ÿ„ŸConfig.cpp (Load & store)
 „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
@@ -588,51 +609,61 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „¤„Ÿ„Ÿ„ŸReversed state tracking
 „    „        „¤„Ÿ„Ÿ„ŸDONE
-„    „¤„Ÿ„Ÿ„ŸSMF3
-„        „¥„Ÿ„Ÿ„ŸGenerator
-„        „    „¥„Ÿ„Ÿ„ŸCore
+„    „¥„Ÿ„Ÿ„ŸSMF3
+„    „    „¥„Ÿ„Ÿ„ŸGenerator
+„    „    „    „¥„Ÿ„Ÿ„ŸCore
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸOptional flags
+„    „    „    „    „¥„Ÿ„Ÿ„Ÿ(24) SMF3FEATURES__$REPLAYTABLE
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¥„Ÿ„Ÿ„Ÿ(25) SMF3FEATURES__$TRACKLAYOUT
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¥„Ÿ„Ÿ„Ÿ(26) SMF3FEATURES__$SIMULTANITY
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¥„Ÿ„Ÿ„Ÿ(27) SMF3FEATURES__$PITCHTABLES
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¥„Ÿ„Ÿ„Ÿ(28) SMF3FEATURES__$NOTEPAIRING
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¥„Ÿ„Ÿ„Ÿ(29) SMF3FEATURES__$MICROSECOND
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¥„Ÿ„Ÿ„Ÿ(30) SMF3FEATURES__$BIGIDXRANGE
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¤„Ÿ„Ÿ„Ÿ(31) SMF3FEATURES__$CERTIFICATE
+„    „    „    „        „¥„Ÿ„Ÿ„ŸBasic signing
+„    „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „        „¥„Ÿ„Ÿ„ŸGenerate private key on build if missing
+„    „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „        „¤„Ÿ„Ÿ„ŸPrivate key obfuscation
+„    „    „    „            „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¤„Ÿ„Ÿ„ŸUI
+„    „    „        „¥„Ÿ„Ÿ„ŸDesign
+„    „    „        „    „¤„Ÿ„Ÿ„ŸDONE
+„    „    „        „¤„Ÿ„Ÿ„ŸImplementation
+„    „    „            „¤„Ÿ„Ÿ„ŸTODO
+„    „    „¥„Ÿ„Ÿ„ŸParser
+„    „    „    „¥„Ÿ„Ÿ„ŸBig index support
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸCore
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸDigital signature validation
+„    „    „    „    „¥„Ÿ„Ÿ„ŸCore
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „¤„Ÿ„Ÿ„ŸCustomizable white list
+„    „    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¤„Ÿ„Ÿ„ŸLive mode
+„    „    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „    „¤„Ÿ„Ÿ„ŸSpecification
+„    „        „¤„Ÿ„Ÿ„ŸDONE
+„    „¤„Ÿ„Ÿ„ŸTrack dependent lyric display
+„        „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
+„        „    „¥„Ÿ„Ÿ„ŸAdvanceIterators()
 „        „    „    „¤„Ÿ„Ÿ„ŸTODO
-„        „    „¥„Ÿ„Ÿ„ŸOptional flags
-„        „    „    „¥„Ÿ„Ÿ„Ÿ(24) SMF3FEATURES__$REPLAYTABLE
-„        „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„        „    „    „¥„Ÿ„Ÿ„Ÿ(25) SMF3FEATURES__$TRACKLAYOUT
-„        „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„        „    „    „¥„Ÿ„Ÿ„Ÿ(26) SMF3FEATURES__$SIMULTANITY
-„        „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„        „    „    „¥„Ÿ„Ÿ„Ÿ(27) SMF3FEATURES__$PITCHTABLES
-„        „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„        „    „    „¥„Ÿ„Ÿ„Ÿ(28) SMF3FEATURES__$NOTEPAIRING
-„        „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„        „    „    „¥„Ÿ„Ÿ„Ÿ(29) SMF3FEATURES__$MICROSECOND
-„        „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„        „    „    „¥„Ÿ„Ÿ„Ÿ(30) SMF3FEATURES__$BIGIDXRANGE
-„        „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„        „    „    „¤„Ÿ„Ÿ„Ÿ(31) SMF3FEATURES__$CERTIFICATE
-„        „    „        „¥„Ÿ„Ÿ„ŸBasic signing
-„        „    „        „    „¤„Ÿ„Ÿ„ŸTODO
-„        „    „        „¥„Ÿ„Ÿ„ŸGenerate private key on build if missing
-„        „    „        „    „¤„Ÿ„Ÿ„ŸTODO
-„        „    „        „¤„Ÿ„Ÿ„ŸPrivate key obfuscation
-„        „    „            „¤„Ÿ„Ÿ„ŸTODO
-„        „    „¤„Ÿ„Ÿ„ŸUI
-„        „        „¥„Ÿ„Ÿ„ŸDesign
-„        „        „    „¤„Ÿ„Ÿ„ŸDONE
-„        „        „¤„Ÿ„Ÿ„ŸImplementation
-„        „            „¤„Ÿ„Ÿ„ŸTODO
-„        „¥„Ÿ„Ÿ„ŸParser
-„        „    „¥„Ÿ„Ÿ„ŸBig index support
+„        „    „¥„Ÿ„Ÿ„ŸJumpTo()
 „        „    „    „¤„Ÿ„Ÿ„ŸTODO
-„        „    „¥„Ÿ„Ÿ„ŸCore
-„        „    „    „¤„Ÿ„Ÿ„ŸTODO
-„        „    „¥„Ÿ„Ÿ„ŸDigital signature validation
-„        „    „    „¥„Ÿ„Ÿ„ŸCore
-„        „    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„        „    „    „¤„Ÿ„Ÿ„ŸCustomizable white list
-„        „    „        „¤„Ÿ„Ÿ„ŸTODO
-„        „    „¤„Ÿ„Ÿ„ŸLive mode
+„        „    „¤„Ÿ„Ÿ„ŸRenderText()
 „        „        „¤„Ÿ„Ÿ„ŸTODO
-„        „¤„Ÿ„Ÿ„ŸSpecification
-„            „¤„Ÿ„Ÿ„ŸDONE
+„        „¤„Ÿ„Ÿ„ŸGameState.h (Memory layout design)
+„            „¤„Ÿ„Ÿ„ŸTODO
 „¥„Ÿ„Ÿ„ŸPiano-FX Studio
 „    „¥„Ÿ„Ÿ„ŸAnimate
 „    „    „¥„Ÿ„Ÿ„ŸAnimation engine v2

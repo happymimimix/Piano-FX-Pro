@@ -141,13 +141,13 @@ void VisualSettings::LoadDefaultColors()
     iBkgColor = 0x007F7F00;
     iBarColor = 0x000000FF;
     color_t R, G, B = 0, S = 80, V = 100;
-    chan_t iColors = sizeof(colors) / sizeof(colors[0]);
-    for (chan_t i = 10, count = 0; count < iColors; i = (i + 7) % iColors, count++)
+    color_t iColors = sizeof(colors) / sizeof(colors[0]);
+    for (color_t i = 10, count = 0; count < iColors; i = (i + 7) % iColors, count++)
     {
         Util::HSVtoRGB(360 * i / iColors, S, V, R, G, B);
         colors[count] = RGB(R, G, B);
     }
-    swap(colors[2], colors[4]);
+    iBackgroundHSL = 0x00000000;
 }
 
 void AudioSettings::LoadDefaultValues()
@@ -161,14 +161,17 @@ void VideoSettings::LoadDefaultValues()
 {
     bTickBased = false;
     bVisualizePitchBends = true;
+    bPortDependency = false;
     bSameWidth = false;
     bMapVel = false;
+    bHighlight = false;
+    bOR = false;
     bShowMarkers = true;
-    eMarkerEncoding = CP_UTF8;
+    bShowLyrics = true;
+    eTextEncoding = CP_UTF8;
     bLimitFPS = true;
     bDebug = false;
-    bDisableUI = false;
-    bOR = false;
+    bDisableStats = false;
 }
 
 void ControlSettings::LoadDefaultValues()
@@ -327,13 +330,13 @@ void VideoSettings::LoadConfigValues(TiXmlElement* txRoot)
     if (txVideo->QueryBoolAttribute("ShowMarkers", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
         bShowMarkers = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
     if (txVideo->QueryIntAttribute("CodePage", &iAttrVal) == TIXML_SUCCESS)
-        eMarkerEncoding = *reinterpret_cast<WORD*>(&iAttrVal);
+        eTextEncoding = *reinterpret_cast<WORD*>(&iAttrVal);
     if (txVideo->QueryBoolAttribute("LimitFPS", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
         bLimitFPS = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
     if (txVideo->QueryBoolAttribute("Debug", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
         bDebug = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
     if (txVideo->QueryBoolAttribute("DisableUI", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
-        bDisableUI = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
+        bDisableStats = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
     if (txVideo->QueryBoolAttribute("RemoveOverlaps", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
         bOR = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
 }
@@ -529,10 +532,10 @@ bool VideoSettings::SaveConfigValues(TiXmlElement* txRoot)
     txVideo->SetAttribute("SameWidthNotes", bSameWidth ? "yes" : "no");
     txVideo->SetAttribute("MapVelocity", bMapVel ? "yes" : "no");
     txVideo->SetAttribute("ShowMarkers", bShowMarkers ? "yes" : "no");
-    txVideo->SetAttribute("CodePage", static_cast<int>(WORD(eMarkerEncoding)));
+    txVideo->SetAttribute("CodePage", static_cast<int>(WORD(eTextEncoding)));
     txVideo->SetAttribute("LimitFPS", bLimitFPS ? "yes" : "no");
     txVideo->SetAttribute("Debug", bDebug ? "yes" : "no");
-    txVideo->SetAttribute("DisableUI", bDisableUI ? "yes" : "no");
+    txVideo->SetAttribute("DisableUI", bDisableStats ? "yes" : "no");
     txVideo->SetAttribute("RemoveOverlaps", bOR ? "yes" : "no");
     return true;
 }

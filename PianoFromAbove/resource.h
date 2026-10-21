@@ -173,7 +173,7 @@
 #define ID_PLAY_VOLUMEDOWN              1117
 #define ID_PLAY_MUTE                    1118
 #define ID_VIEW_CONTROLS                1119
-#define ID_VIEW_KEYBOARD                1110
+#define ID_VIEW_KEYBOARD                1120
 #define ID_VIEW_ALWAYSONTOP             1121
 #define ID_VIEW_FULLSCREEN              1122
 #define ID_VIEW_SETWINDOWSIZE           1123

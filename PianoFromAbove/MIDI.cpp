@@ -993,7 +993,7 @@ void MIDI::ConnectNotes()
     queue<idx_t> NoteQueues[1 << 7][1 << 4];
     g_LoadingProgress.stage = MIDILoadingProgress::Stage::ConnectNotes;
     g_LoadingProgress.progress = 0;
-    g_LoadingProgress.max = m_vTracks.size();
+    g_LoadingProgress.max = m_Info.iNoteCount;
     for (track_t track = 0; track < m_vTracks.size(); ++track) {
         vector<MIDIEvent*>& vEvents = m_vTracks[track]->m_vEvents;
         for (idx_t eventindex = 0; eventindex < vEvents.size(); eventindex++) {
@@ -1010,13 +1010,13 @@ void MIDI::ConnectNotes()
                             NoteQueue.pop();
                             pEvent->SetSisterIdx(pTop);
                             reinterpret_cast<MIDIChannelEvent*>(vEvents[pTop])->SetSisterIdx(eventindex);
+                            g_LoadingProgress.progress++;
                         }
                     }
                 }
             }
         }
         for (key_t Key = 0; Key < (1 << 7); ++Key) for (chan_t Ch = 0; Ch < (1 << 4); ++Ch) queue<idx_t>().swap(NoteQueues[Key][Ch]);
-        g_LoadingProgress.progress++;
     }
 }
 
