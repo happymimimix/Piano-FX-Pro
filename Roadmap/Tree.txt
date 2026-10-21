@@ -368,7 +368,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   ├───GameState.cpp (Implementation)
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───PianoFromAbove.rc (UI design)
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   └───Resource.h (ID definitions)
 │   │   │   │       └───DONE
 │   │   │   ├───Add '[ ] Live loading (SMF3 Exclusive)' to controls
@@ -381,7 +381,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   ├───GameState.cpp (Implementation)
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───PianoFromAbove.rc (UI design)
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   └───Resource.h (ID definitions)
 │   │   │   │       └───DONE
 │   │   │   ├───Add '[x] Allow unknown SMF3 generators' to controls
@@ -394,7 +394,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   ├───GameState.cpp (Implementation)
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───PianoFromAbove.rc (UI design)
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   └───Resource.h (ID definitions)
 │   │   │   │       └───DONE
 │   │   │   ├───Add '[x] Auto Play (Not implemented and probably never will)' to controls and make it checked and disabled forever
@@ -407,7 +407,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   ├───GameState.cpp (Implementation)
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───PianoFromAbove.rc (UI design)
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   └───Resource.h (ID definitions)
 │   │   │   │       └───DONE
 │   │   │   ├───Move '[ ] Piano override' to controls
@@ -420,7 +420,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   ├───GameState.cpp (Implementation)
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───PianoFromAbove.rc (UI design)
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   └───Resource.h (ID definitions)
 │   │   │   │       └───DONE
 │   │   │   ├───Move '[ ] Slow down instead of lag' to controls
@@ -433,7 +433,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   ├───GameState.cpp (Implementation)
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───PianoFromAbove.rc (UI design)
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   └───Resource.h (ID definitions)
 │   │   │   │       └───DONE
 │   │   │   └───Replace '[ ] Piano override' with a new 'Instrument override [____]' drop down (Format '[000] Acoustic Grand Piano' or 'Disabled')
@@ -446,7 +446,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │       ├───GameState.cpp (Implementation)
 │   │   │       │   └───TODO
 │   │   │       ├───PianoFromAbove.rc (UI design)
-│   │   │       │   └───TODO
+│   │   │       │   └───DONE
 │   │   │       └───Resource.h (ID definitions)
 │   │   │           └───DONE
 │   │   ├───Existing page 'Render'
@@ -560,6 +560,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │               ├───Label 'Background color adjustment'
 │   │               │   └───DONE
 │   │               ├───Slider 'Hue shift'
+│   │               │   ├───DONE
 │   │               │   └───TODO
 │   │               ├───Slider 'Luminosity shift'
 │   │               │   └───DONE
@@ -666,7 +667,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │       │       │   └───TODO
 │   │       │       ├───Pitch bend events
 │   │       │       │   └───TODO
-│   │       │       ├───Port chabge events
+│   │       │       ├───Port change events
 │   │       │       │   └───TODO
 │   │       │       └───Tempo events (set playback speed multiplier)
 │   │       │           └───TODO
@@ -710,7 +711,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   └───Generate shader code from template
 │   │   │       └───TODO
 │   │   ├───New builtin shader
-│   │   │   ├───@ChatGPT  Feel free to add whatever shader ideas you can think of here!
+│   │   │   ├───@ChatGPT and @Claude  Feel free to add whatever shader ideas you can think of here!
 │   │   │   │   └───TODO
 │   │   │   ├───TCC-based HSL adjustment
 │   │   │   │   └───TODO
@@ -767,19 +768,20 @@ D:\PIANO-FX-PRO\ROADMAP
 │       │   ├───[CHECK] Double horizontal resolution (requires at least 2 spare channels and visualize pitch bend enabled)
 │       │   ├───[DROPDOWN] Output format (SMF1 or SMF3)
 │       │   ├───[FOLDER_SELECT] Image stream directory
+│       │   ├───[SPIN] Frame duration (in ticks)
 │       │   ├───[SPIN] Frame height (in ticks)
-│       │   ├───[SPIN] Frame time (in ticks
 │       │   └───[SPIN] Max colors
 │       └───Video to image sequence (by invoking ffmpeg)
-└───Source code level modding system
-    ├───C++ AST Analyzation
-    │   └───TODO
-    ├───Example mods
-    │   └───TODO
-    ├───Mod code injection pipeline
-    │   ├───Post-build clean up
-    │   │   └───TODO
-    │   └───Pre-build injection
-    │       └───TODO
-    └───Modding API
-        └───TODO
+├───Source code level modding system
+│   ├───C++ AST Analyzation
+│   │   └───TODO
+│   ├───Example mods
+│   │   └───TODO
+│   ├───Mod code injection pipeline
+│   │   ├───Post-build clean up
+│   │   │   └───TODO
+│   │   └───Pre-build injection
+│   │       └───TODO
+│   └───Modding API
+│       └───TODO
+└───__Scripts

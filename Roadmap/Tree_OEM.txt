@@ -368,7 +368,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
-„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „¥„Ÿ„Ÿ„ŸAdd '[ ] Live loading (SMF3 Exclusive)' to controls
@@ -381,7 +381,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
-„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „¥„Ÿ„Ÿ„ŸAdd '[x] Allow unknown SMF3 generators' to controls
@@ -394,7 +394,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
-„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „¥„Ÿ„Ÿ„ŸAdd '[x] Auto Play (Not implemented and probably never will)' to controls and make it checked and disabled forever
@@ -407,7 +407,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
-„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „¥„Ÿ„Ÿ„ŸMove '[ ] Piano override' to controls
@@ -420,7 +420,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
-„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „¥„Ÿ„Ÿ„ŸMove '[ ] Slow down instead of lag' to controls
@@ -433,7 +433,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „    „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „    „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
-„    „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „    „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „    „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „    „        „¤„Ÿ„Ÿ„ŸDONE
 „    „    „    „¤„Ÿ„Ÿ„ŸReplace '[ ] Piano override' with a new 'Instrument override [____]' drop down (Format '[000] Acoustic Grand Piano' or 'Disabled')
@@ -446,7 +446,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „        „¥„Ÿ„Ÿ„ŸGameState.cpp (Implementation)
 „    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „        „¥„Ÿ„Ÿ„ŸPianoFromAbove.rc (UI design)
-„    „    „        „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „        „    „¤„Ÿ„Ÿ„ŸDONE
 „    „    „        „¤„Ÿ„Ÿ„ŸResource.h (ID definitions)
 „    „    „            „¤„Ÿ„Ÿ„ŸDONE
 „    „    „¥„Ÿ„Ÿ„ŸExisting page 'Render'
@@ -560,6 +560,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „                „¥„Ÿ„Ÿ„ŸLabel 'Background color adjustment'
 „    „                „    „¤„Ÿ„Ÿ„ŸDONE
 „    „                „¥„Ÿ„Ÿ„ŸSlider 'Hue shift'
+„    „                „    „¥„Ÿ„Ÿ„ŸDONE
 „    „                „    „¤„Ÿ„Ÿ„ŸTODO
 „    „                „¥„Ÿ„Ÿ„ŸSlider 'Luminosity shift'
 „    „                „    „¤„Ÿ„Ÿ„ŸDONE
@@ -666,7 +667,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „        „        „    „¤„Ÿ„Ÿ„ŸTODO
 „    „        „        „¥„Ÿ„Ÿ„ŸPitch bend events
 „    „        „        „    „¤„Ÿ„Ÿ„ŸTODO
-„    „        „        „¥„Ÿ„Ÿ„ŸPort chabge events
+„    „        „        „¥„Ÿ„Ÿ„ŸPort change events
 „    „        „        „    „¤„Ÿ„Ÿ„ŸTODO
 „    „        „        „¤„Ÿ„Ÿ„ŸTempo events (set playback speed multiplier)
 „    „        „            „¤„Ÿ„Ÿ„ŸTODO
@@ -710,7 +711,7 @@ D:\PIANO-FX-PRO\ROADMAP
 „    „    „    „¤„Ÿ„Ÿ„ŸGenerate shader code from template
 „    „    „        „¤„Ÿ„Ÿ„ŸTODO
 „    „    „¥„Ÿ„Ÿ„ŸNew builtin shader
-„    „    „    „¥„Ÿ„Ÿ„Ÿ@ChatGPT  Feel free to add whatever shader ideas you can think of here!
+„    „    „    „¥„Ÿ„Ÿ„Ÿ@ChatGPT and @Claude  Feel free to add whatever shader ideas you can think of here!
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¥„Ÿ„Ÿ„ŸTCC-based HSL adjustment
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
@@ -767,19 +768,20 @@ D:\PIANO-FX-PRO\ROADMAP
 „        „    „¥„Ÿ„Ÿ„Ÿ[CHECK] Double horizontal resolution (requires at least 2 spare channels and visualize pitch bend enabled)
 „        „    „¥„Ÿ„Ÿ„Ÿ[DROPDOWN] Output format (SMF1 or SMF3)
 „        „    „¥„Ÿ„Ÿ„Ÿ[FOLDER_SELECT] Image stream directory
+„        „    „¥„Ÿ„Ÿ„Ÿ[SPIN] Frame duration (in ticks)
 „        „    „¥„Ÿ„Ÿ„Ÿ[SPIN] Frame height (in ticks)
-„        „    „¥„Ÿ„Ÿ„Ÿ[SPIN] Frame time (in ticks
 „        „    „¤„Ÿ„Ÿ„Ÿ[SPIN] Max colors
 „        „¤„Ÿ„Ÿ„ŸVideo to image sequence (by invoking ffmpeg)
-„¤„Ÿ„Ÿ„ŸSource code level modding system
-    „¥„Ÿ„Ÿ„ŸC++ AST Analyzation
-    „    „¤„Ÿ„Ÿ„ŸTODO
-    „¥„Ÿ„Ÿ„ŸExample mods
-    „    „¤„Ÿ„Ÿ„ŸTODO
-    „¥„Ÿ„Ÿ„ŸMod code injection pipeline
-    „    „¥„Ÿ„Ÿ„ŸPost-build clean up
-    „    „    „¤„Ÿ„Ÿ„ŸTODO
-    „    „¤„Ÿ„Ÿ„ŸPre-build injection
-    „        „¤„Ÿ„Ÿ„ŸTODO
-    „¤„Ÿ„Ÿ„ŸModding API
-        „¤„Ÿ„Ÿ„ŸTODO
+„¥„Ÿ„Ÿ„ŸSource code level modding system
+„    „¥„Ÿ„Ÿ„ŸC++ AST Analyzation
+„    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „¥„Ÿ„Ÿ„ŸExample mods
+„    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „¥„Ÿ„Ÿ„ŸMod code injection pipeline
+„    „    „¥„Ÿ„Ÿ„ŸPost-build clean up
+„    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „¤„Ÿ„Ÿ„ŸPre-build injection
+„    „        „¤„Ÿ„Ÿ„ŸTODO
+„    „¤„Ÿ„Ÿ„ŸModding API
+„        „¤„Ÿ„Ÿ„ŸTODO
+„¤„Ÿ„Ÿ„Ÿ__Scripts

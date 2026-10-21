@@ -154,9 +154,10 @@
 #define mnBorder moBorder+mBorder //Nonuple
 #define mcBorder mnBorder+mBorder //deCuple
 #define KeySelectW 30+Margin
+#define MarkerEncodingW 140+Margin
+#define InstrumentW 120+Margin
 #define SpinnerW 40+Margin
 #define mSpinnerW 0-40+mMargin
-#define MarkerEncodingW 140+Margin
 #if Property1Text15W >= Property1Text16W && Property1Text15W >= Property1Text17W
 #define HSLAlign Property1Text15W
 #elif Property1Text16W >= Property1Text17W && Property1Text16W >= Property1Text15W
