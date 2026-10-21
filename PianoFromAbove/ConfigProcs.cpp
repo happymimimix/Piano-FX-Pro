@@ -102,6 +102,18 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         SetWindowLongPtr(GetDlgItem(hWnd, IDC_BKGCOLOR), GWLP_USERDATA, cVisual.iBkgColor & 0x00FFFFFF);
         SetWindowLongPtr(GetDlgItem(hWnd, IDC_BARCOLOR), GWLP_USERDATA, cVisual.iBarColor & 0x00FFFFFF);
         SetDlgItemTextW(hWnd, IDC_BACKGROUND, cVisual.sBackground.c_str());
+        SendMessage(GetDlgItem(hWnd, IDC_BKGADJUST_H_SLIDE), TBM_SETRANGE, FALSE, MAKELONG(-180, 180));
+        SendMessage(GetDlgItem(hWnd, IDC_BKGADJUST_H_SLIDE), TBM_SETLINESIZE, 0, 5);
+        SendMessage(GetDlgItem(hWnd, IDC_BKGADJUST_S_SLIDE), TBM_SETRANGE, FALSE, MAKELONG(-100, 100));
+        SendMessage(GetDlgItem(hWnd, IDC_BKGADJUST_S_SLIDE), TBM_SETLINESIZE, 0, 5);
+        SendMessage(GetDlgItem(hWnd, IDC_BKGADJUST_L_SLIDE), TBM_SETRANGE, FALSE, MAKELONG(-100, 100));
+        SendMessage(GetDlgItem(hWnd, IDC_BKGADJUST_L_SLIDE), TBM_SETLINESIZE, 0, 5);
+        signed short H;
+        signed char S;
+        signed char L;
+        Util::DecodeHSLShift(cVisual.iBackgroundHSL, &H, &S, &L);
+        SendMessage(GetDlgItem(hWnd, IDC_BKGADJUST_H_SLIDE), TBM_SETPOS, TRUE, static_cast<win32_t>(H));
+        SendMessage(GetDlgItem(hWnd, IDC_BKGADJUST_H_SLIDE), TBM_SETPOS, TRUE, H);
         return TRUE;
     }
     // Draws the colored buttons
@@ -243,7 +255,6 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
             // Save settings
             config.SaveConfigValues();
-
             if (PointersInitialized) *Ptr_to_m_bUpdateNotePos = true; //Update Note Pos! 
             return TRUE;
         }
@@ -579,7 +590,7 @@ INT_PTR WINAPI ControlProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             cControl.bDumpFrames = IsDlgButtonChecked(hWnd, IDC_FFMPEG);
 
             // Report success and return
-            config.SetControlsSettings(cControl);
+            config.SetControlSettings(cControl);
             SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_NOERROR);
 
             // Save settings
@@ -759,7 +770,7 @@ INT_PTR WINAPI ExportProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             cControl.bDumpFrames = IsDlgButtonChecked(hWnd, IDC_FFMPEG);
 
             // Report success and return
-            config.SetControlsSettings(cControl);
+            config.SetControlSettings(cControl);
             SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_NOERROR);
 
             // Save settings

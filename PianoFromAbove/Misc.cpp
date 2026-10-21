@@ -41,23 +41,61 @@ mms_t DeltaPerformanceCounter::QueryRealDeltaPerformanceCounter() {
 // Small utility functions
 //-----------------------------------------------------------------------------
 
-// The next three functions assume the returned buffer will immediately be consumed by the string constructor
-// Doesn't return string or wstring in order to minimize the number of copying.
-char Util::m_sBuf[16384];
-wchar_t Util::m_wsBuf[16384];
 
-wchar_t* Util::StringToWstring(const string& s)
+wstring Util::Utf8ToWstring(const string& u8str)
 {
-    win32_t result = MultiByteToWideChar(CP_UTF8, 0, s.c_str(), -1, m_wsBuf, sizeof(m_wsBuf) / sizeof(wchar_t));
-    if (!result) m_wsBuf[0] = L'\0';
-    return m_wsBuf;
+    if (u8str.empty()) return {};
+
+    size_t size_needed = MultiByteToWideChar(
+        CP_UTF8,
+        0,
+        u8str.data(),
+        (win32_t)u8str.size(),
+        nullptr,
+        0
+    );
+
+    wstring result(size_needed, 0);
+    MultiByteToWideChar(
+        CP_UTF8,
+        0,
+        u8str.data(),
+        (win32_t)u8str.size(),
+        &result[0],
+        size_needed
+    );
+
+    return result;
 }
 
-char* Util::WstringToString(const wstring& s)
+string Util::WstringToUtf8(const wstring& wstr)
 {
-    win32_t result = WideCharToMultiByte(CP_UTF8, 0, s.c_str(), -1, m_sBuf, sizeof(m_sBuf), NULL, NULL);
-    if (!result) m_sBuf[0] = '\0';
-    return m_sBuf;
+    if (wstr.empty()) return {};
+
+    size_t size_needed = WideCharToMultiByte(
+        CP_UTF8,
+        0,
+        wstr.data(),
+        (win32_t)wstr.size(),
+        nullptr,
+        0,
+        nullptr,
+        nullptr
+    );
+
+    string result(size_needed, 0);
+    WideCharToMultiByte(
+        CP_UTF8,
+        0,
+        wstr.data(),
+        (win32_t)wstr.size(),
+        &result[0],
+        size_needed,
+        nullptr,
+        nullptr
+    );
+
+    return result;
 }
 
 color_t Util::RandColor()
@@ -134,4 +172,48 @@ void Util::HSVtoRGB(color_t H, color_t S, color_t V, color_t& R, color_t& G, col
     R = static_cast<color_t>((dR1 + m) * 255.0 + 0.5);
     G = static_cast<color_t>((dG1 + m) * 255.0 + 0.5);
     B = static_cast<color_t>((dB1 + m) * 255.0 + 0.5);
+}
+
+
+void Util::EncodeHSLShift(signed short H, signed char S, signed char L, color_t* Packed)
+{
+    if (H < 0) {
+        H *= -1;
+        *reinterpret_cast<unsigned short*>(&H) += 180;
+    }
+    if (S < 0) {
+        S *= -1;
+        *reinterpret_cast<unsigned char*>(&S) += 100;
+    }
+    if (L < 0) {
+        L *= -1;
+        *reinterpret_cast<unsigned char*>(&L) += 100;
+    }
+    *Packed = 0;
+    *Packed += *reinterpret_cast<unsigned char*>(&L) % 201;
+    *Packed *= 201;
+    *Packed += *reinterpret_cast<unsigned char*>(&S) % 201;
+    *Packed *= 361;
+    *Packed += *reinterpret_cast<unsigned short*>(&H) % 361;
+}
+
+void Util::DecodeHSLShift(color_t Packed, signed short* H, signed char* S, signed char* L)
+{
+    *reinterpret_cast<unsigned short*>(H) = Packed % 361;
+    Packed /= 361;
+    *reinterpret_cast<unsigned char*>(S) = Packed % 201;
+    Packed /= 201;
+    *reinterpret_cast<unsigned char*>(L) = Packed % 201;
+    if (*reinterpret_cast<unsigned short*>(H) > 180) {
+        *reinterpret_cast<unsigned short*>(H) -= 180;
+        *H *= -1;
+    }
+    if (*reinterpret_cast<unsigned char*>(S) > 100) {
+        *reinterpret_cast<unsigned char*>(S) -= 100;
+        *S *= -1;
+    }
+    if (*reinterpret_cast<unsigned char*>(L) > 100) {
+        *reinterpret_cast<unsigned char*>(L) -= 100;
+        *L *= -1;
+    }
 }

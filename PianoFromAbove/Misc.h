@@ -111,27 +111,25 @@ class DeltaPerformanceCounter {
     mms_t TimerResolution = 0;
 public:
     DeltaPerformanceCounter();
-    mms_t QueryDeltaPerformanceCounter();
-    mms_t QueryDeltaPerformanceFrequency() { return TimerResolution; }
-    mms_t QueryRealDeltaPerformanceCounter();
-    void SetConstantDelta(mms_t Delta) { ConstantDelta = Delta; }
+    __forceinline mms_t QueryDeltaPerformanceCounter();
+    __forceinline mms_t QueryDeltaPerformanceFrequency() { return TimerResolution; }
+    __forceinline mms_t QueryRealDeltaPerformanceCounter();
+    __forceinline void SetConstantDelta(mms_t Delta) { ConstantDelta = Delta; }
 };
 
 //-----------------------------------------------------------------------------
 // Small utility functions
 //-----------------------------------------------------------------------------
 
-class Util
+struct Util
 {
-public:
-    static wchar_t* StringToWstring(const string& s);
-    static char* WstringToString(const wstring& s);
-    static color_t RandColor();
-    static void RGBtoHSV(color_t R, color_t G, color_t B, color_t& H, color_t& S, color_t& V);
-    static void HSVtoRGB(color_t H, color_t S, color_t V, color_t& R, color_t& G, color_t& B);
-private:
-    static char m_sBuf[16384];
-    static wchar_t m_wsBuf[16384];
+    __forceinline static wstring Util::Utf8ToWstring(const string& u8str);
+    __forceinline static string Util::WstringToUtf8(const wstring& wstr);
+    __forceinline static color_t RandColor();
+    __forceinline static void RGBtoHSV(color_t R, color_t G, color_t B, color_t& H, color_t& S, color_t& V);
+    __forceinline static void HSVtoRGB(color_t H, color_t S, color_t V, color_t& R, color_t& G, color_t& B);
+    __forceinline static void EncodeHSLShift(signed short H, signed char S, signed char L, color_t* Packed);
+    __forceinline static void DecodeHSLShift(color_t Packed, signed short* H, signed char* S, signed char* L);
 };
 
 //-----------------------------------------------------------------------------
@@ -139,7 +137,7 @@ private:
 // a single consumer
 //-----------------------------------------------------------------------------
 
-template < typename T >
+template <typename T>
 class TSQueue
 {
 public:
@@ -156,7 +154,7 @@ private:
     volatile win32_t m_iRead;
 };
 
-template< class T >
+template<class T>
 bool TSQueue<T>::Push(const T& tElement)
 {
     win32_t iNextElement = (m_iWrite + 1) % QueueSize;
@@ -171,7 +169,7 @@ bool TSQueue<T>::Push(const T& tElement)
     return true;
 }
 
-template< class T >
+template<class T>
 bool TSQueue<T>::Pop(T& tElement)
 {
     // Is the queue empty?
@@ -183,62 +181,6 @@ bool TSQueue<T>::Pop(T& tElement)
     m_iRead = iNextElement;
 
     return true;
-}
-
-__forceinline wstring Utf8ToWString(const string& u8str)
-{
-    if (u8str.empty()) return {};
-
-    size_t size_needed = MultiByteToWideChar(
-        CP_UTF8,
-        0,
-        u8str.data(),
-        (win32_t)u8str.size(),
-        nullptr,
-        0
-    );
-
-    wstring result(size_needed, 0);
-    MultiByteToWideChar(
-        CP_UTF8,
-        0,
-        u8str.data(),
-        (win32_t)u8str.size(),
-        &result[0],
-        size_needed
-    );
-
-    return result;
-}
-
-__forceinline string WStringToUtf8(const wstring& wstr)
-{
-    if (wstr.empty()) return {};
-
-    size_t size_needed = WideCharToMultiByte(
-        CP_UTF8,
-        0,
-        wstr.data(),
-        (win32_t)wstr.size(),
-        nullptr,
-        0,
-        nullptr,
-        nullptr
-    );
-
-    string result(size_needed, 0);
-    WideCharToMultiByte(
-        CP_UTF8,
-        0,
-        wstr.data(),
-        (win32_t)wstr.size(),
-        &result[0],
-        size_needed,
-        nullptr,
-        nullptr
-    );
-
-    return result;
 }
 
 struct NoteColor

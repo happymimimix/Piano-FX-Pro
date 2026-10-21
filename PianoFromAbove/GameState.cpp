@@ -2428,7 +2428,7 @@ void MainScreen::RenderText() {
     }
     if (strnlen(CheatEngineCaption, sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0])) > 1) {
         if (strnlen(CheatEngineCaption, sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0])) < sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0])) {
-            RenderMessage(&rcMsg, &rcScr, Utf8ToWString(Ptr_to_CaptionContent), CheatEngineCaption[0]);
+            RenderMessage(&rcMsg, &rcScr, Util::Utf8ToWstring(Ptr_to_CaptionContent), CheatEngineCaption[0]);
         }
         else {
             RenderMessage(&rcMsg, &rcScr, LengthExceededPartA + to_wstring(sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]) - 2) + LengthExceededPartB,
@@ -2593,7 +2593,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
     }
     if (cControl.bPhigros) {
         RenderStatusLine(cur_line++, StatisticsText25, L"%07.0f", (m_iPassed == m_MIDI.GetInfo().iNoteCount ? 1000000 : floor(static_cast<float>(m_iPassed) / static_cast<float>(m_MIDI.GetInfo().iNoteCount) * 1000000)));
-        RenderStatusLine(cur_line++, StatisticsText26, L"%s", Utf8ToWString(Difficulty).c_str());
+        RenderStatusLine(cur_line++, StatisticsText26, L"%s", Util::Utf8ToWstring(Difficulty).c_str());
         RenderStatusLine(cur_line++, StatisticsText27, L"%s", StatisticsText28 L" ");
         if (m_iPassed == m_MIDI.GetInfo().iNoteCount) {
             RenderStatusLine(cur_line++, StatisticsText29, L"");
@@ -2822,7 +2822,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         SetConsoleCursorPosition(hConsole, pos);
         wcout << wstring(csbi.dwSize.X - 1, ' ') << L"\n";
         SetConsoleCursorPosition(hConsole, pos);
-        wcout << L"    Caption: \"" + wstring(strlen(CheatEngineCaption) < sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]) ? Utf8ToWString(Ptr_to_CaptionContent) : L"MAXIMUM LENGTH EXCEEDED! ") + L"\" (" + CEPtr() + L"String[" + to_wstring(sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]) - 1) + L"] +" + GetAddress(Ptr_to_CaptionContent) + L") [Read / Write]";
+        wcout << L"    Caption: \"" + wstring(strlen(CheatEngineCaption) < sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]) ? Util::Utf8ToWstring(Ptr_to_CaptionContent) : L"MAXIMUM LENGTH EXCEEDED! ") + L"\" (" + CEPtr() + L"String[" + to_wstring(sizeof(CheatEngineCaption) / sizeof(CheatEngineCaption[0]) - 1) + L"] +" + GetAddress(Ptr_to_CaptionContent) + L") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
@@ -2834,7 +2834,7 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         SetConsoleCursorPosition(hConsole, pos);
         wcout << wstring(csbi.dwSize.X - 1, ' ') << L"\n";
         SetConsoleCursorPosition(hConsole, pos);
-        wcout << L"    DifficultyText: \"" + wstring(strlen(Difficulty) < sizeof(Difficulty) / sizeof(Difficulty[0]) ? Utf8ToWString(Difficulty) : L"MAXIMUM LENGTH EXCEEDED! ") + L"\" (" + CEPtr() + L"String[" + to_wstring(sizeof(Difficulty) / sizeof(Difficulty[0])) + L"] +" + GetAddress(Ptr_to_Difficulty) + L") [Read / Write]";
+        wcout << L"    DifficultyText: \"" + wstring(strlen(Difficulty) < sizeof(Difficulty) / sizeof(Difficulty[0]) ? Util::Utf8ToWstring(Difficulty) : L"MAXIMUM LENGTH EXCEEDED! ") + L"\" (" + CEPtr() + L"String[" + to_wstring(sizeof(Difficulty) / sizeof(Difficulty[0])) + L"] +" + GetAddress(Ptr_to_Difficulty) + L") [Read / Write]";
         pos.X = 0;
         pos.Y = line; line++;
         SetConsoleCursorPosition(hConsole, pos);
