@@ -50,6 +50,7 @@ void Config::LoadDefaultValues()
     m_AudioSettings.LoadDefaultValues();
     m_VideoSettings.LoadDefaultValues();
     m_ControlSettings.LoadDefaultValues();
+    m_ExportSettings.LoadDefaultValues();
     m_PlaybackSettings.LoadDefaultValues();
     m_ViewSettings.LoadDefaultValues();
 }
@@ -81,6 +82,7 @@ void Config::LoadConfigValues(TiXmlElement* txRoot)
     m_AudioSettings.LoadConfigValues(txRoot);
     m_VideoSettings.LoadConfigValues(txRoot);
     m_ControlSettings.LoadConfigValues(txRoot);
+    m_ExportSettings.LoadConfigValues(txRoot);
     m_PlaybackSettings.LoadConfigValues(txRoot);
     m_ViewSettings.LoadConfigValues(txRoot);
 }
@@ -116,6 +118,7 @@ bool Config::SaveConfigValues(TiXmlElement* txRoot)
     bSaved &= m_AudioSettings.SaveConfigValues(txRoot);
     bSaved &= m_VideoSettings.SaveConfigValues(txRoot);
     bSaved &= m_ControlSettings.SaveConfigValues(txRoot);
+    bSaved &= m_ExportSettings.SaveConfigValues(txRoot);
     bSaved &= m_PlaybackSettings.SaveConfigValues(txRoot);
     bSaved &= m_ViewSettings.SaveConfigValues(txRoot);
     return bSaved;
@@ -134,6 +137,7 @@ void VisualSettings::LoadDefaultValues()
     sBackground = L"";
 
     VisualSettings::LoadDefaultColors();
+    VisualSettings::LoadDefaultShifts();
 }
 
 void VisualSettings::LoadDefaultColors()
@@ -147,6 +151,13 @@ void VisualSettings::LoadDefaultColors()
         Util::HSVtoRGB(360 * i / iColors, S, V, R, G, B);
         colors[count] = RGB(R, G, B);
     }
+    colors[2] ^= colors[4];
+    colors[4] ^= colors[2];
+    colors[2] ^= colors[4];
+}
+
+void VisualSettings::LoadDefaultShifts()
+{
     iBackgroundHSL = 0x00000000;
 }
 

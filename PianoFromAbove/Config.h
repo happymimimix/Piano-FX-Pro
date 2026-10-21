@@ -38,6 +38,7 @@ struct VisualSettings : public ISettings
 {
     void LoadDefaultValues();
     void LoadDefaultColors();
+    void LoadDefaultShifts();
     void LoadConfigValues(TiXmlElement* txRoot);
     bool SaveConfigValues(TiXmlElement* txRoot);
 
@@ -234,13 +235,15 @@ public:
     const AudioSettings& GetAudioSettings() const { return m_AudioSettings; }
     const VideoSettings& GetVideoSettings() const { return m_VideoSettings; }
     const ControlSettings& GetControlSettings() const { return m_ControlSettings; }
+    const ExportSettings& GetExportSettings() const { return m_ExportSettings; }
     PlaybackSettings& GetPlaybackSettings() { return m_PlaybackSettings; }
     ViewSettings& GetViewSettings() { return m_ViewSettings; }
 
     void SetVisualSettings(const VisualSettings& VisualSettings) { m_VisualSettings = VisualSettings; }
     void SetAudioSettings(const AudioSettings& audioSettings) { m_AudioSettings = audioSettings; }
     void SetVideoSettings(const VideoSettings& videoSettings) { m_VideoSettings = videoSettings; }
-    void SetControlsSettings(const ControlSettings& ControlSettings) { m_ControlSettings = ControlSettings; }
+    void SetControlSettings(const ControlSettings& ControlSettings) { m_ControlSettings = ControlSettings; }
+    void SetexportSettings(const ExportSettings& ExportSettings) { m_ExportSettings = ExportSettings; }
 
 private:
     // Singleton
@@ -253,6 +256,7 @@ private:
     AudioSettings m_AudioSettings;
     VideoSettings m_VideoSettings;
     ControlSettings m_ControlSettings;
+    ExportSettings m_ExportSettings;
     PlaybackSettings m_PlaybackSettings;
     ViewSettings m_ViewSettings;
 };
