@@ -112,7 +112,7 @@ struct ExportSettings : public ISettings
 
     bool bDumpFrames;
     bool bFullScreenCapture;
-    unsigned short iFPS;
+    unsigned short sFPS_100x;
     bool bDumpEvents;
     bool bPreciseEventDump;
     bool bUseSMPTE;

@@ -202,6 +202,16 @@ void ControlSettings::LoadDefaultValues()
     sSplashMIDI = L"";
 }
 
+void ExportSettings::LoadDefaultValues()
+{
+    bDumpFrames = false;
+    bFullScreenCapture = false;
+    sFPS_100x = 6000;
+    bDumpEvents = false;
+    bPreciseEventDump = false;
+    bUseSMPTE = false;
+}
+
 void PlaybackSettings::LoadDefaultValues()
 {
     m_ePlayMode = GameState::Splash;
@@ -312,7 +322,7 @@ void VisualSettings::LoadConfigValues(TiXmlElement* txRoot)
         if (txBkgShift->QueryIntAttribute("H", &R) == TIXML_SUCCESS &&
             txBkgShift->QueryIntAttribute("S", &G) == TIXML_SUCCESS &&
             txBkgShift->QueryIntAttribute("L", &B) == TIXML_SUCCESS)
-            iBackgroundHSL = static_cast<color_t>(((R & 0xFF) << 0) | ((G & 0xFF) << 8) | ((B & 0xFF) << 16) | (0x00 << 24));
+            iBackgroundHSL = static_cast<color_t>(((R & 361) << 0) | ((G & 201) << 16) | ((B & 201) << 24));
     }
 }
 
@@ -435,8 +445,8 @@ void ExportSettings::LoadConfigValues(TiXmlElement* txRoot)
         bDumpFrames = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
     if (txExport->QueryBoolAttribute("CaptureDesktop", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
         bFullScreenCapture = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
-    if (txExport->QueryBoolAttribute("VideoFPS", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
-        iFPS = *reinterpret_cast<unsigned short*>(&iAttrVal);
+    if (txExport->QueryIntAttribute("VideoFPS", &iAttrVal) == TIXML_SUCCESS)
+        sFPS_100x = *reinterpret_cast<unsigned short*>(&iAttrVal);
     if (txExport->QueryBoolAttribute("DumpEvents", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
         bDumpEvents = (*reinterpret_cast<bool*>(&iAttrVal) != 0);
     if (txExport->QueryBoolAttribute("PreciseDump", reinterpret_cast<bool*>(&iAttrVal)) == TIXML_SUCCESS)
@@ -572,9 +582,9 @@ bool VisualSettings::SaveConfigValues(TiXmlElement* txRoot)
 
     TiXmlElement* txBkgShift = new TiXmlElement("BkgShift");
     txVisual->LinkEndChild(txBkgShift);
-    txBkgShift->SetAttribute("H", (iBackgroundHSL >> 0) & 0xFF);
-    txBkgShift->SetAttribute("S", (iBackgroundHSL >> 8) & 0xFF);
-    txBkgShift->SetAttribute("L", (iBackgroundHSL >> 16) & 0xFF);
+    txBkgShift->SetAttribute("H", (iBackgroundHSL >> 0) & 361); // -180 ~ +180
+    txBkgShift->SetAttribute("S", (iBackgroundHSL >> 16) & 201); // -100 ~ +100
+    txBkgShift->SetAttribute("L", (iBackgroundHSL >> 24) & 201); // -100 ~ +100
 
     return true;
 }
@@ -643,7 +653,7 @@ bool ExportSettings::SaveConfigValues(TiXmlElement* txRoot)
     txRoot->LinkEndChild(txExport);
     txExport->SetAttribute("DumpFrames", bDumpFrames ? "yes" : "no");
     txExport->SetAttribute("CaptureDesktop", bFullScreenCapture ? "yes" : "no");
-    txExport->SetAttribute("VideoFPS", static_cast<int>(unsigned short(iFPS)));
+    txExport->SetAttribute("VideoFPS", static_cast<int>(unsigned short(sFPS_100x)));
     txExport->SetAttribute("DumpEvents", bDumpEvents ? "yes" : "no");
     txExport->SetAttribute("PreciseDump", bPreciseEventDump ? "yes" : "no");
     txExport->SetAttribute("UseSMPTE", bUseSMPTE ? "yes" : "no");
