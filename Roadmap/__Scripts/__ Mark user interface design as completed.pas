@@ -8,7 +8,7 @@ begin
   begin
   FileName := 'DONE';
   end;
-  Search := 'Resource.h (ID definition)\TODO';
+  Search := 'Resource.h (id definition)\TODO';
   SearchPos := WideLength(FilePath) - WideLength(Search) + 1;
   if WideTextPosEx(Search,FilePath,SearchPos) = SearchPos then
   begin

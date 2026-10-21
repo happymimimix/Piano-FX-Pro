@@ -414,7 +414,8 @@ void ControlSettings::LoadConfigValues(TiXmlElement* txRoot)
         sSplashMIDI = Util::StringToWstring(sTempStr);
 }
 
-void ExportSettings::LoadConfigValues(TiXmlElement* txRoot) {
+void ExportSettings::LoadConfigValues(TiXmlElement* txRoot)
+{
     TiXmlElement* txExport = txRoot->FirstChildElement("Export");
     if (!txExport) return;
 
@@ -558,6 +559,12 @@ bool VisualSettings::SaveConfigValues(TiXmlElement* txRoot)
     txVisual->SetAttribute("RandomizeColor", bRandomizeColor ? "yes" : "no");
     txVisual->SetAttribute("Background", Util::WstringToString(sBackground));
 
+    TiXmlElement* txBkgShift = new TiXmlElement("BkgShift");
+    txVisual->LinkEndChild(txBkgShift);
+    txBkgShift->SetAttribute("H", (iBackgroundHSL >> 0) & 0xFF);
+    txBkgShift->SetAttribute("S", (iBackgroundHSL >> 8) & 0xFF);
+    txBkgShift->SetAttribute("L", (iBackgroundHSL >> 16) & 0xFF);
+
     return true;
 }
 
@@ -579,14 +586,19 @@ bool VideoSettings::SaveConfigValues(TiXmlElement* txRoot)
     txRoot->LinkEndChild(txVideo);
     txVideo->SetAttribute("TickBased", bTickBased ? "yes" : "no");
     txVideo->SetAttribute("VisualizePitchBends", bVisualizePitchBends ? "yes" : "no");
+    txVideo->SetAttribute("PortDependentPitchBendVisualization", bPortDependentPitchBends ? "yes" : "no");
     txVideo->SetAttribute("SameWidthNotes", bSameWidth ? "yes" : "no");
     txVideo->SetAttribute("MapVelocity", bMapVel ? "yes" : "no");
+    txVideo->SetAttribute("HighlightPlaying", bHighlight ? "yes" : "no");
+    txVideo->SetAttribute("RemoveOverlaps", bOR ? "yes" : "no");
     txVideo->SetAttribute("ShowMarkers", bShowMarkers ? "yes" : "no");
+    txVideo->SetAttribute("ShowLyrics", bShowLyrics ? "yes" : "no");
+    txVideo->SetAttribute("TrackDependentLyricDisplay", bTrackDependentLyrics ? "yes" : "no");
     txVideo->SetAttribute("CodePage", static_cast<int>(WORD(eTextEncoding)));
     txVideo->SetAttribute("LimitFPS", bLimitFPS ? "yes" : "no");
     txVideo->SetAttribute("Debug", bDebug ? "yes" : "no");
+    txVideo->SetAttribute("TopmostUI", bTopmostStats ? "yes" : "no");
     txVideo->SetAttribute("DisableUI", bDisableStats ? "yes" : "no");
-    txVideo->SetAttribute("RemoveOverlaps", bOR ? "yes" : "no");
     return true;
 }
 
@@ -600,13 +612,30 @@ bool ControlSettings::SaveConfigValues(TiXmlElement* txRoot)
     txControls->SetAttribute("SpeedUpPctPreciseH", *(reinterpret_cast<int*>(&dSpeedUpPct) + 1));
     txControls->SetAttribute("SpeedUpPctPreciseL", *reinterpret_cast<int*>(&dSpeedUpPct));
     txControls->SetDoubleAttribute("SpeedUpPct", dSpeedUpPct);
+    txControls->SetAttribute("WheelMulPreciseH", *(reinterpret_cast<int*>(&dWheelMul) + 1));
+    txControls->SetAttribute("WheelMulPreciseL", *reinterpret_cast<int*>(&dWheelMul));
+    txControls->SetDoubleAttribute("WheelMul", dWheelMul);
     txControls->SetAttribute("AlwaysShowControls", bAlwaysShowControls ? "yes" : "no");
     txControls->SetAttribute("PhigrosMode", bPhigros ? "yes" : "no");
-    txControls->SetAttribute("SplashMIDI", Util::WstringToString(sSplashMIDI));
-    txControls->SetAttribute("VelocityThreshold", static_cast<int>(key_t(iVelocityThreshold)));
-    txControls->SetAttribute("DumpFrames", bDumpFrames ? "yes" : "no");
     txControls->SetAttribute("ManualTimer", bManualTimer ? "yes" : "no");
+    txControls->SetAttribute("VelocityThreshold", static_cast<int>(key_t(iVelocityThreshold)));
     txControls->SetAttribute("InstrumentOverride", static_cast<int>(key_t(eInstrumentOverride)));
+    txControls->SetAttribute("AllowUnknownSMF3", bAllowUnknown ? "yes" : "no");
+    txControls->SetAttribute("LiveMode", bLiveMode ? "yes" : "no");
+    txControls->SetAttribute("SplashMIDI", Util::WstringToString(sSplashMIDI));
+    return true;
+}
+
+bool ExportSettings::SaveConfigValues(TiXmlElement* txRoot)
+{
+    TiXmlElement* txExport = new TiXmlElement("Export");
+    txRoot->LinkEndChild(txExport);
+    txExport->SetAttribute("DumpFrames", bDumpFrames ? "yes" : "no");
+    txExport->SetAttribute("CaptureDesktop", bFullScreenCapture ? "yes" : "no");
+    txExport->SetAttribute("VideoFPS", static_cast<int>(unsigned short(iFPS)));
+    txExport->SetAttribute("DumpEvents", bDumpEvents ? "yes" : "no");
+    txExport->SetAttribute("PreciseDump", bPreciseEventDump ? "yes" : "no");
+    txExport->SetAttribute("UseSMPTE", bUseSMPTE ? "yes" : "no");
     return true;
 }
 

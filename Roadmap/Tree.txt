@@ -251,9 +251,9 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   ├───Items
 │   │   │   │   ├───Add 'Video frame rate [____]' to this new page
 │   │   │   │   │   ├───Config.cpp (Load & store)
-│   │   │   │   │   │   └───TODO
+│   │   │   │   │   │   └───DONE
 │   │   │   │   │   ├───Config.h (Structures)
-│   │   │   │   │   │   └───TODO
+│   │   │   │   │   │   └───DONE
 │   │   │   │   │   ├───ConfigProcs.cpp (UI logic)
 │   │   │   │   │   │   └───TODO
 │   │   │   │   │   ├───GameState.cpp (Implementation)
@@ -264,9 +264,9 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │       └───DONE
 │   │   │   │   ├───Add '[ ] Dump midi output' to track selection
 │   │   │   │   │   ├───Config.cpp (Load & store)
-│   │   │   │   │   │   └───TODO
+│   │   │   │   │   │   └───DONE
 │   │   │   │   │   ├───Config.h (Structures)
-│   │   │   │   │   │   └───TODO
+│   │   │   │   │   │   └───DONE
 │   │   │   │   │   ├───ConfigProcs.cpp (UI logic)
 │   │   │   │   │   │   └───TODO
 │   │   │   │   │   ├───GameState.cpp (Implementation)
@@ -277,9 +277,9 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │       └───DONE
 │   │   │   │   ├───Add '[ ] Full screen capture' to controls (Next to video output)
 │   │   │   │   │   ├───Config.cpp (Load & store)
-│   │   │   │   │   │   └───TODO
+│   │   │   │   │   │   └───DONE
 │   │   │   │   │   ├───Config.h (Structures)
-│   │   │   │   │   │   └───TODO
+│   │   │   │   │   │   └───DONE
 │   │   │   │   │   ├───ConfigProcs.cpp (UI logic)
 │   │   │   │   │   │   └───TODO
 │   │   │   │   │   ├───GameState.cpp (Implementation)
@@ -290,9 +290,9 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │       └───DONE
 │   │   │   │   ├───Add '[ ] Precise event timestamp' to this new page
 │   │   │   │   │   ├───Config.cpp (Load & store)
-│   │   │   │   │   │   └───TODO
+│   │   │   │   │   │   └───DONE
 │   │   │   │   │   ├───Config.h (Structures)
-│   │   │   │   │   │   └───TODO
+│   │   │   │   │   │   └───DONE
 │   │   │   │   │   ├───ConfigProcs.cpp (UI logic)
 │   │   │   │   │   │   └───TODO
 │   │   │   │   │   ├───GameState.cpp (Implementation)
@@ -303,9 +303,9 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │       └───DONE
 │   │   │   │   ├───Add '[ ] Use SMPTE' to this new page (Disable precise timestamp when this one is checked)
 │   │   │   │   │   ├───Config.cpp (Load & store)
-│   │   │   │   │   │   └───TODO
+│   │   │   │   │   │   └───DONE
 │   │   │   │   │   ├───Config.h (Structures)
-│   │   │   │   │   │   └───TODO
+│   │   │   │   │   │   └───DONE
 │   │   │   │   │   ├───ConfigProcs.cpp (UI logic)
 │   │   │   │   │   │   └───TODO
 │   │   │   │   │   ├───GameState.cpp (Implementation)
@@ -316,9 +316,9 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │       └───DONE
 │   │   │   │   ├───Move '[ ] Dump midi output' to this new page
 │   │   │   │   │   ├───Config.cpp (Load & store)
-│   │   │   │   │   │   └───TODO
+│   │   │   │   │   │   └───DONE
 │   │   │   │   │   ├───Config.h (Structures)
-│   │   │   │   │   │   └───TODO
+│   │   │   │   │   │   └───DONE
 │   │   │   │   │   ├───ConfigProcs.cpp (UI logic)
 │   │   │   │   │   │   └───TODO
 │   │   │   │   │   ├───GameState.cpp (Implementation)
@@ -329,9 +329,9 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │       └───DONE
 │   │   │   │   ├───Move '[ ] Full screen capture' to this new page
 │   │   │   │   │   ├───Config.cpp (Load & store)
-│   │   │   │   │   │   └───TODO
+│   │   │   │   │   │   └───DONE
 │   │   │   │   │   ├───Config.h (Structures)
-│   │   │   │   │   │   └───TODO
+│   │   │   │   │   │   └───DONE
 │   │   │   │   │   ├───ConfigProcs.cpp (UI logic)
 │   │   │   │   │   │   └───TODO
 │   │   │   │   │   ├───GameState.cpp (Implementation)
@@ -342,9 +342,9 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │   │       └───DONE
 │   │   │   │   └───Move '[ ] Video output' to this new page
 │   │   │   │       ├───Config.cpp (Load & store)
-│   │   │   │       │   └───TODO
+│   │   │   │       │   └───DONE
 │   │   │   │       ├───Config.h (Structures)
-│   │   │   │       │   └───TODO
+│   │   │   │       │   └───DONE
 │   │   │   │       ├───ConfigProcs.cpp (UI logic)
 │   │   │   │       │   └───TODO
 │   │   │   │       ├───GameState.cpp (Implementation)
@@ -355,9 +355,9 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │           └───DONE
 │   │   │   └───Page
 │   │   │       ├───Config.cpp (Load & store)
-│   │   │       │   └───TODO
+│   │   │       │   └───DONE
 │   │   │       ├───Config.h (Structures)
-│   │   │       │   └───TODO
+│   │   │       │   └───DONE
 │   │   │       ├───ConfigProcs.cpp (UI logic)
 │   │   │       │   └───TODO
 │   │   │       ├───PianoFromAbove.rc (UI design)
@@ -368,9 +368,9 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   ├───Existing page 'Behavior'
 │   │   │   ├───Add 'Mouse wheel scroll skips [____]x more than arrow keys.' to controls
 │   │   │   │   ├───Config.cpp (Load & store)
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───Config.h (Structures)
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───ConfigProcs.cpp (UI logic)
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───GameState.cpp (Implementation)
@@ -381,9 +381,9 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │       └───DONE
 │   │   │   ├───Add '[ ] Live loading (SMF3 Exclusive)' to controls
 │   │   │   │   ├───Config.cpp (Load & store)
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───Config.h (Structures)
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───ConfigProcs.cpp (UI logic)
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───GameState.cpp (Implementation)
@@ -394,9 +394,9 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │       └───DONE
 │   │   │   ├───Add '[x] Allow unknown SMF3 generators' to controls
 │   │   │   │   ├───Config.cpp (Load & store)
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───Config.h (Structures)
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───ConfigProcs.cpp (UI logic)
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───GameState.cpp (Implementation)
@@ -407,9 +407,9 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │       └───DONE
 │   │   │   ├───Add '[x] Auto Play (Not implemented and probably never will)' to controls and make it checked and disabled forever
 │   │   │   │   ├───Config.cpp (Load & store)
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───Config.h (Structures)
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───ConfigProcs.cpp (UI logic)
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───GameState.cpp (Implementation)
@@ -420,9 +420,9 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │       └───DONE
 │   │   │   ├───Move '[ ] Piano override' to controls
 │   │   │   │   ├───Config.cpp (Load & store)
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───Config.h (Structures)
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───ConfigProcs.cpp (UI logic)
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───GameState.cpp (Implementation)
@@ -433,9 +433,9 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │       └───DONE
 │   │   │   ├───Move '[ ] Slow down instead of lag' to controls
 │   │   │   │   ├───Config.cpp (Load & store)
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───Config.h (Structures)
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───ConfigProcs.cpp (UI logic)
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───GameState.cpp (Implementation)
@@ -446,9 +446,9 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │       └───DONE
 │   │   │   └───Replace '[ ] Piano override' with a new 'Instrument override [____]' drop down (Format '[000] Acoustic Grand Piano' or 'Disabled')
 │   │   │       ├───Config.cpp (Load & store)
-│   │   │       │   └───TODO
+│   │   │       │   └───DONE
 │   │   │       ├───Config.h (Structures)
-│   │   │       │   └───TODO
+│   │   │       │   └───DONE
 │   │   │       ├───ConfigProcs.cpp (UI logic)
 │   │   │       │   └───TODO
 │   │   │       ├───GameState.cpp (Implementation)
@@ -460,9 +460,9 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   ├───Existing page 'Render'
 │   │   │   ├───Add '[ ] Highlight playing notes' to render
 │   │   │   │   ├───Config.cpp (Load & store)
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───Config.h (Structures)
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───ConfigProcs.cpp (UI logic)
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───GameState.cpp (Implementation)
@@ -473,9 +473,9 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │       └───DONE
 │   │   │   ├───Add '[ ] Port dependent pitchbend visualization' to render
 │   │   │   │   ├───Config.cpp (Load & store)
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───Config.h (Structures)
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───ConfigProcs.cpp (UI logic)
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───GameState.cpp (Implementation)
@@ -486,9 +486,9 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │       └───DONE
 │   │   │   ├───Add '[ ] Show lyrics' to render
 │   │   │   │   ├───Config.cpp (Load & store)
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───Config.h (Structures)
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───ConfigProcs.cpp (UI logic)
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───GameState.cpp (Implementation)
@@ -499,9 +499,9 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │       └───DONE
 │   │   │   ├───Add '[ ] Topmost statistics' to render
 │   │   │   │   ├───Config.cpp (Load & store)
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───Config.h (Structures)
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───ConfigProcs.cpp (UI logic)
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───GameState.cpp (Implementation)
@@ -512,9 +512,9 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │       └───DONE
 │   │   │   ├───Add '[ ] Track dependent lyric display' to render
 │   │   │   │   ├───Config.cpp (Load & store)
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───Config.h (Structures)
-│   │   │   │   │   └───TODO
+│   │   │   │   │   └───DONE
 │   │   │   │   ├───ConfigProcs.cpp (UI logic)
 │   │   │   │   │   └───TODO
 │   │   │   │   ├───GameState.cpp (Implementation)
@@ -525,9 +525,9 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   │   │       └───TODO
 │   │   │   └───Change 'Marker encoding' to 'Text code page' (Marker text is no longer the only consumer ever since I added the track name display!)
 │   │   │       ├───Config.cpp (Load & store)
-│   │   │       │   └───TODO
+│   │   │       │   └───DONE
 │   │   │       ├───Config.h (Structures)
-│   │   │       │   └───TODO
+│   │   │       │   └───DONE
 │   │   │       ├───ConfigProcs.cpp (UI logic)
 │   │   │       │   └───TODO
 │   │   │       ├───GameState.cpp (Implementation)
@@ -539,9 +539,9 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │   └───Existing page 'Visual'
 │   │       └───Add 'Background HSL adjustments' to visuals
 │   │           ├───Config.cpp (Load & store)
-│   │           │   └───TODO
+│   │           │   └───DONE
 │   │           ├───Config.h (Structures)
-│   │           │   └───TODO
+│   │           │   └───DONE
 │   │           ├───ConfigProcs.cpp (UI logic)
 │   │           │   └───TODO
 │   │           ├───GameState.cpp (Implementation)
@@ -581,8 +581,7 @@ D:\PIANO-FX-PRO\ROADMAP
 │   │               ├───Label 'Background color adjustment'
 │   │               │   └───DONE
 │   │               ├───Slider 'Hue shift'
-│   │               │   ├───DONE
-│   │               │   └───TODO
+│   │               │   └───DONE
 │   │               ├───Slider 'Luminosity shift'
 │   │               │   └───DONE
 │   │               ├───Slider 'Saturation shift'
