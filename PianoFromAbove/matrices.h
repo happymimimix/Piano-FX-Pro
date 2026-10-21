@@ -2,7 +2,7 @@
 #include <WidthsWrapper.h>
 #include <Fonts.h>
 #define PropertyWindowW 300
-#define PropertyWindowH 214
+#define PropertyWindowH 210
 #define TrackWindowW 400
 #define TrackWindowH 250
 #define AboutWindowW 250
