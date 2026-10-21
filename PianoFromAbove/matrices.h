@@ -23,7 +23,7 @@
 #define DialogStyleExtra WS_EX_WINDOWEDGE
 #define LTR_STYLE NULL
 #endif
-#define BoxSpacing 12
+#define BoxSpacing 11
 #define dBoxSpacing BoxSpacing+BoxSpacing //Double
 #define tBoxSpacing dBoxSpacing+BoxSpacing //Triple
 #define qBoxSpacing tBoxSpacing+BoxSpacing //Quadruple
