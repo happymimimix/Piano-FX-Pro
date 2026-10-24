@@ -145,15 +145,15 @@ void VisualSettings::LoadDefaultColors()
     iBkgColor = 0x007F7F00;
     iBarColor = 0x000000FF;
     color_t R, G, B = 0, S = 80, V = 100;
-    color_t iColors = sizeof(colors) / sizeof(colors[0]);
+    color_t iColors = sizeof(TrackColors) / sizeof(TrackColors[0]);
     for (color_t i = 10, count = 0; count < iColors; i = (i + 7) % iColors, count++)
     {
         Util::HSVtoRGB(360 * i / iColors, S, V, R, G, B);
-        colors[count] = RGB(R, G, B);
+        TrackColors[count] = RGB(R, G, B);
     }
-    colors[2] ^= colors[4];
-    colors[4] ^= colors[2];
-    colors[2] ^= colors[4];
+    TrackColors[2] ^= TrackColors[4];
+    TrackColors[4] ^= TrackColors[2];
+    TrackColors[2] ^= TrackColors[4];
 }
 
 void VisualSettings::LoadDefaultShifts()
@@ -283,14 +283,14 @@ void VisualSettings::LoadConfigValues(TiXmlElement* txRoot)
     TiXmlElement* txColors = txVisual->FirstChildElement("Colors");
     if (txColors) {
         for (TiXmlElement* txColor = txColors->FirstChildElement("Color");
-            txColor && Channel < sizeof(colors) / sizeof(colors[0]);
+            txColor && Channel < sizeof(TrackColors) / sizeof(TrackColors[0]);
             txColor = txColor->NextSiblingElement("Color"), Channel++) {
             if (txColor->QueryIntAttribute("R", &R) == TIXML_SUCCESS &&
                 txColor->QueryIntAttribute("G", &G) == TIXML_SUCCESS &&
                 txColor->QueryIntAttribute("B", &B) == TIXML_SUCCESS)
-                colors[Channel] = static_cast<color_t>(((R & 0xFF) << 0) | ((G & 0xFF) << 8) | ((B & 0xFF) << 16) | (0x00 << 24));
+                TrackColors[Channel] = static_cast<color_t>(((R & 0xFF) << 0) | ((G & 0xFF) << 8) | ((B & 0xFF) << 16) | (0x00 << 24));
             if (txColor->QueryIntAttribute("A", &A) == TIXML_SUCCESS)
-                colors[Channel] |= static_cast<color_t>((A & 0xFF) << 24);
+                TrackColors[Channel] |= static_cast<color_t>((A & 0xFF) << 24);
 
         }
     }
@@ -552,14 +552,14 @@ bool VisualSettings::SaveConfigValues(TiXmlElement* txRoot)
 
     TiXmlElement* txColors = new TiXmlElement("Colors");
     txVisual->LinkEndChild(txColors);
-    for (chan_t Channel = 0; Channel < sizeof(colors) / sizeof(colors[0]); Channel++)
+    for (chan_t Channel = 0; Channel < sizeof(TrackColors) / sizeof(TrackColors[0]); Channel++)
     {
         TiXmlElement* txColor = new TiXmlElement("Color");
         txColors->LinkEndChild(txColor);
-        txColor->SetAttribute("R", (colors[Channel] >> 0) & 0xFF);
-        txColor->SetAttribute("G", (colors[Channel] >> 8) & 0xFF);
-        txColor->SetAttribute("B", (colors[Channel] >> 16) & 0xFF);
-        txColor->SetAttribute("A", (colors[Channel] >> 24) & 0xFF);
+        txColor->SetAttribute("R", (TrackColors[Channel] >> 0) & 0xFF);
+        txColor->SetAttribute("G", (TrackColors[Channel] >> 8) & 0xFF);
+        txColor->SetAttribute("B", (TrackColors[Channel] >> 16) & 0xFF);
+        txColor->SetAttribute("A", (TrackColors[Channel] >> 24) & 0xFF);
     }
 
     TiXmlElement* txBkgColor = new TiXmlElement("BkgColor");

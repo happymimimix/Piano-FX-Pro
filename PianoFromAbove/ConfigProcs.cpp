@@ -95,12 +95,14 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         SendMessage(hWndFirstKey, CB_SETCURSEL, cVisual.iFirstKey, 0);
         SendMessage(hWndLastKey, CB_SETCURSEL, cVisual.iLastKey, 0);
         CheckDlgButton(hWnd, IDC_RANDOMIZE, cVisual.bRandomizeColor);
-        for (chan_t i = 0; i < IDC_COLOR16 - IDC_COLOR1 + 1; i++) {
-            EnableWindow(GetDlgItem(hWnd, IDC_COLOR1 + i), !IsDlgButtonChecked(hWnd, IDC_RANDOMIZE));
-            SetWindowLongPtr(GetDlgItem(hWnd, IDC_COLOR1 + i), GWLP_USERDATA, cVisual.colors[i] & 0x00FFFFFF);
+        for (chan_t Item = 0; Item < MaxChannelColors + 2; Item++) {
+            if (Item < MaxChannelColors) EnableWindow(GetDlgItem(hWnd, IDC_COLOR1 + Item), !IsDlgButtonChecked(hWnd, IDC_RANDOMIZE));
+            SetWindowLongPtr(GetDlgItem(hWnd, IDC_COLOR1 + Item), GWLP_USERDATA, cVisual.TrackColors[Item]);
+            // According to Config.h, the memory layout of the color settings are defined as follows:
+            // color_t TrackColors[16], iBkgColor, iBarColor;
+            // Therefore, cVisual.TrackColors[16] is iBkgColor and cVisual.TrackColors[17] is iBarColor!
+            // So there's no need to do anything special for IDC_BKGCOLOR and IDC_BARCOLOR here.
         }
-        SetWindowLongPtr(GetDlgItem(hWnd, IDC_BKGCOLOR), GWLP_USERDATA, cVisual.iBkgColor & 0x00FFFFFF);
-        SetWindowLongPtr(GetDlgItem(hWnd, IDC_BARCOLOR), GWLP_USERDATA, cVisual.iBarColor & 0x00FFFFFF);
         SetDlgItemTextW(hWnd, IDC_BACKGROUND, cVisual.sBackground.c_str());
         SendMessage(GetDlgItem(hWnd, IDC_BKGADJUST_H_SLIDE), TBM_SETRANGE, FALSE, MAKELONG(-180, 180));
         SendMessage(GetDlgItem(hWnd, IDC_BKGADJUST_H_SLIDE), TBM_SETLINESIZE, 0, 5);
@@ -113,7 +115,16 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         signed char L;
         Util::DecodeHSLShift(cVisual.iBackgroundHSL, &H, &S, &L);
         SendMessage(GetDlgItem(hWnd, IDC_BKGADJUST_H_SLIDE), TBM_SETPOS, TRUE, static_cast<win32_t>(H));
-        SendMessage(GetDlgItem(hWnd, IDC_BKGADJUST_H_SLIDE), TBM_SETPOS, TRUE, H);
+        SendMessage(GetDlgItem(hWnd, IDC_BKGADJUST_S_SLIDE), TBM_SETPOS, TRUE, static_cast<win32_t>(S));
+        SendMessage(GetDlgItem(hWnd, IDC_BKGADJUST_L_SLIDE), TBM_SETPOS, TRUE, static_cast<win32_t>(L));
+        TCHAR buf[LONG_MAX_PATH];
+        _stprintf_s(buf, TEXT("%s%hd"), H < 0 ? L"" : L"+", H);
+        SetDlgItemTextW(hWnd, IDC_BKGADJUST_H, buf);
+        _stprintf_s(buf, TEXT("%s%hhd"), S < 0 ? L"" : L"+", S);
+        SetDlgItemTextW(hWnd, IDC_BKGADJUST_S, buf);
+        _stprintf_s(buf, TEXT("%s%hhd"), L < 0 ? L"" : L"+", L);
+        SetDlgItemTextW(hWnd, IDC_BKGADJUST_L, buf);
+
         return TRUE;
     }
     // Draws the colored buttons
@@ -125,7 +136,7 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
         SetTextColor(pdis->hDC, RGB(255, 255, 255));
         SetBkMode(pdis->hDC, TRANSPARENT);
-        SetDCBrushColor(pdis->hDC, IsDlgButtonChecked(hWnd, IDC_RANDOMIZE) && pdis->CtlID >= IDC_COLOR1 && pdis->CtlID <= IDC_COLOR16 ? 0x7f7f7f : (COLORREF)GetWindowLongPtr(pdis->hwndItem, GWLP_USERDATA));
+        SetDCBrushColor(pdis->hDC, IsDlgButtonChecked(hWnd, IDC_RANDOMIZE) && pdis->CtlID >= IDC_COLOR1 && pdis->CtlID <= IDC_COLOR16 ? 0x007F7F7F : (COLORREF)(GetWindowLongPtr(pdis->hwndItem, GWLP_USERDATA) & 0x00FFFFFF));
         FillRect(pdis->hDC, &pdis->rcItem, (HBRUSH)GetStockObject(DC_BRUSH));
         if (IsDlgButtonChecked(hWnd, IDC_RANDOMIZE) && pdis->CtlID >= IDC_COLOR1 && pdis->CtlID <= IDC_COLOR16)
         {
@@ -162,21 +173,25 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         case IDC_BKGCOLOR:
         case IDC_BARCOLOR:
         {
-            static COLORREF acrCustClr[16] = { 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF,
-                                               0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF };
+            COLORREF acrCustClr[16];
             HWND hWndBtn = (HWND)lParam;
-
+            VisualSettings cVisual = Config::GetConfig().GetVisualSettings();
+            cVisual.LoadDefaultColors();
+            for (chan_t Ch = 0; Ch < MaxChannelColors; Ch++) acrCustClr[Ch] = cVisual.TrackColors[Ch] & 0x00FFFFFF;
+            if (iId == IDC_BKGCOLOR || iId == IDC_BARCOLOR) {
+                acrCustClr[14] = cVisual.TrackColors[16] & 0x00FFFFFF;
+                acrCustClr[15] = cVisual.TrackColors[17] & 0x00FFFFFF;
+            }
             // Choose and save the color
             CHOOSECOLOR cc = {};
             cc.lStructSize = sizeof(cc);
             cc.hwndOwner = hWnd;
             cc.lpCustColors = (LPDWORD)acrCustClr;
-            cc.rgbResult = (COLORREF)GetWindowLongPtr(hWndBtn, GWLP_USERDATA);
+            cc.rgbResult = (COLORREF)(GetWindowLongPtr(hWndBtn, GWLP_USERDATA) & 0x00FFFFFF);
             cc.Flags = CC_FULLOPEN | CC_RGBINIT;
             if (!ChooseColor(&cc)) return TRUE;
-
             // Draw the button (indirect)
-            SetWindowLongPtr(hWndBtn, GWLP_USERDATA, cc.rgbResult);
+            SetWindowLongPtr(hWndBtn, GWLP_USERDATA, cc.rgbResult & 0x00FFFFFF | (GetWindowLongPtr(hWndBtn, GWLP_USERDATA) & 0xFF000000));
             InvalidateRect(hWndBtn, nullptr, FALSE);
             return TRUE;
         }
@@ -191,11 +206,10 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         {
             VisualSettings cVisual = Config::GetConfig().GetVisualSettings();
             cVisual.LoadDefaultColors();
-            for (chan_t i = 0; i < IDC_COLOR16 - IDC_COLOR1 + 1; i++)
-                SetWindowLongPtr(GetDlgItem(hWnd, IDC_COLOR1 + i), GWLP_USERDATA, cVisual.colors[i] & 0x00FFFFFF);
-            SetWindowLongPtr(GetDlgItem(hWnd, IDC_BKGCOLOR), GWLP_USERDATA, cVisual.iBkgColor & 0x00FFFFFF);
-            SetWindowLongPtr(GetDlgItem(hWnd, IDC_BARCOLOR), GWLP_USERDATA, cVisual.iBarColor & 0x00FFFFFF);
-            InvalidateRect(hWnd, nullptr, FALSE);
+            for (chan_t Item = 0; Item < MaxChannelColors + 2; Item++) {
+                SetWindowLongPtr(GetDlgItem(hWnd, IDC_COLOR1 + Item), GWLP_USERDATA, cVisual.TrackColors[Item]);
+                InvalidateRect(GetDlgItem(hWnd, IDC_COLOR1 + Item), nullptr, FALSE);
+            }
             return TRUE;
         }
         case IDC_BACKGROUNDBROWSE:
@@ -218,6 +232,32 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             SetDlgItemTextW(hWnd, IDC_BACKGROUND, L"");
             return TRUE;
         }
+        case IDC_BKGADJUST_H:
+            if (iCode == EN_CHANGE) {
+
+            }
+            break;
+        case IDC_BKGADJUSTRESET:
+        {
+            VisualSettings cVisual = Config::GetConfig().GetVisualSettings();
+            cVisual.LoadDefaultShifts();
+            signed short H;
+            signed char S;
+            signed char L;
+            Util::DecodeHSLShift(cVisual.iBackgroundHSL, &H, &S, &L);
+            SendMessage(GetDlgItem(hWnd, IDC_BKGADJUST_H_SLIDE), TBM_SETPOS, TRUE, static_cast<win32_t>(H));
+            SendMessage(GetDlgItem(hWnd, IDC_BKGADJUST_S_SLIDE), TBM_SETPOS, TRUE, static_cast<win32_t>(S));
+            SendMessage(GetDlgItem(hWnd, IDC_BKGADJUST_L_SLIDE), TBM_SETPOS, TRUE, static_cast<win32_t>(L));
+            TCHAR buf[LONG_MAX_PATH];
+            _stprintf_s(buf, TEXT("%s%hd"), H < 0 ? L"" : L"+", H);
+            SetDlgItemTextW(hWnd, IDC_BKGADJUST_H, buf);
+            _stprintf_s(buf, TEXT("%s%hhd"), S < 0 ? L"" : L"+", S);
+            SetDlgItemTextW(hWnd, IDC_BKGADJUST_S, buf);
+            _stprintf_s(buf, TEXT("%s%hhd"), L < 0 ? L"" : L"+", L);
+            SetDlgItemTextW(hWnd, IDC_BKGADJUST_L, buf);
+
+            return TRUE;
+        }
         }
         break;
     }
@@ -226,12 +266,69 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         LPNMHDR lpnmhdr = (LPNMHDR)lParam;
         switch (lpnmhdr->code)
         {
+            // Spin boxes. Just increment or decrement
+        case UDN_DELTAPOS:
+            switch (lpnmhdr->idFrom)
+            {
+            case IDC_BKGADJUST_H_SPIN:
+            {
+                TCHAR buf[LONG_MAX_PATH];
+                LPNMUPDOWN lpnmud = (LPNMUPDOWN)lParam;
+                HWND hWndBkgAdjust = GetDlgItem(hWnd, IDC_BKGADJUST_H);
+                signed short iOldVal = 0;
+                win32_t len = GetWindowText(hWndBkgAdjust, buf, LONG_MAX_PATH);
+                if (len > 0 && _stscanf_s(buf, TEXT("%hd"), &iOldVal))
+                {
+                    signed short iNewVal = iOldVal - lpnmud->iDelta;
+                    if (iNewVal > 180) iNewVal -= 360; else if (iNewVal < -180) iNewVal += 360;
+                    _stprintf_s(buf, TEXT("%hd"), iNewVal);
+                    SetWindowText(hWndBkgAdjust, buf);
+                    SendMessage(GetDlgItem(hWnd, IDC_BKGADJUST_H_SLIDE), TBM_SETPOS, TRUE, static_cast<win32_t>(iNewVal));
+                }
+                return TRUE;
+            }
+            case IDC_BKGADJUST_S_SPIN:
+            {
+                TCHAR buf[LONG_MAX_PATH];
+                LPNMUPDOWN lpnmud = (LPNMUPDOWN)lParam;
+                HWND hWndBkgAdjust = GetDlgItem(hWnd, IDC_BKGADJUST_S);
+                signed short iOldVal = 0;
+                win32_t len = GetWindowText(hWndBkgAdjust, buf, LONG_MAX_PATH);
+                if (len > 0 && _stscanf_s(buf, TEXT("%hd"), &iOldVal))
+                {
+                    signed short iNewVal = iOldVal - lpnmud->iDelta;
+                    if (iNewVal > 100) iNewVal -= 200; else if (iNewVal < -100) iNewVal += 200;
+                    _stprintf_s(buf, TEXT("%hd"), iNewVal);
+                    SetWindowText(hWndBkgAdjust, buf);
+                    SendMessage(GetDlgItem(hWnd, IDC_BKGADJUST_S_SLIDE), TBM_SETPOS, TRUE, static_cast<win32_t>(iNewVal));
+                }
+                return TRUE;
+            }
+            case IDC_BKGADJUST_L_SPIN:
+            {
+                TCHAR buf[LONG_MAX_PATH];
+                LPNMUPDOWN lpnmud = (LPNMUPDOWN)lParam;
+                HWND hWndBkgAdjust = GetDlgItem(hWnd, IDC_BKGADJUST_L);
+                signed short iOldVal = 0;
+                win32_t len = GetWindowText(hWndBkgAdjust, buf, LONG_MAX_PATH);
+                if (len > 0 && _stscanf_s(buf, TEXT("%hd"), &iOldVal))
+                {
+                    signed short iNewVal = iOldVal - lpnmud->iDelta;
+                    if (iNewVal > 100) iNewVal -= 200; else if (iNewVal < -100) iNewVal += 200;
+                    _stprintf_s(buf, TEXT("%hd"), iNewVal);
+                    SetWindowText(hWndBkgAdjust, buf);
+                    SendMessage(GetDlgItem(hWnd, IDC_BKGADJUST_L_SLIDE), TBM_SETPOS, TRUE, static_cast<win32_t>(iNewVal));
+                }
+                return TRUE;
+            }
+            }
+            break;
             // OK or Apply button pressed
         case PSN_APPLY:
         {
             // Get a copy of the config to overwrite the settings
             Config& config = Config::GetConfig();
-            VisualSettings cVisual = config.GetVisualSettings();
+            VisualSettings& cVisual = const_cast<VisualSettings&>(config.GetVisualSettings());
 
             // VisualSettings struct
             cVisual.eKeysShown = (IsDlgButtonChecked(hWnd, IDC_SHOWALLKEYS) ? cVisual.All :
@@ -241,21 +338,16 @@ INT_PTR WINAPI VisualProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             cVisual.iFirstKey = (key_t)SendMessage(GetDlgItem(hWnd, IDC_FIRSTKEY), CB_GETCURSEL, 0, 0);
             cVisual.iLastKey = (key_t)SendMessage(GetDlgItem(hWnd, IDC_LASTKEY), CB_GETCURSEL, 0, 0);
             cVisual.bRandomizeColor = IsDlgButtonChecked(hWnd, IDC_RANDOMIZE);
-            for (chan_t i = 0; i < IDC_COLOR16 - IDC_COLOR1 + 1; i++)
-                cVisual.colors[i] = (color_t)GetWindowLongPtr(GetDlgItem(hWnd, IDC_COLOR1 + i), GWLP_USERDATA) & 0x00FFFFFF | (cVisual.colors[i] & 0xFF000000);
-            cVisual.iBkgColor = (color_t)GetWindowLongPtr(GetDlgItem(hWnd, IDC_BKGCOLOR), GWLP_USERDATA) & 0x00FFFFFF | (cVisual.iBkgColor & 0xFF000000);
-            cVisual.iBarColor = (color_t)GetWindowLongPtr(GetDlgItem(hWnd, IDC_BARCOLOR), GWLP_USERDATA) & 0x00FFFFFF | (cVisual.iBarColor & 0xFF000000);
+            for (chan_t Item = 0; Item < MaxChannelColors + 2; Item++) cVisual.TrackColors[Item] = (color_t)GetWindowLongPtr(GetDlgItem(hWnd, IDC_COLOR1 + Item), GWLP_USERDATA);
             wchar_t background[LONG_MAX_PATH]{};
             GetWindowTextW(GetDlgItem(hWnd, IDC_BACKGROUND), background, LONG_MAX_PATH);
             cVisual.sBackground = background;
 
-            // Report success and return
-            config.SetVisualSettings(cVisual);
-            SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_NOERROR);
-
             // Save settings
             config.SaveConfigValues();
-            if (PointersInitialized) *Ptr_to_m_bUpdateNotePos = true; //Update Note Pos! 
+            if (PointersInitialized) *Ptr_to_m_bUpdateNotePos = true; //Update Note Pos!
+            // Report success
+            SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_NOERROR);
             return TRUE;
         }
         }
@@ -302,7 +394,7 @@ INT_PTR WINAPI AudioProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         {
             // Get a copy of the config to overwrite the settings
             Config& config = Config::GetConfig();
-            AudioSettings cAudio = config.GetAudioSettings();
+            AudioSettings& cAudio = const_cast<AudioSettings&>(config.GetAudioSettings());
 
             // Get the values
             cAudio.iOutDevice = (win32_t)SendDlgItemMessage(hWnd, IDC_MIDIOUT, LB_GETCURSEL, 0, 0);
@@ -324,14 +416,11 @@ INT_PTR WINAPI AudioProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             if (bChanged)
                 HandOffMsg(WM_DEVICECHANGE, 0, 0);
 
-            // Report success and return
-            config.SetAudioSettings(cAudio);
-            SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_NOERROR);
-
             // Save settings
             config.SaveConfigValues();
-
-            if (PointersInitialized) *Ptr_to_m_bUpdateNotePos = true; //Update Note Pos! 
+            if (PointersInitialized) *Ptr_to_m_bUpdateNotePos = true; //Update Note Pos!
+            // Report success
+            SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_NOERROR);
             return TRUE;
         }
         }
@@ -355,13 +444,13 @@ INT_PTR WINAPI VideoProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         CheckDlgButton(hWnd, IDC_SAMEWIDTH, cVideo.bSameWidth);
         CheckDlgButton(hWnd, IDC_MAPVEL, cVideo.bMapVel);
         CheckDlgButton(hWnd, IDC_MARKERS, cVideo.bShowMarkers);
-        SendMessageW(GetDlgItem(hWnd, IDC_MARKERENC), CB_RESETCONTENT, NULL, NULL);
+        SendMessageW(GetDlgItem(hWnd, IDC_CODEPAGE), CB_RESETCONTENT, NULL, NULL);
         struct CPEnumContext {
             HWND Combo;
             UINT SavedCP;
         };
         static thread_local CPEnumContext EnumContext = {};
-        EnumContext = { GetDlgItem(hWnd, IDC_MARKERENC), static_cast<UINT>(cVideo.eTextEncoding) };
+        EnumContext = { GetDlgItem(hWnd, IDC_CODEPAGE), static_cast<UINT>(cVideo.eTextEncoding) };
         EnumSystemCodePages([](LPWSTR CPtxt) -> BOOL {
             const CPEnumContext Context = EnumContext;
             WORD CP = static_cast<WORD>(wcstoul(CPtxt, NULL, 10));
@@ -396,28 +485,25 @@ INT_PTR WINAPI VideoProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         {
             // Get a copy of the config to overwrite the settings
             Config& config = Config::GetConfig();
-            VideoSettings cVideo = config.GetVideoSettings();
+            VideoSettings& cVideo = const_cast<VideoSettings&>(config.GetVideoSettings());
             cVideo.bTickBased = IsDlgButtonChecked(hWnd, IDC_TICKBASED);
             cVideo.bVisualizePitchBends = IsDlgButtonChecked(hWnd, IDC_PITCHBENDS);
             cVideo.bSameWidth = IsDlgButtonChecked(hWnd, IDC_SAMEWIDTH);
             cVideo.bMapVel = IsDlgButtonChecked(hWnd, IDC_MAPVEL);
             cVideo.bShowMarkers = IsDlgButtonChecked(hWnd, IDC_MARKERS);
-            const LRESULT ItemLocation = SendMessage(GetDlgItem(hWnd, IDC_MARKERENC), CB_GETCURSEL, NULL, NULL);
-            const LRESULT CP = SendMessageW(GetDlgItem(hWnd, IDC_MARKERENC), CB_GETITEMDATA, static_cast<WPARAM>(ItemLocation), NULL);
+            const LRESULT ItemLocation = SendMessage(GetDlgItem(hWnd, IDC_CODEPAGE), CB_GETCURSEL, NULL, NULL);
+            const LRESULT CP = SendMessageW(GetDlgItem(hWnd, IDC_CODEPAGE), CB_GETITEMDATA, static_cast<WPARAM>(ItemLocation), NULL);
             cVideo.eTextEncoding = static_cast<WORD>(CP);
             cVideo.bLimitFPS = IsDlgButtonChecked(hWnd, IDC_LIMITFPS);
             cVideo.bDebug = IsDlgButtonChecked(hWnd, IDC_DEBUG);
             cVideo.bDisableStats = IsDlgButtonChecked(hWnd, IDC_DISABLEUI);
             cVideo.bOR = IsDlgButtonChecked(hWnd, IDC_OR);
 
-            // Report success and return
-            config.SetVideoSettings(cVideo);
-            SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_NOERROR);
-
             // Save settings
             config.SaveConfigValues();
-
-            if (PointersInitialized) *Ptr_to_m_bUpdateNotePos = true; //Update Note Pos! 
+            if (PointersInitialized) *Ptr_to_m_bUpdateNotePos = true; //Update Note Pos!
+            // Report success
+            SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_NOERROR);
             return TRUE;
         }
         }
@@ -438,9 +524,9 @@ INT_PTR WINAPI ControlProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
         // Edit boxes
         TCHAR buf[LONG_MAX_PATH];
-        _stprintf_s(buf, TEXT("%g"), cControl.dFwdBackSecs);
+        _stprintf_s(buf, TEXT("%lg"), cControl.dFwdBackSecs);
         SetDlgItemTextW(hWnd, IDC_LRARROWS, buf);
-        _stprintf_s(buf, TEXT("%g"), cControl.dSpeedUpPct);
+        _stprintf_s(buf, TEXT("%lg"), cControl.dSpeedUpPct);
         SetDlgItemTextW(hWnd, IDC_UDARROWS, buf);
         CheckDlgButton(hWnd, IDC_SHOWCONTROLS, cControl.bAlwaysShowControls);
         CheckDlgButton(hWnd, IDC_PHIGROS, cControl.bPhigros);
@@ -497,7 +583,7 @@ INT_PTR WINAPI ControlProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 if (len > 0 && _stscanf_s(buf, TEXT("%lf"), &dOldVal))
                 {
                     double dNewVal = dOldVal - lpnmud->iDelta * .1;
-                    _stprintf_s(buf, TEXT("%g"), dNewVal);
+                    _stprintf_s(buf, TEXT("%lg"), dNewVal);
                     SetWindowText(hWndFwdBack, buf);
                 }
                 return TRUE;
@@ -512,7 +598,7 @@ INT_PTR WINAPI ControlProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 if (len > 0 && _stscanf_s(buf, TEXT("%lf"), &dOldVal))
                 {
                     double dNewVal = dOldVal - lpnmud->iDelta;
-                    _stprintf_s(buf, TEXT("%g"), dNewVal);
+                    _stprintf_s(buf, TEXT("%lg"), dNewVal);
                     SetWindowText(hWndSpeedPct, buf);
                 }
                 return TRUE;
@@ -539,7 +625,7 @@ INT_PTR WINAPI ControlProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         {
             // Get a copy of the config to overwrite the settings
             Config& config = Config::GetConfig();
-            ControlSettings cControl = config.GetControlSettings();
+            ControlSettings& cControl = const_cast<ControlSettings&>(config.GetControlSettings());
 
             // Edit boxes
             TCHAR buf[LONG_MAX_PATH];
@@ -589,14 +675,11 @@ INT_PTR WINAPI ControlProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
             cControl.bDumpFrames = IsDlgButtonChecked(hWnd, IDC_FFMPEG);
 
-            // Report success and return
-            config.SetControlSettings(cControl);
-            SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_NOERROR);
-
             // Save settings
             config.SaveConfigValues();
-
-            if (PointersInitialized) *Ptr_to_m_bUpdateNotePos = true; //Update Note Pos! 
+            if (PointersInitialized) *Ptr_to_m_bUpdateNotePos = true; //Update Note Pos!
+            // Report success
+            SetWindowLongPtr(hWnd, DWLP_MSGRESULT, PSNRET_NOERROR);
             return TRUE;
         }
         }
@@ -618,9 +701,9 @@ INT_PTR WINAPI ExportProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
         // Edit boxes
         TCHAR buf[LONG_MAX_PATH];
-        _stprintf_s(buf, TEXT("%g"), cControl.dFwdBackSecs);
+        _stprintf_s(buf, TEXT("%lg"), cControl.dFwdBackSecs);
         SetDlgItemTextW(hWnd, IDC_LRARROWS, buf);
-        _stprintf_s(buf, TEXT("%g"), cControl.dSpeedUpPct);
+        _stprintf_s(buf, TEXT("%lg"), cControl.dSpeedUpPct);
         SetDlgItemTextW(hWnd, IDC_UDARROWS, buf);
         CheckDlgButton(hWnd, IDC_SHOWCONTROLS, cControl.bAlwaysShowControls);
         CheckDlgButton(hWnd, IDC_PHIGROS, cControl.bPhigros);
@@ -677,7 +760,7 @@ INT_PTR WINAPI ExportProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 if (len > 0 && _stscanf_s(buf, TEXT("%lf"), &dOldVal))
                 {
                     double dNewVal = dOldVal - lpnmud->iDelta * .1;
-                    _stprintf_s(buf, TEXT("%g"), dNewVal);
+                    _stprintf_s(buf, TEXT("%lg"), dNewVal);
                     SetWindowText(hWndFwdBack, buf);
                 }
                 return TRUE;
@@ -692,7 +775,7 @@ INT_PTR WINAPI ExportProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 if (len > 0 && _stscanf_s(buf, TEXT("%lf"), &dOldVal))
                 {
                     double dNewVal = dOldVal - lpnmud->iDelta;
-                    _stprintf_s(buf, TEXT("%g"), dNewVal);
+                    _stprintf_s(buf, TEXT("%lg"), dNewVal);
                     SetWindowText(hWndSpeedPct, buf);
                 }
                 return TRUE;
@@ -819,7 +902,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         SetWindowText(GetDlgItem(hWnd, IDC_FILE), mInfo.sFilename.c_str() + mInfo.sFilename.find_last_of(L'\\') + 1);
         SetWindowText(GetDlgItem(hWnd, IDC_FOLDER), mInfo.sFilename.substr(0, mInfo.sFilename.find_last_of(L'\\')).c_str());
         wstring Formatted = to_wstring(mInfo.iNoteCount);
-        for (signed short i = Formatted.length() - DigitSeparate; i > 0; i -= DigitSeparate) Formatted.insert(i, L",");
+        for (signed short Item = Formatted.length() - DigitSeparate; Item > 0; Item -= DigitSeparate) Formatted.insert(Item, L",");
         _stprintf_s(buf, TEXT("%s"), Formatted.c_str());
         SetWindowText(GetDlgItem(hWnd, IDC_NOTES), buf);
         mms_t tmin = abs(mInfo.llTotalMicroSecs) / 60000000;
@@ -832,14 +915,14 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         vMuted.resize(mInfo.iNumChannels);
         vHidden.resize(mInfo.iNumChannels);
         vColors.resize(mInfo.iNumChannels);
-        for (TnC_t i = 0; i < mInfo.iNumChannels; i++)
+        for (TnC_t Item = 0; Item < mInfo.iNumChannels; Item++)
         {
-            vMuted[i] = vHidden[i] = false;
+            vMuted[Item] = vHidden[Item] = false;
             if (cVisual.bRandomizeColor) {
-                vColors[i] = Util::RandColor() & 0x00FFFFFF | (cVisual.colors[i % 16] & 0xFF000000);
+                vColors[Item] = Util::RandColor() & 0x00FFFFFF | (cVisual.TrackColors[Item % 16] & 0xFF000000);
             }
             else {
-                vColors[i] = cVisual.colors[i % 16];
+                vColors[Item] = cVisual.TrackColors[Item % 16];
             }
         }
 
@@ -854,25 +937,25 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
         LVCOLUMN lvc = {};
         lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT;
-        for (win32_t i = 0; i < static_cast<win32_t>(sizeof(aFmt) / sizeof(win32_t)); i++)
+        for (win32_t Item = 0; Item < static_cast<win32_t>(sizeof(aFmt) / sizeof(win32_t)); Item++)
         {
-            lvc.fmt = aFmt[i];
-            lvc.cx = aCx[i];
-            lvc.pszText = (TCHAR*)aText[i];
-            SendMessage(hWndTracks, LVM_INSERTCOLUMN, i, (LPARAM)&lvc);
-            clwth[i] = aCx[i];
-            PostMessage(hWndTracks, LVM_SETCOLUMNWIDTH, i, clwth[i]);
+            lvc.fmt = aFmt[Item];
+            lvc.cx = aCx[Item];
+            lvc.pszText = (TCHAR*)aText[Item];
+            SendMessage(hWndTracks, LVM_INSERTCOLUMN, Item, (LPARAM)&lvc);
+            clwth[Item] = aCx[Item];
+            PostMessage(hWndTracks, LVM_SETCOLUMNWIDTH, Item, clwth[Item]);
         }
 
         // Set rows of the list view
 #ifdef LIMIT_COLORS
         static bool IsEmpty[MaxTrackColors][16];
         memset(IsEmpty, true, sizeof(IsEmpty));
-        for (track_t i = 0; i < mInfo.iNumTracks; i++) {
-            const MIDITrack::MIDITrackInfo& info = vTracks[i]->GetInfo();
+        for (track_t Item = 0; Item < mInfo.iNumTracks; Item++) {
+            const MIDITrack::MIDITrackInfo& info = vTracks[Item]->GetInfo();
             for (chan_t j = 0; j < MaxChannelColors; j++) {
                 if (info.aNoteCount[j] > 0) {
-                    IsEmpty[i % MaxTrackColors][j] = false;
+                    IsEmpty[Item % MaxTrackColors][j] = false;
                 }
             }
         }
@@ -883,11 +966,11 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         lvi.pszText = buf;
 
         TnC_t iPos = 0;
-        for (track_t i = 0; i < min(mInfo.iNumTracks, MaxTrackColors); i++) {
-            const MIDITrack::MIDITrackInfo& mTrackInfo = vTracks[i]->GetInfo();
+        for (track_t Item = 0; Item < min(mInfo.iNumTracks, MaxTrackColors); Item++) {
+            const MIDITrack::MIDITrackInfo& mTrackInfo = vTracks[Item]->GetInfo();
             for (chan_t j = 0; j < MaxChannelColors; j++) {
 #ifdef LIMIT_COLORS
-                if (!IsEmpty[i][j]) {
+                if (!IsEmpty[Item][j]) {
 #else
                 if (mTrackInfo.aNoteCount[j] > 0) {
 #endif
@@ -911,7 +994,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
                     lvi.iSubItem++;
                     wstring Formatted = to_wstring(mTrackInfo.aNoteCount[j]);
-                    for (signed short i = Formatted.length() - DigitSeparate; i > 0; i -= DigitSeparate) Formatted.insert(i, L",");
+                    for (signed short Item = Formatted.length() - DigitSeparate; Item > 0; Item -= DigitSeparate) Formatted.insert(Item, L",");
                     _stprintf_s(buf, TEXT("%s"), Formatted.c_str());
                     SendMessage(hWndTracks, LVM_SETITEM, 0, (LPARAM)&lvi);
 
@@ -926,17 +1009,6 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
         RECT rcItem = { LVIR_BOUNDS,LVIR_BOUNDS,LVIR_BOUNDS,LVIR_BOUNDS };
         SendMessage(hWndTracks, LVM_GETITEMRECT, 0, (LPARAM)&rcItem);
-
-        if (Config::GetConfig().GetControlSettings().bDumpFrames) {
-            SendMessage(GetDlgItem(hWnd, IDC_NOLAG), BM_SETCHECK, BST_CHECKED, 0);
-            EnableWindow(GetDlgItem(hWnd, IDC_NOLAG), FALSE);
-        }
-        else {
-            SendMessage(GetDlgItem(hWnd, IDC_NOLAG), BM_SETCHECK, BST_UNCHECKED, 0);
-            EnableWindow(GetDlgItem(hWnd, IDC_NOLAG), TRUE);
-        }
-        SendMessage(GetDlgItem(hWnd, IDC_PIANO), BM_SETCHECK, BST_UNCHECKED, 0);
-        EnableWindow(GetDlgItem(hWnd, IDC_PIANO), TRUE);
 
         return TRUE;
         }
@@ -979,22 +1051,22 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 switch (lpnmlv->iSubItem)
                 {
                 case 4:
-                    for (idx_t i = 0; i < static_cast<idx_t>(vMuted.size()); i++) bAllChecked &= vMuted[i];
-                    for (idx_t i = 0; i < static_cast<idx_t>(vMuted.size()); i++) vMuted[i] = !bAllChecked;
+                    for (idx_t Item = 0; Item < static_cast<idx_t>(vMuted.size()); Item++) bAllChecked &= vMuted[Item];
+                    for (idx_t Item = 0; Item < static_cast<idx_t>(vMuted.size()); Item++) vMuted[Item] = !bAllChecked;
                     InvalidateRect(lpnmlv->hdr.hwndFrom, NULL, FALSE);
                     return TRUE;
                 case 5:
-                    for (idx_t i = 0; i < static_cast<idx_t>(vHidden.size()); i++) bAllChecked &= vHidden[i];
-                    for (idx_t i = 0; i < static_cast<idx_t>(vHidden.size()); i++) vHidden[i] = !bAllChecked;
+                    for (idx_t Item = 0; Item < static_cast<idx_t>(vHidden.size()); Item++) bAllChecked &= vHidden[Item];
+                    for (idx_t Item = 0; Item < static_cast<idx_t>(vHidden.size()); Item++) vHidden[Item] = !bAllChecked;
                     InvalidateRect(lpnmlv->hdr.hwndFrom, NULL, FALSE);
                     return TRUE;
                 case 6:
-                    for (idx_t i = 0; i < static_cast<idx_t>(vColors.size()); i++)
+                    for (idx_t Item = 0; Item < static_cast<idx_t>(vColors.size()); Item++)
                         if (cVisual.bRandomizeColor) {
-                            vColors[i] = Util::RandColor() & 0x00FFFFFF | (cVisual.colors[i % 16] & 0xFF000000);
+                            vColors[Item] = Util::RandColor() & 0x00FFFFFF | (cVisual.TrackColors[Item % 16] & 0xFF000000);
                         }
                         else {
-                            vColors[i] = cVisual.colors[i % 16];
+                            vColors[Item] = cVisual.TrackColors[Item % 16];
                         }
                     InvalidateRect(lpnmlv->hdr.hwndFrom, NULL, FALSE);
                     return TRUE;
@@ -1025,8 +1097,10 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                     return TRUE;
                 case 6:
                 {
-                    static COLORREF acrCustClr[16] = { 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF,
-                                                       0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF };
+                    COLORREF acrCustClr[16];
+                    const VisualSettings& cVisual = Config::GetConfig().GetVisualSettings();
+                    for (chan_t Ch = 0; Ch < MaxChannelColors; Ch++) acrCustClr[Ch] = cVisual.TrackColors[Ch] & 0x00FFFFFF;
+                    // Choose color
                     CHOOSECOLOR cc = {};
                     cc.lStructSize = sizeof(cc);
                     cc.hwndOwner = hWnd;
@@ -1034,6 +1108,7 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                     cc.rgbResult = vColors[lvhti.iItem];
                     cc.Flags = CC_FULLOPEN | CC_RGBINIT;
                     if (!ChooseColor(&cc)) return TRUE;
+                    // Draw the button (indirect)
                     vColors[lvhti.iItem] = cc.rgbResult & 0x00FFFFFF | (vColors[lvhti.iItem] & 0xFF000000);
                     InvalidateRect(lpnmia->hdr.hwndFrom, &rcItem, FALSE);
                     return TRUE;
@@ -1103,9 +1178,6 @@ INT_PTR WINAPI TracksProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         {
             MainScreen* pGameState = (MainScreen*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
             pGameState->SetChannelSettings(vMuted, vHidden, vColors);
-
-            Config::GetConfig().m_bManualTimer = IsDlgButtonChecked(hWnd, IDC_NOLAG);
-            Config::GetConfig().m_bPianoOverride = IsDlgButtonChecked(hWnd, IDC_PIANO);
         }
         case IDCANCEL:
             EndDialog(hWnd, iId);

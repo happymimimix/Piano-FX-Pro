@@ -44,8 +44,7 @@ struct VisualSettings : public ISettings
 
     enum KeysShown : uint8_t { All, Song, Custom } eKeysShown;
     key_t iFirstKey, iLastKey;
-    color_t colors[16], iBkgColor;
-    color_t iBarColor;
+    color_t TrackColors[16], iBkgColor, iBarColor;
     bool bRandomizeColor;
     wstring sBackground;
     color_t iBackgroundHSL;

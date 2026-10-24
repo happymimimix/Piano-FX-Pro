@@ -59,6 +59,7 @@ INT_PTR CALLBACK SetResolutionProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM) {
             RECT adjusted = { 0, 0, width, height };
             AdjustWindowRectEx(&adjusted, GetWindowLongW(g_hWnd, GWL_STYLE), TRUE, GetWindowLongW(g_hWnd, GWL_EXSTYLE));
             SetWindowPos(g_hWnd, NULL, 0, 0, adjusted.right - adjusted.left, adjusted.bottom - adjusted.top, SWP_NOMOVE);
+            Config::GetConfig().SaveConfigValues();
         }
         case IDCANCEL:
         {
@@ -82,9 +83,10 @@ INT_PTR CALLBACK SetResolutionProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM) {
 //-----------------------------------------------------------------------------
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    static PlaybackSettings& cPlayback = Config::GetConfig().GetPlaybackSettings();
-    static ViewSettings& cView = Config::GetConfig().GetViewSettings();
-    static const ControlSettings& cControl = Config::GetConfig().GetControlSettings();
+    static Config& config = Config::GetConfig();
+    static PlaybackSettings& cPlayback = config.GetPlaybackSettings();
+    static ViewSettings& cView = config.GetViewSettings();
+    static const ControlSettings& cControl = config.GetControlSettings();
     static bool bInSizeMove = false;
 
     switch (msg)
@@ -166,39 +168,51 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             return 0;
         case ID_PLAY_INCREASERATE:
             cPlayback.SetSpeed(cPlayback.GetSpeed() * (1.0 + cControl.dSpeedUpPct / 100.0), true);
+            config.SaveConfigValues();
             return 0;
         case ID_PLAY_DECREASERATE:
             cPlayback.SetSpeed(cPlayback.GetSpeed() / (1.0 + cControl.dSpeedUpPct / 100.0), true);
+            config.SaveConfigValues();
             return 0;
         case ID_PLAY_RESETRATE:
             cPlayback.SetSpeed(1.0, true);
+            config.SaveConfigValues();
             return 0;
         case ID_PLAY_NFASTER:
             cPlayback.SetNSpeed(cPlayback.GetNSpeed() / (1.0 + cControl.dSpeedUpPct / 100.0), true);
+            config.SaveConfigValues();
             return 0;
         case ID_PLAY_NSLOWER:
             cPlayback.SetNSpeed(cPlayback.GetNSpeed() * (1.0 + cControl.dSpeedUpPct / 100.0), true);
+            config.SaveConfigValues();
             return 0;
         case ID_PLAY_NRESET:
             cPlayback.SetNSpeed(0.25, true);
+            config.SaveConfigValues();
             return 0;
         case ID_PLAY_VOLUMEUP:
             cPlayback.SetVolume(min(cPlayback.GetVolume() + 0.1, 1.0), true);
+            config.SaveConfigValues();
             return 0;
         case ID_PLAY_VOLUMEDOWN:
             cPlayback.SetVolume(max(cPlayback.GetVolume() - 0.1, 0.0), true);
+            config.SaveConfigValues();
             return 0;
         case ID_PLAY_MUTE:
             cPlayback.ToggleMute(true);
+            config.SaveConfigValues();
             return 0;
         case ID_VIEW_CONTROLS:
             cView.ToggleControls(true);
+            config.SaveConfigValues();
             return 0;
         case ID_VIEW_KEYBOARD:
             cView.ToggleKeyboard(true);
+            config.SaveConfigValues();
             return 0;
         case ID_VIEW_ALWAYSONTOP:
             cView.ToggleOnTop(true);
+            config.SaveConfigValues();
             return 0;
         case ID_VIEW_FULLSCREEN:
             cView.ToggleFullScreen(true);
@@ -460,7 +474,8 @@ VOID CopyMenuState(HMENU hMenuSrc, HMENU hMenuDest)
 // Override of the toolbar proc to draw transparent controls
 LRESULT WINAPI BarProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    static PlaybackSettings& cPlayback = Config::GetConfig().GetPlaybackSettings();
+    static Config& config = Config::GetConfig();
+    static PlaybackSettings& cPlayback = config.GetPlaybackSettings();
 
     switch (msg)
     {
@@ -485,12 +500,15 @@ LRESULT WINAPI BarProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             {
             case IDC_VOLUME:
                 cPlayback.SetVolume(iPos / 100.0f, false);
+                config.SaveConfigValues();
                 return 0;
             case IDC_SPEED:
                 cPlayback.SetSpeed(iPos / 100.0f, false);
+                config.SaveConfigValues();
                 return 0;
             case IDC_NSPEED:
                 cPlayback.SetNSpeed((200.0f - iPos) / 100.0f, false);
+                config.SaveConfigValues();
                 return 0;
             }
         }

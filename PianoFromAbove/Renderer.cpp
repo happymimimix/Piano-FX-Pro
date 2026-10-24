@@ -395,7 +395,8 @@ HRESULT Renderer11::ClearAndBeginScene(DWORD color) {
 
     // Send a clear render target command
     float float_color[4] = { (float)((color >> 16) & 0xFF) / 255.0f, (float)((color >> 8) & 0xFF) / 255.0f, (float)(color & 0xFF) / 255.0f, 1.0f };
-    if (!Config::GetConfig().GetVideoSettings().bSameWidth || Config::GetConfig().GetVideoSettings().bOR) {
+    const VideoSettings& cVideo = Config::GetConfig().GetVideoSettings();
+    if (!cVideo.bSameWidth || cVideo.bOR) {
         m_pContext->ClearDepthStencilView(m_pDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
     }
     m_pContext->ClearRenderTargetView(m_pRenderTargetView.Get(), float_color);
@@ -404,8 +405,7 @@ HRESULT Renderer11::ClearAndBeginScene(DWORD color) {
 }
 
 __forceinline void Renderer11::AutoSetNotePipeline(bool inloop) {
-    static Config& config = Config::GetConfig();
-    static const VideoSettings& cVideo = config.GetVideoSettings();
+    const VideoSettings& cVideo = Config::GetConfig().GetVideoSettings();
     if (cVideo.bSameWidth) {
         if (cVideo.bOR) {
             SetPipeline(Pipeline::SameWidthNoteOR);

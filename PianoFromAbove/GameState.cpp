@@ -254,7 +254,7 @@ void SplashScreen::InitState() {
     m_llStartTime = m_MIDI.GetInfo().llFirstNote - 1000000;
     m_bMute = cPlayback.GetMute();
 
-    SetChannelSettings(vector<bool>(), vector<bool>(), vector<color_t>(cVisual.colors, cVisual.colors + sizeof(cVisual.colors) / sizeof(cVisual.colors[0])));
+    SetChannelSettings(vector<bool>(), vector<bool>(), vector<color_t>(cVisual.TrackColors, cVisual.TrackColors + sizeof(cVisual.TrackColors) / sizeof(cVisual.TrackColors[0])));
 
     m_bUpdateNotePos = true;
 }
@@ -863,6 +863,7 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
                 m_fTempOffsetY = 0.0f;
                 m_fTempZoomX = 1.0f;
                 cView.SetZoomMove(false);
+                config.SaveConfigValues();
                 return Success;
             }
             else
@@ -880,6 +881,7 @@ GameState::GameError MainScreen::MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
             m_fTempOffsetY = 0.0f;
             m_fTempZoomX = 1.0f;
             m_bUpdateNotePos = true;
+            config.SaveConfigValues();
             return Success;
         }
         break;
@@ -1955,9 +1957,6 @@ void MainScreen::RenderGlobals() {
 }
 
 void MainScreen::RenderLines() {
-    if (m_bBackgroundLoaded)
-        return;
-
     // Vertical lines
     for (key_t i = m_iStartNote + 1; i <= m_iEndNote; i++)
         if (!MIDI::IsSharp(i - 1) && !MIDI::IsSharp(i))
@@ -2583,10 +2582,10 @@ void MainScreen::RenderStatus(LPRECT prcStatus) {
         }
     }
     if (cVideo.bDebug) {
-        RenderStatusLine(cur_line++, StatisticsText18, L"%lf", cPlayback.GetNSpeed());
-        RenderStatusLine(cur_line++, StatisticsText19, L"%f", cView.GetOffsetX() + m_fTempOffsetX);
-        RenderStatusLine(cur_line++, StatisticsText20, L"%f", cView.GetOffsetY() + m_fTempOffsetY);
-        RenderStatusLine(cur_line++, StatisticsText21, L"%f", cView.GetZoomX() * m_fTempZoomX);
+        RenderStatusLine(cur_line++, StatisticsText18, L"%lg", cPlayback.GetNSpeed());
+        RenderStatusLine(cur_line++, StatisticsText19, L"%g", cView.GetOffsetX() + m_fTempOffsetX);
+        RenderStatusLine(cur_line++, StatisticsText20, L"%g", cView.GetOffsetY() + m_fTempOffsetY);
+        RenderStatusLine(cur_line++, StatisticsText21, L"%g", cView.GetZoomX() * m_fTempZoomX);
         RenderStatusLine(cur_line++, StatisticsText22, L"%d*%d", m_iScreenWidth, m_iScreenHeight);
         RenderStatusLine(cur_line++, StatisticsText23, L"%hhu~%hhu", m_bFlipKeyboard ? m_iEndNote : m_iStartNote, m_bFlipKeyboard ? m_iStartNote : m_iEndNote);
         RenderStatusLine(cur_line++, StatisticsText24, L"%hhu", cControl.iVelocityThreshold);
