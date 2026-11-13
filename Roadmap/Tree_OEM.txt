@@ -1,6 +1,6 @@
 Folder PATH listing for volume Data
 Volume serial number is 9DB5-5629
-E:\PIANO-FX-PRO\ROADMAP
+E:\PFX\ROADMAP\CONTENTS
 „¥„Ÿ„Ÿ„ŸDirectX 11 backport
 „    „¥„Ÿ„Ÿ„ŸCore
 „    „    „¥„Ÿ„Ÿ„Ÿhlsl Shaders
@@ -802,16 +802,15 @@ E:\PIANO-FX-PRO\ROADMAP
 „        „    „¥„Ÿ„Ÿ„Ÿ[SPIN] Frame height (in ticks)
 „        „    „¤„Ÿ„Ÿ„Ÿ[SPIN] Max colors
 „        „¤„Ÿ„Ÿ„ŸVideo to image sequence (by invoking ffmpeg)
-„¥„Ÿ„Ÿ„ŸSource code level modding system
-„    „¥„Ÿ„Ÿ„ŸC++ AST Analyzation
-„    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „¥„Ÿ„Ÿ„ŸExample mods
-„    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „¥„Ÿ„Ÿ„ŸMod code injection pipeline
-„    „    „¥„Ÿ„Ÿ„ŸPost-build clean up
-„    „    „    „¤„Ÿ„Ÿ„ŸTODO
-„    „    „¤„Ÿ„Ÿ„ŸPre-build injection
-„    „        „¤„Ÿ„Ÿ„ŸTODO
-„    „¤„Ÿ„Ÿ„ŸModding API
-„        „¤„Ÿ„Ÿ„ŸTODO
-„¤„Ÿ„Ÿ„Ÿ__Scripts
+„¤„Ÿ„Ÿ„ŸSource code level modding system
+    „¥„Ÿ„Ÿ„ŸC++ AST Analyzation
+    „    „¤„Ÿ„Ÿ„ŸTODO
+    „¥„Ÿ„Ÿ„ŸExample mods
+    „    „¤„Ÿ„Ÿ„ŸTODO
+    „¥„Ÿ„Ÿ„ŸMod code injection pipeline
+    „    „¥„Ÿ„Ÿ„ŸPost-build clean up
+    „    „    „¤„Ÿ„Ÿ„ŸTODO
+    „    „¤„Ÿ„Ÿ„ŸPre-build injection
+    „        „¤„Ÿ„Ÿ„ŸTODO
+    „¤„Ÿ„Ÿ„ŸModding API
+        „¤„Ÿ„Ÿ„ŸTODO

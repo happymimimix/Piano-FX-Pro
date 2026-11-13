@@ -1,6 +1,6 @@
 ﻿Folder PATH listing for volume Data
 Volume serial number is 9DB5-5629
-E:\PIANO-FX-PRO\ROADMAP
+E:\PFX\ROADMAP\CONTENTS
 ├───DirectX 11 backport
 │   ├───Core
 │   │   ├───hlsl Shaders
@@ -802,16 +802,15 @@ E:\PIANO-FX-PRO\ROADMAP
 │       │   ├───[SPIN] Frame height (in ticks)
 │       │   └───[SPIN] Max colors
 │       └───Video to image sequence (by invoking ffmpeg)
-├───Source code level modding system
-│   ├───C++ AST Analyzation
-│   │   └───TODO
-│   ├───Example mods
-│   │   └───TODO
-│   ├───Mod code injection pipeline
-│   │   ├───Post-build clean up
-│   │   │   └───TODO
-│   │   └───Pre-build injection
-│   │       └───TODO
-│   └───Modding API
-│       └───TODO
-└───__Scripts
+└───Source code level modding system
+    ├───C++ AST Analyzation
+    │   └───TODO
+    ├───Example mods
+    │   └───TODO
+    ├───Mod code injection pipeline
+    │   ├───Post-build clean up
+    │   │   └───TODO
+    │   └───Pre-build injection
+    │       └───TODO
+    └───Modding API
+        └───TODO
