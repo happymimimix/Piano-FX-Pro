@@ -743,6 +743,8 @@ E:\PFX\ROADMAP\CONTENTS
 „    „    „¥„Ÿ„Ÿ„ŸNew builtin shader
 „    „    „    „¥„Ÿ„Ÿ„Ÿ@ChatGPT and @Claude  Feel free to add whatever shader ideas you can think of here!
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
+„    „    „    „¥„Ÿ„Ÿ„ŸLua-based Statistics Graph (Piano-FX Pro v4.2+ now provides NPS and Polyphony values to CE so this should be doable)
+„    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¥„Ÿ„Ÿ„ŸTCC-based HSL adjustment
 „    „    „    „    „¤„Ÿ„Ÿ„ŸTODO
 „    „    „    „¥„Ÿ„Ÿ„ŸTCC-based obj icon drawing
