@@ -1589,16 +1589,13 @@ void MainScreen::JumpTo(mms_t llStartTime, bool loadingMode) {
 }
 
 void MainScreen::ApplyColor(MIDIMetaEvent * event) {
-    const auto size = event->GetDataLen();
     const auto data = event->GetData();
-    if (event->GetMetaEventType() == MIDIMetaEvent::ArduanoKivaCompatibleColorEvent &&
-        (size == 8 || size == 12) &&
-        data[0] == 0x00 && data[1] == 0x0F &&
-        (data[2] < 16 || data[2] == 0x7F) &&
-        data[3] == 0) {
-        unsigned color = ((0xFF - data[7]) << 24) | (data[6] << 16) | (data[5] << 8) | data[4];
+    if ((event->GetMetaEventType() == MIDIMetaEvent::ColorEvent || event->GetMetaEventType() == MIDIMetaEvent::Proprietary) &&
+        event->GetDataLen() >= 8 && data[0] == 0x00 && data[1] == 0x0F &&
+        (data[2] <= 0x0F || data[2] == 0x7F) && data[3] == 0x00) {
+        color_t color = ((0xFF - data[7]) << 24) | (data[6] << 16) | (data[5] << 8) | data[4];
         if (data[2] == 0x7F) {
-            //all channels
+            // All channels
             for (chan_t i = 0; i < MaxChannelColors; i++) {
                 auto& chan_settings = m_vTrackSettings[event->GetTrack() % MaxTrackColors].aChannels[i];
                 chan_settings.SetColor(color);
@@ -1611,6 +1608,18 @@ void MainScreen::ApplyColor(MIDIMetaEvent * event) {
             chan_settings.bHidden = data[7] == 0;
         }
         m_bUpdateTrackColor = true;
+    }
+}
+
+void MainScreen::ApplyCamera(MIDIMetaEvent * event) {
+    const auto data = event->GetData();
+    if ((event->GetMetaEventType() == MIDIMetaEvent::CameraEvent || event->GetMetaEventType() == MIDIMetaEvent::Proprietary) &&
+        event->GetDataLen() >= 8 && data[0] == 0x00 && data[1] == 0xF0) {
+        winword_t command = (data[2] << 8) | data[3];
+        win32_t parameter = (data[7] << 24) | (data[6] << 16) | (data[5] << 8) | data[4];
+        switch (command) {
+
+        }
     }
 }
 

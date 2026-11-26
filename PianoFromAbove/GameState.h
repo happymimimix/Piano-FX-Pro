@@ -361,6 +361,7 @@ private:
     void UpdateReversedState(idx_t idx, idx_t sister_idx);
     void JumpTo(mms_t llStartTime, bool loadingMode = false);
     void ApplyMarker(unsigned char* data, msgln_t size);
+    void ApplyCamera(MIDIMetaEvent* event);
     void ApplyColor(MIDIMetaEvent* event);
     void ApplyCurrentTempo();
     void ApplyCurrentSignature();

@@ -185,7 +185,7 @@ idx_t MIDIPos::GetNextEvent(mms_t iMicroSecs, MIDIEvent** pOutEvent)
             MIDIMetaEvent* pMetaEvent = reinterpret_cast<MIDIMetaEvent*>(pMinEvent);
             if (pMetaEvent->GetMetaEventType() == MIDIMetaEvent::SetTempo && pMetaEvent->GetDataLen() == 3) {
                 MIDI::Parse24Bit(pMetaEvent->GetData(), 3, (uint32_t*)&m_iMicroSecsPerBeat);
-                m_iMicroSecsPerBeat |= !m_iMicroSecsPerBeat;// Clamp to > 0
+                m_iMicroSecsPerBeat |= !m_iMicroSecsPerBeat; // Clamp to > 0
             }
         }
 
@@ -852,7 +852,7 @@ void MIDI::MIDIInfo::AddTrackInfo(const MIDITrack& mTrack)
 
 // Sets absolute time variables. A lot of code for not much happening...
 // Has to be EXACT. Even a little drift and things start messing up a few minutes in (metronome, etc)
-bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMetaEvent*>* vMetaEvents, vector<idx_t>* vTempo, vector<idx_t>* vSignature, vector<idx_t>* vMarkers, vector<idx_t>* vReplay, vector<idx_t>* vColors, vector<MIDISysExEvent*>* vSysExEvents)
+bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMetaEvent*>* vMetaEvents, vector<idx_t>* vTempo, vector<idx_t>* vSignature, vector<idx_t>* vMarkers, vector<idx_t>* vReplay, vector<idx_t>* vColors, vector<idx_t>* vCameras, vector<MIDISysExEvent*>* vSysExEvents)
 {
     // Iterator like class
     MIDIPos midiPos(*this);
@@ -945,8 +945,15 @@ bool MIDI::PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMet
                 case MIDIMetaEvent::Marker:
                     if (vMarkers) vMarkers->push_back(static_cast<idx_t>(vMetaEvents->size() - 1));
                     break;
-                case MIDIMetaEvent::ArduanoKivaCompatibleColorEvent:
+                case MIDIMetaEvent::ColorEvent:
                     if (vColors) vColors->push_back(static_cast<idx_t>(vMetaEvents->size() - 1));
+                    break;
+                case MIDIMetaEvent::CameraEvent:
+                    if (vCameras) vCameras->push_back(static_cast<idx_t>(vMetaEvents->size() - 1));
+                    break;
+                case MIDIMetaEvent::Proprietary:
+                    if (vColors) vColors->push_back(static_cast<idx_t>(vMetaEvents->size() - 1));
+                    if (vCameras) vCameras->push_back(static_cast<idx_t>(vMetaEvents->size() - 1));
                     break;
                 default:
                     break;

@@ -168,7 +168,7 @@ public:
     bool IsValid() const { return (m_vTracks.size() > 0 && m_Info.iNoteCount > 0 && m_Info.iDivision > 0 && (m_Info.iFormatType == 0 || m_Info.iFormatType == 1 || m_Info.iFormatType == 768)); }
     bool SkipUnknownSMF3Chunk(unsigned char* Buffer, size_t* Offset, uint32_t* FeatureFlags);
 
-    bool PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMetaEvent*>* vMetaEvents = nullptr, vector<idx_t>* vTempo = nullptr, vector<idx_t>* vSignature = nullptr, vector<idx_t>* vMarkers = nullptr, vector<idx_t>* vReplay = nullptr, vector<idx_t>* vColors = nullptr, vector<MIDISysExEvent*>* vSysExEvents = nullptr);
+    bool PostProcess(vector<MIDIChannelEvent*>& vChannelEvents, vector<MIDIMetaEvent*>* vMetaEvents = nullptr, vector<idx_t>* vTempo = nullptr, vector<idx_t>* vSignature = nullptr, vector<idx_t>* vMarkers = nullptr, vector<idx_t>* vReplay = nullptr, vector<idx_t>* vColors = nullptr, vector<idx_t>* vCameras = nullptr, vector<MIDISysExEvent*>* vSysExEvents = nullptr);
     void ConnectNotes();
     void clear(void);
 
@@ -444,7 +444,7 @@ public:
     MIDIMetaEvent& operator=(const MIDIMetaEvent&) = delete;
     enum MetaEventType : msg_t {
         TextEvent = 0x01, Copyright, SequenceName, InstrumentName, Lyric, Marker, CuePoint, ProgramName, DeviceName,
-        ArduanoKivaCompatibleColorEvent, ChannelPrefix = 0x20, PortPrefix, EndOfTrack = 0x2F,
+        ColorEvent, CameraEvent, ChannelPrefix = 0x20, PortPrefix, EndOfTrack = 0x2F,
         SetTempo = 0x51, SMPTEOffset = 0x54, TimeSignature = 0x58, KeySignature, Proprietary = 0x7F
     };
     fileln_t ParseEvent(const unsigned char* pcData, fileln_t iMaxSize);
